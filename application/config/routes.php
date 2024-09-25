@@ -83,3 +83,5 @@ $route['cart'] = 'customer/shop/cart';
 $route['cart_api'] = 'customer/shop/cart_api';
 $route['checkout'] = 'customer/shop/checkout';
 $route['checkout_submit'] = 'customer/shop/checkout/order';
+$route['APIongkir'] = 'customer/APIongkir';
+$route['APIongkir/getdata_provinsi'] = 'customer/APIongkir/getdata_provinsi';

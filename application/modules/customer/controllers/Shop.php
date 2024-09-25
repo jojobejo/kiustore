@@ -24,6 +24,7 @@ class Shop extends CI_Controller
         //nonaktifkan ongkir otomatis
         // $ongkir = ($cart['total_cart'] >= get_settings('min_shop_to_free_shipping_cost')) ? 0 : get_settings('shipping_cost');
         $ongkir = 0;
+
         $cart['total_price'] = $cart['total_cart'] + $ongkir;
 
         $this->load->view('header');
@@ -114,7 +115,7 @@ class Shop extends CI_Controller
                     $items_multi[$item['product_type']][$item['id']]['satuan_qty'] = $item['satuan_qty'];
                     $items_multi[$item['product_type']][$item['id']]['price'] = $item['price'];
 
-                    $total_price_multi[$item['product_type']] +=  $item['price'];
+                    // $total_price_multi[$item['product_type']] +=  $item['price'];
                 }
 
                 $subtotal = $this->cart->total();

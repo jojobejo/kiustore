@@ -41,8 +41,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <textarea name="note" class="form-control" id="note"></textarea>
                         </div>
                         <!-- Edit Address<a class="btn btn-danger w-100" href="edit-profile.html">Edit Billing Information</a> -->
-
-
                     </div>
                 </div>
             </div>
@@ -85,12 +83,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <label for="karisma">PT. Karisma Indoagro Universal</label>
                                 <div class="check"></div>
                             </div>
-                            <!--  <div class="input-box col-6">
+                            <?php if (level_user() == '1') : ?>
+                                <div class="input-box col-6">
                                     <input id="jnt" name="shipping" type="radio" value="2">
                                     <label for="jnt">J&T Express (J&T)</label>
                                     <div class="check"></div>
                                 </div>
-                                 <div class="input-box col-6">
+                                <div class="input-box col-6">
                                     <input id="lion" name="shipping" type="radio" value="3">
                                     <label for="lion">Lion Parcel (LION)</label>
                                     <div class="check"></div>
@@ -124,7 +123,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                     <input id="anteraja" name="shipping" type="radio" value="9">
                                     <label for="anteraja">AnterAja (ANTERAJA)</label>
                                     <div class="check"></div>
-                                </div> -->
+                                </div>
+                            <?php else : ?>
+                            <?php endif; ?>
                         </div>
 
                     </div>

@@ -30,7 +30,7 @@ class Orders extends CI_Controller
             if ($dt->payment_method == 2 &&  $dt->order_status == 2) {
                 $orders['unpaid']++;
             }
-            if (($dt->payment_method == 2 &&  $dt->order_status == 1) || ($dt->payment_method == 2 &&  $dt->order_status == 3) || ($dt->payment_method == 1 &&  $dt->order_status == 1) || ($dt->payment_method == 1 &&  $dt->order_status == 3)) {
+            if (($dt->payment_method == 2 &&  $dt->order_status == 1) || ($dt->payment_method == 2 &&  $dt->order_status == 3) || ($dt->payment_method == 2 &&  $dt->order_status == 8) || ($dt->payment_method == 1 &&  $dt->order_status == 1) || ($dt->payment_method == 1 &&  $dt->order_status == 3)) {
                 $orders['process']++;
             }
             if (($dt->payment_method == 2 &&  $dt->order_status == 4) || ($dt->payment_method == 1 &&  $dt->order_status == 4)) {

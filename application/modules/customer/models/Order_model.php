@@ -393,8 +393,7 @@ class Order_model extends CI_Model
 
     public function order_data($id)
     {
-        $data = $this->db->query("
-        SELECT
+        $data = $this->db->query("SELECT
                 o.id AS order_id,
                 (
                   SELECT
@@ -425,7 +424,7 @@ class Order_model extends CI_Model
             LEFT JOIN payments p ON
                 p.order_id = o.id
             WHERE
-                o.id = '$id' AND p.id IN(
+                o.id = '$id' AND COALESCE(p.id,0) IN(
             SELECT
                 MAX(id)
             FROM
@@ -439,8 +438,7 @@ class Order_model extends CI_Model
 
     public function order_items($id)
     {
-        $items = $this->db->query("
-        SELECT
+        $items = $this->db->query("SELECT
               oi.product_id,
               (
               SELECT
