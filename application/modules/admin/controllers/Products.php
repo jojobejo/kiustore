@@ -145,6 +145,7 @@ class Products extends CI_Controller
         $this->form_validation->set_rules('stock', 'Stok barang', 'required|numeric');
         $this->form_validation->set_rules('product_unit_1', 'Satuan barang', 'required');
         $this->form_validation->set_rules('description', 'Deskripsi produk');
+        $this->form_validation->set_rules('weight_product', 'Berat Satuan Produk', 'required');
 
         if ($this->form_validation->run() == FALSE) {
             $this->add_new_product();
@@ -160,6 +161,7 @@ class Products extends CI_Controller
             $product_unit_2 = $this->input->post('product_unit_2');
             $product_unit_value = $this->input->post('product_unit_value');
             $product_type = $this->input->post('product_type');
+            $weight_product = $this->input->post('weight_product');
             $desc = $this->input->post('desc');
             $date = date('Y-m-d H:i:s');
 
@@ -197,6 +199,7 @@ class Products extends CI_Controller
             $product['product_unit_2'] = $product_unit_2;
             $product['product_unit_value'] = $product_unit_value;
             $product['product_type'] = $product_type;
+            $product['product_unit_weight'] = $weight_product;
             $product['picture_name'] = $file_name;
             $product['add_date'] = $date;
 
@@ -234,6 +237,7 @@ class Products extends CI_Controller
         $this->form_validation->set_rules('price', 'Harga produk', 'trim|required');
         $this->form_validation->set_rules('stock', 'Stok barang', 'required|numeric');
         $this->form_validation->set_rules('description', 'Deskripsi produk');
+        $this->form_validation->set_rules('weight_product', 'Berat Satuan Produk', 'required');
 
         if ($this->form_validation->run() == FALSE) {
             $id = $this->input->post('id');
@@ -254,6 +258,7 @@ class Products extends CI_Controller
             $product_unit_1 = $this->input->post('product_unit_1');
             $product_unit_2 = $this->input->post('product_unit_2');
             $product_unit_value = $this->input->post('product_unit_value');
+            $weight_product = $this->input->post('weight_product');
             $product_type = $this->input->post('product_type');
             $desc = $this->input->post('desc');
             $available = $this->input->post('is_available');
@@ -306,6 +311,7 @@ class Products extends CI_Controller
             $product['product_unit_1'] = $product_unit_1;
             $product['product_unit_2'] = $product_unit_2;
             $product['product_unit_value'] = $product_unit_value;
+            $product['product_unit_weight'] = $weight_product;
             $product['product_type'] = $product_type;
             $product['picture_name'] = $file_name;
             $product['is_available'] = $available;

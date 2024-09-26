@@ -112,7 +112,7 @@ class Customer_model extends CI_Model
     public function customer_data($id)
     {
         $customer = $this->db->query("
-        SELECT c.user_id as id, c.max_credit, c.profile_picture, c.name, u.email, c.phone_number, c.shop_name, c.shop_address, c.address, c.salesman_id, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level
+        SELECT c.user_id as id, c.max_credit, c.profile_picture, c.name, u.email, c.phone_number, c.shop_name, c.shop_address, c.address, c.salesman_id, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level , c.kota_id
         FROM customers c
         JOIN users u
             ON u.id = c.user_id

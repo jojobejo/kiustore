@@ -78,7 +78,7 @@ class Dashboard extends CI_Controller
             $password = password_hash($password, PASSWORD_BCRYPT);
 
 
-            $this->users->register_user($user_data);
+            // $this->users->register_user($user_data);
             $this->session->set_flashdata('add_new_user_flash', 'User berhasil ditambahkan!');
 
             redirect('admin/admin');

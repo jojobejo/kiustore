@@ -64,6 +64,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   </td>
                 </tr>
                 <tr>
+                  <td>Kota Asal</td>
+                  <td>
+                    <select name="kota" id="kota" class="form-control autosearch">
+                      <?php if ($customer->kota_id != '0') : ?>
+                        <?php if ($kota) : ?>
+                          <?php foreach ($kota->rajaongkir->results as $kota) : ?>
+                            <option name="kota" value="<?= $customer->kota_id ?>"><?= $kota->city_name ?></option>
+                          <?php endforeach; ?>
+                        <?php endif; ?>
+                      <?php else : ?>
+                        <?php if ($kota) : ?>
+                          <?php foreach ($kota->rajaongkir->results as $kota) : ?>
+                            <option name="kota" value="<?= $kota->city_id ?>"><?= $kota->city_name ?></option>
+                          <?php endforeach; ?>
+                        <?php endif; ?>
+                      <?php endif; ?>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
                   <td>Nama Toko</td>
                   <td>
                     <input type="text" value="<?php echo $customer->shop_name; ?>" class="form-control form-control-sm" name="shop_name">
@@ -100,15 +120,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <td>
                     <select name="level" class="form-control" id="level">
                       <option value="<?php echo $customer->level; ?>">
-                        <?php IF ($customer->level == 1) {
-                                  echo 'Umum';
-                              }
-                              ELSEIF ($customer->level == 2) {
-                                echo 'R1';
-                              }
-                              ELSEIF($customer->level == 3) {
-                                echo 'R2';
-                              }
+                        <?php if ($customer->level == 1) {
+                          echo 'Umum';
+                        } elseif ($customer->level == 2) {
+                          echo 'R1';
+                        } elseif ($customer->level == 3) {
+                          echo 'R2';
+                        }
                         ?>
                       </option>
                       <option value="">Pilih Level</option>

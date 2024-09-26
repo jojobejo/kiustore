@@ -19,17 +19,23 @@ class Shop extends CI_Controller
         $cart['carts'] = $this->cart->contents();
         $cart['total_cart'] = $this->cart->total();
 
-        // print_r($cart);
-        // exit;
-        //nonaktifkan ongkir otomatis
-        // $ongkir = ($cart['total_cart'] >= get_settings('min_shop_to_free_shipping_cost')) ? 0 : get_settings('shipping_cost');
-        $ongkir = 0;
+        if (level_user() < 3) {
+            $ongkir = 0;
 
-        $cart['total_price'] = $cart['total_cart'] + $ongkir;
+            $cart['total_price'] = $cart['total_cart'] + $ongkir;
 
-        $this->load->view('header');
-        $this->load->view('shop/cart', $cart);
-        $this->load->view('footer');
+            $this->load->view('header');
+            $this->load->view('shop/cart', $cart);
+            $this->load->view('footer');
+        } else {
+            $ongkir = 0;
+
+            $cart['total_price'] = $cart['total_cart'] + $ongkir;
+
+            $this->load->view('header');
+            $this->load->view('shop/cart', $cart);
+            $this->load->view('footer');
+        }
     }
 
     public function checkout($action = '')
@@ -376,7 +382,6 @@ class Shop extends CI_Controller
                     'rowid' => $this->input->post('rowid'),
                     'qty'   => $this->input->post('qty')
                 );
-
 
                 $detail_item = $this->cart->get_item($this->input->post('rowid'));
                 if ($this->cart->update($updateItem)) {

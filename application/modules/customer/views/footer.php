@@ -14,7 +14,7 @@ $controller = $this->router->fetch_class();
 <div class="internet-connection-status" id="internetStatus"></div>
 
 <!-- Footer Start -->
-<footer class="footer-wrap" style="background-color: #0c5fdb;" >
+<footer class="footer-wrap" style="background-color: #0c5fdb;">
   <ul class="footer">
     <li class="footer-item <?= ($this->uri->segment(1) == 'home' ? 'active' : '') ?>">
       <a href="<?= site_url('home') ?>" class="footer-link">
@@ -81,6 +81,11 @@ $controller = $this->router->fetch_class();
   if (window.history.replaceState) {
     window.history.replaceState(null, null, window.location.href);
   }
+</script>
+<script>
+  $(document).ready(function() {
+    $('.autosearch').select2();
+  });
 </script>
 
 

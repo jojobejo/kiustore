@@ -147,6 +147,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </div>
               </div>
             </div>
+            <div class="form-group">
+              <label class="form-control-label" for="name">Berat Produk Satuan (Grm):</label>
+              <input type="text" name="weight_product" value="<?php echo set_value('weight_product'); ?>" class="form-control" id="weight_product">
+              <?php echo form_error('weight_product'); ?>
+            </div>
 
             <div class="row">
               <div class="col-8">

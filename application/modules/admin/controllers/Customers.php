@@ -18,6 +18,7 @@ class Customers extends CI_Controller
         ));
         $this->load->library('form_validation');
     }
+    public $api_key = "850366532701e5e36174b032cfd311e9";
 
     public function index()
     {
@@ -30,6 +31,31 @@ class Customers extends CI_Controller
 
     public function add_new_customer()
     {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.rajaongkir.com/starter/city",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "key:" . $this->api_key
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+
+        if ($err) {
+            $customer['kota'] = array('error' => true);
+        } else {
+            $customer['kota'] = json_decode($response);
+        }
+
         $params['title'] = 'Tambah Pelanggan Baru';
 
         $customer['flash'] = $this->session->flashdata('add_new_customer_flash');
@@ -50,6 +76,7 @@ class Customers extends CI_Controller
         $this->form_validation->set_rules('npwp', 'NPWP', 'required|numeric');
         $this->form_validation->set_rules('email', 'email', 'trim|required');
         $this->form_validation->set_rules('password', 'Password', 'trim|required');
+        $this->form_validation->set_rules('kota', 'kota', 'trim|required');
 
         if ($this->form_validation->run() == FALSE) {
             // print_r(validation_errors());exit;
@@ -59,6 +86,7 @@ class Customers extends CI_Controller
             $name = $this->input->post('name');
             $nik = $this->input->post('nik');
             $npwp = $this->input->post('npwp');
+            $kota = $this->input->post('kota');
             $address = $this->input->post('address');
             $shop_name = $this->input->post('shop_name');
             $shop_address = $this->input->post('shop_address');
@@ -86,6 +114,7 @@ class Customers extends CI_Controller
                 'nik' => $nik,
                 'npwp' => $npwp,
                 'phone_number' => $no_telp,
+                'kota_id' => $kota,
                 'address' => $address,
                 'shop_name' => $shop_name,
                 'shop_address' => $shop_address,
@@ -105,6 +134,32 @@ class Customers extends CI_Controller
     public function view($id = 0)
     {
         if ($this->customer->is_customer_exist($id)) {
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.rajaongkir.com/starter/city",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "GET",
+                CURLOPT_HTTPHEADER => array(
+                    "key:" . $this->api_key
+                ),
+            ));
+
+            $response = curl_exec($curl);
+            $err = curl_error($curl);
+            curl_close($curl);
+
+            if ($err) {
+                $customer['kota'] = array('error' => true);
+            } else {
+                $customer['kota'] = json_decode($response);
+            }
+
             $data = $this->customer->customer_data($id);
             $customer['admin'] = $this->admin->get_all_admin();
 

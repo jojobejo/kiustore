@@ -88,6 +88,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   </b></td>
               </tr>
               <tr>
+                <td>Berat Satuan (Grm)</td>
+                <td>:</td>
+                <td><b>
+                    <?php echo $product->product_unit_weight; ?>
+                  </b></td>
+              </tr>
+              <tr>
                 <td>Tipe Produk (Pembayaran yang disarankan untuk masing-masing produk)</td>
                 <td>:</td>
                 <td><b>

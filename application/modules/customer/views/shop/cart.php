@@ -65,18 +65,30 @@ defined('BASEPATH') or exit('No direct script access allowed');
             Subtotal <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price); ?></h5>
           </div>
         </div>
-        <!-- <div class="card cart-amount-area mb-3">
+        <div class="card cart-amount-area mb-3">
+          <div class="card-body">
+            Pilih Ekpedisi
+            <input type="text" name="provinsi">
+            <input type="text" name="kota">
+            <select name="" id="" class="form-control mt-2">
+              <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
+              <option value="JNE">JNE</option>
+              <option value="POS INDONESIA">POS INDONESIA</option>
+              <option value="TIKI">TIKI</option>
+            </select>
+            <button class="btn btn-block btn-primary mt-2">CEK ONGKIR</button>
+          </div>
+        </div>
+        <div class="card cart-amount-area mb-3">
           <div class="card-body d-flex align-items-center justify-content-between">
             Biaya Pengiriman
-            Nonaktifkan Ongkir Otomatis
-             <?php if ($total_cart >= get_settings('min_shop_to_free_shipping_cost')) : ?>
-            <h5 class="total-price mb-0"><span class="n-ongkir font-weight-bold">Menunggu Proses Sales</span></h5>
-          <?php else : ?>
+            <!-- <?php if ($total_cart >= get_settings('min_shop_to_free_shipping_cost')) : ?> -->
+            <!-- <?php else : ?>
             <h5 class="total-price mb-0"><span class="n-ongkir font-weight-bold">Rp <?php echo format_rupiah(get_settings('shipping_cost')); ?></span></h5>
-          <?php endif; ?> 
+          <?php endif; ?>  -->
             <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price); ?></h5>
           </div>
-        </div> -->
+        </div>
         <div class="card cart-amount-area mb-3">
           <div class="card-body d-flex align-items-center justify-content-between">
             Total <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price); ?></h5>

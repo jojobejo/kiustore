@@ -155,7 +155,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <div class="col-3">
                 <div class="form-group">
                   <label class="form-control-label" for="desc">Cek Stok</label>
-                  <input type="button"class="btn btn-primary" onclick="cek()" value="Cek Stok">
+                  <input type="button" class="btn btn-primary" onclick="cek()" value="Cek Stok">
                 </div>
               </div>
               <div class="col-3">
@@ -172,6 +172,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <?php echo form_error('result2'); ?>
                 </div>
               </div>
+            </div>
+            <div class="form-group">
+              <label class="form-control-label" for="weight_product">Berat Produk Satuan (Grm):</label>
+              <input type="text" name="weight_product" value="<?php echo set_value('weight_product', $product->product_unit_weight); ?>" class="form-control" id="weight_product">
+              <?php echo form_error('weight_product'); ?>
             </div>
 
             <div class="row">
@@ -304,17 +309,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
       })
     });
 
-    function cek()
-    {
-      var  stock = document.getElementById("stock").value;
-      var  product_unit_value = document.getElementById("product_unit_value").value;
-      var  result = document.getElementById("result").value;
-      var  result2 = document.getElementById("result2").value;
+    function cek() {
+      var stock = document.getElementById("stock").value;
+      var product_unit_value = document.getElementById("product_unit_value").value;
+      var result = document.getElementById("result").value;
+      var result2 = document.getElementById("result2").value;
 
       result = (parseInt(stock) / parseInt(product_unit_value));
       document.getElementById("result").value = Math.floor(result);
       result2 = (parseInt(stock) - (parseInt(product_unit_value) * parseInt(result)));
       document.getElementById("result2").value = Math.floor(result2);
     }
-
   </script>
