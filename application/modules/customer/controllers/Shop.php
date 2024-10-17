@@ -14,13 +14,22 @@ class Shop extends CI_Controller
         ));
     }
 
+    public $api_key = "850366532701e5e36174b032cfd311e9";
+
+
     public function cart()
     {
+        $kiu        = $this->input->post('kiu');
+        $tjuan      = $this->input->post('tjuan');
+        $berat      = $this->input->post('berat');
+        $expedisi   = $this->input->post('kurir');
+        
         $cart['carts'] = $this->cart->contents();
         $cart['total_cart'] = $this->cart->total();
 
+
         if (level_user() < 3) {
-            $ongkir = 0;
+            $ongkir = $cart['ongkir'] = "0";
 
             $cart['total_price'] = $cart['total_cart'] + $ongkir;
 
@@ -28,7 +37,7 @@ class Shop extends CI_Controller
             $this->load->view('shop/cart', $cart);
             $this->load->view('footer');
         } else {
-            $ongkir = 0;
+            $ongkir = $cart['ongkir'] = "0";
 
             $cart['total_price'] = $cart['total_cart'] + $ongkir;
 
@@ -36,6 +45,46 @@ class Shop extends CI_Controller
             $this->load->view('shop/cart', $cart);
             $this->load->view('footer');
         }
+    }
+
+    public function cekongkir()
+    {
+        $kiu        = $this->input->post('kiu');
+        $tjuan      = $this->input->post('tjuan');
+        $berat      = $this->input->post('berat');
+        $expedisi   = $this->input->post('kurir');
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.rajaongkir.com/starter/cost",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => "origin=" . $kiu . "&destination=" . $tjuan . "&weight=" . $berat . "&courier=" . $expedisi . "",
+            CURLOPT_HTTPHEADER => array(
+                "content-type: application/x-www-form-urlencoded",
+                "key:" . $this->api_key,
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            echo "cURL Error #:" . $err;
+        } else {
+            echo $response;
+        }
+
+        $this->load->view('header');
+        $this->load->view('shop/carts');
+        $this->load->view('footer');
     }
 
     public function checkout($action = '')

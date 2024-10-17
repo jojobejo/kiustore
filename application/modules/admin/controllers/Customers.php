@@ -219,7 +219,8 @@ class Customers extends CI_Controller
                 break;
             case 'edit':
                 $customer['user_id'] = $this->input->post('user_id');
-                $customer['name'] = $this->input->post('name');
+                $customer['name'] = $this->input->post('names');
+                $customer['kota'] = $this->input->post('kota');
                 //    $customer['email'] = $this->input->post('email');
                 $customer['phone_number'] = $this->input->post('phone_number');
                 $customer['salesman_id'] = $this->input->post('salesman_id');

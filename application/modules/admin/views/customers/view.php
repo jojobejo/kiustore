@@ -42,7 +42,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <td>Nama Pelanggan</td>
                   <td>
                     <input type="hidden" value="<?php echo $customer->id; ?>" name="user_id">
-                    <input type="text" value="<?php echo $customer->name; ?>" class="form-control form-control-sm" name="name">
+                    <input type="text" value="<?php echo $customer->name; ?>" class="form-control form-control-sm" name="names">
                   </td>
                 </tr>
                 <tr>
@@ -67,18 +67,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <td>Kota Asal</td>
                   <td>
                     <select name="kota" id="kota" class="form-control autosearch">
-                      <?php if ($customer->kota_id != '0') : ?>
-                        <?php if ($kota) : ?>
-                          <?php foreach ($kota->rajaongkir->results as $kota) : ?>
-                            <option name="kota" value="<?= $customer->kota_id ?>"><?= $kota->city_name ?></option>
-                          <?php endforeach; ?>
-                        <?php endif; ?>
-                      <?php else : ?>
-                        <?php if ($kota) : ?>
-                          <?php foreach ($kota->rajaongkir->results as $kota) : ?>
-                            <option name="kota" value="<?= $kota->city_id ?>"><?= $kota->city_name ?></option>
-                          <?php endforeach; ?>
-                        <?php endif; ?>
+                      <?php if ($kota) : ?>
+                        <?php foreach ($kota->rajaongkir->results as $kota) : ?>
+                          <option name="kota" value="<?= $kota->city_id ?>"><?= $kota->city_name ?></option>
+                        <?php endforeach; ?>
                       <?php endif; ?>
                     </select>
                   </td>

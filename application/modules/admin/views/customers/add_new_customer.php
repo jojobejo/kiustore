@@ -71,7 +71,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <?php endif; ?>
               </select>
               <!-- <?php foreach (get_id_province() as $id => $value) : ?>
-                <option value="<?= $id ?>">
+                <option value="<?= $id ?>"> 
                   <?= $value ?>
                 <option>
                 <?php endforeach; ?>

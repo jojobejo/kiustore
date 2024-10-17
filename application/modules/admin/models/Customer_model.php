@@ -146,6 +146,7 @@ class Customer_model extends CI_Model
                 'name' => $customer['name'],
                 //    'email' => $customer['email'],
                 'phone_number' => $customer['phone_number'],
+                'kota_id' => $customer['kota'],
                 'salesman_id' => $customer['salesman_id'],
                 'address' => $customer['address'],
                 'level' => $customer['level'],

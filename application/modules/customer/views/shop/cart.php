@@ -13,6 +13,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
       <?php endif; ?>
 
+
+
+      <!-- SELESAI CEK ONGKIR -->
+
       <form action="<?php echo site_url('checkout'); ?>" method="POST">
         <!-- Cart-->
         <!-- Cart Item Section Start  -->
@@ -65,20 +69,27 @@ defined('BASEPATH') or exit('No direct script access allowed');
             Subtotal <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price); ?></h5>
           </div>
         </div>
-        <div class="card cart-amount-area mb-3">
-          <div class="card-body">
-            Pilih Ekpedisi
-            <input type="text" name="provinsi">
-            <input type="text" name="kota">
-            <select name="" id="" class="form-control mt-2">
-              <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
-              <option value="JNE">JNE</option>
-              <option value="POS INDONESIA">POS INDONESIA</option>
-              <option value="TIKI">TIKI</option>
-            </select>
-            <button class="btn btn-block btn-primary mt-2">CEK ONGKIR</button>
+        <form action="<?php echo site_url('cekongkir'); ?>" method="POST">
+          <div class="card cart-amount-area mb-3">
+            <div class="card-body">
+              Pilih Ekpedisi
+              <!-- kode_id_kota 160 == 'Jember' -->
+              <input type="text" name="kiu" value="160">
+              <input type="text" name="tjuan" value="">
+              <input type="text" name="berat" value="">
+              <input type="text" name="kurir" value="">
+
+              <select name="" id="" class="form-control mt-2">
+                <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
+                <option value="JNE">JNE</option>
+                <option value="POS INDONESIA">POS INDONESIA</option>
+                <option value="TIKI">TIKI</option>
+              </select>
+              <button class="btn btn-block btn-primary mt-2">CEK ONGKIR</button>
+            </div>
           </div>
-        </div>
+        </form>
+
         <div class="card cart-amount-area mb-3">
           <div class="card-body d-flex align-items-center justify-content-between">
             Biaya Pengiriman
@@ -86,7 +97,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <!-- <?php else : ?>
             <h5 class="total-price mb-0"><span class="n-ongkir font-weight-bold">Rp <?php echo format_rupiah(get_settings('shipping_cost')); ?></span></h5>
           <?php endif; ?>  -->
-            <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price); ?></h5>
+            <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($ongkir); ?></h5>
           </div>
         </div>
         <div class="card cart-amount-area mb-3">
