@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Shop extends CI_Controller
 {
+
     public function __construct()
     {
         parent::__construct();
@@ -10,12 +11,12 @@ class Shop extends CI_Controller
         $this->load->library('cart');
         $this->load->model(array(
             'product_model' => 'product',
-            'customer_model' => 'customer'
+            'customer_model' => 'customer',
+            'profile_model' => 'profile'
         ));
     }
 
     public $api_key = "850366532701e5e36174b032cfd311e9";
-
 
     public function cart()
     {
@@ -24,9 +25,11 @@ class Shop extends CI_Controller
         $berat      = $this->input->post('berat');
         $expedisi   = $this->input->post('kurir');
         
+        $data = $this->profile->get_profile();
+
         $cart['carts'] = $this->cart->contents();
         $cart['total_cart'] = $this->cart->total();
-
+        $cart['user'] = $data;
 
         if (level_user() < 3) {
             $ongkir = $cart['ongkir'] = "0";

@@ -67,6 +67,9 @@ class Login extends CI_Controller
                             'login_at' => time(),
                             'remember_me' => ($remember_me == 1) ? TRUE : FALSE
                         ];
+                        $login_data = array(
+                            'user_id' =>  $this->login->logged_user_id()
+                        );
                     } else {
                         $login_data = [
                             'user_id' => $this->login->logged_user_id(),
@@ -81,6 +84,7 @@ class Login extends CI_Controller
                     $login_data = json_encode($login_data);
                     $login_session = $this->encryption->encrypt($login_data);
 
+                    $this->session->set_userdata($login_data);
                     $redirection = $this->session->userdata('redirection');
 
                     if ($redirection) {

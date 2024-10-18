@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Profile extends CI_Controller {
+class Profile extends CI_Controller
+{
     public function __construct()
     {
         parent::__construct();
@@ -44,12 +45,9 @@ class Profile extends CI_Controller {
     {
         $this->form_validation->set_rules('name', 'Nama lengkap', 'required|max_length[32]|min_length[4]');
 
-        if ($this->form_validation->run() === FALSE)
-        {
+        if ($this->form_validation->run() === FALSE) {
             $this->index();
-        }
-        else
-        {
+        } else {
             $data = new stdClass();
 
             $data->name = $this->input->post('name');
@@ -68,18 +66,14 @@ class Profile extends CI_Controller {
 
                 $this->load->library('upload', $config);
 
-                if ($this->upload->do_upload('file'))
-                {
-                    if ($old_profile)
-                    {
-                        unlink('./assets/uploads/users/'. $old_profile);
+                if ($this->upload->do_upload('file')) {
+                    if ($old_profile) {
+                        unlink('./assets/uploads/users/' . $old_profile);
                     }
 
                     $file_data = $this->upload->data();
                     $data->profile_picture = $file_data['file_name'];
-                }
-                else
-                {
+                } else {
                     $errors = $this->upload->display_errors();
                     $errors .= '<p>';
                     $errors .= anchor('profile', '&laquo; Kembali');
@@ -101,21 +95,17 @@ class Profile extends CI_Controller {
         $this->form_validation->set_rules('username', 'Username', 'required|max_length[16]|min_length[4]');
         $this->form_validation->set_rules('password', 'Password', 'min_length[4]');
 
-        if ($this->form_validation->run() === FALSE)
-        {
+        if ($this->form_validation->run() === FALSE) {
             $this->index();
-        }
-        else
-        {
+        } else {
             $data = new stdClass();
             $profile = $this->profile->get_profile();
 
             $get_password = $this->input->post('password');
 
-            if ( empty($get_password)) {
+            if (empty($get_password)) {
                 $password = $profile->password;
-            }
-            else {
+            } else {
                 $password = password_hash($get_password, PASSWORD_BCRYPT);
             }
 
@@ -134,12 +124,9 @@ class Profile extends CI_Controller {
     {
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email|max_length[32]|min_length[10]');
 
-        if ($this->form_validation->run() === FALSE)
-        {
+        if ($this->form_validation->run() === FALSE) {
             $this->index();
-        }
-        else
-        {
+        } else {
             $data = new stdClass();
 
             $data->email = $this->input->post('email');
