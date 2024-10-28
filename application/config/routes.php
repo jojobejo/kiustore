@@ -62,6 +62,7 @@ $route['logout'] = 'auth/logout';
 $route['register'] = 'auth/register';
 $route['policy'] = 'pages/policy';
 
+$route['cartongkir'] = 'customer/addons/addoncart/cart';
 
 $route['customer'] = 'customer/customer';
 $route['profile'] = 'customer/profile';

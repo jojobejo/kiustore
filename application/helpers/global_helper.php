@@ -10,13 +10,7 @@ if (!function_exists('get_settings')) {
             ->where('key', $key)
             ->get('settings')
             ->row();
-
-        // Tambahkan pengecekan jika $row tidak null
-        if ($row) {
-            return $row->content;
-        } else {
-            return null; // Atau default value sesuai kebutuhan
-        }
+        return $row->content;
     }
 }
 

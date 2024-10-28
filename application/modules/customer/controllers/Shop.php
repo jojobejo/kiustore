@@ -24,7 +24,8 @@ class Shop extends CI_Controller
         $tjuan      = $this->input->post('tjuan');
         $berat      = $this->input->post('berat');
         $expedisi   = $this->input->post('kurir');
-        
+
+
         $data = $this->profile->get_profile();
 
         $cart['carts'] = $this->cart->contents();
@@ -33,8 +34,11 @@ class Shop extends CI_Controller
 
         if (level_user() < 3) {
             $ongkir = $cart['ongkir'] = "0";
+            $userdata = $this->session->userdata('user_id');
 
             $cart['total_price'] = $cart['total_cart'] + $ongkir;
+
+            // $cart['weight'] = $this->product->getweight($userdata)->result();
 
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);

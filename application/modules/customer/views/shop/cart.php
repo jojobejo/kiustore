@@ -13,10 +13,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
       <?php endif; ?>
 
-
-
-      <!-- SELESAI CEK ONGKIR -->
-
       <form action="<?php echo site_url('checkout'); ?>" method="POST">
         <!-- Cart-->
         <!-- Cart Item Section Start  -->
@@ -75,7 +71,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
               Pilih Ekpedisi
               <!-- kode_id_kota 160 == 'Jember' -->
               <input type="text" name="kiu" value="160">
-              <input type="text" name="tjuan" value="<?= $user->kota_id ?>">
+              <input type="text" name="tjuan" value="">
               <input type="text" name="berat" value="">
               <input type="text" name="kurir" value="">
 

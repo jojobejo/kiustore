@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Login_model extends CI_Model {
+class Login_model extends CI_Model
+{
     protected $email;
     protected $password;
 
@@ -53,6 +54,12 @@ class Login_model extends CI_Model {
             ->$row;
 
         return $field;
+    }
+
+    function cek_password($username)
+    {
+        $this->db->where('username', $username);
+        return $this->db->get('customer')->result();
     }
 
     public function get_role()

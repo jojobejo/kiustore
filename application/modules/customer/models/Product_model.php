@@ -156,4 +156,10 @@ class Product_model extends CI_Model
 
         return $data;
     }
+
+    public function getweight($id)
+    {
+        return $this->db->query("
+        ");
+    }
 }

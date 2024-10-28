@@ -67,9 +67,12 @@ class Login extends CI_Controller
                             'login_at' => time(),
                             'remember_me' => ($remember_me == 1) ? TRUE : FALSE
                         ];
-                        $login_data = array(
-                            'user_id' =>  $this->login->logged_user_id()
+                        $login_data_set = array(
+                            'user_id' => $this->login->logged_user_id(),
+                            'salesman_id' => $this->login->logged_salesman_id(),
+                            'user_level' => $this->login->logged_user_level(),
                         );
+                        $this->session->set_userdata($login_data_set);
                     } else {
                         $login_data = [
                             'user_id' => $this->login->logged_user_id(),
@@ -80,12 +83,11 @@ class Login extends CI_Controller
                         ];
                     }
 
-
-                    $login_data = json_encode($login_data);
-                    $login_session = $this->encryption->encrypt($login_data);
-
-                    $this->session->set_userdata($login_data);
-                    $redirection = $this->session->userdata('redirection');
+                    $login_data_set     = json_encode($login_data_set);
+                    $login_data         = json_encode($login_data);
+                    $login_session      = $this->encryption->encrypt($login_data);
+                    $login_data_set     = $this->encryption->encrypt($login_data_set);
+                    $redirection        = $this->session->userdata('redirection');
 
                     if ($redirection) {
                         $redir_to = base64_decode($redirection);
@@ -100,8 +102,9 @@ class Login extends CI_Controller
 
                     if ($remember_me == 1) {
                         $this->input->set_cookie('__ACTIVE_SESSION_DATA', $login_session, 604800); //48 jam
+                        $this->input->set_userdata('__ACTIVE_SESSION_DATA', $login_data_set); //48 jam
                     } else {
-                        $this->session->set_userdata('__ACTIVE_SESSION_DATA', $login_session);
+                        $this->session->set_userdata('__ACTIVE_SESSION_DATA', $login_session, $login_data_set);
                     }
 
                     redirect($redir_to);
