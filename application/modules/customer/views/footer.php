@@ -156,6 +156,7 @@ $controller = $this->router->fetch_class();
     var satuan_text = $(this).data('satuan-text');
     var satuan_qty = $(this).data('satuan-qty');
     var product_type = $(this).data('product-type');
+    var product_weight = $(this).data('product_weight');
 
     $.ajax({
       method: 'POST',
@@ -169,7 +170,8 @@ $controller = $this->router->fetch_class();
         satuan_qty: satuan_qty,
         price: price,
         name: name,
-        product_type: product_type
+        product_type: product_type,
+        product_weight: product_weight
       },
       success: function(res) {
         if (res.code == 200) {

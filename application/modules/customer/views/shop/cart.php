@@ -29,12 +29,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <i class="subs" data-feather="minus"></i>
                     <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
                     <i class="adds" data-feather="plus"></i>
-
                   </div>
                   <div class="input-box satuan">
 
                   </div>
-
                 </div>
               </div>
               <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
@@ -72,10 +70,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <!-- kode_id_kota 160 == 'Jember' -->
               <input type="text" name="kiu" value="160">
               <input type="text" name="tjuan" value="">
-              <input type="text" name="berat" value="">
-              <input type="text" name="kurir" value="">
+              <input type="text" name="berat" value="<?php echo $item['total_weight']; ?>">
 
-              <select name="" id="" class="form-control mt-2">
+              <select name="kurir" id="kurir" class="form-control mt-2">
                 <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
                 <option value="JNE">JNE</option>
                 <option value="POS INDONESIA">POS INDONESIA</option>

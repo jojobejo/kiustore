@@ -351,18 +351,22 @@ class Shop extends CI_Controller
                 $sku = $this->input->post('sku');
                 $name = $this->input->post('name');
                 $product_type = $this->input->post('product_type');
+                $product_weight = $this->input->post('product_weight');
 
                 if ($satuan == 1) {
                     $price = $this->input->post('price');
                     $qty_pcs = $qty;
+                    $weighttot = $product_weight;
                 } else {
                     $price = $this->input->post('price') * $this->input->post('satuan_qty');
                     $qty_pcs = $qty * $satuan_qty;
+                    $weighttot = $product_weight * $qty;
                 }
 
                 $total_price_item = $qty * $price;
                 $total_price_in_cart = $this->cart->total();
                 $total_price = $total_price_item + $total_price_in_cart;
+                $total_weight = $weighttot;
 
                 $stock = $this->product->get_stock($id);
                 // $response = array('code' => 200, 'message' => 'stok ' . $stock, 'total_item' => 0);
@@ -375,7 +379,7 @@ class Shop extends CI_Controller
                         'satuan_qty' => $satuan_qty,
                         'price' => $price,
                         'name' => $name,
-                        'product_type' => $product_type
+                        'product_type' => $product_type,
                     );
                     $this->cart->insert($item);
                     $total_item = count($this->cart->contents());
@@ -402,6 +406,7 @@ class Shop extends CI_Controller
                     $carts[$items['rowid']]['qty'] = $items['qty'];
                     $carts[$items['rowid']]['price'] = $items['price'];
                     $carts[$items['rowid']]['subtotal'] = $items['subtotal'];
+                    $carts[$items['rowid']]['subtotalweight'] = $items['subtotalweight'];
                 }
 
                 $response = array('code' => 200, 'carts' => $carts);
