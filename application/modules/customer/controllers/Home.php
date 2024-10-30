@@ -16,17 +16,18 @@ class Home extends CI_Controller
 
     public function index()
     {
-        $params['title'] = 'Selamat Datang di Official Store PT. KARISMA INDOAGRO UNIVERSAL';
-        $params['page_name'] = 'home';
+        $params['title']            = 'Selamat Datang di Official Store PT. KARISMA INDOAGRO UNIVERSAL';
+        $params['page_name']        = 'home';
 
-        $products['products'] = $this->product->get_all_products();
+        $products['products']       = $this->product->get_all_products();
         $products['banner_product'] = $this->product->get_all_banner();
-        $products['categories'] = $this->product->get_home_categories();
+        $products['categories']     = $this->product->get_home_categories();
         $products['promo_products'] = $this->product->promo_products();
-        $products['best_products'] = $this->product->best_products();
-        $products['last_order'] = $this->product->last_order();
-        $products['invoice'] = $this->payment->invoice();
-        $products['tagihan'] = $this->payment->tagihan();
+        $products['best_products']  = $this->product->best_products();
+        $products['last_order']     = $this->product->last_order();
+        $products['invoice']        = $this->payment->invoice();
+        $products['tagihan']        = $this->payment->tagihan();
+
         // get_header($params);
         $this->load->view('header', $products);
         $this->load->view('home', $products);
@@ -119,9 +120,9 @@ class Home extends CI_Controller
         $this->load->library('pagination', $config);
         $page = ($this->uri->segment(4)) ? $this->uri->segment(4) : 0;
 
-        $products['products'] = $this->product->search_products($query, $config['per_page'], $page);
+        $products['products']   = $this->product->search_products($query, $config['per_page'], $page);
         $products['pagination'] = $this->pagination->create_links();
-        $products['count'] = $this->product->count_search_products($query);
+        $products['count']      = $this->product->count_search_products($query);
 
         $this->load->view('header', $params);
         $this->load->view('search', $products);

@@ -142,8 +142,6 @@ $controller = $this->router->fetch_class();
 
   // });
 
-
-
   $('#atc').click(function(e) {
     e.preventDefault();
     var id = $(this).data('id');
@@ -156,7 +154,7 @@ $controller = $this->router->fetch_class();
     var satuan_text = $(this).data('satuan-text');
     var satuan_qty = $(this).data('satuan-qty');
     var product_type = $(this).data('product-type');
-    var product_weight = $(this).data('product_weight');
+    var product_weight = $(this).data('product-weight');
 
     $.ajax({
       method: 'POST',
@@ -289,7 +287,6 @@ $controller = $this->router->fetch_class();
     var text = $("#satuan option:selected").text();
     $('#atc').attr('data-satuan', val);
     $('#atc').attr('data-satuan-text', text);
-
   });
 
   function update_item(rowid, qty) {

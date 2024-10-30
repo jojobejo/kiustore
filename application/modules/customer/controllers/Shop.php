@@ -25,7 +25,6 @@ class Shop extends CI_Controller
         $berat      = $this->input->post('berat');
         $expedisi   = $this->input->post('kurir');
 
-
         $data = $this->profile->get_profile();
 
         $cart['carts'] = $this->cart->contents();
@@ -34,18 +33,17 @@ class Shop extends CI_Controller
 
         if (level_user() < 3) {
             $ongkir = $cart['ongkir'] = "0";
-            $userdata = $this->session->userdata('user_id');
+
+            $cusid  = $this->session->userdata('user_id');
 
             $cart['total_price'] = $cart['total_cart'] + $ongkir;
-
-            // $cart['weight'] = $this->product->getweight($userdata)->result();
+            $cart['tmp_cart']   = $this->product->gettmpshop($cusid)->result();
 
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
             $this->load->view('footer');
         } else {
             $ongkir = $cart['ongkir'] = "0";
-
             $cart['total_price'] = $cart['total_cart'] + $ongkir;
 
             $this->load->view('header');
@@ -109,7 +107,6 @@ class Shop extends CI_Controller
         if (empty($this->input->post())) {
             redirect('home', 'refresh');
         }
-
 
         switch ($action) {
             default:
@@ -200,7 +197,6 @@ class Shop extends CI_Controller
                 $this->session->set_userdata('order_quantity_multi', $items_multi);
                 $this->session->set_userdata('total_price', $params['total']);
                 $this->session->set_userdata('total_price_multi', $total_price_multi);
-
 
                 $this->load->view('header');
                 $this->load->view('shop/checkout', $params);
@@ -343,7 +339,8 @@ class Shop extends CI_Controller
 
         switch ($action) {
             case 'add_item':
-                $id = $this->input->post('id');
+                $id     = $this->input->post('id');
+                $idcus  = $this->session->userdata('user_id');
                 $qty = $this->input->post('qty');
                 $satuan = $this->input->post('satuan');
                 $satuan_text = $this->input->post('satuan_text');
@@ -352,21 +349,22 @@ class Shop extends CI_Controller
                 $name = $this->input->post('name');
                 $product_type = $this->input->post('product_type');
                 $product_weight = $this->input->post('product_weight');
+                $now    = date('Y-m-d');
 
                 if ($satuan == 1) {
                     $price = $this->input->post('price');
                     $qty_pcs = $qty;
-                    $weighttot = $product_weight;
+                    $weight = $product_weight;
                 } else {
                     $price = $this->input->post('price') * $this->input->post('satuan_qty');
                     $qty_pcs = $qty * $satuan_qty;
-                    $weighttot = $product_weight * $qty;
+                    $weight = $product_weight * $satuan_qty;
                 }
 
                 $total_price_item = $qty * $price;
+                $total_weight_item = $qty * $weight;
                 $total_price_in_cart = $this->cart->total();
                 $total_price = $total_price_item + $total_price_in_cart;
-                $total_weight = $weighttot;
 
                 $stock = $this->product->get_stock($id);
                 // $response = array('code' => 200, 'message' => 'stok ' . $stock, 'total_item' => 0);
@@ -380,7 +378,23 @@ class Shop extends CI_Controller
                         'price' => $price,
                         'name' => $name,
                         'product_type' => $product_type,
+                        'total_weight'  => $total_weight_item
                     );
+                    $itemaddons = array(
+                        'idbarang' => $id,
+                        'idcustomer' => $idcus,
+                        'qty' => $qty,
+                        'satuan' => $satuan,
+                        'satuan_text' => $satuan_text,
+                        'satuan_qty' => $satuan_qty,
+                        'price' => $price,
+                        'name' => $name,
+                        'product_type' => $product_type,
+                        'total_weight'  => $total_weight_item,
+                        'create_at'  => $now,
+                    );
+
+                    $this->product->tmp_cart_customer($itemaddons);
                     $this->cart->insert($item);
                     $total_item = count($this->cart->contents());
 
@@ -406,12 +420,12 @@ class Shop extends CI_Controller
                     $carts[$items['rowid']]['qty'] = $items['qty'];
                     $carts[$items['rowid']]['price'] = $items['price'];
                     $carts[$items['rowid']]['subtotal'] = $items['subtotal'];
-                    $carts[$items['rowid']]['subtotalweight'] = $items['subtotalweight'];
+                    $carts[$items['rowid']]['total_weight'] = $items['total_weight'];
                 }
-
                 $response = array('code' => 200, 'carts' => $carts);
                 break;
             case 'cart_info':
+
                 $total_price = $this->cart->total();
                 $total_item = count($this->cart->contents());
 
