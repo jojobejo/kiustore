@@ -1,18 +1,20 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 ?>
-<?php if (count($cartaddons) > 0) : ?>
-  <?php if (count($carts) > 0) : ?>
-    <!-- Main Start -->
-    <main class="main-wrap cart-page mb-xxl">
+<?php if (count($carts) > 0) : ?>
+  <!-- Main Start -->
+  <main class="main-wrap cart-page mb-xxl">
 
-      <?php if ($this->session->flashdata('limit')) : ?>
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <?= $this->session->flashdata('limit'); ?>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      <?php endif; ?>
+    <?php if ($this->session->flashdata('limit')) : ?>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <?= $this->session->flashdata('limit'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <?php endif; ?>
 
+    <form action="<?php echo site_url('checkout'); ?>" method="POST">
+      <!-- Cart-->
+      <!-- Cart Item Section Start  -->
       <div class="cart-item-wrap pt-0 mb-3">
         <?php foreach ($carts as $item) : ?>
           <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
@@ -33,7 +35,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <i data-feather="trash"></i>
             </div>
           </div>
+
         <?php endforeach; ?>
+
 
       </div>
       <!-- Cart Item Section End  -->
@@ -56,29 +60,29 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
       </div>
 
-      <div class="card cart-amount-area mb-3">
-        <div class="card-body">
-          Pilih Ekpedisi
-          <!-- kode_id_kota 160 == 'Jember' -->
-          <?php foreach ($profilecustomer as $p) : ?>
-            <?php foreach ($tmp_cart as $t) : ?>
-              <input type="text" name="kiu" value="160" hidden>
-              <input type="text" name="tjuan" value="<?= $p->kota_id ?>" hidden>
-              <input type="text" name="berat" value="<?= $t->total_weight ?>">
+      <form action="<?php echo site_url('cekongkir'); ?>" method="POST">
+        <div class="card cart-amount-area mb-3">
+          <div class="card-body">
+            Pilih Ekpedisi
+            <!-- kode_id_kota 160 == 'Jember' -->
+            <?php foreach ($profilecustomer as $p) : ?>
+              <?php foreach ($tmp_cart as $t) : ?>
+                <input type="text" name="kiu" value="160">
+                <input type="text" name="tjuan" value="<?= $p->kota_id ?>">
+                <input type="text" name="berat" value="<?= $t->total_weight ?>">
+              <?php endforeach; ?>
             <?php endforeach; ?>
-          <?php endforeach; ?>
 
-          <input type="text" name="" value="">
-
-          <select name="kurir" id="kurir" class="form-control mt-2">
-            <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
-            <option value="jne">JNE</option>
-            <option value="pos">POS INDONESIA</option>
-            <option value="tiki">TIKI</option>
-          </select>
-          <button class="btn btn-block btn-primary mt-2" id="cekongkir">CEK ONGKIR</button>
+            <select name="kurir" id="kurir" class="form-control mt-2">
+              <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
+              <option value="JNE">JNE</option>
+              <option value="POS INDONESIA">POS INDONESIA</option>
+              <option value="TIKI">TIKI</option>
+            </select>
+            <button class="btn btn-block btn-primary mt-2">CEK ONGKIR</button>
+          </div>
         </div>
-      </div>
+      </form>
 
       <div class="card cart-amount-area mb-3">
         <div class="card-body d-flex align-items-center justify-content-between">
@@ -101,41 +105,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <!-- <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price); ?></h5> -->
         </div>
       </div>
-      </form>
 
-    </main>
-    <!-- Main End -->
-  <?php else : ?>
-    <main class="main-wrap empty-cart mb-xxl">
-      <!-- Banner Start -->
-      <div class="banner-box">
-        <img src="<?php echo get_theme_uri('svg/empty-cart.svg'); ?>" class="img-fluid" alt="404" />
-      </div>
-      <!-- Banner End -->
-
-      <!-- Error Section Start -->
-      <section class="error mb-large">
-        <h2 class="font-lg">Keranjang belanja anda kosong</h2>
-        <!-- <p class="content-color font-md">Looks like you haven’t added anything to your cart yet. You will find a lot of interesting products on our “Shop” page</p> -->
-        <a href="<?php echo site_url('category'); ?>" class="btn-solid">Mulai Belanja</a>
-      </section>
-      <!-- Error Section End -->
-    </main>
-  <?php endif; ?>
-<?php else : ?>
-  <main class="main-wrap empty-cart mb-xxl">
-    <!-- Banner Start -->
-    <div class="banner-box">
-      <img src="<?php echo get_theme_uri('svg/empty-cart.svg'); ?>" class="img-fluid" alt="404" />
-    </div>
-    <!-- Banner End -->
-
-    <!-- Error Section Start -->
-    <section class="error mb-large">
-      <h2 class="font-lg">Keranjang belanja anda kosong</h2>
-      <!-- <p class="content-color font-md">Looks like you haven’t added anything to your cart yet. You will find a lot of interesting products on our “Shop” page</p> -->
-      <a href="<?php echo site_url('category'); ?>" class="btn-solid">Mulai Belanja</a>
-    </section>
-    <!-- Error Section End -->
+    </form>
   </main>
+  <!-- Main End -->
 <?php endif; ?>

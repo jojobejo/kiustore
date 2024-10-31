@@ -205,6 +205,69 @@ $controller = $this->router->fetch_class();
     });
   });
 
+  $('#cekongkir').click(function(e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    var sku = $(this).data('sku');
+    var qty = $(this).attr('data-qty');
+    qty = (qty > 0) ? qty : 1;
+    var price = $(this).data('price');
+    var name = $(this).data('name');
+    var satuan = $(this).data('satuan');
+    var satuan_text = $(this).data('satuan-text');
+    var satuan_qty = $(this).data('satuan-qty');
+    var product_type = $(this).data('product-type');
+    var product_weight = $(this).data('product-weight');
+
+    $.ajax({
+      method: 'POST',
+      url: '<?php echo site_url('cart_api?action=cekongkir'); ?>',
+      data: {
+        id: id,
+        sku: sku,
+        qty: qty,
+        satuan: satuan,
+        satuan_text: satuan_text,
+        satuan_qty: satuan_qty,
+        price: price,
+        name: name,
+        product_type: product_type,
+        product_weight: product_weight
+      },
+      success: function(res) {
+        if (res.code == 200) {
+          var totalItem = res.total_item;
+          $('#cart_sum').text(totalItem);
+          $('.cart-item-total').text(totalItem);
+          $("#myToast").toast("show");
+          // toastr.info('Item ditambahkan dalam keranjang');
+          new bs5.Toast({
+            body: 'Berhasil menambahkan barang ke keranjang belanja',
+            autohide: true,
+            animation: true,
+            btnCloseWhite: true,
+            className: 'border-0 bg-success text-white',
+            delay: 2000,
+          }).show();
+        } else if (res.code == 201) {
+          window.location.replace(base_url + "login");
+        } else if (res.code == 202) {
+          console.log(qty);
+          new bs5.Toast({
+            body: res.message,
+            autohide: true,
+            animation: true,
+            btnCloseWhite: true,
+            className: 'border-0 bg-danger text-white',
+            delay: 2000,
+          }).show();
+        } else {
+          console.log('Terjadi kesalahan');
+        }
+      }
+    });
+  });
+
   $('.cart-update').on("input", function(e) {
     e.preventDefault();
 

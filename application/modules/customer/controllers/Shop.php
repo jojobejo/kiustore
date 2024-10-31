@@ -20,24 +20,23 @@ class Shop extends CI_Controller
 
     public function cart()
     {
-        $kiu        = $this->input->post('kiu');
-        $tjuan      = $this->input->post('tjuan');
-        $berat      = $this->input->post('berat');
-        $expedisi   = $this->input->post('kurir');
-
         $data = $this->profile->get_profile();
-
-        $cart['carts'] = $this->cart->contents();
+        $cart['carts']      = $this->cart->contents();
         $cart['total_cart'] = $this->cart->total();
-        $cart['user'] = $data;
+        $cart['user']       = $data;
+
+        //ADD-ONS
+        $cusids             = $this->session->userdata('user_id');
+        $cart['cartaddons'] = $this->product->count_tmp_cart($cusids)->result();
 
         if (level_user() < 3) {
             $ongkir = $cart['ongkir'] = "0";
 
             $cusid  = $this->session->userdata('user_id');
 
-            $cart['total_price'] = $cart['total_cart'] + $ongkir;
-            $cart['tmp_cart']   = $this->product->gettmpshop($cusid)->result();
+            $cart['total_price']     = $cart['total_cart'];
+            $cart['tmp_cart']        = $this->product->gettmpshop($cusid)->result();
+            $cart['profilecustomer'] = $this->product->getcustomer($cusid)->result();
 
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
@@ -69,7 +68,7 @@ class Shop extends CI_Controller
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "origin=" . $kiu . "&destination=" . $tjuan . "&weight=" . $berat . "&courier=" . $expedisi . "",
+            CURLOPT_POSTFIELDS => "origin=" . "$kiu" . "&destination=" . "$tjuan" . "&weight=" . $berat . "&courier=" . "$expedisi",
             CURLOPT_HTTPHEADER => array(
                 "content-type: application/x-www-form-urlencoded",
                 "key:" . $this->api_key,
@@ -82,13 +81,13 @@ class Shop extends CI_Controller
         curl_close($curl);
 
         if ($err) {
-            echo "cURL Error #:" . $err;
+            $data['ckongkir'] = array('error' => true);
         } else {
-            echo $response;
+            $data['ckongkir'] = json_decode($response);
         }
 
         $this->load->view('header');
-        $this->load->view('shop/carts');
+        $this->load->view('shop/carts', $data);
         $this->load->view('footer');
     }
 
@@ -156,7 +155,7 @@ class Shop extends CI_Controller
                 }
 
                 $items = [];
-                $items_multi = [];
+                $items_multi    = [];
                 $total_price_multi[1] = 0;
                 $total_price_multi[2] = 0;
                 $total_price_multi[3] = 0;
@@ -339,6 +338,79 @@ class Shop extends CI_Controller
 
         switch ($action) {
             case 'add_item':
+                $id     = $this->input->post('id');
+                $idcus  = $this->session->userdata('user_id');
+                $qty = $this->input->post('qty');
+                $satuan = $this->input->post('satuan');
+                $satuan_text = $this->input->post('satuan_text');
+                $satuan_qty = $this->input->post('satuan_qty');
+                $sku = $this->input->post('sku');
+                $name = $this->input->post('name');
+                $product_type = $this->input->post('product_type');
+                $product_weight = $this->input->post('product_weight');
+                $now    = date('Y-m-d');
+
+                if ($satuan == 1) {
+                    $price = $this->input->post('price');
+                    $qty_pcs = $qty;
+                    $weight = $product_weight;
+                } else {
+                    $price = $this->input->post('price') * $this->input->post('satuan_qty');
+                    $qty_pcs = $qty * $satuan_qty;
+                    $weight = $product_weight * $satuan_qty;
+                }
+
+                $total_price_item = $qty * $price;
+                $total_weight_item = $qty * $weight;
+                $total_price_in_cart = $this->cart->total();
+                $total_price = $total_price_item + $total_price_in_cart;
+
+                $stock = $this->product->get_stock($id);
+                // $response = array('code' => 200, 'message' => 'stok ' . $stock, 'total_item' => 0);
+                if ($qty_pcs <= $stock) {
+                    $item = array(
+                        'id' => $id,
+                        'qty' => $qty,
+                        'satuan' => $satuan,
+                        'satuan_text' => $satuan_text,
+                        'satuan_qty' => $satuan_qty,
+                        'price' => $price,
+                        'name' => $name,
+                        'product_type' => $product_type,
+                        'total_weight'  => $total_weight_item
+                    );
+                    $itemaddons = array(
+                        'idbarang' => $id,
+                        'idcustomer' => $idcus,
+                        'qty' => $qty,
+                        'satuan' => $satuan,
+                        'satuan_text' => $satuan_text,
+                        'satuan_qty' => $satuan_qty,
+                        'price' => $price,
+                        'name' => $name,
+                        'product_type' => $product_type,
+                        'total_weight'  => $total_weight_item,
+                        'create_at'  => $now,
+                    );
+
+                    $this->product->tmp_cart_customer($itemaddons);
+                    $this->cart->insert($item);
+                    $total_item = count($this->cart->contents());
+
+                    // if ($_SESSION['user_level'] != 1) {
+                    //     $max = get_user_limit_transaction();
+                    // } else {
+                    //     $max = 0;
+                    // }
+
+                    $response = array('code' => 200, 'message' => 'Item dimasukkan dalam keranjang', 'total_item' => $total_item);
+                } else {
+                    $response = array('code' => 202, 'message' => 'Gagal memasukkan dalam keranjang. Stok barang hanya ' . $satuan_qty . ' ' . $qty);
+                }
+
+
+                break;
+            case 'cekongkir':
                 $id     = $this->input->post('id');
                 $idcus  = $this->session->userdata('user_id');
                 $qty = $this->input->post('qty');

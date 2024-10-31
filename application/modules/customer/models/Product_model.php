@@ -29,6 +29,14 @@ class Product_model extends CI_Model
     {
         return $this->db->where('id', $id)->get('products')->row()->stock;
     }
+    public function count_tmp_cart($id)
+    {
+        return $this->db->query("SELECT 
+        COUNT(a.idcustomer) AS item_cart
+        FROM tmp_cart a
+        WHERE a.idcustomer = '$id'
+        ");
+    }
     public function tmp_cart_customer($data)
     {
         $this->db->insert('tmp_cart', $data);
@@ -38,6 +46,13 @@ class Product_model extends CI_Model
         return $this->db->query("SELECT SUM(a.total_weight) AS total_weight
         FROM tmp_cart a 
         WHERE a.idcustomer = '$id'
+        ");
+    }
+    public function getcustomer($id)
+    {
+        return $this->db->query("SELECT a.*
+        FROM customers a 
+        WHERE a.user_id = '$id'
         ");
     }
 
