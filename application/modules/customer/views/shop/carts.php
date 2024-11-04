@@ -16,4 +16,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <h3 class="mb-2"> Rp. <?= number_format($c->cost[0]->value) ?> (<?= $c->cost[0]->etd ?>) Hari</h3>
         <?php endforeach; ?>
     </div>
+    <div class="">
+
+    </div>
 </main>

@@ -68,7 +68,7 @@ class Shop extends CI_Controller
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "origin=" . "$kiu" . "&destination=" . "$tjuan" . "&weight=" . $berat . "&courier=" . "$expedisi",
+            CURLOPT_POSTFIELDS => "origin=" . $kiu . "&destination=" . $tjuan . "&weight=" . $berat . "&courier=" . $expedisi,
             CURLOPT_HTTPHEADER => array(
                 "content-type: application/x-www-form-urlencoded",
                 "key:" . $this->api_key,
@@ -357,11 +357,11 @@ class Shop extends CI_Controller
                 } else {
                     $price = $this->input->post('price') * $this->input->post('satuan_qty');
                     $qty_pcs = $qty * $satuan_qty;
-                    $weight = $product_weight * $satuan_qty;
+                    $weight = $product_weight;
                 }
 
                 $total_price_item = $qty * $price;
-                $total_weight_item = $qty * $weight;
+                $total_weight_item = $weight;
                 $total_price_in_cart = $this->cart->total();
                 $total_price = $total_price_item + $total_price_in_cart;
 
