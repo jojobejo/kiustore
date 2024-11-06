@@ -16,7 +16,7 @@ class Shop extends CI_Controller
         ));
     }
 
-    public $api_key = "850366532701e5e36174b032cfd311e9";
+    public $api_key = "197f7e1329685d3ed9d1468c54efc9dd";
 
     public function cart()
     {
