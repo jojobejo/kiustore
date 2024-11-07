@@ -21,14 +21,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <div class="media-body">
                 <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
                 <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
-                <span class="content-color font-xs"><?php echo $item['total_weight']; ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> = <?= $item['total_weight'] * $item['qty'] ?> </span></span>
+                <span class="content-color font-xs product-weight-<?php echo $item['rowid']; ?>"><?php echo ($item['total_weight'] / 1000); ?>Kg / (pcs)</span>
                 <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
                 <div class="plus-minus">
                   <i class="subs" data-feather="minus"></i>
                   <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
                   <i class="adds" data-feather="plus"></i>
                 </div>
-
               </div>
             </div>
             <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
@@ -55,6 +54,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
       <div class="card cart-amount-area mb-3">
         <div class="card-body d-flex align-items-center justify-content-between">
           Subtotal <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price); ?></h5>
+        </div>
+      </div>
+      <div class="card cart-amount-area mb-3">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          Subweight <h5 class="total-price n-total mb-0">0</h5>
         </div>
       </div>
 

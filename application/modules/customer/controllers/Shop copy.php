@@ -353,18 +353,16 @@ class Shop extends CI_Controller
                 if ($satuan == 1) {
                     $price = $this->input->post('price');
                     $qty_pcs = $qty;
-                    $weight = $product_weight * $qty;
+                    $weight = $product_weight;
                 } else {
                     $price      = $this->input->post('price') * $this->input->post('satuan_qty');
                     $qty_pcs    = $qty * $satuan_qty;
-                    $weight     = $product_weight * $qty;
+                    $weight     = $qty * $product_weight;
                 }
-
                 // TOTAL PRICE
                 $total_price_item = $qty * $price;
                 $total_price_in_cart = $this->cart->total();
                 $total_price = $total_price_item + $total_price_in_cart;
-
                 // TOTAL WEIGTH
                 $total_weight_item = $weight;
 
@@ -380,9 +378,23 @@ class Shop extends CI_Controller
                         'price' => $price,
                         'name' => $name,
                         'product_type' => $product_type,
-                        'product_weight' => $product_weight,
                         'total_weight'  => $total_weight_item
                     );
+                    $itemaddons = array(
+                        'idbarang' => $id,
+                        'idcustomer' => $idcus,
+                        'qty' => $qty,
+                        'satuan' => $satuan,
+                        'satuan_text' => $satuan_text,
+                        'satuan_qty' => $satuan_qty,
+                        'price' => $price,
+                        'name' => $name,
+                        'product_type' => $product_type,
+                        'total_weight'  => $total_weight_item,
+                        'create_at'  => $now,
+                    );
+
+                    $this->product->tmp_cart_customer($itemaddons);
                     $this->cart->insert($item);
                     $total_item = count($this->cart->contents());
 
@@ -397,16 +409,17 @@ class Shop extends CI_Controller
                     $response = array('code' => 202, 'message' => 'Gagal memasukkan dalam keranjang. Stok barang hanya ' . $satuan_qty . ' ' . $qty);
                 }
 
+
                 break;
             case 'display_cart':
                 $carts = [];
+
                 foreach ($this->cart->contents() as $items) {
                     $carts[$items['rowid']]['id'] = $items['id'];
                     $carts[$items['rowid']]['name'] = $items['name'];
                     $carts[$items['rowid']]['qty'] = $items['qty'];
                     $carts[$items['rowid']]['price'] = $items['price'];
                     $carts[$items['rowid']]['subtotal'] = $items['subtotal'];
-                    $carts[$items['rowid']]['product_weight'] = $items['product_weight'];
                     $carts[$items['rowid']]['total_weight'] = $items['total_weight'];
                 }
                 $response = array('code' => 200, 'carts' => $carts);
@@ -454,7 +467,6 @@ class Shop extends CI_Controller
                     $data['code'] = 204;
                     $data['message'] = 'Item qty updated';
                     $data['item']['subtotal'] =  'Rp ' . format_rupiah($this->input->post('qty') * $detail_item['price']);
-                    $data['item']['total_weight'] =  $this->input->post('qty') * $detail_item['product_weight'];
                     $data['total']['subtotal'] = 'Rp ' . format_rupiah($total_price);
                     $data['total']['ongkir'] = ($ongkir > 0) ? 'Rp ' . format_rupiah($ongkir) : '-';
                     $data['total']['total'] = 'Rp ' . format_rupiah($total_price + $ongkir);
