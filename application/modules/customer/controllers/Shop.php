@@ -27,7 +27,9 @@ class Shop extends CI_Controller
 
         //ADD-ONS
         $cusids             = $this->session->userdata('user_id');
-        $cart['cartaddons'] = $this->product->count_tmp_cart($cusids)->result();
+        $now                = date('Y-m-d');
+        $cart['cartaddons'] = $this->product->count_tmp_cart($cusids, $now)->result();
+        $cart['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
 
         if (level_user() < 3) {
             $ongkir = $cart['ongkir'] = "0";
@@ -383,7 +385,22 @@ class Shop extends CI_Controller
                         'product_weight' => $product_weight,
                         'total_weight'  => $total_weight_item
                     );
+                    $items = array(
+                        'idbarang'  => $id,
+                        'idcustomer' => $idcus,
+                        'qty'   => $qty,
+                        'satuan' => $satuan,
+                        'satuan_text' => $satuan_text,
+                        'satuan_qty' => $satuan_qty,
+                        'price' => $price,
+                        'name' => $name,
+                        'product_type' => $product_type,
+                        'product_weight' => $product_weight,
+                        'total_weight'  => $total_weight_item,
+                        'create_at' => $now
+                    );
                     $this->cart->insert($item);
+                    $this->product->tmp_cart_customer($items);
                     $total_item = count($this->cart->contents());
 
                     // if ($_SESSION['user_level'] != 1) {

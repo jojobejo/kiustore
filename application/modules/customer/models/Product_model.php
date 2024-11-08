@@ -29,12 +29,22 @@ class Product_model extends CI_Model
     {
         return $this->db->where('id', $id)->get('products')->row()->stock;
     }
-    public function count_tmp_cart($id)
+    public function count_tmp_cart($id, $now)
     {
         return $this->db->query("SELECT 
         COUNT(a.idcustomer) AS item_cart
         FROM tmp_cart a
         WHERE a.idcustomer = '$id'
+        AND a.create_at = '$now'
+        ");
+    }
+    public function get_tmp_cart($id, $now)
+    {
+        return $this->db->query("SELECT 
+        a.*
+        FROM tmp_cart a
+        WHERE a.idcustomer = '$id'
+        AND a.create_at = '$now'
         ");
     }
     public function tmp_cart_customer($data)

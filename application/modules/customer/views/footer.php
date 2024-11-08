@@ -287,6 +287,7 @@ $controller = $this->router->fetch_class();
         if (res.error == 0) {
           // tr.addClass('alert alert-danger');
           $('.qty-item-' + rowid + '').text(qty);
+          $('.qty-item-' + id + '').text(qty);
           $('.subtotal-item-' + rowid + '').text(res.item.subtotal);
 
           $('.n-subtotal').text(res.total.subtotal);
