@@ -83,6 +83,7 @@ $route['promo'] = 'customer/product/promo';
 $route['product/(:num)/(:any)'] = 'customer/product/product/$1/$2';
 $route['cart'] = 'customer/shop/cart';
 $route['cekongkir'] = 'customer/shop/cekongkir';
+$route['addongkir'] = 'customer/shop/addongkirs';
 
 $route['cart_api'] = 'customer/shop/cart_api';
 $route['checkout'] = 'customer/shop/checkout';

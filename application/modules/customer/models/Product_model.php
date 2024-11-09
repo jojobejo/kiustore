@@ -51,11 +51,25 @@ class Product_model extends CI_Model
     {
         $this->db->insert('tmp_cart', $data);
     }
-    public function gettmpshop($id)
+    public function gettmpshop($id, $tgl)
     {
-        return $this->db->query("SELECT SUM(a.total_weight) AS total_weight
-        FROM tmp_cart a 
+        return $this->db->query("SELECT 
+        b.kota_id AS kota_id,
+        SUM(a.qty)* a.product_weight AS total_weights
+        FROM tmp_cart a
+        JOIN customers b ON b.user_id = a.idcustomer
         WHERE a.idcustomer = '$id'
+        AND a.create_at = '$tgl'
+        GROUP BY a.idcustomer
+        ");
+    }
+    public function getongkirs($id, $tgl)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tbtestongkir a
+        WHERE a.idcustomer = '$id'
+        AND a.create_at = '$tgl'
         ");
     }
     public function getcustomer($id)
@@ -64,6 +78,10 @@ class Product_model extends CI_Model
         FROM customers a 
         WHERE a.user_id = '$id'
         ");
+    }
+    public function addongkir($data)
+    {
+        return $this->db->insert('tbtestongkir', $data);
     }
 
     // public function get_products_for_home()

@@ -36,30 +36,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <?php endforeach; ?>
       </div>
 
-      <div class="cart-item-wrap pt-0 mb-3">
-        <?php foreach ($itm_cart as $itm) : ?>
-          <div class="swipe-to-show cart-<?php echo $itm->id; ?>">
-            <div class="product-list media">
-              <a href="#"><img src="#" alt="offer" /></a>
-              <div class="media-body">
-                <a href="#" class="font-sm"> <?php echo $itm->name; ?> </a>
-                <span class="content-color font-xs">Rp <?php echo format_rupiah($itm->price); ?> x <span class="qty-item-<?php echo $itm->id; ?>"><?php echo $itm->qty; ?> <?php echo $itm->satuan_text; ?></span></span>
-                <span class="content-color font-xs product-weight-<?php echo $itm->id; ?>"><?php echo ($itm->product_weight / 1000); ?>Kg / (pcs)</span>
-                <span class="title-color subtotal-item-<?php echo $itm->id; ?> font-sm">Rp <?php echo format_rupiah($itm->price); ?></span>
-                <div class="plus-minus">
-                  <i class="subs" data-feather="minus"></i>
-                  <input class="cart-update" name="quantity[<?php echo $itm->id; ?>]" type="number" data-qty="<?php echo $itm->qty; ?>" data-rowid="<?php echo $itm->id; ?>" value="<?php echo $itm->qty; ?>" min="0" max="1000" />
-                  <i class="adds" data-feather="plus"></i>
-                </div>
-              </div>
-            </div>
-            <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $itm->id; ?>">
-              <i data-feather="trash"></i>
-            </div>
-          </div>
-        <?php endforeach; ?>
-      </div>
-
       <!-- Cart Item Section End  -->
       <!-- Coupon Area-->
       <div class="card coupon-card mb-3">
@@ -79,61 +55,50 @@ defined('BASEPATH') or exit('No direct script access allowed');
           Subtotal <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price); ?></h5>
         </div>
       </div>
-      <div class="card cart-amount-area mb-3">
-        <div class="card-body d-flex align-items-center justify-content-between">
-          Subweight <h5 class="mb-0">0</h5>
-        </div>
-      </div>
-
-      <form action="<?php echo site_url('cekongkir'); ?>" method="POST">
-        <div class="card cart-amount-area mb-3">
-          <div class="card-body">
-            Pilih Ekpedisi
-            <!-- kode_id_kota 160 == 'Jember' -->
-            <?php foreach ($profilecustomer as $p) : ?>
-              <?php foreach ($tmp_cart as $t) : ?>
-                <input type="text" name="kiu" value="160">
-                <input type="text" name="tjuan" value="<?= $p->kota_id ?>">
-                <input type="text" name="berat" value="<?= $t->total_weight ?>">
-              <?php endforeach; ?>
-            <?php endforeach; ?>
-
-            <select name="kurir" id="kurir" class="form-control mt-2">
-              <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
-              <option value="jne">JNE</option>
-              <option value="pos">POS INDONESIA</option>
-              <option value="tiki">TIKI</option>
-            </select>
-            <?php foreach ($carts as $item) : ?>
-              <input type="text" name="weights" value="">
-            <?php endforeach; ?>
-            <button class="btn btn-block btn-primary mt-2">CEK ONGKIR</button>
+      <?php foreach ($ongkirs as $o) :
+        $jsongkir = explode(';', $o->jsongkir);
+        $expedisi = $o->sjasa;
+        if ($expedisi == "jne") {
+          $expedisi = 'JNE';
+        } elseif ($expedisi == "pos") {
+          $expedisi = 'POS INDONESIA';
+        } elseif ($expedisi == "tiki") {
+          $expedisi = 'TIKI';
+        }
+      ?>
+        <?php if (count([$o->id]) == '1') : ?>
+          <div class="card cart-amount-area mb-3">
+            <div class="card-body">
+              Ekpedisi
+              <input type="text" value="<?= $expedisi ?> - <?= $jsongkir['0'] ?>">
+              <input type="text" value="<?= $jsongkir['1'] ?>(Hari)">
+            </div>
           </div>
-        </div>
-      </form>
-
-      <!-- <div class="card cart-amount-area mb-3">
-        <div class="card-body">
-          Pilih Ekpedisi
-
-          <?php foreach ($profilecustomer as $p) : ?>
-            <?php foreach ($tmp_cart as $t) : ?>
-              <input type="text" name="kiu" value="160">
-              <input type="text" name="tjuan" value="<?= $p->kota_id ?>">
-              <input type="text" name="berat" value="<?= $t->total_weight ?>">
-            <?php endforeach; ?>
-          <?php endforeach; ?>
-
-          <select name="kurir" id="kurir" class="form-control mt-2">
-            <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
-            <option value="jne">JNE</option>
-            <option value="pos">POS INDONESIA</option>
-            <option value="tiki">TIKI</option>
-          </select>
-          <button class="btn btn-block btn-primary mt-2" id="cekongkir">CEK ONGKIR</button>
-
-        </div>
-      </div> -->
+        <?php else : ?>
+          <form action="<?php echo site_url('cekongkir'); ?>" method="POST">
+            <div class="card cart-amount-area mb-3">
+              <div class="card-body">
+                Pilih Ekpedisi
+                <!-- kode_id_kota 160 == 'Jember' -->
+                <?php foreach ($tmp_cart as $t) : ?>
+                  <div hidden>
+                    <input type="text" name="kiu" value="160">
+                    <input type="text" name="tjuan" value="<?= $t->kota_id ?>">
+                    <input type="text" name="berat" value="<?= $t->total_weights ?>">
+                  </div>
+                <?php endforeach; ?>
+                <select name="kurir" id="kurir" class="form-control mt-2">
+                  <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
+                  <option value="jne">JNE</option>
+                  <option value="pos">POS INDONESIA</option>
+                  <option value="tiki">TIKI</option>
+                </select>
+                <button class="btn btn-block btn-primary mt-2">CEK ONGKIR</button>
+              </div>
+            </div>
+          </form>
+        <?php endif; ?>
+      <?php endforeach; ?>
 
       <div class="card cart-amount-area mb-3">
         <div class="card-body d-flex align-items-center justify-content-between">
@@ -142,7 +107,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <!-- <?php else : ?>
             <h5 class="total-price mb-0"><span class="n-ongkir font-weight-bold">Rp <?php echo format_rupiah(get_settings('shipping_cost')); ?></span></h5>
           <?php endif; ?>  -->
-          <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($ongkir); ?></h5>
+          <?php foreach ($ongkirs as $o) :
+            $jsongkir = explode(';', $o->jsongkir);
+          ?>
+            <h5 class="total-price  mb-0">Rp. <?= format_rupiah($jsongkir['2']); ?></h5>
+          <?php endforeach; ?>
         </div>
       </div>
       <div class="card cart-amount-area mb-3">

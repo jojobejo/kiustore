@@ -35,9 +35,12 @@ class Shop extends CI_Controller
             $ongkir = $cart['ongkir'] = "0";
 
             $cusid  = $this->session->userdata('user_id');
+            $now                = date('Y-m-d');
 
+            $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
             $cart['total_price']     = $cart['total_cart'];
-            $cart['tmp_cart']        = $this->product->gettmpshop($cusid)->result();
+            $cart['tmp_cart']        = $this->product->gettmpshop($cusid, $now)->result();
+            $cart['ongkirs']         = $this->product->getongkirs($cusid, $now)->result();
             $cart['profilecustomer'] = $this->product->getcustomer($cusid)->result();
 
             $this->load->view('header');
@@ -91,6 +94,24 @@ class Shop extends CI_Controller
         $this->load->view('header');
         $this->load->view('shop/carts', $data);
         $this->load->view('footer');
+    }
+
+    public function addongkirs()
+    {
+        $datajasa     =  $this->input->post('jasaongkir');
+        $selectjasa   =  $this->input->post('jasa');
+        $customer     =  $this->input->post('customer');
+        $datenow      =  date('Y-m-d');
+
+        $insrtdata = array(
+            'jsongkir'   => $datajasa,
+            'sjasa'      => $selectjasa,
+            'idcustomer' => $customer,
+            'create_at'  => $datenow
+        );
+
+        $this->product->addongkir($insrtdata);
+        redirect('cart');
     }
 
     public function checkout($action = '')

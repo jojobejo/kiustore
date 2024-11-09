@@ -759,36 +759,6 @@ CREATE TABLE `v_products` (
 ,`level_product` varchar(5)
 );
 
--- --------------------------------------------------------
-
---
--- Stand-in struktur untuk tampilan `v_tagihan`
--- (Lihat di bawah untuk tampilan aktual)
---
-CREATE TABLE `v_tagihan` (
-`user_id` bigint(20) unsigned
-,`tagihan` double
-,`max_credit` int(11)
-);
-
--- --------------------------------------------------------
-
---
--- Struktur untuk view `v_products`
---
-DROP TABLE IF EXISTS `v_products`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_products`  AS SELECT `a`.`id` AS `id`, `a`.`category_id` AS `category_id`, `a`.`sku` AS `sku`, `a`.`name` AS `name`, `a`.`description` AS `description`, `a`.`picture_name` AS `picture_name`, `a`.`product_unit_value` AS `product_unit_value`, `a`.`product_unit_1` AS `product_unit_1`, `a`.`product_unit_2` AS `product_unit_2`, `a`.`product_type` AS `product_type`, `a`.`product_unit_weight` AS `product_unit_weight`, if(`b`.`credit` is not null,1,0) AS `promo`, `a`.`price` AS `price`, `a`.`price_2` AS `price_2`, `a`.`price_3` AS `price_3`, if(`b`.`credit` is not null,`a`.`price` - `b`.`credit`,`a`.`price`) AS `promo_price`, if(`b`.`credit` is not null,`a`.`price_2` - `b`.`credit`,`a`.`price_2`) AS `promo_price_2`, if(`b`.`credit` is not null,`a`.`price_3` - `b`.`credit`,`a`.`price_3`) AS `promo_price_3`, if(`b`.`credit` is not null,round(`b`.`credit` / `a`.`price` * 100,0),0) AS `discount`, if(`b`.`credit` is not null,round(`b`.`credit` / `a`.`price_2` * 100,0),0) AS `discount_2`, if(`b`.`credit` is not null,round(`b`.`credit` / `a`.`price_3` * 100,0),0) AS `discount_3`, `a`.`stock` AS `stock`, `a`.`product_unit_1` AS `product_unit`, `a`.`is_available` AS `is_available`, `a`.`add_date` AS `add_date`, CASE WHEN `a`.`price` <> 0 AND `a`.`price_2` = 0 AND `a`.`price_3` = 0 THEN '1' WHEN `a`.`price` = 0 AND `a`.`price_2` <> 0 AND `a`.`price_3` = 0 THEN '2' WHEN `a`.`price` = 0 AND `a`.`price_2` = 0 AND `a`.`price_3` <> 0 THEN '3' WHEN `a`.`price` <> 0 AND `a`.`price_2` <> 0 AND `a`.`price_3` = 0 THEN '1,2' WHEN `a`.`price` <> 0 AND `a`.`price_2` = 0 AND `a`.`price_3` <> 0 THEN '1,3' WHEN `a`.`price` = 0 AND `a`.`price_2` <> 0 AND `a`.`price_3` <> 0 THEN '2,3' WHEN `a`.`price` <> 0 AND `a`.`price_2` <> 0 AND `a`.`price_3` <> 0 THEN '1,2,3' END AS `level_product` FROM (`products` `a` left join `promo` `b` on(`b`.`product_id` = `a`.`id` and cast(`b`.`start_date` as date) <= curdate() and cast(`b`.`expired_date` as date) >= curdate()))  ;
-
--- --------------------------------------------------------
-
---
--- Struktur untuk view `v_tagihan`
---
-DROP TABLE IF EXISTS `v_tagihan`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_tagihan`  AS SELECT `a`.`user_id` AS `user_id`, sum(`a`.`tagihan`) AS `tagihan`, `a`.`max_credit` AS `max_credit` FROM (select `a`.`user_id` AS `user_id`,ifnull(`b`.`total_price`,0) + ifnull(`b`.`shipping_cost`,0) + ifnull(`b`.`insurance`,0) AS `tagihan`,`a`.`max_credit` AS `max_credit` from (`customers` `a` left join `orders` `b` on(`a`.`user_id` = `b`.`user_id` and `b`.`payment_method` = 1 and `b`.`order_status` < 6))) AS `a` GROUP BY `a`.`user_id``user_id`  ;
-
 --
 -- Indexes for dumped tables
 --
