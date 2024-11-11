@@ -267,6 +267,7 @@ $controller = $this->router->fetch_class();
       }
     });
   });
+  
 
   $('.cart-update').on("input", function(e) {
     e.preventDefault();

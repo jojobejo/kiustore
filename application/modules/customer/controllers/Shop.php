@@ -42,16 +42,19 @@ class Shop extends CI_Controller
             $cart['tmp_cart']        = $this->product->gettmpshop($cusid, $now)->result();
             $cart['ongkirs']         = $this->product->getongkirs($cusid, $now)->result();
             $cart['profilecustomer'] = $this->product->getcustomer($cusid)->result();
+            $cart['sts_ongkir']      = $this->product->getstatusongkir($cusid, $now)->result();
+
 
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
             $this->load->view('footer');
         } else {
+
             $ongkir = $cart['ongkir'] = "0";
             $cart['total_price'] = $cart['total_cart'] + $ongkir;
 
             $this->load->view('header');
-            $this->load->view('shop/cart', $cart);
+            $this->load->view('shop/cart_cust_offline', $cart);
             $this->load->view('footer');
         }
     }
@@ -96,22 +99,46 @@ class Shop extends CI_Controller
         $this->load->view('footer');
     }
 
-    public function addongkirs()
+    public function ongkir()
     {
-        $datajasa     =  $this->input->post('jasaongkir');
-        $selectjasa   =  $this->input->post('jasa');
-        $customer     =  $this->input->post('customer');
-        $datenow      =  date('Y-m-d');
 
-        $insrtdata = array(
-            'jsongkir'   => $datajasa,
-            'sjasa'      => $selectjasa,
-            'idcustomer' => $customer,
-            'create_at'  => $datenow
-        );
+        $action = $this->input->post('action');
 
-        $this->product->addongkir($insrtdata);
-        redirect('cart');
+        switch ($action) {
+            case 'addongkir':
+                $datajasa     =  $this->input->post('jasaongkir');
+                $selectjasa   =  $this->input->post('jasa');
+                $customer     =  $this->input->post('customer');
+                $datenow      =  date('Y-m-d');
+
+                $insrtdata = array(
+                    'jsongkir'   => $datajasa,
+                    'sjasa'      => $selectjasa,
+                    'idcustomer' => $customer,
+                    'create_at'  => $datenow
+                );
+
+                $updatests = array(
+                    'sts_ongkir' => '1'
+                );
+
+                $this->product->addongkir($insrtdata);
+                $this->product->updatests($customer, $datenow, $updatests);
+                redirect('cart');
+                break;
+            case 'deleteongkir':
+                $customer     =  $this->input->post('customer');
+                $datenow      =  date('Y-m-d');
+
+                $updatests = array(
+                    'sts_ongkir' => '0'
+                );
+
+                $this->product->updatests($customer, $datenow, $updatests);
+                $this->product->deleteongkirs($customer);
+                redirect('cart');
+                break;
+        }
     }
 
     public function checkout($action = '')
