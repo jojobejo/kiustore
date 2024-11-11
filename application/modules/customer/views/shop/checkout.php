@@ -71,66 +71,38 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </div>
             </div>
             <!-- shipping method choose-->
-            <div class="shipping-method-choose mb-3">
-                <div class="alert alert-info m-2">Metode Pengiriman</div>
-                <div class="card shipping-method-choose-card">
-                    <div class="card-body">
-
-
-                        <div class="row">
-                            <div class="input-box col-6">
-                                <input id="karisma" name="shipping" type="radio" value="1" checked>
-                                <label for="karisma">PT. Karisma Indoagro Universal</label>
-                                <div class="check"></div>
+            <?php if (level_user() == '1') : ?>
+                <div class="shipping-method-choose mb-3" hidden>
+                    <div class="alert alert-info m-2">Metode Pengiriman</div>
+                    <div class="card shipping-method-choose-card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="input-box col-6">
+                                    <input id="karisma" name="shipping" type="radio" value="2" checked>
+                                    <label for="karisma">PT. Karisma Indoagro Universal</label>
+                                    <div class="check"></div>
+                                </div>
                             </div>
-                            <?php if (level_user() == '1') : ?>
-                                <div class="input-box col-6">
-                                    <input id="jnt" name="shipping" type="radio" value="2">
-                                    <label for="jnt">J&T Express (J&T)</label>
-                                    <div class="check"></div>
-                                </div>
-                                <div class="input-box col-6">
-                                    <input id="lion" name="shipping" type="radio" value="3">
-                                    <label for="lion">Lion Parcel (LION)</label>
-                                    <div class="check"></div>
-                                </div>
-                                <div class="input-box col-6">
-                                    <input id="ninja" name="shipping" type="radio" value="4">
-                                    <label for="ninja">Ninja Xpress (NINJA)</label>
-                                    <div class="check"></div>
-                                </div>
-                                <div class="input-box col-6">
-                                    <input id="sicepat" name="shipping" type="radio" value="5">
-                                    <label for="sicepat">SiCepat Express (SICEPAT)</label>
-                                    <div class="check"></div>
-                                </div>
-                                <div class="input-box col-6">
-                                    <input id="tiki" name="shipping" type="radio" value="6">
-                                    <label for="tiki">Citra Van Titipan Kilat (TIKI)</label>
-                                    <div class="check"></div>
-                                </div>
-                                <div class="input-box col-6">
-                                    <input id="sentral" name="shipping" type="radio" value="7">
-                                    <label for="sentral">Sentral Cargo (SENTRAL)</label>
-                                    <div class="check"></div>
-                                </div>
-                                <div class="input-box col-6">
-                                    <input id="wahana" name="shipping" type="radio" value="8">
-                                    <label for="wahana">Wahana Express</label>
-                                    <div class="check"></div>
-                                </div>
-                                <div class="input-box col-6">
-                                    <input id="anteraja" name="shipping" type="radio" value="9">
-                                    <label for="anteraja">AnterAja (ANTERAJA)</label>
-                                    <div class="check"></div>
-                                </div>
-                            <?php else : ?>
-                            <?php endif; ?>
                         </div>
-
                     </div>
                 </div>
-            </div>
+            <?php else : ?>
+                <div class="shipping-method-choose mb-3">
+                    <div class="alert alert-info m-2">Metode Pengiriman</div>
+                    <div class="card shipping-method-choose-card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="input-box col-6">
+                                    <input id="karisma" name="shipping" type="radio" value="1" checked>
+                                    <label for="karisma">PT. Karisma Indoagro Universal</label>
+                                    <div class="check"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
             <!-- Cart Amount Area-->
             <div class="card cart-amount-area mb-10">
                 <div class="card-body d-flex align-items-center justify-content-between">

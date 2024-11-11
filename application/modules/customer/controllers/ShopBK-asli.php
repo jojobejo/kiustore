@@ -3,7 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Shop extends CI_Controller
 {
-
     public function __construct()
     {
         parent::__construct();
@@ -11,134 +10,25 @@ class Shop extends CI_Controller
         $this->load->library('cart');
         $this->load->model(array(
             'product_model' => 'product',
-            'customer_model' => 'customer',
-            'profile_model' => 'profile'
+            'customer_model' => 'customer'
         ));
     }
-
-    public $api_key = "197f7e1329685d3ed9d1468c54efc9dd";
 
     public function cart()
     {
-        $data = $this->profile->get_profile();
-        $cart['carts']      = $this->cart->contents();
+        $cart['carts'] = $this->cart->contents();
         $cart['total_cart'] = $this->cart->total();
-        $cart['user']       = $data;
 
-        //ADD-ONS
-        $cusids             = $this->session->userdata('user_id');
-        $now                = date('Y-m-d');
-        $cart['cartaddons'] = $this->product->count_tmp_cart($cusids, $now)->result();
-        $cart['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
-
-        if (level_user() < 3) {
-            $ongkir = $cart['ongkir'] = "0";
-
-            $cusid  = $this->session->userdata('user_id');
-            $now                = date('Y-m-d');
-
-            $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
-            $cart['total_price']     = $cart['total_cart'];
-            $cart['tmp_cart']        = $this->product->gettmpshop($cusid, $now)->result();
-            $cart['ongkirs']         = $this->product->getongkirs($cusid, $now)->result();
-            $cart['profilecustomer'] = $this->product->getcustomer($cusid)->result();
-            $cart['sts_ongkir']      = $this->product->getstatusongkir($cusid, $now)->result();
-
-
-            $this->load->view('header');
-            $this->load->view('shop/cart', $cart);
-            $this->load->view('footer');
-        } else {
-
-            $ongkir = $cart['ongkir'] = "0";
-            $cart['total_price'] = $cart['total_cart'] + $ongkir;
-
-            $this->load->view('header');
-            $this->load->view('shop/cart_cust_offline', $cart);
-            $this->load->view('footer');
-        }
-    }
-
-    public function cekongkir()
-    {
-        $kiu        = $this->input->post('kiu');
-        $tjuan      = $this->input->post('tjuan');
-        $berat      = $this->input->post('berat');
-        $expedisi   = $this->input->post('kurir');
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.rajaongkir.com/starter/cost",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "origin=" . $kiu . "&destination=" . $tjuan . "&weight=" . $berat . "&courier=" . $expedisi,
-            CURLOPT_HTTPHEADER => array(
-                "content-type: application/x-www-form-urlencoded",
-                "key:" . $this->api_key,
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-
-        if ($err) {
-            $data['ckongkir'] = array('error' => true);
-        } else {
-            $data['ckongkir'] = json_decode($response);
-        }
+        // print_r($cart);
+        // exit;
+        //nonaktifkan ongkir otomatis
+        // $ongkir = ($cart['total_cart'] >= get_settings('min_shop_to_free_shipping_cost')) ? 0 : get_settings('shipping_cost');
+        $ongkir = 0;
+        $cart['total_price'] = $cart['total_cart'] + $ongkir;
 
         $this->load->view('header');
-        $this->load->view('shop/carts', $data);
+        $this->load->view('shop/cart', $cart);
         $this->load->view('footer');
-    }
-
-    public function ongkir()
-    {
-
-        $action = $this->input->post('action');
-
-        switch ($action) {
-            case 'addongkir':
-                $datajasa     =  $this->input->post('jasaongkir');
-                $selectjasa   =  $this->input->post('jasa');
-                $customer     =  $this->input->post('customer');
-                $datenow      =  date('Y-m-d');
-
-                $insrtdata = array(
-                    'jsongkir'   => $datajasa,
-                    'sjasa'      => $selectjasa,
-                    'idcustomer' => $customer,
-                    'create_at'  => $datenow
-                );
-
-                $updatests = array(
-                    'sts_ongkir' => '1'
-                );
-
-                $this->product->addongkir($insrtdata);
-                $this->product->updatests($customer, $datenow, $updatests);
-                redirect('cart');
-                break;
-            case 'deleteongkir':
-                $customer     =  $this->input->post('customer');
-                $datenow      =  date('Y-m-d');
-
-                $updatests = array(
-                    'sts_ongkir' => '0'
-                );
-
-                $this->product->updatests($customer, $datenow, $updatests);
-                $this->product->deleteongkirs($customer);
-                redirect('cart');
-                break;
-        }
     }
 
     public function checkout($action = '')
@@ -156,6 +46,7 @@ class Shop extends CI_Controller
         if (empty($this->input->post())) {
             redirect('home', 'refresh');
         }
+
 
         switch ($action) {
             default:
@@ -205,7 +96,7 @@ class Shop extends CI_Controller
                 }
 
                 $items = [];
-                $items_multi    = [];
+                $items_multi = [];
                 $total_price_multi[1] = 0;
                 $total_price_multi[2] = 0;
                 $total_price_multi[3] = 0;
@@ -223,7 +114,7 @@ class Shop extends CI_Controller
                     $items_multi[$item['product_type']][$item['id']]['satuan_qty'] = $item['satuan_qty'];
                     $items_multi[$item['product_type']][$item['id']]['price'] = $item['price'];
 
-                    // $total_price_multi[$item['product_type']] +=  $item['price'];
+                    $total_price_multi[$item['product_type']] +=  $item['price'];
                 }
 
                 $subtotal = $this->cart->total();
@@ -246,6 +137,7 @@ class Shop extends CI_Controller
                 $this->session->set_userdata('order_quantity_multi', $items_multi);
                 $this->session->set_userdata('total_price', $params['total']);
                 $this->session->set_userdata('total_price_multi', $total_price_multi);
+
 
                 $this->load->view('header');
                 $this->load->view('shop/checkout', $params);
@@ -388,35 +280,26 @@ class Shop extends CI_Controller
 
         switch ($action) {
             case 'add_item':
-                $id     = $this->input->post('id');
-                $idcus  = $this->session->userdata('user_id');
+                $id = $this->input->post('id');
                 $qty = $this->input->post('qty');
                 $satuan = $this->input->post('satuan');
                 $satuan_text = $this->input->post('satuan_text');
                 $satuan_qty = $this->input->post('satuan_qty');
-                // $sku = $this->input->post('sku');
+                $sku = $this->input->post('sku');
                 $name = $this->input->post('name');
                 $product_type = $this->input->post('product_type');
-                $product_weight = $this->input->post('product_weight');
-                $now    = date('Y-m-d');
 
                 if ($satuan == 1) {
                     $price = $this->input->post('price');
                     $qty_pcs = $qty;
-                    $weight = $product_weight * $qty;
                 } else {
-                    $price      = $this->input->post('price') * $this->input->post('satuan_qty');
-                    $qty_pcs    = $qty * $satuan_qty;
-                    $weight     = $product_weight * $qty;
+                    $price = $this->input->post('price') * $this->input->post('satuan_qty');
+                    $qty_pcs = $qty * $satuan_qty;
                 }
 
-                // TOTAL PRICE
                 $total_price_item = $qty * $price;
                 $total_price_in_cart = $this->cart->total();
                 $total_price = $total_price_item + $total_price_in_cart;
-
-                // TOTAL WEIGTH
-                $total_weight_item = $weight;
 
                 $stock = $this->product->get_stock($id);
                 // $response = array('code' => 200, 'message' => 'stok ' . $stock, 'total_item' => 0);
@@ -429,26 +312,9 @@ class Shop extends CI_Controller
                         'satuan_qty' => $satuan_qty,
                         'price' => $price,
                         'name' => $name,
-                        'product_type' => $product_type,
-                        'product_weight' => $product_weight,
-                        'total_weight'  => $total_weight_item
-                    );
-                    $items = array(
-                        'idbarang'  => $id,
-                        'idcustomer' => $idcus,
-                        'qty'   => $qty,
-                        'satuan' => $satuan,
-                        'satuan_text' => $satuan_text,
-                        'satuan_qty' => $satuan_qty,
-                        'price' => $price,
-                        'name' => $name,
-                        'product_type' => $product_type,
-                        'product_weight' => $product_weight,
-                        'total_weight'  => $total_weight_item,
-                        'create_at' => $now
+                        'product_type' => $product_type
                     );
                     $this->cart->insert($item);
-                    $this->product->tmp_cart_customer($items);
                     $total_item = count($this->cart->contents());
 
                     // if ($_SESSION['user_level'] != 1) {
@@ -462,22 +328,22 @@ class Shop extends CI_Controller
                     $response = array('code' => 202, 'message' => 'Gagal memasukkan dalam keranjang. Stok barang hanya ' . $satuan_qty . ' ' . $qty);
                 }
 
+
                 break;
             case 'display_cart':
                 $carts = [];
+
                 foreach ($this->cart->contents() as $items) {
                     $carts[$items['rowid']]['id'] = $items['id'];
                     $carts[$items['rowid']]['name'] = $items['name'];
                     $carts[$items['rowid']]['qty'] = $items['qty'];
                     $carts[$items['rowid']]['price'] = $items['price'];
                     $carts[$items['rowid']]['subtotal'] = $items['subtotal'];
-                    $carts[$items['rowid']]['product_weight'] = $items['product_weight'];
-                    $carts[$items['rowid']]['total_weight'] = $items['total_weight'];
                 }
+
                 $response = array('code' => 200, 'carts' => $carts);
                 break;
             case 'cart_info':
-
                 $total_price = $this->cart->total();
                 $total_item = count($this->cart->contents());
 
@@ -510,6 +376,7 @@ class Shop extends CI_Controller
                     'qty'   => $this->input->post('qty')
                 );
 
+
                 $detail_item = $this->cart->get_item($this->input->post('rowid'));
                 if ($this->cart->update($updateItem)) {
                     $data['error'] = 0;
@@ -519,7 +386,6 @@ class Shop extends CI_Controller
                     $data['code'] = 204;
                     $data['message'] = 'Item qty updated';
                     $data['item']['subtotal'] =  'Rp ' . format_rupiah($this->input->post('qty') * $detail_item['price']);
-                    $data['item']['total_weight'] =  $this->input->post('qty') * $detail_item['product_weight'];
                     $data['total']['subtotal'] = 'Rp ' . format_rupiah($total_price);
                     $data['total']['ongkir'] = ($ongkir > 0) ? 'Rp ' . format_rupiah($ongkir) : '-';
                     $data['total']['total'] = 'Rp ' . format_rupiah($total_price + $ongkir);

@@ -92,6 +92,7 @@ class Shop extends CI_Controller
             $data['ckongkir'] = array('error' => true);
         } else {
             $data['ckongkir'] = json_decode($response);
+            $data['customer'] = $this->customer->data();
         }
 
         $this->load->view('header');
@@ -222,8 +223,7 @@ class Shop extends CI_Controller
                     $items_multi[$item['product_type']][$item['id']]['satuan_text'] = $item['satuan_text'];
                     $items_multi[$item['product_type']][$item['id']]['satuan_qty'] = $item['satuan_qty'];
                     $items_multi[$item['product_type']][$item['id']]['price'] = $item['price'];
-
-                    // $total_price_multi[$item['product_type']] +=  $item['price'];
+                    $total_price_multi[$item['product_type']] +=  $item['price'];
                 }
 
                 $subtotal = $this->cart->total();
