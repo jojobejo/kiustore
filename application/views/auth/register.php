@@ -67,16 +67,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <input class="form-control" id="nama" name="nama" type="text" placeholder="Nama Anda">
               <?php echo form_error('nama'); ?>
             </div>
-            <!--    <div class="form-group text-start mb-4"><span>NIK</span>
-                  <label for="nik"><i class="lni lni-envelope"></i></label>
-                  <input class="form-control" id="nik" name="nik" type="text" placeholder="">
-                  <?php echo form_error('nik'); ?>
-                </div>
-                <div class="form-group text-start mb-4"><span>NPWP</span>
-                  <label for="npwp"><i class="lni lni-envelope"></i></label>
-                  <input class="form-control" id="npwp" name="npwp" type="text" placeholder="">
-                  <?php echo form_error('npwp'); ?>
-                </div> -->
             <div class="form-group text-start mb-4"><span>Alamat</span>
               <label for="alamat"><i class="lni lni-map"></i></label>
               <input class="form-control" id="alamat" name="alamat" type="text" placeholder="">
@@ -87,11 +77,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <input class="form-control" id="email" name="email" type="email" placeholder="" autocomplete="off">
               <?php echo form_error('email'); ?>
             </div>
-            <!--    <div class="form-group text-start mb-4"><span>Nama Toko</span>
-                  <label for="nama_toko"><i class="lni lni-envelope"></i></label>
-                  <input class="form-control" id="nama_toko" name="nama_toko" type="text" placeholder="">
-                  <?php echo form_error('nama_toko'); ?>
-                </div> -->
             <div class="form-group text-start mb-4"><span>No Telp</span>
               <label for="no_telp"><i class="lni lni-phone"></i></label>
               <input class="form-control" id="no_telp" name="no_telp" type="text" placeholder="">

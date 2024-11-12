@@ -15,6 +15,8 @@ class Profile extends CI_Controller
         $this->load->library('form_validation');
     }
 
+    public $api_key = "197f7e1329685d3ed9d1468c54efc9dd";
+
     public function index()
     {
         $data = $this->profile->get_profile();
@@ -25,6 +27,44 @@ class Profile extends CI_Controller
 
         $this->load->view('header', $params);
         $this->load->view('profile', $user);
+        $this->load->view('footer');
+    }
+
+    public function change_alamat_asal()
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://pro.rajaongkir.com/api/province",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "content-type: application/x-www-form-urlencoded",
+                "key:" . $this->api_key,
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            $user['kota'] = array('error' => true);
+        } else {
+            // DATA AWAL
+            $data = $this->profile->get_profile();
+            $params['title'] = $data->name;
+            // JSON-RAJA-ONGKIR
+            $user['kota'] = json_decode($response);
+        }
+
+        $this->load->view('header', $params);
+        $this->load->view('profile_alamat', $user);
         $this->load->view('footer');
     }
 

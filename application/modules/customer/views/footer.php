@@ -84,10 +84,22 @@ $controller = $this->router->fetch_class();
 </script>
 <script>
   $(document).ready(function() {
-    $('.autosearch').select2();
+    $(".provinsi_customer_edit").select2({
+      tags: true
+    });
+    $(".provinsi_customer").select2({
+      tags: true
+    });
+    $(".provinsi").select2({
+      tags: true
+    });
   });
 </script>
+<script>
+  $(document).ready(function() {
 
+  });
+</script>
 
 <?php if (!empty($_SESSION['__ACTIVE_SESSION_DATA'])) : ?>
   <script>
@@ -267,7 +279,7 @@ $controller = $this->router->fetch_class();
       }
     });
   });
-  
+
 
   $('.cart-update').on("input", function(e) {
     e.preventDefault();
@@ -380,6 +392,9 @@ $controller = $this->router->fetch_class();
     }
 
   };
+
+
+
 
 
   $('.adds').on('click', function() {

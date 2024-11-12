@@ -14,7 +14,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <h6 class="text-center mb-0 text-white">Cek Ongkir</h6>
                     </div>
                 </div>
-
                 <div class="card user-data-card">
                     <div class="card-body">
                         <div class="">

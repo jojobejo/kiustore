@@ -34,6 +34,9 @@
   <link rel="stylesheet" id="change-link" type="text/css" href="<?php echo get_theme_uri('css/style.css?v=0.01'); ?>" />
   <!-- jquery 3.6.0 -->
   <script src="<?php echo get_theme_uri('js/jquery-3.6.0.min.js'); ?>"></script>
+  <!-- SELECT2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <!-- Head End -->
 

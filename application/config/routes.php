@@ -67,6 +67,7 @@ $route['cartongkir'] = 'customer/addons/addoncart/cart';
 
 $route['customer'] = 'customer/customer';
 $route['profile'] = 'customer/profile';
+$route['change_alamat_customer_profile'] = 'customer/profile/change_alamat_asal';
 $route['message'] = 'customer/message';
 $route['send_message'] = 'customer/message/send';
 $route['count_unread_messages'] = 'customer/message/count_unread';
