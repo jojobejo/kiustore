@@ -64,18 +64,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   </td>
                 </tr>
                 <tr>
-                  <td>Kota Asal</td>
-                  <td>
-                    <select name="kota" id="kota" class="form-control autosearch">
-                      <?php if ($kota) : ?>
-                        <?php foreach ($kota->rajaongkir->results as $kota) : ?>
-                          <option name="kota" value="<?= $kota->city_id ?>"><?= $kota->city_name ?></option>
-                        <?php endforeach; ?>
-                      <?php endif; ?>
-                    </select>
-                  </td>
-                </tr>
-                <tr>
                   <td>Nama Toko</td>
                   <td>
                     <input type="text" value="<?php echo $customer->shop_name; ?>" class="form-control form-control-sm" name="shop_name">
@@ -84,7 +72,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <tr>
                   <td>Alamat Toko</td>
                   <td>
-                    <input type="text" value="<?php echo $customer->shop_address; ?>" class="form-control form-control-sm" name="shop_address">
+                    <div class="row">
+                      <div class="col-8">
+                        <input type="text" value="<?php echo $customer->shop_address; ?>" class="form-control form-control-sm" name="shop_address" readonly>
+                      </div>
+                      <div class="col-2">
+                        <a href="<?= base_url('') ?>" class="btn btn-warning btn-sm"><i class="fa fa-edit text-warning"></i></a>
+                      </div>
+                    </div>
                   </td>
                 </tr>
                 <tr>
