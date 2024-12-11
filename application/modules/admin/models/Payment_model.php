@@ -270,7 +270,7 @@ class Payment_model extends CI_Model
 
     public function delete($id)
     {
-      $this->db->query("
+        $this->db->query("
             DELETE
             FROM payments p
             WHERE p.id = '$id'
@@ -290,5 +290,14 @@ class Payment_model extends CI_Model
         ");
 
         return $payments->result();
+    }
+
+    public function payment_bri()
+    {
+        $payment_briva = $this->db->query("SELECT 
+        a.*
+        FROM payments a ");
+
+        return $payment_briva->result();
     }
 }

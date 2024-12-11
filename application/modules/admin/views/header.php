@@ -16,9 +16,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
   <!-- Icons -->
   <link rel="stylesheet" href="<?php echo get_theme_uri('js/plugins/nucleo/css/nucleo.css', 'argon'); ?>" type="text/css">
   <link rel="stylesheet" href="<?php echo get_theme_uri('js/plugins/@fortawesome/fontawesome-free/css/all.min.css', 'argon'); ?>" type="text/css">
-  
-  
-  
+
+
+
 
   <!-- Argon CSS -->
   <link rel="stylesheet" href="<?php echo get_theme_uri('css/argon9f1e.css?v=1.1.0', 'argon'); ?>" type="text/css">
@@ -94,9 +94,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </li>
             <?php if (admin_role() == 'admin' || admin_role() == 'adminonline') : ?>
               <li class="nav-item">
-                <a class="nav-link <?= ($this->uri->segment(3) == 'category' ? 'active' : '') ?>" href="<?php echo site_url('admin/products/category'); ?>">
+                <a class="nav-link <?= ($this->uri->segment(3) == 'category' ? 'active' : '') ?>" href="<?php echo site_url('admin/payments/briva_payment'); ?>">
                   <i class="ni ni-bullet-list-67 text-info"></i>
                   <span class="nav-link-text">Kategori Produk</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link <?= ($this->uri->segment(2) == 'payments' ? 'active' : '') ?>" href="<?php echo site_url('admin/payments/briva_payment'); ?>">
+                  <i class="ni ni-bullet-list-67 text-info"></i>
+                  <span class="nav-link-text">BRIVA API</span>
                 </a>
               </li>
               <li class="nav-item">

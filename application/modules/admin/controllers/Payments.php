@@ -99,7 +99,7 @@ class Payments extends CI_Controller
             $status = 3;
             $flash = 'Pembayaran Gagal';
             $this->payment->set_payment_status_gagal($id, $status, $order_id);
-          //  $this->payment->delete($id);
+            //  $this->payment->delete($id);
         } else {
             $flash = 'Tidak ada tindakan dilakukan';
         }
@@ -163,5 +163,17 @@ class Payments extends CI_Controller
                 $response = $orders;
                 break;
         }
+    }
+
+    public function briva_payment()
+    {
+
+        $params['title'] = 'Payment VIA BRIVA-API';
+        $data['briva']   = $this->payment->payment_bri();
+
+
+        $this->load->view('header', $params);
+        $this->load->view('payments/brivapayments', $data);
+        $this->load->view('footer');
     }
 }
