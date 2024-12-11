@@ -2,7 +2,6 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 
-
 <main class="main-wrap cart-page mb-xxl">
     <!-- Checkout Wrapper-->
     <form action="<?php echo site_url('ongkir'); ?>" method="POST">
@@ -15,10 +14,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </div>
                 </div>
                 <div class="card user-data-card">
+                    <?= print_r($ckongkir) ?>
                     <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Alamat Lengkap</label>
-                            <input type="text" name="name" value="<?php echo $customer->shop_address; ?> , <?= $ckongkir->rajaongkir->destination_details->city_name ?>,<?= $ckongkir->rajaongkir->destination_details->province ?>" class="form-control" id="name" required readonly>
+                            <input type="text" name="name" value="<?php echo $customer->shop_address; ?> , <?= $ckongkir->rajaongkir->origin_details->city_name ?>,<?= $ckongkir->rajaongkir->destination_details->province ?>" class="form-control" id="name" required readonly>
                         </div>
                     </div>
                     <div class="card-body">

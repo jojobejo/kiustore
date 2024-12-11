@@ -62,7 +62,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <!-- kode_id_kota 160 == 'Jember' -->
               <form action="<?= base_url('cekongkir'); ?>" method="POST">
                 <?php foreach ($tmp_cart as $t) : ?>
-                  <div hidden>
+                  <div>
                     <input type="text" name="kiu" value="160">
                     <input type="text" name="tjuan" value="<?= $t->kota_id ?>">
                     <input type="text" name="berat" value="<?= $t->total_weights ?>">

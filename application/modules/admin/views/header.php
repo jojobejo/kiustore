@@ -106,6 +106,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </a>
               </li>
               <li class="nav-item">
+                <a class="nav-link" <?= ($this->uri->segment(2) == 'ongkir' ? 'active' : '') ?> href="<?php echo site_url('admin/ongkir'); ?>">
+                  <i class="ni ni-bullet-list-67 text-info"></i>
+                  <span class="nav-link-text">Data Ongkir</span>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a class="nav-link <?= ($this->uri->segment(2) == 'banner_product' ? 'active' : '') ?>" href="<?php echo site_url('admin/banner_product'); ?>">
                   <i class="fa fa-image text-success"></i>
                   <span class="nav-link-text">Banner Produk</span>
