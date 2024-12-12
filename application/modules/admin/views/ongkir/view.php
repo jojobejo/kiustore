@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 ?>
+
 <!-- Header -->
 <div class="header bg-primary pb-6">
     <div class="container-fluid">
@@ -22,10 +23,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="card-wrapper">
                 <div class="card">
                     <div class="card-header">
-
                     </div>
                     <div class="card-body">
-
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>id_city</th>
+                                    <th>Nama Provinsi</th>
+                                    <th>#</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if ($province) : ?>
+                                    <?php foreach ($province->rajaongkir->results as $r) : ?>
+                                        <tr>
+                                            <td><?= $r->province_id ?></td>
+                                            <td><?= $r->province ?></td>
+                                            <td></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
                     <div class="card-footer">
 

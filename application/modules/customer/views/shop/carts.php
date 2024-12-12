@@ -14,7 +14,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </div>
                 </div>
                 <div class="card user-data-card">
-                    <?= print_r($ckongkir) ?>
                     <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Alamat Lengkap</label>
