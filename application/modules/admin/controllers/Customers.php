@@ -160,12 +160,15 @@ class Customers extends CI_Controller
                 $customer['kota'] = json_decode($response);
             }
 
-            $data = $this->customer->customer_data($id);
+            $data  = $this->customer->customer_data($id);
+            $cusva = $this->customer->get_status_va($id);
+
             $customer['admin'] = $this->admin->get_all_admin();
 
             $params['title'] = $data->name;
 
             $customer['customer'] = $data;
+            $customer['va']     = $cusva;
             $customer['flash'] = $this->session->flashdata('customer_flash');
             $customer['orders'] = $this->order->order_by($id);
             $customer['payments'] = $this->payment->payment_by($id);
@@ -177,7 +180,6 @@ class Customers extends CI_Controller
             show_404();
         }
     }
-
 
     public function api($action = '')
     {
@@ -237,5 +239,18 @@ class Customers extends CI_Controller
         $response = json_encode($response);
         $this->output->set_content_type('application/json')
             ->set_output($response);
+    }
+
+    public function generate_va()
+    {
+        $idcus  = $this->input->post('idcus');
+        $vacus  = $this->input->post('vacusno');
+
+        $generate = array(
+            'va_code'   => $vacus
+        );
+
+        $this->customer->updateva($idcus, $generate);
+        redirect('admin/customers/view/' . $idcus);
     }
 }

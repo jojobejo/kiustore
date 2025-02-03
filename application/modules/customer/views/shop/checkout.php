@@ -50,7 +50,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <div class="card shipping-method-choose-card">
                     <div class="card-body">
                         <div class="payment-method-choose">
-
                             <div class="row">
                                 <!-- Net Banking Option Start -->
                                 <?php if (is_member()) : ?>
@@ -61,25 +60,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <?php endif; ?>
                                 <div class="input-box col-6">
                                     <input type="radio" name="payment" id="transfer" value="2" checked="" />
-                                    <label class="form-check-label" for="transfer">Transfer Bank </label>
+                                    <label class="form-check-label" for="transfer">VA - KARISMA </label>
                                 </div>
                                 <!-- Net Banking Option End -->
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
             <!-- shipping method choose-->
             <?php if (level_user() == '1') : ?>
-                <div class="shipping-method-choose mb-3" hidden>
+                <div class="shipping-method-choose mb-3">
                     <div class="alert alert-info m-2">Metode Pengiriman</div>
                     <div class="card shipping-method-choose-card">
                         <div class="card-body">
                             <div class="row">
                                 <div class="input-box col-6">
-                                    <input id="karisma" name="shipping" type="radio" value="2" checked>
-                                    <label for="karisma">PT. Karisma Indoagro Universal</label>
+                                    <input id="expiedisi" name="shipping" type="radio" value="2" checked>
+                                    <label for="karisma">Menyesuaikan dengan ekspedisi yang dipilih</label>
                                     <div class="check"></div>
                                 </div>
                             </div>
@@ -107,6 +105,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="card cart-amount-area mb-10">
                 <div class="card-body d-flex align-items-center justify-content-between">
                     <!--    <h5 class="total-price mb-0">Rp <?php echo format_rupiah($total); ?></h5> -->
+                    <input type="text" name="usrid" id="usrid" class="btn btn-warning" value="<?= $this->session->userdata('user_id') ?>" hidden>
                     <input type="submit" class="btn btn-warning" value="Buat Pesanan">
                 </div>
             </div>

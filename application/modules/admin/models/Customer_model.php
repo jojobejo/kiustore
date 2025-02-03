@@ -112,16 +112,55 @@ class Customer_model extends CI_Model
     public function customer_data($id)
     {
         $customer = $this->db->query("
-        SELECT c.user_id as id, c.max_credit, c.profile_picture, c.name, u.email, c.phone_number, c.shop_name, c.shop_address, c.address, c.salesman_id, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level , c.kota_id
-        FROM customers c
-        JOIN users u
-            ON u.id = c.user_id
-        LEFT JOIN users s
-            ON s.id = c.salesman_id
-            WHERE c.user_id = '$id'
+        SELECT
+            c.user_id as id,
+            c.max_credit,
+            c.profile_picture,
+            c.name,
+            u.email,
+            c.phone_number,
+            c.shop_name,
+            c.shop_address,
+            c.address,
+            c.salesman_id,
+            IFNULL (s.name, '-') AS sales_name,
+            u.status,
+            u.register_date,
+            c.shop_name,
+            c.level,
+            c.va_code,
+            c.kota_id,
+            c.va_code
+        FROM
+            customers c
+            JOIN users u ON u.id = c.user_id
+            LEFT JOIN users s ON s.id = c.salesman_id
+        WHERE
+            c.user_id = '$id'
         ");
 
         return $customer->row();
+    }
+
+    public function get_status_va($id)
+    {
+        $nova   = $this->db->query("
+        SELECT
+        (CASE 
+            WHEN c.va_code = '0' THEN 'not' 
+            WHEN c.va_code != '0' THEN 'yes'
+            END)  AS va 
+        FROM customers c 
+        WHERE c.user_id = '$id'
+        ");
+
+        return $nova->row();
+    }
+
+    public function updateva($id, $data)
+    {
+        $this->db->where('user_id', $id);
+        return $this->db->update('customers', $data);
     }
 
     public function pengiriman_data($ttb_number)

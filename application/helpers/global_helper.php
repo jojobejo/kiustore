@@ -390,7 +390,29 @@ if (!function_exists('get_order_status')) {
         else if ($status == 7)
             return '<span class="badge bg-danger">Dibatalkan</span>';
         else if ($status == 8)
-            return '<span class="badge bg-warning">Menunggu Konfirmasi</span>';
+            return '<span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span>';
+    }
+}
+
+if (!function_exists('get_payment_methods')) {
+    function get_payment_methods($payment)
+    {
+        if ($payment == 1)
+            return '<span class="badge bg-warning">Proses oleh Sales</span>';
+        else if ($payment == 2)
+            return '<span class="badge bg-info">Menunggu Pembayaran</span>';
+        else if ($payment == 3)
+            return '<span class="badge bg-primary">Pengemasan</span>';
+        else if ($payment == 4)
+            return '<span class="badge bg-secondary">Pengiriman</span>';
+        else if ($payment == 5)
+            return '<span class="badge bg-dark">Barang Diterima</span>';
+        else if ($payment == 6)
+            return '<span class="badge bg-success">Selesai</span>';
+        else if ($payment == 7)
+            return '<span class="badge bg-danger">Dibatalkan</span>';
+        else if ($payment == 8)
+            return '<span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span>';
     }
 }
 

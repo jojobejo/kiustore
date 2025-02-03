@@ -12,7 +12,8 @@ class Shop extends CI_Controller
         $this->load->model(array(
             'product_model' => 'product',
             'customer_model' => 'customer',
-            'profile_model' => 'profile'
+            'profile_model' => 'profile',
+            'Payment_model' => 'payment'
         ));
     }
 
@@ -234,6 +235,7 @@ class Shop extends CI_Controller
 
                 $subtotal = $this->cart->total();
                 $ongkir = (int) ($subtotal >= get_settings('min_shop_to_free_shipping_cost')) ? 0 : get_settings('shipping_cost');
+                $user_id = $this->session->userdata('user_id');
 
                 $params['customer'] = $this->customer->data();
                 $params['subtotal'] = $subtotal;
@@ -332,7 +334,6 @@ class Shop extends CI_Controller
 
                                 $n++;
                             }
-
                             $this->product->create_order_items($items);
                         }
                     }
@@ -369,7 +370,17 @@ class Shop extends CI_Controller
                         $n++;
                     }
 
+                    $vacode = $this->payment->get_va_code($user_id);
+
+                    $datava = array(
+                        'order_number'  => $order_number,
+                        'user_id'       => $user_id,
+                        'va_code'       => $vacode->vacode,
+                        'status'        => '1'
+                    );
+
                     $this->product->create_order_items($items);
+                    $this->payment->input_va($datava);
                 }
 
                 $this->cart->destroy();

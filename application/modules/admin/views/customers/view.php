@@ -237,6 +237,44 @@ defined('BASEPATH') or exit('No direct script access allowed');
       </div>
 
 
+      <div class="card card-primary">
+        <div class="card-header">
+          <h3 class="mb-0">Virtual Account Payment</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <?php if ($va->va == 'yes') : ?>
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">VA CODE</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><?= $customer->va_code ?></td>
+                    <td>ACTIVE</td>
+                  </tr>
+                </tbody>
+              </table>
+            <?php else : ?>
+              <?php
+              $vacus  =  '62' . substr($customer->phone_number, 2);
+              $idcus  = $customer->id;
+              ?>
+              <div class="alert alert-info">VA Belum Terbuat</div>
+              <form action="<?= base_url('generate_va'); ?>" method="POST">
+                <input type="text" name="idcus" id="idcus" value="<?= $idcus ?>">
+                <input type="text" name="vacusno" id="vacusno" value="<?= $vacus ?>">
+                <button type="submit" class="btn btn-warning">GENERATE VA</button>
+              </form>
+            <?php endif; ?>
+          </div>
+        </div>
+      </div>
+
+
     </div> <!-- col -->
   </div>
 

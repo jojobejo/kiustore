@@ -14,6 +14,16 @@ class Payments extends CI_Controller
             'payment_model' => 'payment'
         ));
         $this->load->library('form_validation');
+
+        // Payment Status
+        // 7   =  batal
+        // 6   =  done
+        // 5   =  barang diterima
+        // 4   =  pengiriman
+        // 3   =  pengemasan
+        // 2   =  menunggu pembayaran
+        // 1   =  menunggu sales
+
     }
 
     public function index()
@@ -60,10 +70,12 @@ class Payments extends CI_Controller
     public function confirm()
     {
         $order_id = $this->input->get('order');
+        $cusid  = $this->session->userdata('user_id');
 
         $params['title'] = 'Konfirmasi Pembayaran';
 
         $payments['orders'] = $this->order->order_with_bank_payments($order_id);
+        $payments['customer'] = $this->order->get_data_customer($cusid);
         //  $payments['orders'] = $this->payment->order_data($id);
         $payments['banks'] = (array) json_decode(get_settings('payment_banks'));
         $payments['order_id'] = $order_id;
@@ -104,25 +116,27 @@ class Payments extends CI_Controller
 
             $this->load->library('upload', $config);
 
-            if ($this->upload->do_upload('picture')) {
-                $data = $this->upload->data();
-                $config['image_library'] = 'gd2';
-                $config['source_image'] = './assets/uploads/payments/' . $data['file_name'];
-                $config['create_thumb'] = FALSE;
-                $config['maintain_ratio'] = FALSE;
-                $config['quality'] = '50%';
-                $config['width'] = 400;
-                $config['height'] = 600;
-                $new_file_name = $data['file_name'];
-                $config['new_image'] = './assets/uploads/payments/' . $new_file_name;
-                $this->load->library('image_lib', $config);
-                $this->image_lib->resize();
-                $file_name = $data['file_name'];
+            // if ($this->upload->do_upload('picture')) {
+            //     $data = $this->upload->data();
+            //     $config['image_library'] = 'gd2';
+            //     $config['source_image'] = './assets/uploads/payments/' . $data['file_name'];
+            //     $config['create_thumb'] = FALSE;
+            //     $config['maintain_ratio'] = FALSE;
+            //     $config['quality'] = '50%';
+            //     $config['width'] = 400;
+            //     $config['height'] = 600;
+            //     $new_file_name = $data['file_name'];
+            //     $config['new_image'] = './assets/uploads/payments/' . $new_file_name;
+            //     $this->load->library('image_lib', $config);
+            //     $this->image_lib->resize();
+            //     $file_name = $data['file_name'];
 
-                $picture_name = $file_name;
-            } else {
-                show_error($this->upload->display_errors());
-            }
+            //     $picture_name = $file_name;
+            // } else {
+            //     show_error($this->upload->display_errors());
+            // }
+
+            $picture_name = "-";
 
             $data = array(
                 'transfer_to' => $bank,

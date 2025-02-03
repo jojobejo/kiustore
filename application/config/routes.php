@@ -57,6 +57,7 @@ $route['translate_uri_dashes'] = FALSE;
 $route['dashboard_admin'] = 'admin/dashboard';
 $route['admin'] = 'admin/admin';
 $route['send_admin_message'] = 'admin/messages/send';
+$route['generate_va'] = 'admin/customers/generate_va';
 
 $route['login'] = 'auth/login';
 $route['logout'] = 'auth/logout';

@@ -503,4 +503,37 @@ class Order_model extends CI_Model
     {
         return $this->db->where('user_id', $this->user_id)->order_by('order_date', 'DESC')->get('orders')->result();
     }
+
+    public function get_data_customer($id)
+    {
+        $customer = $this->db->query("
+        SELECT
+            c.user_id as id,
+            c.max_credit,
+            c.profile_picture,
+            c.name,
+            u.email,
+            c.phone_number,
+            c.shop_name,
+            c.shop_address,
+            c.address,
+            c.salesman_id,
+            IFNULL (s.name, '-') AS sales_name,
+            u.status,
+            u.register_date,
+            c.shop_name,
+            c.level,
+            c.va_code,
+            c.kota_id,
+            c.va_code
+        FROM
+            customers c
+            JOIN users u ON u.id = c.user_id
+            LEFT JOIN users s ON s.id = c.salesman_id
+        WHERE
+            c.user_id = '$id'
+        ");
+
+        return $customer->row();
+    }
 }

@@ -11,7 +11,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <div class="media-body">
                     <span class="font-sm">Order ID: #<?php echo $data->order_number; ?></span>
                     <h2><?php echo get_order_status($data->order_status, $data->payment_method); ?></h2>
-                    <h2><?php echo get_payment_status($data->payment_status); ?></h2>
+                    
                 </div>
             </div>
         </div>
@@ -214,7 +214,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success">Konfirmasi Pembayaran</a>
                     <?php else : ?>
                         <div class="alert alert-info m-2 w-100">Menunggu konfirmasi pembayaran</div>
-                        <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success">Konfirmasi Pembayaran</a>
+                        <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success m-2 w-100">Lakukan Pembayaran</a>
                     <?php endif; ?>
                 <?php elseif ($data->order_status == 3) : ?>
                     <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan</div>
