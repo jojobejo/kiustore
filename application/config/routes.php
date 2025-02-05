@@ -93,3 +93,5 @@ $route['checkout'] = 'customer/shop/checkout';
 $route['checkout_submit'] = 'customer/shop/checkout/order';
 
 $route['admin/ongkir'] = 'admin/ongkir';
+
+$route['admin/apibriva'] = 'admin/api_payment_briva';

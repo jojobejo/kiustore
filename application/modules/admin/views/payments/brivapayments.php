@@ -31,14 +31,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <h3>BRIVA API</h3>
                 </div>
                 <div class="card-body">
-                    <div class="form-group">
-                        <div class="row">
-                            <label class="col-2" for="kd_user" class="form-control"></label>
-                            <div class="col-10">
-                                <input class="form-control" type="text" id="action" name="action" value="">
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
                 <div class="card-footer">
                 </div>

@@ -165,12 +165,19 @@ class Payments extends CI_Controller
         }
     }
 
+    private $url = 'https://sandbox.partner.api.bri.co.id';
+    private $privateKey = file_get_contents('private_key_rsa.pem');
+    private $client_secret = '5JwtO5v1EkO0yswO'; //Consumer Secret
+    private $client_id = 'AGZJwGBUqlThM2XBzuLdA31qKzvujGKV'; //Consumer Key
+    private $xPartnerId = 'ROMalang'; // di generate oleh bri
+    private $partnerServiceId = '   22001'; // di generate oleh bri
+    private $customerNo = '00218322'; // di generate oleh partner
+
     public function briva_payment()
     {
 
         $params['title'] = 'Payment VIA BRIVA-API';
         $data['briva']   = $this->payment->payment_bri();
-
 
         $this->load->view('header', $params);
         $this->load->view('payments/brivapayments', $data);
