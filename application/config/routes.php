@@ -87,7 +87,6 @@ $route['cart'] = 'customer/shop/cart';
 $route['cekongkir'] = 'customer/shop/cekongkir';
 $route['ongkir'] = 'customer/shop/ongkir';
 
-
 $route['cart_api'] = 'customer/shop/cart_api';
 $route['checkout'] = 'customer/shop/checkout';
 $route['checkout_submit'] = 'customer/shop/checkout/order';

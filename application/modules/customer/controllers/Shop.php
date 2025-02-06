@@ -29,8 +29,10 @@ class Shop extends CI_Controller
         //ADD-ONS
         $cusids             = $this->session->userdata('user_id');
         $now                = date('Y-m-d');
+
         $cart['cartaddons'] = $this->product->count_tmp_cart($cusids, $now)->result();
         $cart['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
+
 
         if (level_user() < 3) {
             $ongkir = $cart['ongkir'] = "0";
@@ -44,7 +46,6 @@ class Shop extends CI_Controller
             $cart['ongkirs']         = $this->product->getongkirs($cusid, $now)->result();
             $cart['profilecustomer'] = $this->product->getcustomer($cusid)->result();
             $cart['sts_ongkir']      = $this->product->getstatusongkir($cusid, $now)->result();
-
 
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
@@ -168,6 +169,9 @@ class Shop extends CI_Controller
         switch ($action) {
             default:
 
+                $iduser     = $this->session->userdata('user_id');
+                $kdchart    = $this->product->kdnonkomersial($iduser);
+
                 $coupon = $this->input->post('coupon_code') ? $this->input->post('coupon_code') : $this->session->userdata('_temp_coupon');
                 $quantity = $this->input->post('quantity') ? $this->input->post('quantity') : $this->session->userdata('_temp_quantity');
 
@@ -243,6 +247,8 @@ class Shop extends CI_Controller
                 $params['total'] = $subtotal + $ongkir - $discount;
                 $params['discount'] = $disc;
 
+
+
                 // print_r('<pre>');
                 // print_r($items);
                 // print_r($items_multi);
@@ -255,9 +261,17 @@ class Shop extends CI_Controller
                 $this->session->set_userdata('total_price', $params['total']);
                 $this->session->set_userdata('total_price_multi', $total_price_multi);
 
+                // GENERATE KDCHART
+                $generatechart = array(
+                    'kdchart'   => $kdchart
+                );
+                $this->product->removechartall($kdchart);
+                $this->product->insertgenerate($generatechart);
+
                 $this->load->view('header');
                 $this->load->view('shop/checkout', $params);
                 $this->load->view('footer');
+
                 break;
             case 'order':
                 $quantity = $this->session->userdata('order_quantity');
@@ -401,7 +415,9 @@ class Shop extends CI_Controller
 
     public function cart_api()
     {
-        $action = $this->input->get('action');
+        $action     = $this->input->get('action');
+        $iduser     = $this->session->userdata('user_id');
+        $kdchart    = $this->product->kdnonkomersial($iduser);
 
         switch ($action) {
             case 'add_item':
@@ -437,7 +453,9 @@ class Shop extends CI_Controller
 
                 $stock = $this->product->get_stock($id);
                 // $response = array('code' => 200, 'message' => 'stok ' . $stock, 'total_item' => 0);
+
                 if ($qty_pcs <= $stock) {
+
                     $item = array(
                         'id' => $id,
                         'qty' => $qty,
@@ -448,9 +466,12 @@ class Shop extends CI_Controller
                         'name' => $name,
                         'product_type' => $product_type,
                         'product_weight' => $product_weight,
-                        'total_weight'  => $total_weight_item
+                        'total_weight'  => $total_weight_item,
+                        'kdchart'  => $kdchart
                     );
+
                     $items = array(
+                        'kdchart'  => $kdchart,
                         'idbarang'  => $id,
                         'idcustomer' => $idcus,
                         'qty'   => $qty,
@@ -464,6 +485,7 @@ class Shop extends CI_Controller
                         'total_weight'  => $total_weight_item,
                         'create_at' => $now
                     );
+
                     $this->cart->insert($item);
                     $this->product->tmp_cart_customer($items);
                     $total_item = count($this->cart->contents());
@@ -483,6 +505,7 @@ class Shop extends CI_Controller
             case 'display_cart':
                 $carts = [];
                 foreach ($this->cart->contents() as $items) {
+
                     $carts[$items['rowid']]['id'] = $items['id'];
                     $carts[$items['rowid']]['name'] = $items['name'];
                     $carts[$items['rowid']]['qty'] = $items['qty'];
@@ -490,6 +513,7 @@ class Shop extends CI_Controller
                     $carts[$items['rowid']]['subtotal'] = $items['subtotal'];
                     $carts[$items['rowid']]['product_weight'] = $items['product_weight'];
                     $carts[$items['rowid']]['total_weight'] = $items['total_weight'];
+                    $carts[$items['rowid']]['kdchart'] = $items['kdchart'];
                 }
                 $response = array('code' => 200, 'carts' => $carts);
                 break;
@@ -503,9 +527,13 @@ class Shop extends CI_Controller
 
                 $response['data'] = $data;
                 break;
-            case 'remove_item':
-                $rowid = $this->input->post('rowid');
 
+            case 'remove_item':
+
+                $rowid = $this->input->post('rowid');
+                $carts = $this->input->post('brid');
+
+                $this->product->removechart($kdchart, $carts);
                 $this->cart->remove($rowid);
                 $total_price = $this->cart->total();
                 $total_item = $this->cart->total_items();
@@ -520,6 +548,7 @@ class Shop extends CI_Controller
 
                 $response = $data;
                 break;
+
             case 'update_item':
 
                 $updateItem = array(
@@ -543,7 +572,6 @@ class Shop extends CI_Controller
                 } else {
                     $data['error'] = 1;
                 }
-
                 $response = $data;
                 break;
         }

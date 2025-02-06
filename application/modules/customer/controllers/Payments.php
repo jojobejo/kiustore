@@ -69,6 +69,9 @@ class Payments extends CI_Controller
 
     public function confirm()
     {
+
+
+
         $order_id = $this->input->get('order');
         $cusid  = $this->session->userdata('user_id');
 
@@ -76,6 +79,7 @@ class Payments extends CI_Controller
 
         $payments['orders'] = $this->order->order_with_bank_payments($order_id);
         $payments['customer'] = $this->order->get_data_customer($cusid);
+        $payments['target_time'] = date('Y-m-d H:i:s', strtotime('+2 hour'));
         //  $payments['orders'] = $this->payment->order_data($id);
         $payments['banks'] = (array) json_decode(get_settings('payment_banks'));
         $payments['order_id'] = $order_id;

@@ -4,8 +4,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <!-- Main Start -->
 <main class="main-wrap index-page mb-xxl">
 
-
-
     <!-- Everyday Essentials Start -->
     <section class="low-price-section pt-0 mt-2 mb-5">
 
@@ -23,7 +21,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="mb-3">
                 <div class="title mb-2"><span>Cara Pembayaran</span></div>
             </div>
-            <div>
+            <div hidden>
                 <div class="mb-3">
                     <div class="title mb-2"><span>Order</span></div>
                     <input type="hidden" name="order_id" class="form-control" id="orders" value="<?= $orders->id; ?>">
@@ -70,6 +68,35 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <?php echo form_error('picture'); ?>
                 </div>
             </div>
+
+            <center>
+
+                <h3>Bayar Sebelum : </h3>
+                <div id="timer" style="font-size: large; font-weight: bold; background-color: yellow;" class="mt-2 mb-3">
+                </div>
+            </center>
+
+            <script>
+                // Ambil waktu target dari PHP
+                var targetTime = new Date("<?= $target_time; ?>").getTime();
+
+                // Perbarui hitungan mundur setiap detik
+                var x = setInterval(function() {
+                    var now = new Date().getTime();
+                    var distance = targetTime - now;
+
+                    var hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+                    var minutes = Math.floor((distance / (1000 * 60)) % 60);
+                    var seconds = Math.floor((distance / 1000) % 60);
+
+                    document.getElementById("timer").innerHTML = hours + " jam " + minutes + " menit " + seconds + " detik ";
+
+                    if (distance < 0) {
+                        clearInterval(x);
+                        document.getElementById("timer").innerHTML = "Nomor VA Expired";
+                    }
+                }, 1000);
+            </script>
 
             <button class="btn btn-success w-100 mb-5" type="submit">Konfirmasi</button>
             <?php if ($flash) : ?>

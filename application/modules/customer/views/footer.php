@@ -315,6 +315,8 @@ $controller = $this->router->fetch_class();
     e.preventDefault();
 
     var rowid = $(this).data('rowid');
+    var brid = $(this).data('brid');
+
     var cart_list = $('.cart-' + rowid);
     // $('.product-name', tr).html('<i class="fa fa-spin fa-spinner"></i> Menghapus...');
 
@@ -322,7 +324,8 @@ $controller = $this->router->fetch_class();
       method: 'POST',
       url: '<?php echo site_url('cart_api?action=remove_item'); ?>',
       data: {
-        rowid: rowid
+        rowid: rowid,
+        brid: brid
       },
       success: function(res) {
         if (res.code == 204) {

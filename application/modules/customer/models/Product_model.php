@@ -29,6 +29,7 @@ class Product_model extends CI_Model
     {
         return $this->db->where('id', $id)->get('products')->row()->stock;
     }
+
     public function count_tmp_cart($id, $now)
     {
         return $this->db->query("SELECT 
@@ -38,6 +39,7 @@ class Product_model extends CI_Model
         AND a.create_at = '$now'
         ");
     }
+
     public function get_tmp_cart($id, $now)
     {
         return $this->db->query("SELECT 
@@ -45,11 +47,17 @@ class Product_model extends CI_Model
         FROM tmp_cart a
         WHERE a.idcustomer = '$id'
         AND a.create_at = '$now'
+        LIMIT 1
         ");
     }
     public function tmp_cart_customer($data)
     {
         $this->db->insert('tmp_cart', $data);
+    }
+
+    public function insertgenerate($data)
+    {
+        $this->db->insert('generate_kdchart', $data);
     }
     public function getstatusongkir($id, $tgl)
     {
@@ -90,8 +98,10 @@ class Product_model extends CI_Model
         FROM tbtestongkir a
         WHERE a.idcustomer = '$id'
         AND a.create_at = '$tgl'
+        AND a.status = 0
         ");
     }
+    
     public function getcustomer($id)
     {
         return $this->db->query("SELECT a.*
@@ -235,5 +245,34 @@ class Product_model extends CI_Model
     {
         return $this->db->query("
         ");
+    }
+
+    function kdnonkomersial($idcus)
+    {
+        $cd1 = $this->db->query("SELECT MAX(RIGHT(kdchart,4)) AS kd_max FROM generate_kdchart WHERE DATE(create_at)=CURDATE()");
+        $kd1 = "";
+        if ($cd1->num_rows() > 0) {
+            foreach ($cd1->result() as $k) {
+                $tmp = ((int)$k->kd_max) + 1;
+                $kd1 = sprintf("%04s", $tmp);
+            }
+        } else {
+            $kd1 = "0001";
+        }
+        date_default_timezone_set('Asia/Jakarta');
+        $kdnk1 = 'KIU' . $idcus . date('dmy') . $kd1;
+        return $kdnk1;
+    }
+
+    function removechart($kdchart, $idrow)
+    {
+        $this->db->where('kdchart', $kdchart);
+        $this->db->where('idbarang', $idrow);
+        return $this->db->delete('tmp_cart');
+    }
+    function removechartall($kdchart)
+    {
+        $this->db->where('kdchart', $kdchart);
+        return $this->db->delete('tmp_cart');
     }
 }
