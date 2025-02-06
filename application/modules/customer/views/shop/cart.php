@@ -125,7 +125,34 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div>
           <?php endforeach; ?>
         <?php endif; ?>
-        <form action="<?= base_url('checkout'); ?>" method="POST">
+        <div hidden>
+          <form action="<?= base_url('checkout'); ?>" method="POST">
+            <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
+            <input id="code" name="coupon_code" type="text" class="form-control" placeholder="">
+            <?php foreach ($carts as $item) : ?>
+              <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
+                <div class="product-list media">
+                  <a href="#"><img src="<?php echo get_product_image($item['id']); ?>" alt="offer" /></a>
+                  <div class="media-body">
+                    <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
+                    <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
+                    <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
+                    <div class="plus-minus">
+                      <i class="subs" data-feather="minus"></i>
+                      <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
+                      <i class="adds" data-feather="plus"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
+                  <i data-feather="trash"></i>
+                </div>
+              </div>
+            <?php endforeach; ?>
+        </div>
+        <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
+        </form>
+        <!-- <form action="<?= base_url('checkout'); ?>" method="POST">
           <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
           <input id="code" name="coupon_code" type="text" class="form-control" placeholder="">
           <?php foreach ($carts as $item) : ?>
@@ -149,7 +176,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div>
           <?php endforeach; ?>
           <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
-        </form>
+        </form> -->
       <?php endforeach; ?>
 
     </main>
