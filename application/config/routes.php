@@ -100,3 +100,5 @@ $route['readonlychange'] = 'customer/profile/toggle_readonly';
 $route['inputlocation'] = 'customer/profile/inputlocation';
 
 $route['get_provinces'] = 'customer/profile/get_provinces';
+
+// coba
