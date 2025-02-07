@@ -77,28 +77,11 @@ $controller = $this->router->fetch_class();
 <script src="<?php echo get_theme_uri('js/bs5-toast.min.js'); ?>"></script>
 <script src="<?php echo site_url('assets/js/offline.js'); ?>"></script>
 
+
 <script>
   if (window.history.replaceState) {
     window.history.replaceState(null, null, window.location.href);
   }
-</script>
-<script>
-  $(document).ready(function() {
-    $(".provinsi_customer_edit").select2({
-      tags: true
-    });
-    $(".provinsi_customer").select2({
-      tags: true
-    });
-    $(".provinsi").select2({
-      tags: true
-    });
-  });
-</script>
-<script>
-  $(document).ready(function() {
-
-  });
 </script>
 
 <?php if (!empty($_SESSION['__ACTIVE_SESSION_DATA'])) : ?>

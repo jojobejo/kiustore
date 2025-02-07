@@ -36,4 +36,14 @@ class Profile_model extends CI_Model
     {
         return $this->db->where('id', $this->user_id)->update('users', $data);
     }
+    public function detail_loc()
+    {
+        $id = $this->user_id;
+
+        $data = $this->db->query("
+            SELECT COUNT(a.user_id) AS loc_sts FROM customer_location a where a.user_id = '$id'
+        ");
+
+        return $data->row();
+    }
 }
