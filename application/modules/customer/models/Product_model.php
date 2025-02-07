@@ -101,7 +101,7 @@ class Product_model extends CI_Model
         AND a.status = 0
         ");
     }
-    
+
     public function getcustomer($id)
     {
         return $this->db->query("SELECT a.*
@@ -109,6 +109,7 @@ class Product_model extends CI_Model
         WHERE a.user_id = '$id'
         ");
     }
+
     public function addongkir($data)
     {
         return $this->db->insert('tbtestongkir', $data);
