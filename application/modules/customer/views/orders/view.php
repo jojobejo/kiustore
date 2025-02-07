@@ -11,6 +11,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <div class="media-body">
                     <span class="font-sm">Order ID: #<?php echo $data->order_number; ?></span>
                     <h2><?php echo get_order_status($data->order_status, $data->payment_method); ?></h2>
+                    <h3>HALO</h3>
                     
                 </div>
             </div>
