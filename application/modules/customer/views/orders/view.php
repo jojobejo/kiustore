@@ -9,7 +9,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="media">
                 <img src="<?php echo get_theme_uri('icons/svg/box.svg'); ?>" alt="box" />
                 <div class="media-body">
-                    <span class="font-sm">Order ID: #<?php echo $data->order_number; ?></span>
+                    <span class="font-sm">Order ID: <?= $data->order_number; ?></span>
                     <h2><?php echo get_order_status($data->order_status, $data->payment_method); ?></h2>
                 </div>
             </div>
