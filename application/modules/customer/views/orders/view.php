@@ -3,7 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 
 <main class="main-wrap order-detail mb-xxl">
-
     <!-- Banner Start -->
     <section class="pt-0">
         <div class="banner-box">

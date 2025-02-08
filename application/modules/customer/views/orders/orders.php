@@ -55,6 +55,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
                 <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
+
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />
@@ -90,10 +91,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
     <div class="tab-pane fade" id="catagories2" role="tabpanel" aria-labelledby="catagories2-tab">
       <?php foreach ($orders as $order) : ?>
-        <?php if (($order->payment_method == 2 &&  $order->order_status == 1) || ($order->payment_method == 2 &&  $order->order_status == 3) || ($order->payment_method == 2 &&  $order->order_status == 8) || ($order->payment_method == 1 &&  $order->order_status == 1) || ($order->payment_method == 1 &&  $order->order_status == 3)) : ?>
+        <?php if (($order->payment_method == 2 &&  $order->order_status == 1) || ($order->payment_method == 2 &&  $order->order_status == 3)|| ($order->payment_method == 2 &&  $order->order_status == 8) || ($order->payment_method == 1 &&  $order->order_status == 1) || ($order->payment_method == 1 &&  $order->order_status == 3)) : ?>
           <div class="order-box">
             <div class="media">
-              <a href="<?= base_url('order_view/') . $order->id  ?>" class="content-box">
+              <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number; ?>" class="content-box">
                 <h2 class="font-sm title-color">ID: #<?= $order->order_number; ?></h2>
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
@@ -105,22 +106,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </div> -->
             </div>
             <div class="bottom-content">
-                <a href="<?= base_url('order_view/') . $order->id  ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
-                <span class="content-color font-xs">
-                  <?php if ($order->payment_method == 2) : ?>
-                    <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                  <?php else : ?>
-                    <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                  <?php endif; ?>
-                </span>
-                <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
-                <div class="rating">
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                </div>
+              <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
+              <span class="content-color font-xs">
+                <?php if ($order->payment_method == 2) : ?>
+                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
+                <?php else : ?>
+                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
+                <?php endif; ?>
+              </span>
+              <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
+              <div class="rating">
+                <i data-feather="star"></i>
+                <i data-feather="star"></i>
+                <i data-feather="star"></i>
+                <i data-feather="star"></i>
+                <i data-feather="star"></i>
+              </div>
             </div>
           </div>
         <?php endif; ?>

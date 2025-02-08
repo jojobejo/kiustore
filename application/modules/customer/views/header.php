@@ -44,11 +44,9 @@
 
 </head>
 <!-- Head End -->
-
 <!-- Body Start -->
 
 <body>
-
   <!-- Skeleton loader Start | LOAD BEFORE LOAD PAGE-->
   <div class="skeleton-loader">
     <!-- Header Start -->
