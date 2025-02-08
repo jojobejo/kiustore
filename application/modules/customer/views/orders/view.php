@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 
 <main class="main-wrap order-detail mb-xxl">
+
     <!-- Banner Start -->
     <section class="pt-0">
         <div class="banner-box">
@@ -11,8 +12,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <div class="media-body">
                     <span class="font-sm">Order ID: #<?php echo $data->order_number; ?></span>
                     <h2><?php echo get_order_status($data->order_status, $data->payment_method); ?></h2>
-                    <h3>HALO</h3>
-                    
                 </div>
             </div>
         </div>

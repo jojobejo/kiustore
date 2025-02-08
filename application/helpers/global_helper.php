@@ -373,7 +373,7 @@ if (!function_exists('product_type')) {
 }
 
 if (!function_exists('get_order_status')) {
-    function get_order_status($status, $payment)
+    function get_order_status($status)
     {
         if ($status == 1)
             return '<span class="badge bg-warning">Proses oleh Sales</span>';
