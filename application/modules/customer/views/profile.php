@@ -13,6 +13,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <!--  <span class="content-color font-md">Batas Kredit : <?php echo get_user_max_credit(); ?></span> -->
                 <span class="content-color font-md">
                     <button type="button" id="toggleReadonly" class="btn btn-sm btn-warning"><i class="fas fa-pencil-alt"></i></button>
+                    <a href="<?= base_url('alamat_coba') ?>" class="btn btn-primary w-100">COBA</a>
                 </span>
             </div>
         </div>
@@ -72,7 +73,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
     <?php endif; ?>
 
-    <a type="submit" id="newButton" class="btn btn-success w-100" style="display: none;">Simpan Perubahan</a>
+    <div class="row">
+        <div class="col">
+            <a id="newButtonclose" class="btn btn-secondary w-100" style="display: none;" href="<?= base_url('profile') ?>">Batal</a>
+        </div>
+        <div class="col">
+            <a type="submit" id="newButton" class="btn btn-success w-100" style="display: none;">Simpan Perubahan</a>
+        </div>
+    </div>
+
 
     <?php if ($flash) : ?>
         <p class="text-center text-success"><?php echo $flash; ?></p>
@@ -103,11 +112,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     if (isReadonly === 0) {
                         $("#toggleReadonly").hide();
                         $("#newButton").show();
+                        $("#newButtonclose").show();
                     }
                 }
             });
         });
-        
+
         $('#provinsi').select2({
             placeholder: "Pilih Provinsi",
         });

@@ -10,7 +10,8 @@ class Profile extends CI_Controller
         verify_session('customer');
 
         $this->load->model(array(
-            'profile_model' => 'profile'
+            'profile_model' => 'profile',
+            'rajaongkir_model' => 'ongkirapi'
         ));
         $this->load->library('form_validation');
     }
@@ -106,6 +107,20 @@ class Profile extends CI_Controller
         }
     }
 
+    public function cusalamat()
+    {
+        $data = $this->profile->get_profile();
+        $loc = $this->profile->detail_loc();
+
+        $params['title']    = $data->name;
+        $user['user']       = $data;
+        $user['user_loc']   = $loc;
+        $user['flash']      = $this->session->flashdata('profile');
+
+        $this->load->view('header', $params);
+        $this->load->view('profilebk_rajaongkir', $user);
+        $this->load->view('footer');
+    }
 
     public function change_alamat_asal()
     {

@@ -68,6 +68,7 @@ $route['cartongkir'] = 'customer/addons/addoncart/cart';
 
 $route['customer'] = 'customer/customer';
 $route['profile'] = 'customer/profile';
+$route['alamat_coba'] = 'customer/profile/cusalamat';
 $route['change_alamat_customer_profile'] = 'customer/profile/change_alamat_asal';
 $route['message'] = 'customer/message';
 $route['send_message'] = 'customer/message/send';
@@ -101,4 +102,11 @@ $route['inputlocation'] = 'customer/profile/inputlocation';
 
 $route['get_provinces'] = 'customer/profile/get_provinces';
 
-// coba
+// RAJAONGKIR 
+
+$route['rajaongkir'] = 'customer/rajaongkir';
+
+$route['rajaongkir/get_provinces'] = 'customer/rajaongkir/get_provinces';
+$route['rajaongkir/get_cities'] = 'customer/rajaongkir/get_cities';
+$route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
+$route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
