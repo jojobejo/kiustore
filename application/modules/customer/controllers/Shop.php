@@ -34,10 +34,11 @@ class Shop extends CI_Controller
         $cart['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
 
         if (level_user() < 3) {
+
             $ongkir = $cart['ongkir'] = "0";
 
             $cusid  = $this->session->userdata('user_id');
-            $now                = date('Y-m-d');
+            $now                     = date('Y-m-d');
 
             $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
             $cart['total_price']     = $cart['total_cart'];
@@ -66,10 +67,10 @@ class Shop extends CI_Controller
         $tjuan      = $this->input->post('tjuan');
         $berat      = $this->input->post('berat');
         $expedisi   = $this->input->post('kurir');
+        $cusids     = $this->session->userdata('user_id');
+        $now        = date('Y-m-d');
 
         $curl = curl_init();
-
-
 
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://pro.rajaongkir.com/api/cost",
@@ -79,10 +80,7 @@ class Shop extends CI_Controller
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            // CURLOPT_POSTFIELDS => "origin=" . $kiu . "&destination=" . $tjuan . "&weight=" . $berat . "&courier=" . $expedisi,
-            // CURLOPT_POSTFIELDS => "origin=" . $kiu . "&originType=city&destination=" . $tjuan . "&destinationType=subdistrict&weight=" . $berat . "&courier=" . $expedisi,
             CURLOPT_POSTFIELDS => "origin=" . $kiu . "&originType=city&destination=" . $tjuan . "&destinationType=subdistrict&weight=" . $berat . "&courier=" . $expedisi,
-
 
             CURLOPT_HTTPHEADER => array(
                 "content-type: application/x-www-form-urlencoded",
@@ -100,6 +98,7 @@ class Shop extends CI_Controller
         } else {
             $data['ckongkir'] = json_decode($response);
             $data['customer'] = $this->customer->data();
+            $data['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
         }
 
         $this->load->view('header');
@@ -117,12 +116,15 @@ class Shop extends CI_Controller
                 $datajasa     =  $this->input->post('jasaongkir');
                 $selectjasa   =  $this->input->post('jasa');
                 $customer     =  $this->input->post('customer');
+                $kdfaktur     =  $this->input->post('kdfaktur');
                 $datenow      =  date('Y-m-d');
 
                 $insrtdata = array(
                     'jsongkir'   => $datajasa,
+                    'kd_faktur'   => $kdfaktur,
                     'sjasa'      => $selectjasa,
                     'idcustomer' => $customer,
+                    'status'     => '1',
                     'create_at'  => $datenow
                 );
 
@@ -246,15 +248,6 @@ class Shop extends CI_Controller
                 $params['total'] = $subtotal + $ongkir - $discount;
                 $params['discount'] = $disc;
 
-
-
-                // print_r('<pre>');
-                // print_r($items);
-                // print_r($items_multi);
-                // print_r($total_price_multi);
-                // print_r('</pre>');
-                // exit;
-
                 $this->session->set_userdata('order_quantity', $items);
                 $this->session->set_userdata('order_quantity_multi', $items_multi);
                 $this->session->set_userdata('total_price', $params['total']);
@@ -264,7 +257,8 @@ class Shop extends CI_Controller
                 $generatechart = array(
                     'kdchart'   => $kdchart
                 );
-                $this->product->removechartall($kdchart);
+
+                // $this->product->removechartall($kdchart); 
                 $this->product->insertgenerate($generatechart);
 
                 $this->load->view('header');

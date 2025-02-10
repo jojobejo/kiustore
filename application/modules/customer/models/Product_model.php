@@ -59,16 +59,32 @@ class Product_model extends CI_Model
     {
         $this->db->insert('generate_kdchart', $data);
     }
+
     public function getstatusongkir($id, $tgl)
     {
         return $this->db->query("SELECT 
-        a.sts_ongkir        
+        a.sts_ongkir,
+        a.kdchart
         FROM tmp_cart a
         WHERE a.idcustomer = '$id'
         AND a.create_at = '$tgl'
         limit 1
         ");
     }
+    
+    // COBA LAGI
+    public function getstatusongkirss($id, $tgl)
+    {
+        return $this->db->query("SELECT 
+        a.sts_ongkir,
+        a.kdchart
+        FROM tmp_cart a
+        WHERE a.idcustomer = '$id'
+        AND a.create_at = '$tgl'
+        limit 1
+        ");
+    }
+
     public function gettmpshop($id, $tgl)
     {
         return $this->db->query("SELECT 
@@ -81,16 +97,19 @@ class Product_model extends CI_Model
         GROUP BY a.idcustomer
         ");
     }
+
     public function updatests($id, $tgl, $data)
     {
         $this->db->where('idcustomer', $id);
         $this->db->where('create_at', $tgl);
         return $this->db->update('tmp_cart', $data);
     }
+
     public function deleteongkirs($id)
     {
         return $this->db->delete('tbtestongkir', array("idcustomer" => $id));
     }
+
     public function getongkirs($id, $tgl)
     {
         return $this->db->query("SELECT
@@ -98,7 +117,7 @@ class Product_model extends CI_Model
         FROM tbtestongkir a
         WHERE a.idcustomer = '$id'
         AND a.create_at = '$tgl'
-        AND a.status = 0
+        AND a.status > 0
         ");
     }
 

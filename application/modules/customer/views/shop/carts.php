@@ -45,6 +45,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <input type="text" name="action" id="action" value="addongkir" hidden>
                             <input type="text" name="jasa" id="jasa" value="<?= $ckongkir->rajaongkir->results[0]->code ?>" hidden>
                             <input type="text" name="customer" id="customer" value="<?= $this->session->userdata('user_id') ?>" hidden>
+                            <?php foreach ($itm_cart as $itm) : ?>
+                                <input type="text" name="kdfaktur" id="kdfaktur" value="<?= $itm->kdchart ?>">
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>

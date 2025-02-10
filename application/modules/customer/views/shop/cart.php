@@ -56,6 +56,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
       </div>
 
       <?php foreach ($sts_ongkir as $st) : ?>
+
         <?php if ($st->sts_ongkir == '0') : ?>
           <div class="card cart-amount-area mb-3">
             <div class="card-body">
@@ -83,7 +84,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
               </form>
             </div>
           </div>
-        <?php else : ?>
+        <?php elseif ($st->sts_ongkir == '1') : ?>
+          
           <?php foreach ($ongkirs as $o) :
             $now  = date('Y-m-d');
             $jsongkir = explode(';', $o->jsongkir);
@@ -98,6 +100,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
           ?>
             <div class="card cart-amount-area mb-2">
               <div class="card-body  d-flex align-items-center justify-content-between">
+                Biaya Pengiriman
+                <h5 class="total-price  mb-0">Rp. <?= format_rupiah($jsongkir['2']); ?></h5>
+              </div>
+              <div class="card-body  d-flex align-items-center justify-content-between">
                 Ekpedisi
                 <input type="text" value="<?= $expedisi ?> - <?= $jsongkir['0'] ?>" hidden>
                 <input type="text" value="<?= $jsongkir['1'] ?>(Hari)" hidden>
@@ -111,16 +117,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div>
             <div class="card cart-amount-area mb-3">
               <div class="card-body d-flex align-items-center justify-content-between">
-                Biaya Pengiriman
-                <!-- <?php if ($total_cart >= get_settings('min_shop_to_free_shipping_cost')) : ?>  -->
-                <!-- <?php else : ?> -->
-                <!-- <?php endif; ?>  -->
-                <!-- <h5 class="total-price mb-0"><span class="n-ongkir font-weight-bold">Rp <?php echo format_rupiah(get_settings('shipping_cost')); ?></span></h5> -->
-                <h5 class="total-price  mb-0">Rp. <?= format_rupiah($jsongkir['2']); ?></h5>
-              </div>
-            </div>
-            <div class="card cart-amount-area mb-3">
-              <div class="card-body d-flex align-items-center justify-content-between">
                 Total <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price + $jsongkir['2']); ?></h5>
               </div>
             </div>
@@ -128,7 +124,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <div hidden>
             <form action="<?= base_url('checkout'); ?>" method="POST">
               <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
-              <input id="code" name="coupon_code" type="text" class="form-control" placeholder="">
               <?php foreach ($carts as $item) : ?>
                 <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
                   <div class="product-list media">
@@ -145,7 +140,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </div>
                   </div>
                   <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
-                    <i data-feather="trash"></i>
                   </div>
                 </div>
               <?php endforeach; ?>
