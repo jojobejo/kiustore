@@ -424,12 +424,7 @@ class Order_model extends CI_Model
             LEFT JOIN payments p ON
                 p.order_id = o.id
             WHERE
-                o.id = '$id' AND COALESCE(p.id,0) IN(
-            SELECT
-                MAX(id)
-            FROM
-                `payments`
-            )
+                o.id = '$id'
 
     ");
 
@@ -475,7 +470,7 @@ class Order_model extends CI_Model
                 FROM orders o 
                 LEFT JOIN coupons c ON c.id = o.coupon_id
                 LEFT JOIN payments p ON p.order_id = o.id
-                WHERE o.id = '$id' AND COALESCE(p.id,0) IN (SELECT MAX(id) FROM payments)
+                WHERE o.id = '$id'
             ) AS x
         ");
 

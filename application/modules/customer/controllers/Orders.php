@@ -52,8 +52,8 @@ class Orders extends CI_Controller
 
     public function view($id)
     {
-        $data = $this->order->order_data_coba($id);
-        $items = $this->order->order_items_coba($id);
+        $data = $this->order->order_data($id);
+        $items = $this->order->order_items($id);
         $banks = json_decode(get_settings('payment_banks'));
         $banks = (array) $banks;
 
@@ -61,19 +61,19 @@ class Orders extends CI_Controller
 
         $order['data'] = $data;
         $order['items'] = $items;
-        // $order['delivery_data'] = json_decode($data->delivery_data);
+        $order['delivery_data'] = json_decode($data->delivery_data);
         $order['banks'] = $banks;
 
-        print_r($order['data']);
-
+        // print_r($data);
+        // var_dump($data);
         // print_r('<pre>');
         // print_r($order['data']);
         // print_r('<pre>');
         // exit;
 
-        // $this->load->view('header', $params);
-        // $this->load->view('orders/view_coba', $order);
-        // $this->load->view('footer');
+        $this->load->view('header', $params);
+        $this->load->view('orders/view', $order);
+        $this->load->view('footer');
     }
 
     // public function view($id = 0)
