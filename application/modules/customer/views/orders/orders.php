@@ -97,8 +97,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <h2 class="font-sm title-color">ID: #<?= $order->order_number; ?></h2>
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
-                <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
-
+                <span class="content-color font-xs">Jumlah Barangs: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />

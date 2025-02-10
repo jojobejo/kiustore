@@ -53,16 +53,16 @@ class Orders extends CI_Controller
     public function view($id = 0)
     {
         if ($this->order->is_order_exist($id)) {
-            $data = $this->order->order_data($id);
-            $items = $this->order->order_items($id);
+            $data = $this->order->order_data_coba($id);
+            $items = $this->order->order_items_coba($id);
             $banks = json_decode(get_settings('payment_banks'));
             $banks = (array) $banks;
 
-            $params['title'] = 'Order #' . $data->order_number;
+            $params['title'] = 'Order #' . $data->kode_faktur;
 
             $order['data'] = $data;
             $order['items'] = $items;
-            $order['delivery_data'] = json_decode($data->delivery_data);
+            // $order['delivery_data'] = json_decode($data->delivery_data);
             $order['banks'] = $banks;
 
             // print_r('<pre>');
@@ -71,12 +71,40 @@ class Orders extends CI_Controller
             // exit;
 
             $this->load->view('header', $params);
-            $this->load->view('orders/view', $order);
+            $this->load->view('orders/view_coba', $order);
             $this->load->view('footer');
         } else {
             show_404();
         }
     }
+
+    // public function view($id = 0)
+    // {
+    //     if ($this->order->is_order_exist($id)) {
+    //         $data = $this->order->order_data($id);
+    //         $items = $this->order->order_items($id);
+    //         $banks = json_decode(get_settings('payment_banks'));
+    //         $banks = (array) $banks;
+
+    //         $params['title'] = 'Order #' . $data->order_number;
+
+    //         $order['data'] = $data;
+    //         $order['items'] = $items;
+    //         $order['delivery_data'] = json_decode($data->delivery_data);
+    //         $order['banks'] = $banks;
+
+    //         // print_r('<pre>');
+    //         // print_r($order['data']);
+    //         // print_r('<pre>');
+    //         // exit;
+
+    //         $this->load->view('header', $params);
+    //         $this->load->view('orders/view', $order);
+    //         $this->load->view('footer');
+    //     } else {
+    //         show_404();
+    //     }
+    // }
 
     public function order_api()
     {

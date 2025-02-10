@@ -436,6 +436,83 @@ class Order_model extends CI_Model
         return $data->row();
     }
 
+    public function order_data_coba($id)
+    {
+        $data = $this->db->query("SELECT
+            x.order_id,
+            x.total_belanja,
+            x.kode_faktur,
+            x.invoice_number AS invoice_number,
+            x.ttb_number as ttb_number,
+            x.order_date as order_date,
+            x.due_date as due_date,
+            x.total_items as total_items,
+            x.shipping_cost as shipping_cost
+            FROM
+            (
+                SELECT
+                o.order_number AS kode_faktur,
+                o.invoice_number AS invoice_number,
+                o.ttb_number as ttb_number,
+                o.order_date as order_date,
+                o.due_date as due_date,
+                o.total_items as total_items,
+                o.shipping_cost as shipping_cost,
+                o.id AS order_id,
+                p.id,
+                c.name,
+                c.code,
+                c.credit kupon,
+                p.payment_price,
+                p.payment_date,
+                p.picture_name,
+                p.payment_status,
+                p.confirmed_date,
+                p.payment_data,
+                
+                SUM(o.total_price + o.shipping_cost + o.insurance) AS final_price,
+                (SELECT SUM(oi.order_qty * oi.order_price) FROM order_items oi WHERE oi.order_id = '$id') AS total_belanja
+                FROM orders o 
+                LEFT JOIN coupons c ON c.id = o.coupon_id
+                LEFT JOIN payments p ON p.order_id = o.id
+                WHERE o.id = '$id' AND COALESCE(p.id,0) IN (SELECT MAX(id) FROM payments)
+            ) AS x
+        ");
+
+        return $data->row();
+    }
+
+    public function order_items_coba($id)
+    {
+        $items = $this->db->query("SELECT
+        x.product_id,
+        x.total_belanja,
+        x.order_qty,
+        x.name,
+        x.satuan_text,
+        x.satuan_qty,
+        x.order_price
+        FROM
+        (
+            SELECT
+            oi.product_id AS product_id,
+            (SELECT SUM(oi.order_qty * oi.order_price) FROM order_items oi WHERE oi.order_id = '$id') AS total_belanja,
+            oi.order_qty AS order_qty,
+            oi.satuan AS satuan ,
+            oi.satuan_text AS satuan_text,
+            oi.satuan_qty AS satuan_qty,
+            oi.order_price AS order_price,
+            p.name AS name 
+            FROM order_items oi
+            JOIN products p ON p.id = oi.product_id
+            WHERE oi.order_id = '$id'
+            GROUP BY oi.id
+        ) AS x 
+        ");
+
+        return $items->result();
+    }
+
     public function order_items($id)
     {
         $items = $this->db->query("SELECT

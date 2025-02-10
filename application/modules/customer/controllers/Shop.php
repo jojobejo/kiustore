@@ -33,7 +33,6 @@ class Shop extends CI_Controller
         $cart['cartaddons'] = $this->product->count_tmp_cart($cusids, $now)->result();
         $cart['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
 
-
         if (level_user() < 3) {
             $ongkir = $cart['ongkir'] = "0";
 
