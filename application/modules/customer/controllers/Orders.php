@@ -50,32 +50,31 @@ class Orders extends CI_Controller
         $this->load->view('footer');
     }
 
-    public function view($id = 0)
+    public function view($id)
     {
-        if ($this->order->is_order_exist($id)) {
-            $data = $this->order->order_data_coba($id);
-            $items = $this->order->order_items_coba($id);
-            $banks = json_decode(get_settings('payment_banks'));
-            $banks = (array) $banks;
+        $data = $this->order->order_data_coba($id);
+        $items = $this->order->order_items_coba($id);
+        $banks = json_decode(get_settings('payment_banks'));
+        $banks = (array) $banks;
 
-            $params['title'] = 'Order #' . $data->kode_faktur;
+        $params['title'] = 'Order #' . $data->kode_faktur;
 
-            $order['data'] = $data;
-            $order['items'] = $items;
-            // $order['delivery_data'] = json_decode($data->delivery_data);
-            $order['banks'] = $banks;
+        $order['data'] = $data;
+        $order['items'] = $items;
+        // $order['delivery_data'] = json_decode($data->delivery_data);
+        $order['banks'] = $banks;
 
-            // print_r('<pre>');
-            // print_r($order['data']);
-            // print_r('<pre>');
-            // exit;
+        print_r($data);
+        var_dump($data);
 
-            $this->load->view('header', $params);
-            $this->load->view('orders/view_coba', $order);
-            $this->load->view('footer');
-        } else {
-            show_404();
-        }
+        // print_r('<pre>');
+        // print_r($order['data']);
+        // print_r('<pre>');
+        // exit;
+
+        // $this->load->view('header', $params);
+        // $this->load->view('orders/view_coba', $order);
+        // $this->load->view('footer');
     }
 
     // public function view($id = 0)
