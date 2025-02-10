@@ -64,8 +64,7 @@ class Orders extends CI_Controller
         // $order['delivery_data'] = json_decode($data->delivery_data);
         $order['banks'] = $banks;
 
-        print_r($data);
-        var_dump($data);
+        print_r($order['data']);
 
         // print_r('<pre>');
         // print_r($order['data']);
