@@ -71,7 +71,7 @@ class Product_model extends CI_Model
         limit 1
         ");
     }
-    
+
     // COBA LAGI
     public function getstatusongkirss($id, $tgl)
     {
@@ -294,5 +294,21 @@ class Product_model extends CI_Model
     {
         $this->db->where('kdchart', $kdchart);
         return $this->db->delete('tmp_cart');
+    }
+
+    public function getprice_ongkir($iduser, $kdchart)
+    {
+        // Ambil data dari database (misalnya dari tabel `shipping`)
+        return $this->db->get_where('tbtestongkir', ['idcustomer' => $iduser, 'kd_faktur' => $kdchart, 'status' => '1'])->result();
+    }
+
+    public function getongkir_checkout($id, $kd)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tbtestongkir a
+        WHERE a.idcustomer = '$id'
+        AND a.kd_faktur = '$kd'
+        ")->result();
     }
 }

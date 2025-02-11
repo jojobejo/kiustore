@@ -40,7 +40,27 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <label for="exampleFormControlInput1" class="form-label">Catatan</label>
                             <textarea name="note" class="form-control" id="note"></textarea>
                         </div>
-                        <!-- Edit Address<a class="btn btn-danger w-100" href="edit-profile.html">Edit Billing Information</a> -->
+
+                        <?php foreach ($jasa_ongkir as $j) :
+                            $now = date('Y-m-d');
+                            $jsongkir = explode(';', $j->jsongkir);
+                            $expedisi = $j->sjasa;
+                            if ($expedisi == "jne") {
+                                $expedisi = 'JNE';
+                            } elseif ($expedisi == "pos") {
+                                $expedisi = 'POS INDONESIA';
+                            } elseif ($expedisi == "tiki") {
+                                $expedisi = 'TIKI';
+                            }
+                        ?>
+                            <div hidden>
+                                <input type="text" value="<?= $jsongkir['0'] ?>" name="jns_shipping" id="jns_shipping">
+                                <input type="text" value="<?= $jsongkir['1'] ?> Hari" name="estimasi" id="estimasi">
+                                <input type="text" value="<?= $jsongkir['2'] ?>" name="ongkirprice" id="ongkirprice">
+                                <input type="text" value="<?= $kdchart ?>" name="kdfaktur" id="kdfaktur">
+                            </div>
+
+                            <!-- Edit Address<a class="btn btn-danger w-100" href="edit-profile.html">Edit Billing Information</a> -->
                     </div>
                 </div>
             </div>
@@ -76,8 +96,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <div class="card-body">
                             <div class="row">
                                 <div class="input-box col-6">
-                                    <input id="expiedisi" name="shipping" type="radio" value="2" checked>
-                                    <label for="karisma">Menyesuaikan dengan ekspedisi yang dipilih</label>
+                                    <input id="expiedisi" name="shipping" type="radio" value="5" checked>
+                                    <label for="karisma"><?= $expedisi ?> - <?= $jsongkir['0'] ?> - Estimasi - <?= $jsongkir['1'] ?> (Rp. <?= number_format($jsongkir['2'], 0) ?>)</label>
                                     <div class="check"></div>
                                 </div>
                             </div>
@@ -100,15 +120,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </div>
                 </div>
             <?php endif; ?>
+        <?php endforeach; ?>
 
-            <!-- Cart Amount Area-->
-            <div class="card cart-amount-area mb-10">
-                <div class="card-body d-flex align-items-center justify-content-between">
-                    <!--    <h5 class="total-price mb-0">Rp <?php echo format_rupiah($total); ?></h5> -->
-                    <input type="text" name="usrid" id="usrid" class="btn btn-warning" value="<?= $this->session->userdata('user_id') ?>" hidden>
-                    <input type="submit" class="btn btn-warning" value="Buat Pesanan">
-                </div>
+        <!-- Cart Amount Area-->
+        <div class="card cart-amount-area mb-10">
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <!--    <h5 class="total-price mb-0">Rp <?php echo format_rupiah($total); ?></h5> -->
+                <input type="text" name="usrid" id="usrid" class="btn btn-warning" value="<?= $this->session->userdata('user_id') ?>" hidden>
+                <input type="submit" class="btn btn-warning" value="Buat Pesanan">
             </div>
+        </div>
         </div>
     </form>
 

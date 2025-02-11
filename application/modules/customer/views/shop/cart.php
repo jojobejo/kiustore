@@ -56,7 +56,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
       </div>
 
       <?php foreach ($sts_ongkir as $st) : ?>
-
         <?php if ($st->sts_ongkir == '0') : ?>
           <div class="card cart-amount-area mb-3">
             <div class="card-body">
@@ -84,8 +83,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
               </form>
             </div>
           </div>
+
         <?php elseif ($st->sts_ongkir == '1') : ?>
-          
           <?php foreach ($ongkirs as $o) :
             $now  = date('Y-m-d');
             $jsongkir = explode(';', $o->jsongkir);

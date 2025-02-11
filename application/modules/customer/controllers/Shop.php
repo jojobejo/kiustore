@@ -145,7 +145,6 @@ class Shop extends CI_Controller
                 );
 
                 $this->product->updatests($customer, $datenow, $updatests);
-                $this->product->deleteongkirs($customer);
                 redirect('cart');
                 break;
         }
@@ -238,50 +237,51 @@ class Shop extends CI_Controller
                     $total_price_multi[$item['product_type']] +=  $item['price'];
                 }
 
-                $subtotal = $this->cart->total();
-                $ongkir = (int) ($subtotal >= get_settings('min_shop_to_free_shipping_cost')) ? 0 : get_settings('shipping_cost');
-                $user_id = $this->session->userdata('user_id');
+                $subtotal       = $this->cart->total();
+                $ongkir         = 0;
+                $user_id        = $this->session->userdata('user_id');
+                $jasa_ongkir    = $this->product->getongkir_checkout($iduser, $kdchart);
 
                 $params['customer'] = $this->customer->data();
                 $params['subtotal'] = $subtotal;
-                $params['ongkir'] = ($ongkir > 0) ? 'Rp' . format_rupiah($ongkir) : 'Gratis';
-                $params['total'] = $subtotal + $ongkir - $discount;
+                $params['jasa_ongkir'] = $jasa_ongkir;
+                // $params['ongkir']   = $params['harga_kirim'];
+                $params['total']    = $subtotal + $ongkir - $discount;
                 $params['discount'] = $disc;
+                $params['kdchart']  = $kdchart;
 
                 $this->session->set_userdata('order_quantity', $items);
                 $this->session->set_userdata('order_quantity_multi', $items_multi);
                 $this->session->set_userdata('total_price', $params['total']);
                 $this->session->set_userdata('total_price_multi', $total_price_multi);
 
-                // GENERATE KDCHART
-                $generatechart = array(
-                    'kdchart'   => $kdchart
-                );
-
-                // $this->product->removechartall($kdchart); 
-                $this->product->insertgenerate($generatechart);
-
                 $this->load->view('header');
                 $this->load->view('shop/checkout', $params);
                 $this->load->view('footer');
 
                 break;
+
             case 'order':
-                $quantity = $this->session->userdata('order_quantity');
 
-                $user_id = get_current_user_id();
-                $coupon_id = $this->session->userdata('coupon_id');
+                $quantity   = $this->session->userdata('order_quantity');
+
+                $user_id    = get_current_user_id();
+                $coupon_id  = $this->session->userdata('coupon_id');
                 $order_date = date('Y-m-d H:i:s');
-                $due_date = date('Y-m-d');
-                $payment = $this->input->post('payment');
-                $shipping = $this->input->post('shipping');
+                $due_date   = date('Y-m-d');
+                $payment    = $this->input->post('payment');
+                $shipping   = $this->input->post('shipping');
+                $ongkirprice   = $this->input->post('ongkirprice');
+                $kdfaktur   = $this->input->post('kdfaktur');
+                $estimasi   = $this->input->post('estimasi');
+                $jnkirim    = $this->input->post('jns_shipping');
 
-                $name = $this->input->post('name');
+                $name       = $this->input->post('name');
                 $phone_number = $this->input->post('phone_number');
-                $address = $this->input->post('address');
-                $shop_name = $this->input->post('shop_name');
+                $address    = $this->input->post('address');
+                $shop_name  = $this->input->post('shop_name');
                 $shop_address = $this->input->post('shop_address');
-                $note = $this->input->post('note');
+                $note       = $this->input->post('note');
 
                 $delivery_data = array(
                     'customer' => array(
@@ -295,7 +295,6 @@ class Shop extends CI_Controller
                 );
 
                 $delivery_data = json_encode($delivery_data);
-
 
                 // if credit payment
                 if ($payment == 1) {
@@ -318,6 +317,7 @@ class Shop extends CI_Controller
                                 'user_id' => $user_id,
                                 'coupon_id' => $coupon_id,
                                 'order_number' => $order_number,
+                                'kd_faktur'    => $kdfaktur,
                                 'order_status' => 1,
                                 'order_date' => $order_date,
                                 'total_price' => $total,
@@ -325,7 +325,10 @@ class Shop extends CI_Controller
                                 'payment_method' => ($type == 1 ? 2 : 1),
                                 'shipping_method' => $shipping,
                                 'delivery_data' => $delivery_data,
-                                'due_date' => $due_date
+                                'due_date' => $due_date,
+                                'jenis_pengiriman' => $jnkirim,
+                                'estimasi_kirim' => $estimasi,
+                                'shipping_cost' => $ongkirprice
                             );
 
                             $order = $this->product->create_order($order);
@@ -353,6 +356,7 @@ class Shop extends CI_Controller
                         'user_id' => $user_id,
                         'coupon_id' => $coupon_id,
                         'order_number' => $order_number,
+                        'kd_faktur' => $kdfaktur,
                         'order_status' => 1,
                         'order_date' => $order_date,
                         'total_price' => $total_price,
@@ -360,12 +364,16 @@ class Shop extends CI_Controller
                         'payment_method' => $payment,
                         'shipping_method' => $shipping,
                         'delivery_data' => $delivery_data,
-                        'due_date' => $due_date
+                        'due_date' => $due_date,
+                        'jenis_pengiriman' => $jnkirim,
+                        'estimasi_kirim' => $estimasi,
+                        'shipping_cost' => $ongkirprice
                     );
 
                     $order = $this->product->create_order($order);
                     $n = 0;
                     foreach ($quantity as $id => $data) {
+
                         $items[$n]['order_id'] = $order;
                         $items[$n]['product_id'] = $id;
                         $items[$n]['order_qty'] = $data['qty'];
@@ -377,8 +385,12 @@ class Shop extends CI_Controller
                         $n++;
                     }
 
+                    // GENERATE KDCHART
                     $vacode = $this->payment->get_va_code($user_id);
 
+                    $generatechart = array(
+                        'kdchart'   => $kdfaktur
+                    );
                     $datava = array(
                         'order_number'  => $order_number,
                         'user_id'       => $user_id,
@@ -388,6 +400,8 @@ class Shop extends CI_Controller
 
                     $this->product->create_order_items($items);
                     $this->payment->input_va($datava);
+                    $this->product->removechartall($kdfaktur);
+                    $this->product->insertgenerate($generatechart);
                 }
 
                 $this->cart->destroy();
@@ -479,8 +493,13 @@ class Shop extends CI_Controller
                         'create_at' => $now
                     );
 
+                    $generatechart = array(
+                        'kdchart'   => $kdchart
+                    );
+
                     $this->cart->insert($item);
                     $this->product->tmp_cart_customer($items);
+                    $this->product->insertgenerate($generatechart);
                     $total_item = count($this->cart->contents());
 
                     // if ($_SESSION['user_level'] != 1) {
