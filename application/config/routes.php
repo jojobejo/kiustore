@@ -68,7 +68,7 @@ $route['cartongkir'] = 'customer/addons/addoncart/cart';
 
 $route['customer'] = 'customer/customer';
 $route['profile'] = 'customer/profile';
-$route['alamat_coba'] = 'customer/profile/cusalamat';
+$route['cus_edit_customer/(:any)'] = 'customer/profile/cus_editdata/$1';
 $route['change_alamat_customer_profile'] = 'customer/profile/change_alamat_asal';
 $route['message'] = 'customer/message';
 $route['send_message'] = 'customer/message/send';
@@ -99,13 +99,10 @@ $route['admin/apibriva'] = 'admin/api_payment_briva';
 // COBA
 $route['readonlychange'] = 'customer/profile/toggle_readonly';
 $route['inputlocation'] = 'customer/profile/inputlocation';
-
 $route['get_provinces'] = 'customer/profile/get_provinces';
 
 // RAJAONGKIR 
-
 $route['rajaongkir'] = 'customer/rajaongkir';
-
 $route['rajaongkir/get_provinces'] = 'customer/rajaongkir/get_provinces';
 $route['rajaongkir/get_cities'] = 'customer/rajaongkir/get_cities';
 $route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
