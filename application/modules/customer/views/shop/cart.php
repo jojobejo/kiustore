@@ -120,7 +120,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
               </div>
             </div>
           <?php endforeach; ?>
-          <div hidden>
+          <div>
             <form action="<?= base_url('checkout'); ?>" method="POST">
               <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
               <?php foreach ($carts as $item) : ?>
@@ -145,7 +145,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
           </div>
 
           <?php foreach ($itm_cart as $itm) : ?>
-            <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
+            <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart">
           <?php endforeach; ?>
           <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
           </form>

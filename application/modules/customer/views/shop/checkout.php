@@ -57,10 +57,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <input type="text" value="<?= $jsongkir['0'] ?>" name="jns_shipping" id="jns_shipping">
                                 <input type="text" value="<?= $jsongkir['1'] ?> Hari" name="estimasi" id="estimasi">
                                 <input type="text" value="<?= $jsongkir['2'] ?>" name="ongkirprice" id="ongkirprice">
-                                <input type="text" value="<?= $kdchart ?>" name="kdfaktur" id="kdfaktur">
+                                <input type="text" value="<?= $j->kd_faktur ?>" name="kdfaktur" id="kdfaktur">
                             </div>
-
-                            <!-- Edit Address<a class="btn btn-danger w-100" href="edit-profile.html">Edit Billing Information</a> -->
                     </div>
                 </div>
             </div>

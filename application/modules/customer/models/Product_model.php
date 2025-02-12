@@ -302,13 +302,13 @@ class Product_model extends CI_Model
         return $this->db->get_where('tbtestongkir', ['idcustomer' => $iduser, 'kd_faktur' => $kdchart, 'status' => '1'])->result();
     }
 
-    public function getongkir_checkout($id, $kd)
+    public function getongkir_checkout($id, $now)
     {
         return $this->db->query("SELECT
         a.*
         FROM tbtestongkir a
         WHERE a.idcustomer = '$id'
-        AND a.kd_faktur = '$kd'
+        AND a.create_at = '$now'
         ")->result();
     }
 }

@@ -170,7 +170,7 @@ class Shop extends CI_Controller
             default:
 
                 $iduser     = $this->session->userdata('user_id');
-                $kdchart    = $this->product->kdnonkomersial($iduser);
+                // $kdchart    = $this->product->kdnonkomersial($iduser);
 
                 $coupon = $this->input->post('coupon_code') ? $this->input->post('coupon_code') : $this->session->userdata('_temp_coupon');
                 $quantity = $this->input->post('quantity') ? $this->input->post('quantity') : $this->session->userdata('_temp_quantity');
@@ -237,10 +237,12 @@ class Shop extends CI_Controller
                     $total_price_multi[$item['product_type']] +=  $item['price'];
                 }
 
+                $now                = date('Y-m-d');
+
                 $subtotal       = $this->cart->total();
                 $ongkir         = 0;
                 $user_id        = $this->session->userdata('user_id');
-                $jasa_ongkir    = $this->product->getongkir_checkout($iduser, $kdchart);
+                $jasa_ongkir    = $this->product->getongkir_checkout($iduser, $now);
 
                 $params['customer'] = $this->customer->data();
                 $params['subtotal'] = $subtotal;
@@ -248,7 +250,6 @@ class Shop extends CI_Controller
                 // $params['ongkir']   = $params['harga_kirim'];
                 $params['total']    = $subtotal + $ongkir - $discount;
                 $params['discount'] = $disc;
-                $params['kdchart']  = $kdchart;
 
                 $this->session->set_userdata('order_quantity', $items);
                 $this->session->set_userdata('order_quantity_multi', $items_multi);
