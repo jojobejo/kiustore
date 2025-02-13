@@ -45,16 +45,30 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="input-box mb-2">
                 <label class="form-label">Provinsi :</label>
                 <select class="kiuselect form-control" name="province" id="province"></select>
-                <input type="text" id="pro_id" name="pro_id" value="">
+
             </div>
             <div class="input-box mb-2">
                 <label class="form-label">Kota/Kabupaten :</label>
                 <select class="kiuselect form-control" name="city" id="city"></select>
-                <input type="text" id="kab_id" name="kab_id" value="">
+
             </div>
             <div class="input-box mb-2">
                 <label class="form-label">Kecamatan :</label>
                 <select class="kiuselect form-control" name="subdistrict" id="subdistrict"></select>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label class="form-label">provinsi_id :</label>
+                <input type="text" id="pro_id" name="pro_id" value="">
+            </div>
+            <div class="col">
+                <label class="form-label">city_id :</label>
+                <input type="text" id="kab_id" name="kab_id" value="">
+            </div>
+            <div class="col">
+                <label class="form-label">subdistric_id</label>
                 <input type="text" id="kec_id" name="kec_id" value="">
             </div>
         </div>
@@ -118,10 +132,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
             }
         });
 
-        // Load kecamatan berdasarkan kota yang dipilih
         $('#city').change(function() {
             let city_id = $(this).val();
             $('#subdistrict').html('<option value="">Pilih</option>');
+            $('#subdistrict_id').val(''); // Reset input hidden
+
             if (city_id) {
                 $.get("<?= base_url('rajaongkir/get_subdistricts') ?>", {
                     city_id
@@ -135,20 +150,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
         });
 
         $('#subdistrict').change(function() {
-            let kec_id = $(this).val();
-            $('#subdistrict').html('<option value="">Pilih</option>');
-            if (kec_id) {
-                $.get("<?= base_url('rajaongkir/get_subdistricts') ?>", {
-                    kec_id
-                }, function(data) {
-                    $.each(JSON.parse(data), function(i, subdistrict) {
-                        $('#subdistrict').append('<option value="' + subdistrict.subdistrict_id + '">' + subdistrict.subdistrict_name + '</option>');
-                        $('#kec_id').val(kec_id);
-                    });
-                });
-            }
+            let subdistrict_id = $(this).val();
+            $('#kec_id').val(subdistrict_id); // Set value input hidden
         });
-
 
         loadProvinces();
 
