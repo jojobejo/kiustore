@@ -77,6 +77,7 @@ class Profile extends CI_Controller
         $id = $action;
         // 1 = verifikasi alamat
         // 2 = edit profile 
+        // 3 = save alamat - customer  
 
         switch ($id) {
             case '1':
@@ -93,6 +94,25 @@ class Profile extends CI_Controller
                 break;
             case '2':
 
+                break;
+            case '3':
+
+                $pro_id = $this->input->post('pro_id');
+                $kab_id = $this->input->post('kab_id');
+                $kec_id = $this->input->post('kec_id');
+                $data = array(
+                    'province_id'    => $pro_id,
+                    'kota_id'        => $kab_id,
+                    'subdistrict_id' => $kec_id
+                );
+
+                $update = $this->profile->update($data);
+
+                if ($update) {
+                    echo json_encode(['status' => 'success', 'message' => 'Alamat berhasil diperbarui!']);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => 'Gagal memperbarui alamat!']);
+                }
 
                 break;
         }

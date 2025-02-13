@@ -184,6 +184,18 @@ if (!function_exists('is_member')) {
     }
 }
 
+if (!function_exists('is_members')) {
+    function is_members()
+    {
+        $user_data = session_data();
+        $user_level = $user_data->user_level;
+        if ($user_level < 3) {
+            return 0;
+        }
+        return 1;
+    }
+}
+
 if (!function_exists('atc_check')) {
     function atc_check()
     {

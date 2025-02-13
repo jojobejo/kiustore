@@ -36,16 +36,13 @@ class Shop extends CI_Controller
         if (level_user() < 3) {
 
             $ongkir = $cart['ongkir'] = "0";
-
-            $cusid  = $this->session->userdata('user_id');
-            $now                     = date('Y-m-d');
-
+            $cart['member']        = is_members();
             $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
             $cart['total_price']     = $cart['total_cart'];
-            $cart['tmp_cart']        = $this->product->gettmpshop($cusid, $now)->result();
-            $cart['ongkirs']         = $this->product->getongkirs($cusid, $now)->result();
-            $cart['profilecustomer'] = $this->product->getcustomer($cusid)->result();
-            $cart['sts_ongkir']      = $this->product->getstatusongkir($cusid, $now)->result();
+            $cart['tmp_cart']        = $this->product->gettmpshop($cusids, $now)->result();
+            $cart['ongkirs']         = $this->product->getongkirs($cusids, $now)->result();
+            $cart['profilecustomer'] = $this->product->getcustomer($cusids)->result();
+            $cart['sts_ongkir']      = $this->product->getstatusongkir($cusids, $now)->result();
 
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
@@ -53,7 +50,12 @@ class Shop extends CI_Controller
         } else {
 
             $ongkir = $cart['ongkir'] = "0";
-            $cart['total_price'] = $cart['total_cart'] + $ongkir;
+
+            $cart['member']        = is_members();
+            $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
+            $cart['profilecustomer'] = $this->product->getcustomer($cusids)->result();
+            $cart['total_price']     = $cart['total_cart'] + $ongkir;
+            $cart['profilecustomer'] = $this->product->getcustomer($cusids)->result();
 
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
@@ -237,31 +239,52 @@ class Shop extends CI_Controller
                     $total_price_multi[$item['product_type']] +=  $item['price'];
                 }
 
-                $now                = date('Y-m-d');
+                $akseslv        = is_members();
 
-                $subtotal       = $this->cart->total();
-                $ongkir         = 0;
-                $user_id        = $this->session->userdata('user_id');
-                $jasa_ongkir    = $this->product->getongkir_checkout($iduser, $now);
+                if ($akseslv == 1) {
 
-                $params['customer'] = $this->customer->data();
-                $params['subtotal'] = $subtotal;
-                $params['jasa_ongkir'] = $jasa_ongkir;
-                // $params['ongkir']   = $params['harga_kirim'];
-                $params['total']    = $subtotal + $ongkir - $discount;
-                $params['discount'] = $disc;
+                    $now            = date('Y-m-d');
+                    $subtotal       = $this->cart->total();
+                    $ongkir         = 0;
+                    $user_id        = $this->session->userdata('user_id');
 
-                $this->session->set_userdata('order_quantity', $items);
-                $this->session->set_userdata('order_quantity_multi', $items_multi);
-                $this->session->set_userdata('total_price', $params['total']);
-                $this->session->set_userdata('total_price_multi', $total_price_multi);
+                    $params['customer'] = $this->customer->data();
+                    $params['kdchart'] = $this->product->getkdchart($iduser);
+                    $params['subtotal'] = $subtotal;
+                    $params['total']    = $subtotal + $ongkir - $discount;
+                    $params['discount'] = $disc;
 
-                $this->load->view('header');
-                $this->load->view('shop/checkout', $params);
-                $this->load->view('footer');
+                    $this->session->set_userdata('order_quantity', $items);
+                    $this->session->set_userdata('order_quantity_multi', $items_multi);
+                    $this->session->set_userdata('total_price', $params['total']);
+                    $this->session->set_userdata('total_price_multi', $total_price_multi);
 
+                    $this->load->view('header');
+                    $this->load->view('shop/checkout', $params);
+                    $this->load->view('footer');
+                } else {
+                    $now            = date('Y-m-d');
+                    $subtotal       = $this->cart->total();
+                    $ongkir         = 0;
+                    $user_id        = $this->session->userdata('user_id');
+                    $jasa_ongkir    = $this->product->getongkir_checkout($iduser, $now);
+
+                    $params['customer'] = $this->customer->data();
+                    $params['subtotal'] = $subtotal;
+                    $params['jasa_ongkir'] = $jasa_ongkir;
+                    $params['total']    = $subtotal + $ongkir - $discount;
+                    $params['discount'] = $disc;
+
+                    $this->session->set_userdata('order_quantity', $items);
+                    $this->session->set_userdata('order_quantity_multi', $items_multi);
+                    $this->session->set_userdata('total_price', $params['total']);
+                    $this->session->set_userdata('total_price_multi', $total_price_multi);
+
+                    $this->load->view('header');
+                    $this->load->view('shop/checkout', $params);
+                    $this->load->view('footer');
+                }
                 break;
-
             case 'order':
 
                 $quantity   = $this->session->userdata('order_quantity');
@@ -308,101 +331,190 @@ class Shop extends CI_Controller
                         $this->session->set_flashdata('limit', 'Total belanjaan anda melebihi batas kredit. Sisa limit kredit anda <strong>Rp.' . format_rupiah($limit_transaction) . '</strong>');
                         redirect('cart');
                     }
+                    if (is_members() == '1') {
+                        foreach ($total_price_multi as $type => $total) {
+                            if ($total) {
+                                $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $coupon_id);
+                                $due_date = ($type == 1 ? date('Y-m-d') : ($type == 2 ? date('Y-m-d', strtotime(' + 1 months')) : ($type == 3 ? date('Y-m-d', strtotime(' + 2 months')) : "")));
 
-                    foreach ($total_price_multi as $type => $total) {
-                        if ($total) {
-                            $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $coupon_id);
-                            $due_date = ($type == 1 ? date('Y-m-d') : ($type == 2 ? date('Y-m-d', strtotime(' + 1 months')) : ($type == 3 ? date('Y-m-d', strtotime(' + 2 months')) : "")));
-
-                            $order = array(
-                                'user_id' => $user_id,
-                                'coupon_id' => $coupon_id,
-                                'order_number' => $order_number,
-                                'kd_faktur'    => $kdfaktur,
-                                'order_status' => 1,
-                                'order_date' => $order_date,
-                                'total_price' => $total,
-                                'total_items' => count($quantity_multi[$type]),
-                                'payment_method' => ($type == 1 ? 2 : 1),
-                                'shipping_method' => $shipping,
-                                'delivery_data' => $delivery_data,
-                                'due_date' => $due_date,
-                                'jenis_pengiriman' => $jnkirim,
-                                'estimasi_kirim' => $estimasi,
-                                'shipping_cost' => $ongkirprice
-                            );
-
-                            $order = $this->product->create_order($order);
-                            $n = 0;
-                            foreach ($quantity_multi[$type] as $id => $data) {
-                                $items[$n]['order_id'] = $order;
-                                $items[$n]['product_id'] = $id;
-                                $items[$n]['order_qty'] = $data['qty'];
-                                $items[$n]['satuan'] = $data['satuan'];
-                                $items[$n]['satuan_text'] = $data['satuan_text'];
-                                $items[$n]['satuan_qty'] = $data['satuan_qty'];
-                                $items[$n]['order_price'] = $data['price'];
-
-                                $n++;
+                                $order = array(
+                                    'user_id' => $user_id,
+                                    'coupon_id' => $coupon_id,
+                                    'order_number' => $order_number,
+                                    'kd_faktur'    => $kdfaktur,
+                                    'order_status' => 1,
+                                    'order_date' => $order_date,
+                                    'total_price' => $total,
+                                    'total_items' => count($quantity_multi[$type]),
+                                    'payment_method' => ($type == 1 ? 2 : 1),
+                                    'shipping_method' => $shipping,
+                                    'delivery_data' => $delivery_data,
+                                    'due_date' => $due_date,
+                                    'jenis_pengiriman' => '89',
+                                    'estimasi_kirim' => 0,
+                                    'shipping_cost' => 0
+                                );
+                                $order = $this->product->create_order($order);
+                                $n = 0;
+                                foreach ($quantity_multi[$type] as $id => $data) {
+                                    $items[$n]['order_id'] = $order;
+                                    $items[$n]['product_id'] = $id;
+                                    $items[$n]['order_qty'] = $data['qty'];
+                                    $items[$n]['satuan'] = $data['satuan'];
+                                    $items[$n]['satuan_text'] = $data['satuan_text'];
+                                    $items[$n]['satuan_qty'] = $data['satuan_qty'];
+                                    $items[$n]['order_price'] = $data['price'];
+                                    $n++;
+                                }
+                                $this->product->create_order_items($items);
                             }
-                            $this->product->create_order_items($items);
+                        }
+                    } else {
+                        foreach ($total_price_multi as $type => $total) {
+                            if ($total) {
+                                $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $coupon_id);
+                                $due_date = ($type == 1 ? date('Y-m-d') : ($type == 2 ? date('Y-m-d', strtotime(' + 1 months')) : ($type == 3 ? date('Y-m-d', strtotime(' + 2 months')) : "")));
+
+                                $order = array(
+                                    'user_id' => $user_id,
+                                    'coupon_id' => $coupon_id,
+                                    'order_number' => $order_number,
+                                    'kd_faktur'    => $kdfaktur,
+                                    'order_status' => 1,
+                                    'order_date' => $order_date,
+                                    'total_price' => $total,
+                                    'total_items' => count($quantity_multi[$type]),
+                                    'payment_method' => ($type == 1 ? 2 : 1),
+                                    'shipping_method' => $shipping,
+                                    'delivery_data' => $delivery_data,
+                                    'due_date' => $due_date,
+                                    'jenis_pengiriman' => $jnkirim,
+                                    'estimasi_kirim' => $estimasi,
+                                    'shipping_cost' => $ongkirprice
+                                );
+                                $order = $this->product->create_order($order);
+                                $n = 0;
+                                foreach ($quantity_multi[$type] as $id => $data) {
+                                    $items[$n]['order_id'] = $order;
+                                    $items[$n]['product_id'] = $id;
+                                    $items[$n]['order_qty'] = $data['qty'];
+                                    $items[$n]['satuan'] = $data['satuan'];
+                                    $items[$n]['satuan_text'] = $data['satuan_text'];
+                                    $items[$n]['satuan_qty'] = $data['satuan_qty'];
+                                    $items[$n]['order_price'] = $data['price'];
+                                    $n++;
+                                }
+                                $this->product->create_order_items($items);
+                            }
                         }
                     }
-                    //  $this->product->add_credit_limit($total_price);
+                } else {
+                    // untuk metode pembayaran cash order langsung dijadikan 1
+                    if (is_members() == '1') {
+                        $total_price = $this->session->userdata('total_price');
+                        $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
+                        $order = array(
+                            'user_id' => $user_id,
+                            'coupon_id' => $coupon_id,
+                            'order_number' => $order_number,
+                            'kd_faktur' => $kdfaktur,
+                            'order_status' => 1,
+                            'order_date' => $order_date,
+                            'total_price' => $total_price,
+                            'total_items' => count($quantity),
+                            'payment_method' => $payment,
+                            'shipping_method' => $shipping,
+                            'delivery_data' => $delivery_data,
+                            'due_date' => $due_date,
+                            'jenis_pengiriman' => 89,
+                            'estimasi_kirim' => 0,
+                            'shipping_cost' => 0
+                        );
 
-                } else { // untuk metode pembayaran cash order langsung dijadikan 1
-                    $total_price = $this->session->userdata('total_price');
-                    $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
-                    $order = array(
-                        'user_id' => $user_id,
-                        'coupon_id' => $coupon_id,
-                        'order_number' => $order_number,
-                        'kd_faktur' => $kdfaktur,
-                        'order_status' => 1,
-                        'order_date' => $order_date,
-                        'total_price' => $total_price,
-                        'total_items' => count($quantity),
-                        'payment_method' => $payment,
-                        'shipping_method' => $shipping,
-                        'delivery_data' => $delivery_data,
-                        'due_date' => $due_date,
-                        'jenis_pengiriman' => $jnkirim,
-                        'estimasi_kirim' => $estimasi,
-                        'shipping_cost' => $ongkirprice
-                    );
+                        $order = $this->product->create_order($order);
+                        $n = 0;
 
-                    $order = $this->product->create_order($order);
-                    $n = 0;
-                    foreach ($quantity as $id => $data) {
+                        foreach ($quantity as $id => $data) {
+                            $items[$n]['order_id'] = $order;
+                            $items[$n]['product_id'] = $id;
+                            $items[$n]['order_qty'] = $data['qty'];
+                            $items[$n]['satuan'] = $data['satuan'];
+                            $items[$n]['satuan_text'] = $data['satuan_text'];
+                            $items[$n]['satuan_qty'] = $data['satuan_qty'];
+                            $items[$n]['order_price'] = $data['price'];
+                            $n++;
+                        }
 
-                        $items[$n]['order_id'] = $order;
-                        $items[$n]['product_id'] = $id;
-                        $items[$n]['order_qty'] = $data['qty'];
-                        $items[$n]['satuan'] = $data['satuan'];
-                        $items[$n]['satuan_text'] = $data['satuan_text'];
-                        $items[$n]['satuan_qty'] = $data['satuan_qty'];
-                        $items[$n]['order_price'] = $data['price'];
+                        // GENERATE KDCHART
+                        $vacode = $this->payment->get_va_code($user_id);
 
-                        $n++;
+                        $generatechart = array(
+                            'kdchart'   => $kdfaktur
+                        );
+                        $datava = array(
+                            'order_number'  => $order_number,
+                            'user_id'       => $user_id,
+                            'va_code'       => $vacode->vacode,
+                            'status'        => '1'
+                        );
+
+                        $this->product->create_order_items($items);
+                        $this->payment->input_va($datava);
+                        $this->product->removechartall($kdfaktur);
+                        $this->product->insertgenerate($generatechart);
+                    } else {
+                        $total_price = $this->session->userdata('total_price');
+                        $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
+                        $order = array(
+                            'user_id' => $user_id,
+                            'coupon_id' => $coupon_id,
+                            'order_number' => $order_number,
+                            'kd_faktur' => $kdfaktur,
+                            'order_status' => 1,
+                            'order_date' => $order_date,
+                            'total_price' => $total_price,
+                            'total_items' => count($quantity),
+                            'payment_method' => $payment,
+                            'shipping_method' => $shipping,
+                            'delivery_data' => $delivery_data,
+                            'due_date' => $due_date,
+                            'jenis_pengiriman' => $jnkirim,
+                            'estimasi_kirim' => $estimasi,
+                            'shipping_cost' => $ongkirprice
+                        );
+
+                        $order = $this->product->create_order($order);
+                        $n = 0;
+
+                        foreach ($quantity as $id => $data) {
+                            $items[$n]['order_id'] = $order;
+                            $items[$n]['product_id'] = $id;
+                            $items[$n]['order_qty'] = $data['qty'];
+                            $items[$n]['satuan'] = $data['satuan'];
+                            $items[$n]['satuan_text'] = $data['satuan_text'];
+                            $items[$n]['satuan_qty'] = $data['satuan_qty'];
+                            $items[$n]['order_price'] = $data['price'];
+                            $n++;
+                        }
+
+                        // GENERATE KDCHART
+                        $vacode = $this->payment->get_va_code($user_id);
+
+                        $generatechart = array(
+                            'kdchart'   => $kdfaktur
+                        );
+                        $datava = array(
+                            'order_number'  => $order_number,
+                            'user_id'       => $user_id,
+                            'va_code'       => $vacode->vacode,
+                            'status'        => '1'
+                        );
+
+                        $this->product->create_order_items($items);
+                        $this->payment->input_va($datava);
+                        $this->product->removechartall($kdfaktur);
+                        $this->product->insertgenerate($generatechart);
                     }
-
-                    // GENERATE KDCHART
-                    $vacode = $this->payment->get_va_code($user_id);
-
-                    $generatechart = array(
-                        'kdchart'   => $kdfaktur
-                    );
-                    $datava = array(
-                        'order_number'  => $order_number,
-                        'user_id'       => $user_id,
-                        'va_code'       => $vacode->vacode,
-                        'status'        => '1'
-                    );
-
-                    $this->product->create_order_items($items);
-                    $this->payment->input_va($datava);
-                    $this->product->removechartall($kdfaktur);
-                    $this->product->insertgenerate($generatechart);
                 }
 
                 $this->cart->destroy();
@@ -494,13 +606,8 @@ class Shop extends CI_Controller
                         'create_at' => $now
                     );
 
-                    $generatechart = array(
-                        'kdchart'   => $kdchart
-                    );
-
                     $this->cart->insert($item);
                     $this->product->tmp_cart_customer($items);
-                    $this->product->insertgenerate($generatechart);
                     $total_item = count($this->cart->contents());
 
                     // if ($_SESSION['user_level'] != 1) {

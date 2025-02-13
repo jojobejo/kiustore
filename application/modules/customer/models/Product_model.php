@@ -311,4 +311,14 @@ class Product_model extends CI_Model
         AND a.create_at = '$now'
         ")->result();
     }
+
+    public function getkdchart($id)
+    {
+        return $this->db->query("SELECT
+        a.idcustomer , a.kdchart
+        FROM tmp_cart a
+        WHERE a.idcustomer = '$id'
+        LIMIT 1
+        ")->result();
+    }
 }
