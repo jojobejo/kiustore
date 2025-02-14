@@ -1092,7 +1092,7 @@ class Order_model extends CI_Model
             ->update('orders', array(
                 'invoice_number' => $data['invoice_number'],
                 'ttb_number' => $data['ttb_number'],
-              //  'due_date' => $data['due_date'],
+                //  'due_date' => $data['due_date'],
                 'shipping_cost' => $data['shipping_cost'],
                 'insurance' => $data['insurance'],
                 'order_status' => $status
@@ -1178,7 +1178,6 @@ class Order_model extends CI_Model
                 u.id
 
   		";
-
         return $this->db->query($sql);
     }
 }

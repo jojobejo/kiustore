@@ -208,7 +208,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </form>
           </div>
         </div>
-
         <!--      <div class="card card-primary">
                 <div class="card-header">
                     <h3 class="mb-0">Data Penerima</h3>
@@ -389,6 +388,18 @@ defined('BASEPATH') or exit('No direct script access allowed');
               </div>
             <?php endif; ?>
           </div>
+
+          <div class="card card-primary" id="#briva">
+            <div class="card-header">
+              <h3 class="mb-0">Virtual Account BRI</h3>
+            </div>
+            <div class="card-body">
+              <div class="alert alert-info m-2">Data VA Tidak Ada</div>
+              <form action="" method="POST">
+              </form>
+            </div>
+          </div>
+          
         <?php } ?>
       </div>
     <?php endif; ?>
