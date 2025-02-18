@@ -56,6 +56,7 @@ $route['translate_uri_dashes'] = FALSE;
 
 $route['dashboard_admin'] = 'admin/dashboard';
 $route['admin'] = 'admin/admin';
+
 $route['send_admin_message'] = 'admin/messages/send';
 $route['generate_va'] = 'admin/customers/generate_va';
 
@@ -94,7 +95,6 @@ $route['checkout'] = 'customer/shop/checkout';
 $route['checkout_submit'] = 'customer/shop/checkout/order';
 
 $route['admin/ongkir'] = 'admin/ongkir';
-
 $route['admin/apibriva'] = 'admin/api_payment_briva';
 
 // COBA
@@ -110,3 +110,7 @@ $route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
 $route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
 
 // BRI VA
+$route['admin/brivaws'] = 'admin/brivawsapi';
+
+$route['generate_signature'] = 'admin/brivawsapi/generate_signature';
+$route['gettoken'] = 'admin/brivawsapi/getToken';

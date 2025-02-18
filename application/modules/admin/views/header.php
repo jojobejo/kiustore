@@ -100,7 +100,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link <?= ($this->uri->segment(2) == 'payments' ? 'active' : '') ?>" href="<?php echo site_url('admin/payments/briva_payment'); ?>">
+                <a class="nav-link <?= ($this->uri->segment(2) == 'payments' ? 'active' : '') ?>" href="<?php echo site_url('admin/brivaws'); ?>">
                   <i class="ni ni-bullet-list-67 text-info"></i>
                   <span class="nav-link-text">BRIVA API</span>
                 </a>

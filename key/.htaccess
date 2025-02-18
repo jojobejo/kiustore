@@ -1,0 +1,4 @@
+<Files "private.pem">
+    Order Allow,Deny
+    Deny from all
+</Files>
