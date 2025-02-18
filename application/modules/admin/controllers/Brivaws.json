@@ -1,0 +1,60 @@
+let pmlibCode = pm.environment.get("pmlib_code");
+
+try {
+    const response = await pm.sendRequest({
+        url: "https://postman-echo.com/get",
+        method: "GET"
+    });
+
+    console.log(response.json());
+} catch (err) {
+    console.error(err);
+}
+
+Date.prototype.toIsoString = function() {
+    var tzo = -this.getTimezoneOffset(),
+        dif = tzo >= 0 ? '+' : '-',
+        pad = function(num) {
+            var norm = Math.floor(Math.abs(num));
+            return (norm < 10 ? '0' : '') + norm;
+        };
+    return this.getFullYear() +
+        '-' + pad(this.getMonth() + 1) +
+        '-' + pad(this.getDate()) +
+        'T' + pad(this.getHours()) +
+        ':' + pad(this.getMinutes()) +
+        ':' + pad(this.getSeconds()) +
+        '.' + this.getMilliseconds() + 
+        dif + pad(tzo / 60) +
+        ':' + pad(tzo % 60);
+}
+
+var dt = new Date();
+var timestamp = dt.toIsoString();
+postman.setEnvironmentVariable('timestamp', timestamp);
+
+var prvKeyPEM = pm.environment.get("private_key");
+var clientid = pm.environment.get("client_id");
+
+
+console.log(prvKeyPEM);
+
+// Use 'jsrsasign' library
+const base64String = pmlib.rs.stob64u('My amazing string')
+console.log('Url Base64 string: ' + base64String)
+
+var sig = new pmlib.rs.KJUR.crypto.Signature({"alg": "SHA256withRSA"});
+console.log(sig);
+sig.init(prvKeyPEM);
+sig.updateString(clientid+'|'+timestamp);
+var hSigVal = sig.sign();
+
+postman.setEnvironmentVariable('signature', hexToBase64(hSigVal));
+postman.setEnvironmentVariable('signature_hex', hSigVal);
+
+
+function hexToBase64(hexstring) {
+    return btoa(hexstring.match(/\w{2}/g).map(function(a) {
+        return String.fromCharCode(parseInt(a, 16));
+    }).join(""));
+}
