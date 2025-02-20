@@ -1,0 +1,1 @@
+{"stringToSign":"POST:\/snap\/v1.0\/transfer-va\/create-va:napbBUuXEoejkogmZbwUKb61SPrS:90611afcd2e5e2d44a476f9a692e96c13b48de00a97d02e60ac78f33938f5859:2025-02-20T05:50:19Z","signature":"AKdWXjjzy4BJP4MEbD1JwfUTQBbdJLcH6FRxQYWvsTgeZ+ydgNwqeqLDCMrZizs5Ea\/CpQQ4bfQe7rl0sidPJA=="}

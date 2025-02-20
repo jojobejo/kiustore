@@ -27,14 +27,17 @@ class Brivawsapi extends CI_Controller
     {
         $endpoint = '/snap/v1.0/transfer-va/create-va';
         $fullUrl = $this->url . $endpoint;
-        $timestamp = gmdate("Y-m-d\TH:i:s\Z");
+        $tokenData = $this->getToken();
+        $timestamp = $tokenData['timestamp'];
 
-        $token = getToken();
-        if (!$token) {
+        if (!isset($tokenData['accessToken'])) {
             return $this->output
                 ->set_content_type('application/json')
                 ->set_output(json_encode(['status' => false, 'message' => 'Failed to get token']));
         }
+
+        $token = $tokenData['accessToken'];
+        file_put_contents('token_used_log.txt', "Using Token: " . $token . PHP_EOL, FILE_APPEND);
 
         $body = [
             'partnerServiceId'   => $this->partnerServiceId,
@@ -52,24 +55,11 @@ class Brivawsapi extends CI_Controller
             ]
         ];
 
-        $response = curl_request($fullUrl, $token, 'POST', $body);
+        $response = curl_request($fullUrl, $endpoint, $timestamp, $token, 'POST', $body);
 
         return $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode($response));
-    }
-
-    public function generate_signature()
-    {
-        $client_id = $this->input->post('X-CLIENT-KEY');
-        $timestamp = $this->input->post('X-TIMESTAMP');
-
-        $data = $client_id . "|" . $timestamp;
-        openssl_sign($data, $signature, $this->privateKey, OPENSSL_ALGO_SHA256);
-        $signature_base64 = base64_encode($signature);
-
-        header('Content-Type: application/json');
-        echo json_encode(['signature' => $signature_base64]);
     }
 
     private function generate_asymmetric_signature($client_id, $timestamp)
@@ -111,18 +101,34 @@ class Brivawsapi extends CI_Controller
 
         $result = json_decode($response, true);
 
+        if (!isset($result['accessToken'])) {
+            return ['status' => false, 'message' => 'Failed to retrieve token'];
+        }
+        
+        file_put_contents('token_response_log.txt', json_encode($result) . PHP_EOL, FILE_APPEND);
+
+
         if ($httpCode == 200) {
             echo json_encode([
+                'status' => 'berhasil mendapati token',
+                'accessToken' => $result['accessToken'],
+            ]);
+
+            return [
                 'status' => 'success',
                 'accessToken' => $result['accessToken'],
                 'tokenType' => $result['tokenType'],
-                'expiresIn' => $result['expiresIn'] . " seconds (" . round($result['expiresIn'] / 60, 2) . " minutes)"
-            ]);
+                'expiresIn' => $result['expiresIn'],
+                'timestamp' => $timestamp
+            ];
         } else {
             echo json_encode([
+                'status' => 'gagal mendapati token',
+            ]);
+            return [
                 'status' => 'error',
                 'message' => $result
-            ]);
+            ];
         }
     }
 }
