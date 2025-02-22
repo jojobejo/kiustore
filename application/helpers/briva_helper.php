@@ -70,7 +70,7 @@ if (!function_exists('curl_request')) {
         $xPartnerId = 'kuionline';
 
         $headers = [
-            'Authorization: BearerToken ' . ' ' . $token,
+            'Authorization:BearerToken ' . $token,
             'X-TIMESTAMP:' . $timestamp,
             'X-SIGNATURE:' . symmetricSignature($method, $endpoint, $body, $timestamp, $token),
             'Content-Type:application/json',
@@ -88,14 +88,6 @@ if (!function_exists('curl_request')) {
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        file_put_contents('curl_response_log.txt', json_encode([
-            'http_code' => $httpCode,
-            'response' => $response
-        ]) . PHP_EOL, FILE_APPEND);
-
-        if ($response === false) {
-            return ['status' => false, 'message' => curl_error($ch)];
-        }
 
         curl_close($ch);
         return json_decode($response, true);
@@ -104,29 +96,24 @@ if (!function_exists('curl_request')) {
     if (!function_exists('symmetricSignature')) {
         function symmetricSignature($method, $endpoint, $body, $timestamp, $accessToken)
         {
-            global $client_secret; //Consumer Secret
+            $CI = &get_instance();
+            $CI->load->config('briva');
 
-            $hashBody = json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $client_secret = $CI->config->item('briva')['client_secret'];
+
+            $hashBody = json_encode($body);
             $hashBody = hash('sha256', $hashBody);
             $signedBody = strtolower($hashBody); // Convert to lowercase
 
-            $parsedUrl = parse_url($endpoint);
-            $endpointPath = $parsedUrl['path']; // Gunakan path tanpa domain
-
             $stringToSign = implode(':', [
                 $method,
-                $endpointPath,
+                $endpoint,
                 $accessToken,
                 $signedBody,
                 $timestamp
             ]);
 
             $signature = hash_hmac('sha512', $stringToSign, $client_secret, true);
-
-            file_put_contents('signature_log.txt', json_encode([
-                'stringToSign' => $stringToSign,
-                'signature' => base64_encode($signature)
-            ]) . PHP_EOL, FILE_APPEND);
 
             // X-SIGNATURE
             return base64_encode($signature);
