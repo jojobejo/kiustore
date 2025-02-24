@@ -39,6 +39,13 @@ $root .= str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAM
 
 $config['base_url']    = $root;
 
+$config['bri_client_id'] = 'GWdY1JVM6DH9V2AcxBHwxPTuc6GRAPlQ';
+$config['bri_client_secret'] = 'OtISRRKULlrxYKsA';
+
+$config['bri_api_key'] = '';
+$config['bri_base_url'] = 'https://sandbox.partner.api.bri.co.id'; // Ubah ke production jika sudah live
+
+
 /*
 |--------------------------------------------------------------------------
 | Index File
