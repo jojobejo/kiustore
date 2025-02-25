@@ -119,4 +119,6 @@ $route['admin/brivaws'] = 'admin/brivawsapi';
 // $route['generate_signature'] = 'admin/brivawsapi/generate_signature';
 // $route['generate_asymmetric_signature'] = 'admin/brivawsapi/generate_asymmetric_signature';
 
-$route['get_token'] = 'admin/Brivawsapi/getToken';
+$route['get_token'] = 'admin/Brivawsapi/get_token';
+
+$route['create_va'] = 'admin/Brivawsapi/create_va';
