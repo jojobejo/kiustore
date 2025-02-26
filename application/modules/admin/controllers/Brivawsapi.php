@@ -8,17 +8,21 @@ class Brivawsapi extends CI_Controller
     private $url;
     private $privateKey;
     private $secret_key;
-    private $xPartnerId;
+    private $xPartnerId = 'kuionline';
+    private $partnerServiceId = '22123';
+    private $customerNo = '00218322';
+    private $idcus = '111';
 
     public function __construct()
     {
         parent::__construct();
-        $this->client_id    = 'APRGrJBHviW0cLSKZlJDZ4AHXXW9JAki';
-        $this->privateKey   = file_get_contents(FCPATH . 'key/private.pem');
-        $this->url          = 'https://sandbox.partner.api.bri.co.id';
-        $this->secret_key   = 'oSsY5SM5svjj2mY9';
-        $this->xpartnerid   = 'kuionline';
-        $this->partnerid    = '22123';
+        $this->client_id        = 'APRGrJBHviW0cLSKZlJDZ4AHXXW9JAki';
+        $this->privateKey       = file_get_contents(FCPATH . 'key/private.pem');
+        $this->url              = 'https://sandbox.partner.api.bri.co.id';
+        $this->secret_key       = 'oSsY5SM5svjj2mY9';
+
+        $this->xpartner         = 'kuionline';
+        $this->partnerid        = '22123';
     }
 
     private function asymmetricSignature($client_id, $timestamp)
@@ -34,9 +38,9 @@ class Brivawsapi extends CI_Controller
 
     private function symmetricSignature($method, $path, $body, $timestamp, $accessToken)
     {
-        $hashBody = json_encode($body);
-        $hashBody = hash('sha256', $hashBody);
-        $signedBody = strtolower($hashBody);
+        $hashBody = json_encode($body); // Body minify
+        $hashBody = hash('sha256', $hashBody); // Calculate Hash with sha256
+        $signedBody = strtolower($hashBody); // Convert to lowercase
 
         $stringToSign = implode(':', [
             $method,
@@ -47,7 +51,6 @@ class Brivawsapi extends CI_Controller
         ]);
 
         $signature = hash_hmac('sha512', $stringToSign, $this->secret_key, true);
-
         return base64_encode($signature);
     }
 
@@ -59,7 +62,6 @@ class Brivawsapi extends CI_Controller
         $timestamp  = gmdate('Y-m-d\TH:i:s.000\Z');
         $cust = '102030';
 
-        // Ambil access token
         $token_response = $this->get_token();
         $token_data = json_decode($token_response, true);
 
@@ -90,55 +92,18 @@ class Brivawsapi extends CI_Controller
         ];
 
         $sysmetricsignature = $this->symmetricSignature($method, $patch, $body, $timestamp, $access_token);
+        
 
-        $headers = [
+        header('Content-Type: application/json');
+        echo json_encode([
             'Authorization:Bearer ' . $access_token,
             'X-TIMESTAMP:' . $timestamp,
             'X-SIGNATURE:' . $sysmetricsignature,
             'Content-Type:application/json',
-            'X-PARTNER-ID:' . $this->partnerid,
+            'X-PARTNER-ID:' . $this->xpartner,
             'CHANNEL-ID:00001',
-            'X-EXTERNAL-ID:' . rand(100000000, 999999999) // Random setiap request
-        ];
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $fullurl);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-
-        if ($response === false) {
-            return json_encode([
-                "status" => "error",
-                "message" => "cURL Error: " . $curlError
-            ], JSON_PRETTY_PRINT);
-        }
-
-        $createva = json_decode($response, true);
-
-        // Response handling lebih rapi
-        if ($httpCode == 200 && isset($createva['virtualAccountNo'])) {
-            return json_encode([
-                "status" => "success",
-                "message" => "VA telah terbuat",
-                "data" => $createva
-            ], JSON_PRETTY_PRINT);
-        } else {
-            return json_encode([
-                "status" => "error",
-                "message" => "Gagal membuat VA",
-                "http_code" => $httpCode,
-                "response" => $createva
-            ], JSON_PRETTY_PRINT);
-        }
+            'X-EXTERNAL-ID:' . rand(100000000, 999999999)
+        ]);
     }
 
     public function get_token()
