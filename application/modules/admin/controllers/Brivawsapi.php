@@ -16,13 +16,10 @@ class Brivawsapi extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->client_id        = 'APRGrJBHviW0cLSKZlJDZ4AHXXW9JAki';
-        $this->privateKey       = file_get_contents(FCPATH . 'key/private.pem');
-        $this->url              = 'https://sandbox.partner.api.bri.co.id';
-        $this->secret_key       = 'oSsY5SM5svjj2mY9';
-
-        $this->xpartner         = 'kuionline';
-        $this->partnerid        = '22123';
+        $this->client_id    = 'APRGrJBHviW0cLSKZlJDZ4AHXXW9JAki';
+        $this->privateKey   = file_get_contents(FCPATH . 'key/private.pem');
+        $this->url          = 'https://sandbox.partner.api.bri.co.id';
+        $this->secret_key   = 'oSsY5SM5svjj2mY9';
     }
 
     private function asymmetricSignature($client_id, $timestamp)
@@ -50,7 +47,8 @@ class Brivawsapi extends CI_Controller
             $timestamp
         ]);
 
-        $signature = hash_hmac('sha512', $stringToSign, $this->secret_key, true);
+        $signature = hash_hmac('sha512', $stringToSign, $client_secret, true);
+
         return base64_encode($signature);
     }
 
@@ -62,6 +60,7 @@ class Brivawsapi extends CI_Controller
         $timestamp  = gmdate('Y-m-d\TH:i:s.000\Z');
         $cust = '102030';
 
+        // Ambil access token
         $token_response = $this->get_token();
         $token_data = json_decode($token_response, true);
 
@@ -92,19 +91,78 @@ class Brivawsapi extends CI_Controller
         ];
 
         $sysmetricsignature = $this->symmetricSignature($method, $patch, $body, $timestamp, $access_token);
-        
 
-        header('Content-Type: application/json');
-        echo json_encode([
+        $headers = [
             'Authorization:Bearer ' . $access_token,
             'X-TIMESTAMP:' . $timestamp,
             'X-SIGNATURE:' . $sysmetricsignature,
             'Content-Type:application/json',
-            'X-PARTNER-ID:' . $this->xpartner,
+            'X-PARTNER-ID:' . $this->partnerid,
             'CHANNEL-ID:00001',
-            'X-EXTERNAL-ID:' . rand(100000000, 999999999)
-        ]);
+            'X-EXTERNAL-ID:' . rand(100000000, 999999999) // Random setiap request
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $fullurl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        error_log("HTTP Code: " . $httpCode);
+        error_log("Response: " . $response);
+        error_log("cURL Error: " . $curlError);
+
+        if ($response === false) {
+            return json_encode([
+                "status" => "error",
+                "message" => "cURL Error: " . $curlError
+            ], JSON_PRETTY_PRINT);
+        }
+
+        $createva = json_decode($response, true);
+
+        // Response handling lebih rapi
+        if ($httpCode == 200 && isset($createva['virtualAccountNo'])) {
+            return json_encode([
+                "status" => "success",
+                "message" => "VA telah terbuat",
+                "data" => $createva
+            ], JSON_PRETTY_PRINT);
+        } else {
+            return json_encode([
+                "status" => "error",
+                "message" => "Gagal membuat VA",
+                "http_code" => $httpCode,
+                "response" => $createva
+            ], JSON_PRETTY_PRINT);
+        }
     }
+
+    // if (isset($token_data['status']) && $token_data['status'] === 'success') {
+    //         $access_token = $token_data['access_token'];
+
+    //         $response = [
+    //             "status" => "success",
+    //             "message" => "Virtual Account berhasil dibuat",
+    //             "access_token" => $access_token
+    //         ];
+    //     } else {
+    //         $response = [
+    //             "status" => "error",
+    //             "message" => "Gagal membuat Virtual Account, tidak bisa mendapatkan access token",
+    //             "error_detail" => $token_data
+    //         ];
+    //     }
+    //     header('Content-Type: application/json');
+    //     echo json_encode($response, JSON_PRETTY_PRINT);
 
     public function get_token()
     {
@@ -149,6 +207,10 @@ class Brivawsapi extends CI_Controller
 
         if ($httpCode == 200 && isset($token['accessToken'])) {
             header('Content-Type: application/json');
+            echo json_encode([
+                "status" => "success",
+                "access_token" => $token['accessToken']
+            ], JSON_PRETTY_PRINT);
             return json_encode([
                 "status" => "success",
                 "access_token" => $token['accessToken']

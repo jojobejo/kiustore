@@ -1,0 +1,130 @@
+{
+	"info": {
+		"_postman_id": "0e055e10-1847-4dbd-a449-4310f154ce1a",
+		"name": "Token SNAP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19670630"
+	},
+	"item": [
+		{
+			"name": "Get Token",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"eval(pm.globals.get('pmlib_code'));",
+							"",
+							"Date.prototype.toIsoString = function() {",
+							"    var tzo = -this.getTimezoneOffset(),",
+							"        dif = tzo >= 0 ? '+' : '-',",
+							"        pad = function(num) {",
+							"            var norm = Math.floor(Math.abs(num));",
+							"            return (norm < 10 ? '0' : '') + norm;",
+							"        };",
+							"    return this.getFullYear() +",
+							"        '-' + pad(this.getMonth() + 1) +",
+							"        '-' + pad(this.getDate()) +",
+							"        'T' + pad(this.getHours()) +",
+							"        ':' + pad(this.getMinutes()) +",
+							"        ':' + pad(this.getSeconds()) +",
+							"        '.' + this.getMilliseconds() + ",
+							"        dif + pad(tzo / 60) +",
+							"        ':' + pad(tzo % 60);",
+							"}",
+							"",
+							"var dt = new Date();",
+							"var timestamp = dt.toIsoString();",
+							"postman.setEnvironmentVariable('timestamp', timestamp);",
+							"",
+							"var prvKeyPEM = pm.environment.get(\"private_key\");",
+							"var clientid = pm.environment.get(\"client_id\");",
+							"",
+							"",
+							"console.log(prvKeyPEM);",
+							"",
+							"// Use 'jsrsasign' library",
+							"const base64String = pmlib.rs.stob64u('My amazing string')",
+							"console.log('Url Base64 string: ' + base64String)",
+							"",
+							"var sig = new pmlib.rs.KJUR.crypto.Signature({\"alg\": \"SHA256withRSA\"});",
+							"console.log(sig);",
+							"sig.init(prvKeyPEM);",
+							"sig.updateString(clientid+'|'+timestamp);",
+							"var hSigVal = sig.sign();",
+							"",
+							"postman.setEnvironmentVariable('signature', hexToBase64(hSigVal));",
+							"postman.setEnvironmentVariable('signature_hex', hSigVal);",
+							"",
+							"",
+							"function hexToBase64(hexstring) {",
+							"    return btoa(hexstring.match(/\\w{2}/g).map(function(a) {",
+							"        return String.fromCharCode(parseInt(a, 16));",
+							"    }).join(\"\"));",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-SIGNATURE",
+						"value": "{{signature_hex}}",
+						"type": "text"
+					},
+					{
+						"key": "X-CLIENT-KEY",
+						"value": "{{client_id}}",
+						"type": "text"
+					},
+					{
+						"key": "X-TIMESTAMP",
+						"value": "{{timestamp}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"grantType\": \"client_credentials\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/access-token/b2b",
+					"protocol": "https",
+					"host": [
+						"sandbox",
+						"partner",
+						"api",
+						"bri",
+						"co",
+						"id"
+					],
+					"path": [
+						"snap",
+						"v1.0",
+						"access-token",
+						"b2b"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

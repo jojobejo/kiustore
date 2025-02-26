@@ -1,0 +1,3144 @@
+{
+	"info": {
+		"_postman_id": "eee282e0-b53a-4c87-b61f-14c0dde77dda",
+		"name": "BRIVA WS test partner",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19670630"
+	},
+	"item": [
+		{
+			"name": "Virtual Account (BRIVA WS) Copy",
+			"item": [
+				{
+					"name": "Realcase",
+					"item": [
+						{
+							"name": "Create VA",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.globals.set(\"external-id\", _.random (10000000,999999999));\r",
+											"\r",
+											"function getPath(url) {\r",
+											"    var pathRegex = /.+?\\:\\/\\/.+?(\\/.+?)(?:#|\\?|$)/;\r",
+											"    var result = url.match(pathRegex);\r",
+											"    return result && result.length > 1 ? result[1] : ''; \r",
+											"}\r",
+											" \r",
+											"function getQueryString(url) {\r",
+											"    var arrSplit = url.split('?');\r",
+											"    return arrSplit.length > 1 ? url.substring(url.indexOf('?')+1) : ''; \r",
+											"}\r",
+											" \r",
+											"function getAuthHeader(httpMethod, requestUrl, requestBody) {\r",
+											"    var requestPath = getPath(requestUrl);\r",
+											"    var queryString = getQueryString(requestUrl);\r",
+											"    \r",
+											"    if (httpMethod == 'GET' || !requestBody) {\r",
+											"        requestBody = ''; \r",
+											"    } else {\r",
+											"        requestBody = requestBody;\r",
+											"    }\r",
+											"    \r",
+											"    Date.prototype.toIsoString = function() {\r",
+											"        var tzo = -this.getTimezoneOffset(),\r",
+											"            dif = tzo >= 0 ? '+' : '-',\r",
+											"            pad = function(num) {\r",
+											"                var norm = Math.floor(Math.abs(num));\r",
+											"                return (norm < 10 ? '0' : '') + norm;\r",
+											"            };\r",
+											"        return this.getFullYear() +\r",
+											"            '-' + pad(this.getMonth() + 1) +\r",
+											"            '-' + pad(this.getDate()) +\r",
+											"            'T' + pad(this.getHours()) +\r",
+											"            ':' + pad(this.getMinutes()) +\r",
+											"            ':' + pad(this.getSeconds()) +\r",
+											"            '.' + this.getMilliseconds() + \r",
+											"            dif + pad(tzo / 60) +\r",
+											"            ':' + pad(tzo % 60);\r",
+											"    }\r",
+											"\r",
+											"    var dt = new Date();\r",
+											"    var timestamp = dt.toIsoString();\r",
+											"    postman.setEnvironmentVariable('timestamp', timestamp);\r",
+											"\r",
+											"    console.log(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    var hash = CryptoJS.SHA256(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    payload = httpMethod + \":\" + requestPath + \":\" + pm.environment.get('token') + \":\" \r",
+											"        + hash.toString(CryptoJS.enc.Hex) + \":\" + timestamp;\r",
+											"\r",
+											"    postman.setEnvironmentVariable('signature_payload', payload);\r",
+											"    \r",
+											"    var hmacSignature = CryptoJS.HmacSHA512(payload, pm.environment.get('client_secret'));\r",
+											"    return hmacSignature;\r",
+											"}\r",
+											"\r",
+											"postman.setEnvironmentVariable('signature', getAuthHeader(request['method'], request['url'], request['data']));\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "tokenType",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "accessToken",
+											"value": "{{token}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-EXTERNAL-ID",
+										"value": "123499",
+										"type": "text"
+									},
+									{
+										"key": "CHANNEL-ID",
+										"value": "BAPE",
+										"type": "text"
+									},
+									{
+										"key": "X-ESB-SERVICE_ID",
+										"value": "1234561234567",
+										"type": "text",
+										"disabled": true
+									},
+									{
+										"key": "X-SIGNATURE",
+										"value": "{{signature}}",
+										"type": "text"
+									},
+									{
+										"key": "X-TIMESTAMP",
+										"value": "{{timestamp}}",
+										"type": "text"
+									},
+									{
+										"key": "X-ESB-SERVICE_ID",
+										"value": "00001",
+										"type": "text",
+										"disabled": true
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text",
+										"disabled": true
+									},
+									{
+										"key": "X-PARTNER-ID",
+										"value": "integratorsn4p",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"institutionCode\": \"12345\",\r\n    \"partnerServiceId\": \"   55888\",\r\n    \"customerNo\": \"1234912245\",\r\n    \"virtualAccountNo\": \"   558881234912245\",\r\n    \"virtualAccountName\": \"NEW\",\r\n    \"totalAmount\": {\r\n        \"value\": \"10000.00\",\r\n        \"currency\": \"IDR\"\r\n    },\r\n    \"expiredDate\": \"2023-01-24T14:54:00+07:00\",\r\n    \"trxId\": \"sdasdasfawgfawqwq3213wfsasgasg\",\r\n    \"additionalInfo\": {\r\n        \"description\": \"keterangan\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/create-va",
+									"protocol": "https",
+									"host": [
+										"sandbox",
+										"partner",
+										"api",
+										"bri",
+										"co",
+										"id"
+									],
+									"path": [
+										"snap",
+										"v1.0",
+										"transfer-va",
+										"create-va"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Invalid Field Mandatory",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-EXTERNAL-ID",
+												"value": "123456789",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "CHANNEL-ID",
+												"value": "BAPE",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-ESB-SERVICE_ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"customerNo\": \"08138599\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"virtualAccountName\": \"Jokul Doe\",\r\n    \"totalAmount\": {\r\n        \"value\": \"1000000000000.00\",\r\n        \"currency\": \"IDR\"\r\n    },\r\n    \"expiredDate\": \"2022-02-28T22:38:25+07:00\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"additionalInfo\": {\r\n        \"description\": \"keterangan\"\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/create-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"create-va"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 16 Dec 2021 08:15:20 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "87"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "0489aa58-24fb-4bb0-899f-1e4627770ded"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4002702\",\n    \"responseMessage\": \"Invalid Mandatory Field partnerServiceId\"\n}"
+								},
+								{
+									"name": "Invalid Bill",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-EXTERNAL-ID",
+												"value": "123456789",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "CHANNEL-ID",
+												"value": "BAPE",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-ESB-SERVICE_ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138598\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"virtualAccountName\": \"Jokul Doe\",\r\n    \"totalAmount\": {\r\n        \"value\": \"1000000000000.00\",\r\n        \"currency\": \"IDR\"\r\n    },\r\n    \"expiredDate\": \"2022-02-28T22:38:25+07:00\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"additionalInfo\": {\r\n        \"description\": \"keterangan\"\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/create-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"create-va"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 16 Dec 2021 08:20:58 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "75"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "17819c0b-1e0f-481e-9ac4-8b6827b705d8"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4042712\",\n    \"responseMessage\": \"Invalid Bill/Virtual Account\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Update VA",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({\r",
+											"  key: \"X-EXTERNAL-ID\",\r",
+											"  value: Math.floor(Math.random()*999999999) + 100000000\r",
+											"});\r",
+											"\r",
+											"function getPath(url) {\r",
+											"    var pathRegex = /.+?\\:\\/\\/.+?(\\/.+?)(?:#|\\?|$)/;\r",
+											"    var result = url.match(pathRegex);\r",
+											"    return result && result.length > 1 ? result[1] : ''; \r",
+											"}\r",
+											" \r",
+											"function getQueryString(url) {\r",
+											"    var arrSplit = url.split('?');\r",
+											"    return arrSplit.length > 1 ? url.substring(url.indexOf('?')+1) : ''; \r",
+											"}\r",
+											" \r",
+											"function getAuthHeader(httpMethod, requestUrl, requestBody) {\r",
+											"    var requestPath = getPath(requestUrl);\r",
+											"    var queryString = getQueryString(requestUrl);\r",
+											"    \r",
+											"    if (httpMethod == 'GET' || !requestBody) {\r",
+											"        requestBody = ''; \r",
+											"    } else {\r",
+											"        requestBody = requestBody;\r",
+											"    }\r",
+											"    \r",
+											"    Date.prototype.toIsoString = function() {\r",
+											"        var tzo = -this.getTimezoneOffset(),\r",
+											"            dif = tzo >= 0 ? '+' : '-',\r",
+											"            pad = function(num) {\r",
+											"                var norm = Math.floor(Math.abs(num));\r",
+											"                return (norm < 10 ? '0' : '') + norm;\r",
+											"            };\r",
+											"        return this.getFullYear() +\r",
+											"            '-' + pad(this.getMonth() + 1) +\r",
+											"            '-' + pad(this.getDate()) +\r",
+											"            'T' + pad(this.getHours()) +\r",
+											"            ':' + pad(this.getMinutes()) +\r",
+											"            ':' + pad(this.getSeconds()) +\r",
+											"            '.' + this.getMilliseconds() + \r",
+											"            dif + pad(tzo / 60) +\r",
+											"            ':' + pad(tzo % 60);\r",
+											"    }\r",
+											"\r",
+											"    var dt = new Date();\r",
+											"    var timestamp = dt.toIsoString();\r",
+											"    postman.setEnvironmentVariable('timestamp', timestamp);\r",
+											"\r",
+											"    console.log(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    var hash = CryptoJS.SHA256(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    payload = httpMethod + \":\" + requestPath + \":\" + pm.environment.get('token') + \":\" \r",
+											"        + hash.toString(CryptoJS.enc.Hex) + \":\" + timestamp;\r",
+											"\r",
+											"    postman.setEnvironmentVariable('signature_payload', payload);\r",
+											"    \r",
+											"    var hmacSignature = CryptoJS.HmacSHA512(payload, pm.environment.get('client_secret'));\r",
+											"    return hmacSignature;\r",
+											"}\r",
+											"\r",
+											"postman.setEnvironmentVariable('signature', getAuthHeader(request['method'], request['url'], request['data']));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "tokenType",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "accessToken",
+											"value": "{{token}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "X-SIGNATURE",
+										"value": "{{signature}}",
+										"type": "text"
+									},
+									{
+										"key": "X-TIMESTAMP",
+										"value": "{{timestamp}}",
+										"type": "text"
+									},
+									{
+										"key": "CHANNEL-ID",
+										"value": "7780",
+										"type": "text"
+									},
+									{
+										"key": "X-ESB-SERVICE_ID",
+										"value": "123456",
+										"type": "text",
+										"disabled": true
+									},
+									{
+										"key": "X-EXTERNAL-ID",
+										"value": "123490",
+										"type": "text"
+									},
+									{
+										"key": "X-PARTNER-ID",
+										"value": "snapt3stintegrator",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"institutionCode\": \"12345\",\r\n    \"partnerServiceId\": \"   55888\",\r\n    \"customerNo\": \"1234912245\",\r\n    \"virtualAccountNo\": \"   558881234912245\",\r\n    \"virtualAccountName\": \"Susie Williamson\",\r\n    \"totalAmount\": {\r\n        \"value\": \"10000.00\",\r\n        \"currency\": \"IDR\"\r\n    },\r\n    \"expiredDate\": \"2023-01-24T14:54:00+07:00\",\r\n    \"trxId\": \"sdasdasfawgfawqwq3213wfsasgasg\",\r\n    \"additionalInfo\": {\r\n        \"description\": \"keterangan\"\r\n    }\r\n}\r\n\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/update-va",
+									"protocol": "https",
+									"host": [
+										"sandbox",
+										"partner",
+										"api",
+										"bri",
+										"co",
+										"id"
+									],
+									"path": [
+										"snap",
+										"v1.0",
+										"transfer-va",
+										"update-va"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											},
+											{
+												"key": "CHANNEL-ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-ESB-SERVICE_ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-EXTERNAL-ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138596\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"virtualAccountName\": \"Syahrian Adil\",\r\n    \"totalAmount\": {\r\n        \"value\": \"10000.00\",\r\n        \"currency\": \"IDR\"\r\n    },\r\n    \"expiredDate\": \"2022-02-28T22:38:25+07:00\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"additionalInfo\": {\r\n        \"description\": \"keterangan\"\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/update-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"update-va"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 16 Dec 2021 17:24:59 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "363"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "9c48a8e9-5b9f-4b75-9d57-2a172618a14c"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"2002800\",\n    \"responseMessage\": \"Successful\",\n    \"virtualAccountData\": {\n        \"partnerServiceId\": \"   77777\",\n        \"customerNo\": \"08138596\",\n        \"virtualAccountNo\": \"   7777708138596\",\n        \"virtualAccountName\": \"Syahrian Adil\",\n        \"trxId\": \"abcdefgh1234\",\n        \"totalAmount\": {\n            \"value\": \"10000\",\n            \"currency\": \"IDR\"\n        },\n        \"expiredDate\": \"2022-02-28 22:38:25\",\n        \"additionalInfo\": {\n            \"description\": \"keterangan\"\n        }\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Update Status VA",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({\r",
+											"  key: \"X-EXTERNAL-ID\",\r",
+											"  value: Math.floor(Math.random()*999999999) + 100000000\r",
+											"});\r",
+											"function getPath(url) {\r",
+											"    var pathRegex = /.+?\\:\\/\\/.+?(\\/.+?)(?:#|\\?|$)/;\r",
+											"    var result = url.match(pathRegex);\r",
+											"    return result && result.length > 1 ? result[1] : ''; \r",
+											"}\r",
+											" \r",
+											"function getQueryString(url) {\r",
+											"    var arrSplit = url.split('?');\r",
+											"    return arrSplit.length > 1 ? url.substring(url.indexOf('?')+1) : ''; \r",
+											"}\r",
+											" \r",
+											"function getAuthHeader(httpMethod, requestUrl, requestBody) {\r",
+											"    var requestPath = getPath(requestUrl);\r",
+											"    var queryString = getQueryString(requestUrl);\r",
+											"    \r",
+											"    if (httpMethod == 'GET' || !requestBody) {\r",
+											"        requestBody = ''; \r",
+											"    } else {\r",
+											"        requestBody = requestBody;\r",
+											"    }\r",
+											"    \r",
+											"    Date.prototype.toIsoString = function() {\r",
+											"        var tzo = -this.getTimezoneOffset(),\r",
+											"            dif = tzo >= 0 ? '+' : '-',\r",
+											"            pad = function(num) {\r",
+											"                var norm = Math.floor(Math.abs(num));\r",
+											"                return (norm < 10 ? '0' : '') + norm;\r",
+											"            };\r",
+											"        return this.getFullYear() +\r",
+											"            '-' + pad(this.getMonth() + 1) +\r",
+											"            '-' + pad(this.getDate()) +\r",
+											"            'T' + pad(this.getHours()) +\r",
+											"            ':' + pad(this.getMinutes()) +\r",
+											"            ':' + pad(this.getSeconds()) +\r",
+											"            '.' + this.getMilliseconds() + \r",
+											"            dif + pad(tzo / 60) +\r",
+											"            ':' + pad(tzo % 60);\r",
+											"    }\r",
+											"\r",
+											"    var dt = new Date();\r",
+											"    var timestamp = dt.toIsoString();\r",
+											"    postman.setEnvironmentVariable('timestamp', timestamp);\r",
+											"\r",
+											"    console.log(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    var hash = CryptoJS.SHA256(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    payload = httpMethod + \":\" + requestPath + \":\" + pm.environment.get('token') + \":\" \r",
+											"        + hash.toString(CryptoJS.enc.Hex) + \":\" + timestamp;\r",
+											"\r",
+											"    postman.setEnvironmentVariable('signature_payload', payload);\r",
+											"    \r",
+											"    var hmacSignature = CryptoJS.HmacSHA512(payload, pm.environment.get('client_secret'));\r",
+											"    return hmacSignature;\r",
+											"}\r",
+											"\r",
+											"postman.setEnvironmentVariable('signature', getAuthHeader(request['method'], request['url'], request['data']));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "tokenType",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "accessToken",
+											"value": "{{token}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "X-SIGNATURE",
+										"value": "{{signature}}",
+										"type": "text"
+									},
+									{
+										"key": "X-TIMESTAMP",
+										"value": "{{timestamp}}",
+										"type": "text"
+									},
+									{
+										"key": "X-ESB-SERVICE_ID",
+										"value": "123456",
+										"type": "text",
+										"disabled": true
+									},
+									{
+										"key": "CHANNEL-ID",
+										"value": "BAPE",
+										"type": "text"
+									},
+									{
+										"key": "X-EXTERNAL-ID",
+										"value": "123456789",
+										"type": "text",
+										"disabled": true
+									},
+									{
+										"key": "X-PARTNER-ID",
+										"value": "integratorsn4p",
+										"type": "text"
+									},
+									{
+										"key": "X-EXTERNAL-ID",
+										"value": "12341235",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"partnerServiceId\": \"   22038\",\r\n    \"customerNo\": \"31521430343\",\r\n    \"virtualAccountNo\": \"   2203831521430343\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"paidStatus\": \"Y\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/update-status",
+									"protocol": "https",
+									"host": [
+										"sandbox",
+										"partner",
+										"api",
+										"bri",
+										"co",
+										"id"
+									],
+									"path": [
+										"snap",
+										"v1.0",
+										"transfer-va",
+										"update-status"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											},
+											{
+												"key": "X-ESB-SERVICE_ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "CHANNEL-ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-EXTERNAL-ID",
+												"value": "123456789",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138597\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"paidStatus\": \"Y\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/update-status",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"update-status"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:03:43 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "212"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "ee833a73-a6e5-4c8e-bf33-21802bbb5edd"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"2002900\",\n    \"responseMessage\": \"Successful\",\n    \"virtualAccountData\": {\n        \"partnerServiceId\": \"   77777\",\n        \"customerNo\": \"08138597\",\n        \"virtualAccountNo\": \"   7777708138597\",\n        \"trxId\": \"abcdefgh1234\",\n        \"paidStatus\": \"Y\"\n    }\n}"
+								},
+								{
+									"name": "Invalid Mandatory",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											},
+											{
+												"key": "X-ESB-SERVICE_ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "CHANNEL-ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-EXTERNAL-ID",
+												"value": "123456789",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"customerNo\": \"08138597\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"paidStatus\": \"Y\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/update-status",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"update-status"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:05:13 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "87"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "14c32b22-e3c1-4210-a137-8cc89ffebdfb"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4002902\",\n    \"responseMessage\": \"Invalid Mandatory Field partnerServiceId\"\n}"
+								},
+								{
+									"name": "Invalid Format",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											},
+											{
+												"key": "X-ESB-SERVICE_ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "CHANNEL-ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-EXTERNAL-ID",
+												"value": "123456789",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777A\",\r\n    \"customerNo\": \"08138597\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"paidStatus\": \"Y\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/update-status",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"update-status"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:05:33 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "84"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "bf2e8931-e507-4209-a0d9-4f314b14ff74"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4002901\",\n    \"responseMessage\": \"Invalid Field Format partnerServiceId\"\n}"
+								},
+								{
+									"name": "Invalid Bill",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											},
+											{
+												"key": "X-ESB-SERVICE_ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "CHANNEL-ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-EXTERNAL-ID",
+												"value": "123456789",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138580\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"paidStatus\": \"Y\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/update-status",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"update-status"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:06:01 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "75"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "88b51a6f-ddae-4724-be07-bfbf9233c64b"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4042912\",\n    \"responseMessage\": \"Invalid Bill/Virtual Account\"\n}"
+								},
+								{
+									"name": "Invalid Fotmar Paid Status",
+									"originalRequest": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											},
+											{
+												"key": "X-ESB-SERVICE_ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "CHANNEL-ID",
+												"value": "123456",
+												"type": "text",
+												"disabled": true
+											},
+											{
+												"key": "X-EXTERNAL-ID",
+												"value": "123456789",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138597\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\",\r\n    \"paidStatus\": \"L\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/update-status",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"update-status"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:06:20 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "78"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "057a3c99-d78f-471a-a0c1-5fcc1bd85350"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4002901\",\n    \"responseMessage\": \"Invalid Field Format paidStatus\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Inquiry VA",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// pm.request.headers.add({\r",
+											"//   key: \"X-EXTERNAL-ID\",\r",
+											"//   value: Math.floor(Math.random()*999999999) + 100000000\r",
+											"// });\r",
+											"function getPath(url) {\r",
+											"    var pathRegex = /.+?\\:\\/\\/.+?(\\/.+?)(?:#|\\?|$)/;\r",
+											"    var result = url.match(pathRegex);\r",
+											"    return result && result.length > 1 ? result[1] : ''; \r",
+											"}\r",
+											" \r",
+											"function getQueryString(url) {\r",
+											"    var arrSplit = url.split('?');\r",
+											"    return arrSplit.length > 1 ? url.substring(url.indexOf('?')+1) : ''; \r",
+											"}\r",
+											" \r",
+											"function getAuthHeader(httpMethod, requestUrl, requestBody) {\r",
+											"    var requestPath = getPath(requestUrl);\r",
+											"    var queryString = getQueryString(requestUrl);\r",
+											"    \r",
+											"    if (httpMethod == 'GET' || !requestBody) {\r",
+											"        requestBody = ''; \r",
+											"    } else {\r",
+											"        requestBody = requestBody;\r",
+											"    }\r",
+											"    \r",
+											"    Date.prototype.toIsoString = function() {\r",
+											"        var tzo = -this.getTimezoneOffset(),\r",
+											"            dif = tzo >= 0 ? '+' : '-',\r",
+											"            pad = function(num) {\r",
+											"                var norm = Math.floor(Math.abs(num));\r",
+											"                return (norm < 10 ? '0' : '') + norm;\r",
+											"            };\r",
+											"        return this.getFullYear() +\r",
+											"            '-' + pad(this.getMonth() + 1) +\r",
+											"            '-' + pad(this.getDate()) +\r",
+											"            'T' + pad(this.getHours()) +\r",
+											"            ':' + pad(this.getMinutes()) +\r",
+											"            ':' + pad(this.getSeconds()) +\r",
+											"            '.' + this.getMilliseconds() + \r",
+											"            dif + pad(tzo / 60) +\r",
+											"            ':' + pad(tzo % 60);\r",
+											"    }\r",
+											"\r",
+											"    var dt = new Date();\r",
+											"    var timestamp = dt.toIsoString();\r",
+											"    postman.setEnvironmentVariable('timestamp', timestamp);\r",
+											"\r",
+											"    console.log(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    var hash = CryptoJS.SHA256(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    payload = httpMethod + \":\" + requestPath + \":\" + pm.environment.get('token') + \":\" \r",
+											"        + hash.toString(CryptoJS.enc.Hex) + \":\" + timestamp;\r",
+											"\r",
+											"    postman.setEnvironmentVariable('signature_payload', payload);\r",
+											"    \r",
+											"    var hmacSignature = CryptoJS.HmacSHA512(payload, pm.environment.get('client_secret'));\r",
+											"    return hmacSignature;\r",
+											"}\r",
+											"\r",
+											"postman.setEnvironmentVariable('signature', getAuthHeader(request['method'], request['url'], request['data']));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "tokenType",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "accessToken",
+											"value": "{{token}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "CHANNEL-ID",
+										"value": "BAPE",
+										"type": "text"
+									},
+									{
+										"key": "X-SIGNATURE",
+										"value": "{{signature}}",
+										"type": "text"
+									},
+									{
+										"key": "X-TIMESTAMP",
+										"value": "{{timestamp}}",
+										"type": "text"
+									},
+									{
+										"key": "X-PARTNER-ID",
+										"value": "snapt3stintegrator",
+										"type": "text"
+									},
+									{
+										"key": "X-EXTERNAL-ID",
+										"value": "12341235",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"partnerServiceId\": \"   55888\",\r\n    \"customerNo\": \"1234900041\",\r\n    \"virtualAccountNo\": \"   558881234900041\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/inquiry-va",
+									"protocol": "https",
+									"host": [
+										"sandbox",
+										"partner",
+										"api",
+										"bri",
+										"co",
+										"id"
+									],
+									"path": [
+										"snap",
+										"v1.0",
+										"transfer-va",
+										"inquiry-va"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Invalid Mandatory",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138601\",\r\n    \"virtualAccountNo\": \"   7777708138601\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/inquiry-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"inquiry-va"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:07:30 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "87"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "b96c6dae-483e-4b97-9ca4-e5573908a5b2"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003002\",\n    \"responseMessage\": \"Invalid Mandatory Field partnerServiceId\"\n}"
+								},
+								{
+									"name": "Invalid Bill",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138601\",\r\n    \"virtualAccountNo\": \"   7777708138601\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/inquiry-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"inquiry-va"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:07:57 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "75"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "875f6c8b-2e66-47f0-b08d-01091d69d2ed"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4043012\",\n    \"responseMessage\": \"Invalid Bill/Virtual Account\"\n}"
+								},
+								{
+									"name": "Invalid Format",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   777777\",\r\n    \"customerNo\": \"08138601\",\r\n    \"virtualAccountNo\": \"   7777708138601\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/inquiry-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"inquiry-va"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:08:12 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "84"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "32cb1aac-25eb-4363-9aa6-ec4030cc8d1a"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003001\",\n    \"responseMessage\": \"Invalid Field Format partnerServiceId\"\n}"
+								},
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138580\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/inquiry-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"inquiry-va"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Mon, 20 Dec 2021 08:16:17 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "364"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "3d76960c-975b-474d-b69e-4bd9e72b1a6a"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"2003000\",\n    \"responseMessage\": \"Successful\",\n    \"virtualAccountData\": {\n        \"partnerServiceId\": \"   77777\",\n        \"customerNo\": \"08138580\",\n        \"virtualAccountNo\": \"   7777708138580\",\n        \"virtualAccountName\": \"Jokul Doe\",\n        \"trxId\": \"abcdefgh1234\",\n        \"totalAmount\": {\n            \"value\": \"100000.00\",\n            \"currency\": \"IDR\"\n        },\n        \"expiredDate\": \"2022-02-28T22:38:25Z\",\n        \"additionalInfo\": {\n            \"description\": \"keterangan\"\n        }\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete VA",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({\r",
+											"  key: \"X-EXTERNAL-ID\",\r",
+											"  value: Math.floor(Math.random()*999999999) + 100000000\r",
+											"});\r",
+											"function getPath(url) {\r",
+											"    var pathRegex = /.+?\\:\\/\\/.+?(\\/.+?)(?:#|\\?|$)/;\r",
+											"    var result = url.match(pathRegex);\r",
+											"    return result && result.length > 1 ? result[1] : ''; \r",
+											"}\r",
+											" \r",
+											"function getQueryString(url) {\r",
+											"    var arrSplit = url.split('?');\r",
+											"    return arrSplit.length > 1 ? url.substring(url.indexOf('?')+1) : ''; \r",
+											"}\r",
+											" \r",
+											"function getAuthHeader(httpMethod, requestUrl, requestBody) {\r",
+											"    var requestPath = getPath(requestUrl);\r",
+											"    var queryString = getQueryString(requestUrl);\r",
+											"    \r",
+											"    if (httpMethod == 'GET' || !requestBody) {\r",
+											"        requestBody = ''; \r",
+											"    } else {\r",
+											"        requestBody = requestBody;\r",
+											"    }\r",
+											"    \r",
+											"    Date.prototype.toIsoString = function() {\r",
+											"        var tzo = -this.getTimezoneOffset(),\r",
+											"            dif = tzo >= 0 ? '+' : '-',\r",
+											"            pad = function(num) {\r",
+											"                var norm = Math.floor(Math.abs(num));\r",
+											"                return (norm < 10 ? '0' : '') + norm;\r",
+											"            };\r",
+											"        return this.getFullYear() +\r",
+											"            '-' + pad(this.getMonth() + 1) +\r",
+											"            '-' + pad(this.getDate()) +\r",
+											"            'T' + pad(this.getHours()) +\r",
+											"            ':' + pad(this.getMinutes()) +\r",
+											"            ':' + pad(this.getSeconds()) +\r",
+											"            '.' + this.getMilliseconds() + \r",
+											"            dif + pad(tzo / 60) +\r",
+											"            ':' + pad(tzo % 60);\r",
+											"    }\r",
+											"\r",
+											"    var dt = new Date();\r",
+											"    var timestamp = dt.toIsoString();\r",
+											"    postman.setEnvironmentVariable('timestamp', timestamp);\r",
+											"\r",
+											"    console.log(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    var hash = CryptoJS.SHA256(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    payload = httpMethod + \":\" + requestPath + \":\" + pm.environment.get('token') + \":\" \r",
+											"        + hash.toString(CryptoJS.enc.Hex) + \":\" + timestamp;\r",
+											"\r",
+											"    postman.setEnvironmentVariable('signature_payload', payload);\r",
+											"    \r",
+											"    var hmacSignature = CryptoJS.HmacSHA512(payload, pm.environment.get('client_secret'));\r",
+											"    return hmacSignature;\r",
+											"}\r",
+											"\r",
+											"postman.setEnvironmentVariable('signature', getAuthHeader(request['method'], request['url'], request['data']));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "tokenType",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "accessToken",
+											"value": "{{token}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "X-SIGNATURE",
+										"value": "{{signature}}"
+									},
+									{
+										"key": "X-TIMESTAMP",
+										"value": "{{timestamp}}"
+									},
+									{
+										"key": "X-PARTNER-ID",
+										"value": "integratorsn4p"
+									},
+									{
+										"key": "CHANNEL-ID",
+										"value": "BAPE"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"partnerServiceId\": \"   80199\",\r\n    \"customerNo\": \"1005232244009\",\r\n    \"virtualAccountNo\": \"   801991005232244009\",\r\n    \"trxId\": \"\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/delete-va",
+									"protocol": "https",
+									"host": [
+										"sandbox",
+										"partner",
+										"api",
+										"bri",
+										"co",
+										"id"
+									],
+									"path": [
+										"snap",
+										"v1.0",
+										"transfer-va",
+										"delete-va"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Invalid Format",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   7777A\",\r\n    \"customerNo\": \"08138597\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/delete-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"delete-va"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:09:53 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "84"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "56e7cae6-287e-4b24-ac80-319488ee865d"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003101\",\n    \"responseMessage\": \"Invalid Field Format partnerServiceId\"\n}"
+								},
+								{
+									"name": "Invalid Mandatory",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"\",\r\n    \"customerNo\": \"08138597\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/delete-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"delete-va"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:10:11 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "87"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "87bc48b9-7187-4b27-9a20-a36f77e1e2d1"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003102\",\n    \"responseMessage\": \"Invalid Mandatory Field partnerServiceId\"\n}"
+								},
+								{
+									"name": "Invalid Bill",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138580\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/delete-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"delete-va"
+											]
+										}
+									},
+									"status": "Not Found",
+									"code": 404,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 19 Dec 2021 16:10:58 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "75"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "04d80828-76ad-498f-8b41-2ad986257244"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4043112\",\n    \"responseMessage\": \"Invalid Bill/Virtual Account\"\n}"
+								},
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77777\",\r\n    \"customerNo\": \"08138580\",\r\n    \"virtualAccountNo\": \"   7777708138599\",\r\n    \"trxId\": \"abcdefgh1234\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/delete-va",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"delete-va"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Mon, 20 Dec 2021 08:18:27 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "217"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "163e0754-38d9-4397-923f-ace26f602f19"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"2003100\",\n    \"responseMessage\": \"Successful\",\n    \"virtualAccountData\": {\n        \"partnerServiceId\": \"   77777\",\n        \"customerNo\": \"08138580\",\n        \"virtualAccountNo\": \"   7777708138580\",\n        \"trxId\": \"abcdefgh1234\",\n        \"additionalInfo\": null\n    }\n}"
+								}
+							]
+						},
+						{
+							"name": "Get Report",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({\r",
+											"  key: \"X-EXTERNAL-ID\",\r",
+											"  value: Math.floor(Math.random()*999999999) + 100000000\r",
+											"});\r",
+											"function getPath(url) {\r",
+											"    var pathRegex = /.+?\\:\\/\\/.+?(\\/.+?)(?:#|\\?|$)/;\r",
+											"    var result = url.match(pathRegex);\r",
+											"    return result && result.length > 1 ? result[1] : ''; \r",
+											"}\r",
+											" \r",
+											"function getQueryString(url) {\r",
+											"    var arrSplit = url.split('?');\r",
+											"    return arrSplit.length > 1 ? url.substring(url.indexOf('?')+1) : ''; \r",
+											"}\r",
+											" \r",
+											"function getAuthHeader(httpMethod, requestUrl, requestBody) {\r",
+											"    var requestPath = getPath(requestUrl);\r",
+											"    var queryString = getQueryString(requestUrl);\r",
+											"    \r",
+											"    if (httpMethod == 'GET' || !requestBody) {\r",
+											"        requestBody = ''; \r",
+											"    } else {\r",
+											"        requestBody = requestBody;\r",
+											"    }\r",
+											"    \r",
+											"    Date.prototype.toIsoString = function() {\r",
+											"        var tzo = -this.getTimezoneOffset(),\r",
+											"            dif = tzo >= 0 ? '+' : '-',\r",
+											"            pad = function(num) {\r",
+											"                var norm = Math.floor(Math.abs(num));\r",
+											"                return (norm < 10 ? '0' : '') + norm;\r",
+											"            };\r",
+											"        return this.getFullYear() +\r",
+											"            '-' + pad(this.getMonth() + 1) +\r",
+											"            '-' + pad(this.getDate()) +\r",
+											"            'T' + pad(this.getHours()) +\r",
+											"            ':' + pad(this.getMinutes()) +\r",
+											"            ':' + pad(this.getSeconds()) +\r",
+											"            '.' + this.getMilliseconds() + \r",
+											"            dif + pad(tzo / 60) +\r",
+											"            ':' + pad(tzo % 60);\r",
+											"    }\r",
+											"\r",
+											"    var dt = new Date();\r",
+											"    var timestamp = dt.toIsoString();\r",
+											"    postman.setEnvironmentVariable('timestamp', timestamp);\r",
+											"\r",
+											"    console.log(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    var hash = CryptoJS.SHA256(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    payload = httpMethod + \":\" + requestPath + \":\" + pm.environment.get('token') + \":\" \r",
+											"        + hash.toString(CryptoJS.enc.Hex) + \":\" + timestamp;\r",
+											"\r",
+											"    postman.setEnvironmentVariable('signature_payload', payload);\r",
+											"    \r",
+											"    var hmacSignature = CryptoJS.HmacSHA512(payload, pm.environment.get('client_secret'));\r",
+											"    return hmacSignature;\r",
+											"}\r",
+											"\r",
+											"postman.setEnvironmentVariable('signature', getAuthHeader(request['method'], request['url'], request['data']));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "tokenType",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "accessToken",
+											"value": "{{token}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "CHANNEL-ID",
+										"value": "BAPE",
+										"type": "text"
+									},
+									{
+										"key": "X-SIGNATURE",
+										"value": "{{signature}}",
+										"type": "text"
+									},
+									{
+										"key": "X-TIMESTAMP",
+										"value": "{{timestamp}}",
+										"type": "text"
+									},
+									{
+										"key": "X-PARTNER-ID",
+										"value": "integratorsn4p",
+										"type": "text"
+									},
+									{
+										"key": "X-EXTERNAL-ID",
+										"value": "123499",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n       \"institutionCode\": \"12345\",\r\n       \"partnerServiceId\": \"   55888\",\r\n       \"startDate\": \"2023-01-27\",\r\n       \"startTime\": \"12:02:00+07:00\",\r\n       \"endDate\": \"2023-01-27\",\r\n       \"endTime\": \"23:59:59+07:00\",\r\n       \"additionalinfo\": { \r\n          \"uniqueCode\": \"test\", \r\n          \"customerCode\": \"test\" \r\n   } \r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+									"protocol": "https",
+									"host": [
+										"sandbox",
+										"partner",
+										"api",
+										"bri",
+										"co",
+										"id"
+									],
+									"path": [
+										"snap",
+										"v1.0",
+										"transfer-va",
+										"report"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Invalid Mandatory",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"\",\r\n    \"startDate\": \"2021-11-03\",\r\n    \"startTime\": \"00:00\",\r\n    \"endDate\": \"2021-11-03\",\r\n    \"endTime\": \"12:00\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"report"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Mon, 20 Dec 2021 10:42:05 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "87"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "2254a01a-8bce-462d-9f93-74a481c3ac12"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003502\",\n    \"responseMessage\": \"Invalid Mandatory Field partnerServiceId\"\n}"
+								},
+								{
+									"name": "Invalid Date more than 60 days",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77204\",\r\n    \"startDate\": \"2020-11-03\",\r\n    \"startTime\": \"00:00\",\r\n    \"endDate\": \"2021-11-03\",\r\n    \"endTime\": \"12:00\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"report"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Mon, 20 Dec 2021 11:02:29 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "77"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "c6f23f8f-9d5c-44f8-b126-315a62ca4a68"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003501\",\n    \"responseMessage\": \"Invalid Field Format startDate\"\n}"
+								},
+								{
+									"name": "Invalid Format",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   7720A\",\r\n    \"startDate\": \"2021-11-03\",\r\n    \"startTime\": \"00:00\",\r\n    \"endDate\": \"2021-11-03\",\r\n    \"endTime\": \"12:00\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"report"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Mon, 20 Dec 2021 10:42:48 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "84"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "4ff065b2-13f4-485b-b4fb-61252784a86e"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003501\",\n    \"responseMessage\": \"Invalid Field Format partnerServiceId\"\n}"
+								},
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "CHANNEL-ID",
+												"value": "BAPE",
+												"type": "text"
+											},
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											},
+											{
+												"key": "X-PARTNER-ID",
+												"value": "10000",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77204\",\r\n    \"startDate\": \"2021-11-03\",\r\n    \"startTime\": \"00:00\",\r\n    \"endDate\": \"2021-11-03\",\r\n    \"endTime\": \"12:00\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"report"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 06 Mar 2022 15:27:38 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "92c318a6-c604-4384-9fac-c7ff203b5d79"
+										},
+										{
+											"key": "X-TIMESTAMP",
+											"value": "2022-03-06T15:27:37+07:00"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"2003500\",\n    \"responseMessage\": \"Successful\",\n    \"virtualAccountData\": [\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2109180041\",\n            \"virtualAccountNo\": \"   772042109180041\",\n            \"virtualAccountName\": \"\",\n            \"trxId\": \"2130780041019445767\",\n            \"totalAmount\": {\n                \"value\": \"1000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 07:10:23.0\",\n            \"additionalInfo\": {\n                \"channel\": \"TRFHMB\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0888232   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403190112\",\n            \"virtualAccountNo\": \"   772043403190112\",\n            \"virtualAccountName\": \"\",\n            \"trxId\": \"2130700000120006004\",\n            \"totalAmount\": {\n                \"value\": \"970000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 07:32:07.0\",\n            \"additionalInfo\": {\n                \"channel\": \"TRFLA\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0888901   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402180561\",\n            \"virtualAccountNo\": \"   772043402180561\",\n            \"virtualAccountName\": \"TANTRI DEVI MILE\",\n            \"trxId\": \"2130788885010240889\",\n            \"totalAmount\": {\n                \"value\": \"315000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 07:34:05.0\",\n            \"additionalInfo\": {\n                \"channel\": \"NBMB\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"8888501   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009190003\",\n            \"virtualAccountNo\": \"   772045009190003\",\n            \"virtualAccountName\": \"RAHMA MAULIDA AN\",\n            \"trxId\": \"2130790003010010110\",\n            \"totalAmount\": {\n                \"value\": \"1500000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 08:35:12.0\",\n            \"additionalInfo\": {\n                \"channel\": \"ATM \",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"9855172   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2109190069\",\n            \"virtualAccountNo\": \"   772042109190069\",\n            \"virtualAccountName\": \"DIKDIK NUGRAHA\",\n            \"trxId\": \"2130716454514000003\",\n            \"totalAmount\": {\n                \"value\": \"740000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:02:32.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009190158\",\n            \"virtualAccountNo\": \"   772045009190158\",\n            \"virtualAccountName\": \"ATIH NURHASANAH\",\n            \"trxId\": \"2130740410514000007\",\n            \"totalAmount\": {\n                \"value\": \"1005000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:06:38.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4041051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"7001190058\",\n            \"virtualAccountNo\": \"   772047001190058\",\n            \"virtualAccountName\": \"\",\n            \"trxId\": \"2130700000120286133\",\n            \"totalAmount\": {\n                \"value\": \"1050000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:07:44.0\",\n            \"additionalInfo\": {\n                \"channel\": \"TRFLA\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0888199   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009190138\",\n            \"virtualAccountNo\": \"   772045009190138\",\n            \"virtualAccountName\": \"RIKA NURPAHLIANA\",\n            \"trxId\": \"2130740410514000009\",\n            \"totalAmount\": {\n                \"value\": \"970000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:08:39.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4041051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402190187\",\n            \"virtualAccountNo\": \"   772043402190187\",\n            \"virtualAccountName\": \"AMIEN SUJIWA\",\n            \"trxId\": \"2130705420534000043\",\n            \"totalAmount\": {\n                \"value\": \"700000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:12:40.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0542053   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2124210005\",\n            \"virtualAccountNo\": \"   772042124210005\",\n            \"virtualAccountName\": \"KEMAL MUAMMAR SI\",\n            \"trxId\": \"2130710005010010115\",\n            \"totalAmount\": {\n                \"value\": \"5090000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:31:59.0\",\n            \"additionalInfo\": {\n                \"channel\": \"ATM \",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"9904143   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402210047\",\n            \"virtualAccountNo\": \"   772043402210047\",\n            \"virtualAccountName\": \"WANDA SALSA HERAWAN\",\n            \"trxId\": \"2130716454514000005\",\n            \"totalAmount\": {\n                \"value\": \"3000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:37:26.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402210065\",\n            \"virtualAccountNo\": \"   772043402210065\",\n            \"virtualAccountName\": \"SINTYA FITRIYANI\",\n            \"trxId\": \"2130700000053842134\",\n            \"totalAmount\": {\n                \"value\": \"3000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:39:42.0\",\n            \"additionalInfo\": {\n                \"channel\": \"EDC \",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0852092   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506180175\",\n            \"virtualAccountNo\": \"   772043506180175\",\n            \"virtualAccountName\": \"UJANG GANJAR APRILIANTO\",\n            \"trxId\": \"2130740190514000015\",\n            \"totalAmount\": {\n                \"value\": \"830000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:58:01.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4019051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300180205\",\n            \"virtualAccountNo\": \"   772043300180205\",\n            \"virtualAccountName\": \"RD BANGKIT FAJAR ANUGRAH\",\n            \"trxId\": \"2130705420534000073\",\n            \"totalAmount\": {\n                \"value\": \"2241000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:00:25.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0542053   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403170071\",\n            \"virtualAccountNo\": \"   772043403170071\",\n            \"virtualAccountName\": \"ANNISA JULIANTI\",\n            \"trxId\": \"2130740410514000013\",\n            \"totalAmount\": {\n                \"value\": \"290000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:00:34.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4041051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403170099\",\n            \"virtualAccountNo\": \"   772043403170099\",\n            \"virtualAccountName\": \"SINDY NURWULANDININA\",\n            \"trxId\": \"2130740410514000015\",\n            \"totalAmount\": {\n                \"value\": \"290000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:02:34.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4041051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506190028\",\n            \"virtualAccountNo\": \"   772043506190028\",\n            \"virtualAccountName\": \"LIA ARSITAMARA\",\n            \"trxId\": \"2130740190514000027\",\n            \"totalAmount\": {\n                \"value\": \"1000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:09:48.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4019051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403180119\",\n            \"virtualAccountNo\": \"   772043403180119\",\n            \"virtualAccountName\": \"AYU SITI MASITOH\",\n            \"trxId\": \"2130700000108207096\",\n            \"totalAmount\": {\n                \"value\": \"828500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:16:40.0\",\n            \"additionalInfo\": {\n                \"channel\": \"BRLK\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0852036   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300210046\",\n            \"virtualAccountNo\": \"   772043300210046\",\n            \"virtualAccountName\": \"DADAN ANUGRAH RA\",\n            \"trxId\": \"2130788884550242641\",\n            \"totalAmount\": {\n                \"value\": \"6876500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:31:27.0\",\n            \"additionalInfo\": {\n                \"channel\": \"NBMB\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"8888455   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504180109\",\n            \"virtualAccountNo\": \"   772043504180109\",\n            \"virtualAccountName\": \"PUTRI LULU JENITA\",\n            \"trxId\": \"2130701000584000073\",\n            \"totalAmount\": {\n                \"value\": \"3000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:36:00.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0100058   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300180097\",\n            \"virtualAccountNo\": \"   772043300180097\",\n            \"virtualAccountName\": \"GALIH YOGASWARA \",\n            \"trxId\": \"2130700000024472493\",\n            \"totalAmount\": {\n                \"value\": \"1200000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:36:42.0\",\n            \"additionalInfo\": {\n                \"channel\": \"IBNK\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0888492   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300180102\",\n            \"virtualAccountNo\": \"   772043300180102\",\n            \"virtualAccountName\": \"MUHAMAD ILHAM SYAH RIZAL\",\n            \"trxId\": \"2130740060514000051\",\n            \"totalAmount\": {\n                \"value\": \"1045000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:36:43.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4006051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009180041\",\n            \"virtualAccountNo\": \"   772045009180041\",\n            \"virtualAccountName\": \"ACEP APRIANDI\",\n            \"trxId\": \"2130716454514000017\",\n            \"totalAmount\": {\n                \"value\": \"1350000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:40:47.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009180119\",\n            \"virtualAccountNo\": \"   772045009180119\",\n            \"virtualAccountName\": \"THERESA FELA ARSELINA\",\n            \"trxId\": \"2130741810514000005\",\n            \"totalAmount\": {\n                \"value\": \"1500000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:45:10.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4181051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402180313\",\n            \"virtualAccountNo\": \"   772043402180313\",\n            \"virtualAccountName\": \"SHINTA YUSNIA MA\",\n            \"trxId\": \"2130700000100515076\",\n            \"totalAmount\": {\n                \"value\": \"670500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:47:27.0\",\n            \"additionalInfo\": {\n                \"channel\": \"BRLK\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0852036   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403190067\",\n            \"virtualAccountNo\": \"   772043403190067\",\n            \"virtualAccountName\": \"IRMA\",\n            \"trxId\": \"2130716454514000019\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:51:57.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009190053\",\n            \"virtualAccountNo\": \"   772045009190053\",\n            \"virtualAccountName\": \"TIKA RAI RAHAYU\",\n            \"trxId\": \"2130716454514000021\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:52:26.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504190008\",\n            \"virtualAccountNo\": \"   772043504190008\",\n            \"virtualAccountName\": \"SRI DEVI ANGGRAENI\",\n            \"trxId\": \"2130716454514000023\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:53:04.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504190054\",\n            \"virtualAccountNo\": \"   772043504190054\",\n            \"virtualAccountName\": \"IIS SITI MAESAROH\",\n            \"trxId\": \"2130716454514000025\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:53:44.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504190062\",\n            \"virtualAccountNo\": \"   772043504190062\",\n            \"virtualAccountName\": \"RIDA NURFARIDA RAHMAT\",\n            \"trxId\": \"2130716454514000027\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:54:23.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506190062\",\n            \"virtualAccountNo\": \"   772043506190062\",\n            \"virtualAccountName\": \"IMAS\",\n            \"trxId\": \"2130716454514000029\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:55:08.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300170010\",\n            \"virtualAccountNo\": \"   772043300170010\",\n            \"virtualAccountName\": \"LAELATUL KAMILAH\",\n            \"trxId\": \"2130716454514000031\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:55:49.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504170007\",\n            \"virtualAccountNo\": \"   772043504170007\",\n            \"virtualAccountName\": \"RIZALDY IRSYAD FATHURROH\",\n            \"trxId\": \"2130716454514000033\",\n            \"totalAmount\": {\n                \"value\": \"1092000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:56:27.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506170192\",\n            \"virtualAccountNo\": \"   772043506170192\",\n            \"virtualAccountName\": \"TINA TRISNIA\",\n            \"trxId\": \"2130716454514000035\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:57:07.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"7011170013\",\n            \"virtualAccountNo\": \"   772047011170013\",\n            \"virtualAccountName\": \"FAJAR MAULANA\",\n            \"trxId\": \"2130716454514000037\",\n            \"totalAmount\": {\n                \"value\": \"1390000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:57:50.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402170050\",\n            \"virtualAccountNo\": \"   772043402170050\",\n            \"virtualAccountName\": \"SUSI SUSILAWATI\",\n            \"trxId\": \"2130716454514000039\",\n            \"totalAmount\": {\n                \"value\": \"1390000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:58:28.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403170151\",\n            \"virtualAccountNo\": \"   772043403170151\",\n            \"virtualAccountName\": \"MUTIARA ARDIANTI\",\n            \"trxId\": \"2130716454514000041\",\n            \"totalAmount\": {\n                \"value\": \"1390000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:59:17.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2109170057\",\n            \"virtualAccountNo\": \"   772042109170057\",\n            \"virtualAccountName\": \"AYU TRI NURJANAH\",\n            \"trxId\": \"2130716454514000043\",\n            \"totalAmount\": {\n                \"value\": \"1232000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:59:57.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2119170013\",\n            \"virtualAccountNo\": \"   772042119170013\",\n            \"virtualAccountName\": \"HIKMAH KURNIA SEPTIANI\",\n            \"trxId\": \"2130716454514000045\",\n            \"totalAmount\": {\n                \"value\": \"1162000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:00:33.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2107170005\",\n            \"virtualAccountNo\": \"   772042107170005\",\n            \"virtualAccountName\": \"DINDA PUTRI HANDAYANI\",\n            \"trxId\": \"2130716454514000047\",\n            \"totalAmount\": {\n                \"value\": \"812000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:01:12.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2108170040\",\n            \"virtualAccountNo\": \"   772042108170040\",\n            \"virtualAccountName\": \"LINDA HAJARWATI\",\n            \"trxId\": \"2130716454514000049\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:01:50.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009170123\",\n            \"virtualAccountNo\": \"   772045009170123\",\n            \"virtualAccountName\": \"NOLA NUR FADILAH\",\n            \"trxId\": \"2130716454514000051\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:02:29.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009170038\",\n            \"virtualAccountNo\": \"   772045009170038\",\n            \"virtualAccountName\": \"AGUS GUNARA\",\n            \"trxId\": \"2130716454514000053\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:03:06.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506170340\",\n            \"virtualAccountNo\": \"   772043506170340\",\n            \"virtualAccountName\": \"WAHYU AZIS FAHRIZA\",\n            \"trxId\": \"2130716454514000055\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:03:47.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403170162\",\n            \"virtualAccountNo\": \"   772043403170162\",\n            \"virtualAccountName\": \"RIKA KARTIKA\",\n            \"trxId\": \"2130716454514000057\",\n            \"totalAmount\": {\n                \"value\": \"1390000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:04:34.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009180057\",\n            \"virtualAccountNo\": \"   772045009180057\",\n            \"virtualAccountName\": \"ROBBY PARAMA\",\n            \"trxId\": \"2130744550514000013\",\n            \"totalAmount\": {\n                \"value\": \"375000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:07:03.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4455051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2107180047\",\n            \"virtualAccountNo\": \"   772042107180047\",\n            \"virtualAccountName\": \"ROSIE SUCI PEBRI\",\n            \"trxId\": \"2130780047010010341\",\n            \"totalAmount\": {\n                \"value\": \"380000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:10:31.0\",\n            \"additionalInfo\": {\n                \"channel\": \"ATM \",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4050900   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2107170053\",\n            \"virtualAccountNo\": \"   772042107170053\",\n            \"virtualAccountName\": \"LARAS SAFITRI\",\n            \"trxId\": \"2130716454514000063\",\n            \"totalAmount\": {\n                \"value\": \"248500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:16:38.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504180046\",\n            \"virtualAccountNo\": \"   772043504180046\",\n            \"virtualAccountName\": \"PANJI PURNAMA\",\n            \"trxId\": \"2130740480514000123\",\n            \"totalAmount\": {\n                \"value\": \"600000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:23:41.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4048051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402210150\",\n            \"virtualAccountNo\": \"   772043402210150\",\n            \"virtualAccountName\": \"RISNA RISMAYA\",\n            \"trxId\": \"2130716454514000069\",\n            \"totalAmount\": {\n                \"value\": \"2000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:23:45.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300180089\",\n            \"virtualAccountNo\": \"   772043300180089\",\n            \"virtualAccountName\": \"FAJAR HERMAWAN\",\n            \"trxId\": \"2130744620524000069\",\n            \"totalAmount\": {\n                \"value\": \"1760000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:45:57.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4462052   \"\n            }\n        }\n    ]\n}"
+								}
+							]
+						},
+						{
+							"name": "inquiry status",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.request.headers.add({\r",
+											"  key: \"X-EXTERNAL-ID\",\r",
+											"  value: Math.floor(Math.random()*999999999) + 100000000\r",
+											"});\r",
+											"function getPath(url) {\r",
+											"    var pathRegex = /.+?\\:\\/\\/.+?(\\/.+?)(?:#|\\?|$)/;\r",
+											"    var result = url.match(pathRegex);\r",
+											"    return result && result.length > 1 ? result[1] : ''; \r",
+											"}\r",
+											" \r",
+											"function getQueryString(url) {\r",
+											"    var arrSplit = url.split('?');\r",
+											"    return arrSplit.length > 1 ? url.substring(url.indexOf('?')+1) : ''; \r",
+											"}\r",
+											" \r",
+											"function getAuthHeader(httpMethod, requestUrl, requestBody) {\r",
+											"    var requestPath = getPath(requestUrl);\r",
+											"    var queryString = getQueryString(requestUrl);\r",
+											"    \r",
+											"    if (httpMethod == 'GET' || !requestBody) {\r",
+											"        requestBody = ''; \r",
+											"    } else {\r",
+											"        requestBody = requestBody;\r",
+											"    }\r",
+											"    \r",
+											"    Date.prototype.toIsoString = function() {\r",
+											"        var tzo = -this.getTimezoneOffset(),\r",
+											"            dif = tzo >= 0 ? '+' : '-',\r",
+											"            pad = function(num) {\r",
+											"                var norm = Math.floor(Math.abs(num));\r",
+											"                return (norm < 10 ? '0' : '') + norm;\r",
+											"            };\r",
+											"        return this.getFullYear() +\r",
+											"            '-' + pad(this.getMonth() + 1) +\r",
+											"            '-' + pad(this.getDate()) +\r",
+											"            'T' + pad(this.getHours()) +\r",
+											"            ':' + pad(this.getMinutes()) +\r",
+											"            ':' + pad(this.getSeconds()) +\r",
+											"            '.' + this.getMilliseconds() + \r",
+											"            dif + pad(tzo / 60) +\r",
+											"            ':' + pad(tzo % 60);\r",
+											"    }\r",
+											"\r",
+											"    var dt = new Date();\r",
+											"    var timestamp = dt.toIsoString();\r",
+											"    postman.setEnvironmentVariable('timestamp', timestamp);\r",
+											"\r",
+											"    console.log(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    var hash = CryptoJS.SHA256(JSON.stringify(JSON.parse(requestBody), null, 0));\r",
+											"\r",
+											"    payload = httpMethod + \":\" + requestPath + \":\" + pm.environment.get('token') + \":\" \r",
+											"        + hash.toString(CryptoJS.enc.Hex) + \":\" + timestamp;\r",
+											"\r",
+											"    postman.setEnvironmentVariable('signature_payload', payload);\r",
+											"    \r",
+											"    var hmacSignature = CryptoJS.HmacSHA512(payload, pm.environment.get('client_secret'));\r",
+											"    return hmacSignature;\r",
+											"}\r",
+											"\r",
+											"postman.setEnvironmentVariable('signature', getAuthHeader(request['method'], request['url'], request['data']));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "tokenType",
+											"value": "",
+											"type": "string"
+										},
+										{
+											"key": "accessToken",
+											"value": "{{token}}",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "CHANNEL-ID",
+										"value": "BAPE",
+										"type": "text"
+									},
+									{
+										"key": "X-SIGNATURE",
+										"value": "{{signature}}",
+										"type": "text"
+									},
+									{
+										"key": "X-TIMESTAMP",
+										"value": "{{timestamp}}",
+										"type": "text"
+									},
+									{
+										"key": "X-PARTNER-ID",
+										"value": "integratorsn4p",
+										"type": "text"
+									},
+									{
+										"key": "X-EXTERNAL-ID",
+										"value": "45325",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"partnerServiceId\": \"   22041\",\r\n    \"customerNo\": \"5060275555\",\r\n    \"virtualAccountNo\": \"   220415060275555\",\r\n\t\"inquiryRequestId\": \"test\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/status",
+									"protocol": "https",
+									"host": [
+										"sandbox",
+										"partner",
+										"api",
+										"bri",
+										"co",
+										"id"
+									],
+									"path": [
+										"snap",
+										"v1.0",
+										"transfer-va",
+										"status"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Invalid Mandatory",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"\",\r\n    \"startDate\": \"2021-11-03\",\r\n    \"startTime\": \"00:00\",\r\n    \"endDate\": \"2021-11-03\",\r\n    \"endTime\": \"12:00\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"report"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Mon, 20 Dec 2021 10:42:05 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "87"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "2254a01a-8bce-462d-9f93-74a481c3ac12"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003502\",\n    \"responseMessage\": \"Invalid Mandatory Field partnerServiceId\"\n}"
+								},
+								{
+									"name": "Invalid Date more than 60 days",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77204\",\r\n    \"startDate\": \"2020-11-03\",\r\n    \"startTime\": \"00:00\",\r\n    \"endDate\": \"2021-11-03\",\r\n    \"endTime\": \"12:00\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"report"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Mon, 20 Dec 2021 11:02:29 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "77"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "c6f23f8f-9d5c-44f8-b126-315a62ca4a68"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003501\",\n    \"responseMessage\": \"Invalid Field Format startDate\"\n}"
+								},
+								{
+									"name": "Invalid Format",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   7720A\",\r\n    \"startDate\": \"2021-11-03\",\r\n    \"startTime\": \"00:00\",\r\n    \"endDate\": \"2021-11-03\",\r\n    \"endTime\": \"12:00\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"report"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Mon, 20 Dec 2021 10:42:48 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "84"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "4ff065b2-13f4-485b-b4fb-61252784a86e"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"4003501\",\n    \"responseMessage\": \"Invalid Field Format partnerServiceId\"\n}"
+								},
+								{
+									"name": "Success",
+									"originalRequest": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "CHANNEL-ID",
+												"value": "BAPE",
+												"type": "text"
+											},
+											{
+												"key": "X-SIGNATURE",
+												"value": "{{signature}}",
+												"type": "text"
+											},
+											{
+												"key": "X-TIMESTAMP",
+												"value": "{{timestamp}}",
+												"type": "text"
+											},
+											{
+												"key": "X-PARTNER-ID",
+												"value": "10000",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"partnerServiceId\": \"   77204\",\r\n    \"startDate\": \"2021-11-03\",\r\n    \"startTime\": \"00:00\",\r\n    \"endDate\": \"2021-11-03\",\r\n    \"endTime\": \"12:00\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/transfer-va/report",
+											"protocol": "https",
+											"host": [
+												"sandbox",
+												"partner",
+												"api",
+												"bri",
+												"co",
+												"id"
+											],
+											"path": [
+												"snap",
+												"v1.0",
+												"transfer-va",
+												"report"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sun, 06 Mar 2022 15:27:38 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "X-Bri-Reqid",
+											"value": "92c318a6-c604-4384-9fac-c7ff203b5d79"
+										},
+										{
+											"key": "X-TIMESTAMP",
+											"value": "2022-03-06T15:27:37+07:00"
+										},
+										{
+											"key": "Transfer-Encoding",
+											"value": "chunked"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"responseCode\": \"2003500\",\n    \"responseMessage\": \"Successful\",\n    \"virtualAccountData\": [\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2109180041\",\n            \"virtualAccountNo\": \"   772042109180041\",\n            \"virtualAccountName\": \"\",\n            \"trxId\": \"2130780041019445767\",\n            \"totalAmount\": {\n                \"value\": \"1000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 07:10:23.0\",\n            \"additionalInfo\": {\n                \"channel\": \"TRFHMB\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0888232   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403190112\",\n            \"virtualAccountNo\": \"   772043403190112\",\n            \"virtualAccountName\": \"\",\n            \"trxId\": \"2130700000120006004\",\n            \"totalAmount\": {\n                \"value\": \"970000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 07:32:07.0\",\n            \"additionalInfo\": {\n                \"channel\": \"TRFLA\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0888901   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402180561\",\n            \"virtualAccountNo\": \"   772043402180561\",\n            \"virtualAccountName\": \"TANTRI DEVI MILE\",\n            \"trxId\": \"2130788885010240889\",\n            \"totalAmount\": {\n                \"value\": \"315000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 07:34:05.0\",\n            \"additionalInfo\": {\n                \"channel\": \"NBMB\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"8888501   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009190003\",\n            \"virtualAccountNo\": \"   772045009190003\",\n            \"virtualAccountName\": \"RAHMA MAULIDA AN\",\n            \"trxId\": \"2130790003010010110\",\n            \"totalAmount\": {\n                \"value\": \"1500000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 08:35:12.0\",\n            \"additionalInfo\": {\n                \"channel\": \"ATM \",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"9855172   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2109190069\",\n            \"virtualAccountNo\": \"   772042109190069\",\n            \"virtualAccountName\": \"DIKDIK NUGRAHA\",\n            \"trxId\": \"2130716454514000003\",\n            \"totalAmount\": {\n                \"value\": \"740000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:02:32.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009190158\",\n            \"virtualAccountNo\": \"   772045009190158\",\n            \"virtualAccountName\": \"ATIH NURHASANAH\",\n            \"trxId\": \"2130740410514000007\",\n            \"totalAmount\": {\n                \"value\": \"1005000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:06:38.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4041051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"7001190058\",\n            \"virtualAccountNo\": \"   772047001190058\",\n            \"virtualAccountName\": \"\",\n            \"trxId\": \"2130700000120286133\",\n            \"totalAmount\": {\n                \"value\": \"1050000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:07:44.0\",\n            \"additionalInfo\": {\n                \"channel\": \"TRFLA\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0888199   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009190138\",\n            \"virtualAccountNo\": \"   772045009190138\",\n            \"virtualAccountName\": \"RIKA NURPAHLIANA\",\n            \"trxId\": \"2130740410514000009\",\n            \"totalAmount\": {\n                \"value\": \"970000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:08:39.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4041051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402190187\",\n            \"virtualAccountNo\": \"   772043402190187\",\n            \"virtualAccountName\": \"AMIEN SUJIWA\",\n            \"trxId\": \"2130705420534000043\",\n            \"totalAmount\": {\n                \"value\": \"700000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:12:40.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0542053   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2124210005\",\n            \"virtualAccountNo\": \"   772042124210005\",\n            \"virtualAccountName\": \"KEMAL MUAMMAR SI\",\n            \"trxId\": \"2130710005010010115\",\n            \"totalAmount\": {\n                \"value\": \"5090000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:31:59.0\",\n            \"additionalInfo\": {\n                \"channel\": \"ATM \",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"9904143   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402210047\",\n            \"virtualAccountNo\": \"   772043402210047\",\n            \"virtualAccountName\": \"WANDA SALSA HERAWAN\",\n            \"trxId\": \"2130716454514000005\",\n            \"totalAmount\": {\n                \"value\": \"3000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:37:26.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402210065\",\n            \"virtualAccountNo\": \"   772043402210065\",\n            \"virtualAccountName\": \"SINTYA FITRIYANI\",\n            \"trxId\": \"2130700000053842134\",\n            \"totalAmount\": {\n                \"value\": \"3000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:39:42.0\",\n            \"additionalInfo\": {\n                \"channel\": \"EDC \",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0852092   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506180175\",\n            \"virtualAccountNo\": \"   772043506180175\",\n            \"virtualAccountName\": \"UJANG GANJAR APRILIANTO\",\n            \"trxId\": \"2130740190514000015\",\n            \"totalAmount\": {\n                \"value\": \"830000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 09:58:01.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4019051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300180205\",\n            \"virtualAccountNo\": \"   772043300180205\",\n            \"virtualAccountName\": \"RD BANGKIT FAJAR ANUGRAH\",\n            \"trxId\": \"2130705420534000073\",\n            \"totalAmount\": {\n                \"value\": \"2241000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:00:25.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0542053   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403170071\",\n            \"virtualAccountNo\": \"   772043403170071\",\n            \"virtualAccountName\": \"ANNISA JULIANTI\",\n            \"trxId\": \"2130740410514000013\",\n            \"totalAmount\": {\n                \"value\": \"290000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:00:34.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4041051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403170099\",\n            \"virtualAccountNo\": \"   772043403170099\",\n            \"virtualAccountName\": \"SINDY NURWULANDININA\",\n            \"trxId\": \"2130740410514000015\",\n            \"totalAmount\": {\n                \"value\": \"290000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:02:34.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4041051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506190028\",\n            \"virtualAccountNo\": \"   772043506190028\",\n            \"virtualAccountName\": \"LIA ARSITAMARA\",\n            \"trxId\": \"2130740190514000027\",\n            \"totalAmount\": {\n                \"value\": \"1000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:09:48.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4019051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403180119\",\n            \"virtualAccountNo\": \"   772043403180119\",\n            \"virtualAccountName\": \"AYU SITI MASITOH\",\n            \"trxId\": \"2130700000108207096\",\n            \"totalAmount\": {\n                \"value\": \"828500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:16:40.0\",\n            \"additionalInfo\": {\n                \"channel\": \"BRLK\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0852036   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300210046\",\n            \"virtualAccountNo\": \"   772043300210046\",\n            \"virtualAccountName\": \"DADAN ANUGRAH RA\",\n            \"trxId\": \"2130788884550242641\",\n            \"totalAmount\": {\n                \"value\": \"6876500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:31:27.0\",\n            \"additionalInfo\": {\n                \"channel\": \"NBMB\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"8888455   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504180109\",\n            \"virtualAccountNo\": \"   772043504180109\",\n            \"virtualAccountName\": \"PUTRI LULU JENITA\",\n            \"trxId\": \"2130701000584000073\",\n            \"totalAmount\": {\n                \"value\": \"3000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:36:00.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0100058   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300180097\",\n            \"virtualAccountNo\": \"   772043300180097\",\n            \"virtualAccountName\": \"GALIH YOGASWARA \",\n            \"trxId\": \"2130700000024472493\",\n            \"totalAmount\": {\n                \"value\": \"1200000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:36:42.0\",\n            \"additionalInfo\": {\n                \"channel\": \"IBNK\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0888492   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300180102\",\n            \"virtualAccountNo\": \"   772043300180102\",\n            \"virtualAccountName\": \"MUHAMAD ILHAM SYAH RIZAL\",\n            \"trxId\": \"2130740060514000051\",\n            \"totalAmount\": {\n                \"value\": \"1045000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:36:43.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4006051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009180041\",\n            \"virtualAccountNo\": \"   772045009180041\",\n            \"virtualAccountName\": \"ACEP APRIANDI\",\n            \"trxId\": \"2130716454514000017\",\n            \"totalAmount\": {\n                \"value\": \"1350000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:40:47.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009180119\",\n            \"virtualAccountNo\": \"   772045009180119\",\n            \"virtualAccountName\": \"THERESA FELA ARSELINA\",\n            \"trxId\": \"2130741810514000005\",\n            \"totalAmount\": {\n                \"value\": \"1500000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:45:10.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4181051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402180313\",\n            \"virtualAccountNo\": \"   772043402180313\",\n            \"virtualAccountName\": \"SHINTA YUSNIA MA\",\n            \"trxId\": \"2130700000100515076\",\n            \"totalAmount\": {\n                \"value\": \"670500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:47:27.0\",\n            \"additionalInfo\": {\n                \"channel\": \"BRLK\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"0852036   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403190067\",\n            \"virtualAccountNo\": \"   772043403190067\",\n            \"virtualAccountName\": \"IRMA\",\n            \"trxId\": \"2130716454514000019\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:51:57.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009190053\",\n            \"virtualAccountNo\": \"   772045009190053\",\n            \"virtualAccountName\": \"TIKA RAI RAHAYU\",\n            \"trxId\": \"2130716454514000021\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:52:26.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504190008\",\n            \"virtualAccountNo\": \"   772043504190008\",\n            \"virtualAccountName\": \"SRI DEVI ANGGRAENI\",\n            \"trxId\": \"2130716454514000023\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:53:04.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504190054\",\n            \"virtualAccountNo\": \"   772043504190054\",\n            \"virtualAccountName\": \"IIS SITI MAESAROH\",\n            \"trxId\": \"2130716454514000025\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:53:44.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504190062\",\n            \"virtualAccountNo\": \"   772043504190062\",\n            \"virtualAccountName\": \"RIDA NURFARIDA RAHMAT\",\n            \"trxId\": \"2130716454514000027\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:54:23.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506190062\",\n            \"virtualAccountNo\": \"   772043506190062\",\n            \"virtualAccountName\": \"IMAS\",\n            \"trxId\": \"2130716454514000029\",\n            \"totalAmount\": {\n                \"value\": \"2398500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:55:08.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300170010\",\n            \"virtualAccountNo\": \"   772043300170010\",\n            \"virtualAccountName\": \"LAELATUL KAMILAH\",\n            \"trxId\": \"2130716454514000031\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:55:49.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504170007\",\n            \"virtualAccountNo\": \"   772043504170007\",\n            \"virtualAccountName\": \"RIZALDY IRSYAD FATHURROH\",\n            \"trxId\": \"2130716454514000033\",\n            \"totalAmount\": {\n                \"value\": \"1092000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:56:27.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506170192\",\n            \"virtualAccountNo\": \"   772043506170192\",\n            \"virtualAccountName\": \"TINA TRISNIA\",\n            \"trxId\": \"2130716454514000035\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:57:07.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"7011170013\",\n            \"virtualAccountNo\": \"   772047011170013\",\n            \"virtualAccountName\": \"FAJAR MAULANA\",\n            \"trxId\": \"2130716454514000037\",\n            \"totalAmount\": {\n                \"value\": \"1390000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:57:50.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402170050\",\n            \"virtualAccountNo\": \"   772043402170050\",\n            \"virtualAccountName\": \"SUSI SUSILAWATI\",\n            \"trxId\": \"2130716454514000039\",\n            \"totalAmount\": {\n                \"value\": \"1390000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:58:28.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403170151\",\n            \"virtualAccountNo\": \"   772043403170151\",\n            \"virtualAccountName\": \"MUTIARA ARDIANTI\",\n            \"trxId\": \"2130716454514000041\",\n            \"totalAmount\": {\n                \"value\": \"1390000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:59:17.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2109170057\",\n            \"virtualAccountNo\": \"   772042109170057\",\n            \"virtualAccountName\": \"AYU TRI NURJANAH\",\n            \"trxId\": \"2130716454514000043\",\n            \"totalAmount\": {\n                \"value\": \"1232000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 10:59:57.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2119170013\",\n            \"virtualAccountNo\": \"   772042119170013\",\n            \"virtualAccountName\": \"HIKMAH KURNIA SEPTIANI\",\n            \"trxId\": \"2130716454514000045\",\n            \"totalAmount\": {\n                \"value\": \"1162000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:00:33.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2107170005\",\n            \"virtualAccountNo\": \"   772042107170005\",\n            \"virtualAccountName\": \"DINDA PUTRI HANDAYANI\",\n            \"trxId\": \"2130716454514000047\",\n            \"totalAmount\": {\n                \"value\": \"812000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:01:12.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2108170040\",\n            \"virtualAccountNo\": \"   772042108170040\",\n            \"virtualAccountName\": \"LINDA HAJARWATI\",\n            \"trxId\": \"2130716454514000049\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:01:50.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009170123\",\n            \"virtualAccountNo\": \"   772045009170123\",\n            \"virtualAccountName\": \"NOLA NUR FADILAH\",\n            \"trxId\": \"2130716454514000051\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:02:29.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009170038\",\n            \"virtualAccountNo\": \"   772045009170038\",\n            \"virtualAccountName\": \"AGUS GUNARA\",\n            \"trxId\": \"2130716454514000053\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:03:06.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3506170340\",\n            \"virtualAccountNo\": \"   772043506170340\",\n            \"virtualAccountName\": \"WAHYU AZIS FAHRIZA\",\n            \"trxId\": \"2130716454514000055\",\n            \"totalAmount\": {\n                \"value\": \"1250000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:03:47.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3403170162\",\n            \"virtualAccountNo\": \"   772043403170162\",\n            \"virtualAccountName\": \"RIKA KARTIKA\",\n            \"trxId\": \"2130716454514000057\",\n            \"totalAmount\": {\n                \"value\": \"1390000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:04:34.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"5009180057\",\n            \"virtualAccountNo\": \"   772045009180057\",\n            \"virtualAccountName\": \"ROBBY PARAMA\",\n            \"trxId\": \"2130744550514000013\",\n            \"totalAmount\": {\n                \"value\": \"375000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:07:03.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4455051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2107180047\",\n            \"virtualAccountNo\": \"   772042107180047\",\n            \"virtualAccountName\": \"ROSIE SUCI PEBRI\",\n            \"trxId\": \"2130780047010010341\",\n            \"totalAmount\": {\n                \"value\": \"380000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:10:31.0\",\n            \"additionalInfo\": {\n                \"channel\": \"ATM \",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4050900   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"2107170053\",\n            \"virtualAccountNo\": \"   772042107170053\",\n            \"virtualAccountName\": \"LARAS SAFITRI\",\n            \"trxId\": \"2130716454514000063\",\n            \"totalAmount\": {\n                \"value\": \"248500.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:16:38.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3504180046\",\n            \"virtualAccountNo\": \"   772043504180046\",\n            \"virtualAccountName\": \"PANJI PURNAMA\",\n            \"trxId\": \"2130740480514000123\",\n            \"totalAmount\": {\n                \"value\": \"600000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:23:41.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4048051   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3402210150\",\n            \"virtualAccountNo\": \"   772043402210150\",\n            \"virtualAccountName\": \"RISNA RISMAYA\",\n            \"trxId\": \"2130716454514000069\",\n            \"totalAmount\": {\n                \"value\": \"2000000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:23:45.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"1645451   \"\n            }\n        },\n        {\n            \"partnerServiceId\": \"   77204\",\n            \"customerNo\": \"3300180089\",\n            \"virtualAccountNo\": \"   772043300180089\",\n            \"virtualAccountName\": \"FAJAR HERMAWAN\",\n            \"trxId\": \"2130744620524000069\",\n            \"totalAmount\": {\n                \"value\": \"1760000.00\",\n                \"currency\": \"IDR\"\n            },\n            \"trxDateTime\": \"2021-11-03 11:45:57.0\",\n            \"additionalInfo\": {\n                \"channel\": \"OTHER\",\n                \"description\": \"\",\n                \"sourceAccountVa\": \"10401002213308\",\n                \"tellerId\": \"4462052   \"\n            }\n        }\n    ]\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Get Token Copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"eval(pm.globals.get('pmlib_code'));",
+							"",
+							"Date.prototype.toIsoString = function() {",
+							"    var tzo = -this.getTimezoneOffset(),",
+							"        dif = tzo >= 0 ? '+' : '-',",
+							"        pad = function(num) {",
+							"            var norm = Math.floor(Math.abs(num));",
+							"            return (norm < 10 ? '0' : '') + norm;",
+							"        };",
+							"    return this.getFullYear() +",
+							"        '-' + pad(this.getMonth() + 1) +",
+							"        '-' + pad(this.getDate()) +",
+							"        'T' + pad(this.getHours()) +",
+							"        ':' + pad(this.getMinutes()) +",
+							"        ':' + pad(this.getSeconds()) +",
+							"        '.' + this.getMilliseconds() + ",
+							"        dif + pad(tzo / 60) +",
+							"        ':' + pad(tzo % 60);",
+							"}",
+							"",
+							"var dt = new Date();",
+							"var timestamp = dt.toIsoString();",
+							"postman.setEnvironmentVariable('timestamp', timestamp);",
+							"",
+							"var prvKeyPEM = pm.environment.get(\"private_key\");",
+							"var clientid = pm.environment.get(\"client_id\");",
+							"",
+							"",
+							"console.log(prvKeyPEM);",
+							"",
+							"// Use 'jsrsasign' library",
+							"const base64String = pmlib.rs.stob64u('My amazing string')",
+							"console.log('Url Base64 string: ' + base64String)",
+							"",
+							"var sig = new pmlib.rs.KJUR.crypto.Signature({\"alg\": \"SHA256withRSA\"});",
+							"console.log(sig);",
+							"sig.init(prvKeyPEM);",
+							"sig.updateString(clientid+'|'+timestamp);",
+							"var hSigVal = sig.sign();",
+							"",
+							"postman.setEnvironmentVariable('signature', hexToBase64(hSigVal));",
+							"postman.setEnvironmentVariable('signature_hex', hSigVal);",
+							"",
+							"",
+							"function hexToBase64(hexstring) {",
+							"    return btoa(hexstring.match(/\\w{2}/g).map(function(a) {",
+							"        return String.fromCharCode(parseInt(a, 16));",
+							"    }).join(\"\"));",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable(\"token\", jsonData.accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-SIGNATURE",
+						"value": "{{signature_hex}}",
+						"type": "text"
+					},
+					{
+						"key": "X-CLIENT-KEY",
+						"value": "{{client_id}}",
+						"type": "text"
+					},
+					{
+						"key": "X-TIMESTAMP",
+						"value": "{{timestamp}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"grantType\": \"client_credentials\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://sandbox.partner.api.bri.co.id/snap/v1.0/access-token/b2b",
+					"protocol": "https",
+					"host": [
+						"sandbox",
+						"partner",
+						"api",
+						"bri",
+						"co",
+						"id"
+					],
+					"path": [
+						"snap",
+						"v1.0",
+						"access-token",
+						"b2b"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
