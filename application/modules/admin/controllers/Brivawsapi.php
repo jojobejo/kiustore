@@ -8,10 +8,7 @@ class Brivawsapi extends CI_Controller
     private $url;
     private $privateKey;
     private $secret_key;
-    private $xPartnerId = 'kuionline';
-    private $partnerServiceId = '22123';
-    private $customerNo = '00218322';
-    private $idcus = '111';
+    private $xPartnerId;
 
     public function __construct()
     {
@@ -20,6 +17,8 @@ class Brivawsapi extends CI_Controller
         $this->privateKey   = file_get_contents(FCPATH . 'key/private.pem');
         $this->url          = 'https://sandbox.partner.api.bri.co.id';
         $this->secret_key   = 'oSsY5SM5svjj2mY9';
+        $this->xpartnerid   = 'kuionline';
+        $this->partnerid    = '22123';
     }
 
     private function asymmetricSignature($client_id, $timestamp)
@@ -35,9 +34,9 @@ class Brivawsapi extends CI_Controller
 
     private function symmetricSignature($method, $path, $body, $timestamp, $accessToken)
     {
-        $hashBody = json_encode($body); // Body minify
-        $hashBody = hash('sha256', $hashBody); // Calculate Hash with sha256
-        $signedBody = strtolower($hashBody); // Convert to lowercase
+        $hashBody = json_encode($body);
+        $hashBody = hash('sha256', $hashBody);
+        $signedBody = strtolower($hashBody);
 
         $stringToSign = implode(':', [
             $method,
@@ -47,33 +46,99 @@ class Brivawsapi extends CI_Controller
             $timestamp
         ]);
 
-        $signature = hash_hmac('sha512', $stringToSign, $client_secret, true);
+        $signature = hash_hmac('sha512', $stringToSign, $this->secret_key, true);
 
         return base64_encode($signature);
     }
 
     public function create_va()
     {
+        $patch = '/snap/v1.0/transfer-va/create-va';
+        $fullurl = $this->url . $patch;
+        $method = 'POST';
+        $timestamp  = gmdate('Y-m-d\TH:i:s.000\Z');
+        $cust = '102030';
+
+        // Ambil access token
         $token_response = $this->get_token();
         $token_data = json_decode($token_response, true);
 
-        if (isset($token_data['status']) && $token_data['status'] === 'success') {
-            $access_token = $token_data['access_token'];
-
-            $response = [
-                "status" => "success",
-                "message" => "Virtual Account berhasil dibuat",
-                "access_token" => $access_token
-            ];
-        } else {
-            $response = [
+        if (!isset($token_data['status']) || $token_data['status'] !== 'success') {
+            return json_encode([
                 "status" => "error",
-                "message" => "Gagal membuat Virtual Account, tidak bisa mendapatkan access token",
+                "message" => "Gagal mendapatkan access token",
                 "error_detail" => $token_data
-            ];
+            ], JSON_PRETTY_PRINT);
         }
-        header('Content-Type: application/json');
-        echo json_encode($response, JSON_PRETTY_PRINT);
+
+        $access_token = $token_data['access_token'];
+
+        $body = [
+            'partnerServiceId'   => $this->client_id,
+            'customerNo'         => $cust,
+            'virtualAccountNo'   => $this->client_id . $cust,
+            'virtualAccountName' => 'CUST01',
+            'totalAmount'        => [
+                'value'    => '11000.00',
+                'currency' => 'IDR'
+            ],
+            'expiredDate'        => date('c', strtotime('2024-06-30 23:00')),
+            'trxId'              => 'trx12346',
+            'additionalInfo'     => [
+                'description' => 'keterangan'
+            ]
+        ];
+
+        $sysmetricsignature = $this->symmetricSignature($method, $patch, $body, $timestamp, $access_token);
+
+        $headers = [
+            'Authorization:Bearer ' . $access_token,
+            'X-TIMESTAMP:' . $timestamp,
+            'X-SIGNATURE:' . $sysmetricsignature,
+            'Content-Type:application/json',
+            'X-PARTNER-ID:' . $this->partnerid,
+            'CHANNEL-ID:00001',
+            'X-EXTERNAL-ID:' . rand(100000000, 999999999) // Random setiap request
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $fullurl);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false) {
+            return json_encode([
+                "status" => "error",
+                "message" => "cURL Error: " . $curlError
+            ], JSON_PRETTY_PRINT);
+        }
+
+        $createva = json_decode($response, true);
+
+        // Response handling lebih rapi
+        if ($httpCode == 200 && isset($createva['virtualAccountNo'])) {
+            return json_encode([
+                "status" => "success",
+                "message" => "VA telah terbuat",
+                "data" => $createva
+            ], JSON_PRETTY_PRINT);
+        } else {
+            return json_encode([
+                "status" => "error",
+                "message" => "Gagal membuat VA",
+                "http_code" => $httpCode,
+                "response" => $createva
+            ], JSON_PRETTY_PRINT);
+        }
     }
 
     public function get_token()
