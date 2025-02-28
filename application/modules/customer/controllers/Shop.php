@@ -25,10 +25,11 @@ class Shop extends CI_Controller
         $cart['carts']      = $this->cart->contents();
         $cart['total_cart'] = $this->cart->total();
         $cart['user']       = $data;
-
         //ADD-ONS
         $cusids             = $this->session->userdata('user_id');
         $now                = date('Y-m-d');
+
+        $cart['area']       = $this->payment->areacust($cusids);
 
         $cart['cartaddons'] = $this->product->count_tmp_cart($cusids, $now)->result();
         $cart['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
@@ -50,7 +51,6 @@ class Shop extends CI_Controller
         } else {
 
             $ongkir = $cart['ongkir'] = "0";
-
             $cart['member']        = is_members();
             $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
             $cart['profilecustomer'] = $this->product->getcustomer($cusids)->result();
@@ -66,7 +66,7 @@ class Shop extends CI_Controller
     public function cekongkir()
     {
         $kiu        = $this->input->post('kiu');
-        $tjuan      = $this->input->post('tjuan');
+        $kec       = $this->input->post('subdis');
         $berat      = $this->input->post('berat');
         $expedisi   = $this->input->post('kurir');
         $cusids     = $this->session->userdata('user_id');
@@ -82,7 +82,7 @@ class Shop extends CI_Controller
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "origin=" . $kiu . "&originType=city&destination=" . $tjuan . "&destinationType=subdistrict&weight=" . $berat . "&courier=" . $expedisi,
+            CURLOPT_POSTFIELDS => "origin=" . $kiu . "&originType=city&destination=" . $kec . "&destinationType=subdistrict&weight=" . $berat . "&courier=" . $expedisi,
 
             CURLOPT_HTTPHEADER => array(
                 "content-type: application/x-www-form-urlencoded",
@@ -110,9 +110,7 @@ class Shop extends CI_Controller
 
     public function ongkir()
     {
-
         $action = $this->input->post('action');
-
         switch ($action) {
             case 'addongkir':
                 $datajasa     =  $this->input->post('jasaongkir');
@@ -138,6 +136,7 @@ class Shop extends CI_Controller
                 $this->product->updatests($customer, $datenow, $updatests);
                 redirect('cart');
                 break;
+
             case 'deleteongkir':
                 $customer     =  $this->input->post('customer');
                 $datenow      =  date('Y-m-d');
@@ -146,7 +145,12 @@ class Shop extends CI_Controller
                     'sts_ongkir' => '0'
                 );
 
+                $updatestss = array(
+                    'status' => '3'
+                );
+
                 $this->product->updatests($customer, $datenow, $updatests);
+                $this->product->stsongkir($customer, $datenow, $updatestss);
                 redirect('cart');
                 break;
         }
@@ -173,7 +177,6 @@ class Shop extends CI_Controller
 
                 $iduser     = $this->session->userdata('user_id');
                 // $kdchart    = $this->product->kdnonkomersial($iduser);
-
                 $coupon = $this->input->post('coupon_code') ? $this->input->post('coupon_code') : $this->session->userdata('_temp_coupon');
                 $quantity = $this->input->post('quantity') ? $this->input->post('quantity') : $this->session->userdata('_temp_quantity');
 
@@ -274,6 +277,7 @@ class Shop extends CI_Controller
                     $params['jasa_ongkir'] = $jasa_ongkir;
                     $params['total']    = $subtotal + $ongkir - $discount;
                     $params['discount'] = $disc;
+                    $params['kdchart'] = $this->product->getkdchart($iduser);
 
                     $this->session->set_userdata('order_quantity', $items);
                     $this->session->set_userdata('order_quantity_multi', $items_multi);
@@ -332,6 +336,7 @@ class Shop extends CI_Controller
                         redirect('cart');
                     }
                     if (is_members() == '1') {
+                        $kdfakturs   = $this->input->post('kdfaktur');
                         foreach ($total_price_multi as $type => $total) {
                             if ($total) {
                                 $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $coupon_id);
@@ -341,7 +346,7 @@ class Shop extends CI_Controller
                                     'user_id' => $user_id,
                                     'coupon_id' => $coupon_id,
                                     'order_number' => $order_number,
-                                    'kd_faktur'    => $kdfaktur,
+                                    'kd_faktur'    => $kdfakturs,
                                     'order_status' => 1,
                                     'order_date' => $order_date,
                                     'total_price' => $total,
@@ -371,6 +376,7 @@ class Shop extends CI_Controller
                         }
                     } else {
                         foreach ($total_price_multi as $type => $total) {
+                            $jnkirim    = $this->input->post('jns_shipping');
                             if ($total) {
                                 $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $coupon_id);
                                 $due_date = ($type == 1 ? date('Y-m-d') : ($type == 2 ? date('Y-m-d', strtotime(' + 1 months')) : ($type == 3 ? date('Y-m-d', strtotime(' + 2 months')) : "")));
@@ -388,8 +394,8 @@ class Shop extends CI_Controller
                                     'shipping_method' => $shipping,
                                     'delivery_data' => $delivery_data,
                                     'due_date' => $due_date,
-                                    'jenis_pengiriman' => $jnkirim,
-                                    'estimasi_kirim' => $estimasi,
+                                    'jenis_pengiriman' => '89',
+                                    'estimasi_kirim' => '0',
                                     'shipping_cost' => $ongkirprice
                                 );
                                 $order = $this->product->create_order($order);
@@ -411,6 +417,8 @@ class Shop extends CI_Controller
                 } else {
                     // untuk metode pembayaran cash order langsung dijadikan 1
                     if (is_members() == '1') {
+
+
                         $total_price = $this->session->userdata('total_price');
                         $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
                         $order = array(
@@ -451,6 +459,7 @@ class Shop extends CI_Controller
                         $generatechart = array(
                             'kdchart'   => $kdfaktur
                         );
+
                         $datava = array(
                             'order_number'  => $order_number,
                             'user_id'       => $user_id,
@@ -458,6 +467,12 @@ class Shop extends CI_Controller
                             'status'        => '1'
                         );
 
+                        $now            = date('Y-m-d');
+                        $updatesongkir = array(
+                            'status'    => '3'
+                        );
+
+                        $this->product->stsongkir($user_id, $now, $updatesongkir);
                         $this->product->create_order_items($items);
                         $this->payment->input_va($datava);
                         $this->product->removechartall($kdfaktur);

@@ -32,6 +32,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <input type="text" name="name" value="<?= $ckongkir->rajaongkir->results[0]->code ?> - <?= $ckongkir->rajaongkir->results[0]->name ?>" class="form-control" id="name" required readonly>
                         </div>
                     </div>
+                    
                     <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Jasa Yang Digunakan</label>
@@ -46,7 +47,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <input type="text" name="jasa" id="jasa" value="<?= $ckongkir->rajaongkir->results[0]->code ?>" hidden>
                             <input type="text" name="customer" id="customer" value="<?= $this->session->userdata('user_id') ?>" hidden>
                             <?php foreach ($itm_cart as $itm) : ?>
-                                <input type="text" name="kdfaktur" id="kdfaktur" value="<?= $itm->kdchart ?>">
+                                <input type="text" name="kdfaktur" id="kdfaktur" value="<?= $itm->kdchart ?>" hidden>
                             <?php endforeach; ?>
                         </div>
                     </div>

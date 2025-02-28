@@ -64,8 +64,10 @@ class Product_model extends CI_Model
     {
         return $this->db->query("SELECT 
         a.sts_ongkir,
-        a.kdchart
+        a.kdchart,
+        b.subdistrict_id AS sub
         FROM tmp_cart a
+        JOIN customers b ON b.user_id = a.idcustomer
         WHERE a.idcustomer = '$id'
         AND a.create_at = '$tgl'
         limit 1
@@ -88,7 +90,9 @@ class Product_model extends CI_Model
     public function gettmpshop($id, $tgl)
     {
         return $this->db->query("SELECT 
+        b.province_id AS province_id,
         b.kota_id AS kota_id,
+        b.subdistrict_id AS sub_id,
         SUM(a.qty)* a.product_weight AS total_weights
         FROM tmp_cart a
         JOIN customers b ON b.user_id = a.idcustomer
@@ -105,9 +109,12 @@ class Product_model extends CI_Model
         return $this->db->update('tmp_cart', $data);
     }
 
-    public function deleteongkirs($id)
+    public function stsongkir($id, $tgl, $data)
     {
-        return $this->db->delete('tbtestongkir', array("idcustomer" => $id));
+        $this->db->where('idcustomer', $id);
+        $this->db->where('create_at', $tgl);
+        $this->db->where('status', '1');
+        return $this->db->update('tbtestongkir', $data);
     }
 
     public function getongkirs($id, $tgl)
@@ -117,7 +124,7 @@ class Product_model extends CI_Model
         FROM tbtestongkir a
         WHERE a.idcustomer = '$id'
         AND a.create_at = '$tgl'
-        AND a.status > 0
+        AND a.status = 1
         ");
     }
 
@@ -308,6 +315,7 @@ class Product_model extends CI_Model
         a.*
         FROM tbtestongkir a
         WHERE a.idcustomer = '$id'
+        AND a.status = 1
         AND a.create_at = '$now'
         ")->result();
     }
