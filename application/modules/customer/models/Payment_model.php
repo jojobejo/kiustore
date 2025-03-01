@@ -119,7 +119,12 @@ class Payment_model extends CI_Model
     }
     public function get_va_code($id)
     {
-        $query  = $this->db->query("SELECT a.va_code AS vacode FROM customers a WHERE a.user_id = '$id'")->row();
+        $query  = $this->db->query("SELECT 
+        a.phone_number AS custno,
+        a.user_id AS id
+        FROM customers a  
+        WHERE a.user_id = '$id'
+        ")->row();
         return  $query;
     }
     public function areacust($id)

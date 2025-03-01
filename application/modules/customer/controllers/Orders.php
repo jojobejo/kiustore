@@ -25,12 +25,13 @@ class Orders extends CI_Controller
         $orders['deliver'] = 0;
         $orders['success'] = 0;
         $orders['cancel'] = 0;
+        $orders['all']  = 0;
         // $orders['cancel'] = 0;
         foreach ($orders['orders'] as $dt) {
-            if ($dt->payment_method == 2 &&  $dt->order_status == 2) {
+            if (($dt->payment_method == 2 &&  $dt->order_status == 2) || ($dt->payment_method == 1 && $dt->order_status == 2)) {
                 $orders['unpaid']++;
             }
-            if (($dt->payment_method == 2 &&  $dt->order_status == 1) || ($dt->payment_method == 2 &&  $dt->order_status == 3) || ($dt->payment_method == 2 &&  $dt->order_status == 8) || ($dt->payment_method == 1 &&  $dt->order_status == 1) || ($dt->payment_method == 1 &&  $dt->order_status == 3)) {
+            if (($dt->payment_method == 2 &&  $dt->order_status == 1) || ($dt->payment_method == 1 && $dt->order_status == 9) || ($dt->payment_method == 2 &&  $dt->order_status == 3) || ($dt->payment_method == 2 &&  $dt->order_status == 8) || ($dt->payment_method == 1 &&  $dt->order_status == 1) || ($dt->payment_method == 1 &&  $dt->order_status == 3)) {
                 $orders['process']++;
             }
             if (($dt->payment_method == 2 &&  $dt->order_status == 4) || ($dt->payment_method == 1 &&  $dt->order_status == 4)) {
@@ -41,6 +42,9 @@ class Orders extends CI_Controller
             }
             if (($dt->payment_method == 2 &&  $dt->order_status == 7) || ($dt->payment_method == 1 &&  $dt->order_status == 7)) {
                 $orders['cancel']++;
+            }
+            if ($dt->payment_method > 0 &&  $dt->order_status > 0) {
+                $orders['all']++;
             }
         }
         // print_r($unpaid);

@@ -295,10 +295,10 @@ class Orders extends CI_Controller
                 $data['id'] = $this->input->post('id');
                 $data['invoice_number'] = $this->input->post('invoice_number');
                 $data['ttb_number'] = $this->input->post('ttb_number');
-              //  $data['due_date'] = $this->input->post('due_date');
                 $data['shipping_cost'] = $this->input->post('shipping_cost');
                 $data['insurance'] = $this->input->post('insurance');
                 $data['payment_method'] = $this->input->post('payment_method');
+                $data['order_status']   = $this->input->post('order_status');
 
                 $this->order->verify($data);
 

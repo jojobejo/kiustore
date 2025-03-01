@@ -127,7 +127,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <td>
                         <input type="hidden" value="<?php echo $item->id; ?>" name="id[]">
                         <input type="hidden" value="<?php echo $item->order_qty; ?>" name="qty[]">
-                        <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]" <?= ($data->order_status != 1 ? 'readonly' : ''); ?>>
+                        <?php if ($data->order_status == 9) : ?>
+                          <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]">
+                        <?php elseif ($data->order_status != 1) : ?>
+                          <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]" readonly>
+                        <?php endif; ?>
                       </td>
                     </tr>
                   <?php endforeach; ?>
@@ -135,9 +139,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <tr>
                     <td colspan="4">
                       <div class="col-md-3 text-right">
-                        <?php if ($data->order_status == 1) { ?>
+                        <?php if ($data->order_status == 1) : ?>
                           <input type="submit" class="btn btn-primary" value="Update Harga">
-                        <?php } ?>
+                        <?php elseif ($data->order_status == 9) : ?>
+                          <input type="submit" class="btn btn-primary" value="Update Harga">
+                        <?php endif; ?>
+
                       </div>
                     </td>
                   </tr>
@@ -166,6 +173,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <td>
                     <input type="hidden" value="<?php echo $data->id; ?>" name="id">
                     <input type="hidden" value="<?php echo $data->payment_method; ?>" name="payment_method">
+                    <input type="hidden" value="<?php echo $data->order_status; ?>" name="order_status">
                     <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number">
                   </td>
                 </tr>
@@ -399,7 +407,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
               </form>
             </div>
           </div>
-          
+
         <?php } ?>
       </div>
     <?php endif; ?>

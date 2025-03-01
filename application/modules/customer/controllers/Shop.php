@@ -239,12 +239,13 @@ class Shop extends CI_Controller
                     $items_multi[$item['product_type']][$item['id']]['satuan_text'] = $item['satuan_text'];
                     $items_multi[$item['product_type']][$item['id']]['satuan_qty'] = $item['satuan_qty'];
                     $items_multi[$item['product_type']][$item['id']]['price'] = $item['price'];
-                    $total_price_multi[$item['product_type']] +=  $item['price'];
+                    // $total_price_multi[$item['product_type']] +=  $item['price'];
+                    $total_price_multi[$item['product_type']] += ($item['price'] * $item['qty']);
                 }
 
                 $akseslv        = is_members();
 
-                if ($akseslv == 1) {
+                if ($akseslv > 1) {
 
                     $now            = date('Y-m-d');
                     $subtotal       = $this->cart->total();
@@ -335,7 +336,7 @@ class Shop extends CI_Controller
                         $this->session->set_flashdata('limit', 'Total belanjaan anda melebihi batas kredit. Sisa limit kredit anda <strong>Rp.' . format_rupiah($limit_transaction) . '</strong>');
                         redirect('cart');
                     }
-                    if (is_members() == '1') {
+                    if (is_members() == '0') {
                         $kdfakturs   = $this->input->post('kdfaktur');
                         foreach ($total_price_multi as $type => $total) {
                             if ($total) {
@@ -347,7 +348,7 @@ class Shop extends CI_Controller
                                     'coupon_id' => $coupon_id,
                                     'order_number' => $order_number,
                                     'kd_faktur'    => $kdfakturs,
-                                    'order_status' => 1,
+                                    'order_status' => 9,
                                     'order_date' => $order_date,
                                     'total_price' => $total,
                                     'total_items' => count($quantity_multi[$type]),
@@ -372,6 +373,7 @@ class Shop extends CI_Controller
                                     $n++;
                                 }
                                 $this->product->create_order_items($items);
+                                $this->product->removechartall($kdfakturs);
                             }
                         }
                     } else {
@@ -386,7 +388,7 @@ class Shop extends CI_Controller
                                     'coupon_id' => $coupon_id,
                                     'order_number' => $order_number,
                                     'kd_faktur'    => $kdfaktur,
-                                    'order_status' => 1,
+                                    'order_status' => 9,
                                     'order_date' => $order_date,
                                     'total_price' => $total,
                                     'total_items' => count($quantity_multi[$type]),
@@ -415,10 +417,9 @@ class Shop extends CI_Controller
                         }
                     }
                 } else {
+                    $user_id    = get_current_user_id();
                     // untuk metode pembayaran cash order langsung dijadikan 1
-                    if (is_members() == '1') {
-
-
+                    if (is_member() == '1') {
                         $total_price = $this->session->userdata('total_price');
                         $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
                         $order = array(
@@ -455,6 +456,7 @@ class Shop extends CI_Controller
 
                         // GENERATE KDCHART
                         $vacode = $this->payment->get_va_code($user_id);
+                        $createva = "2123" . $vacode->id . $vacode->custno;
 
                         $generatechart = array(
                             'kdchart'   => $kdfaktur
@@ -463,21 +465,16 @@ class Shop extends CI_Controller
                         $datava = array(
                             'order_number'  => $order_number,
                             'user_id'       => $user_id,
-                            'va_code'       => $vacode->vacode,
+                            'va_code'       => $createva,
                             'status'        => '1'
                         );
 
-                        $now            = date('Y-m-d');
-                        $updatesongkir = array(
-                            'status'    => '3'
-                        );
-
-                        $this->product->stsongkir($user_id, $now, $updatesongkir);
                         $this->product->create_order_items($items);
                         $this->payment->input_va($datava);
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);
                     } else {
+                        $user_id    = get_current_user_id();
                         $total_price = $this->session->userdata('total_price');
                         $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
                         $order = array(
@@ -514,6 +511,7 @@ class Shop extends CI_Controller
 
                         // GENERATE KDCHART
                         $vacode = $this->payment->get_va_code($user_id);
+                        $createva = "2123" . $vacode->id . $vacode->custno;
 
                         $generatechart = array(
                             'kdchart'   => $kdfaktur
@@ -521,10 +519,15 @@ class Shop extends CI_Controller
                         $datava = array(
                             'order_number'  => $order_number,
                             'user_id'       => $user_id,
-                            'va_code'       => $vacode->vacode,
+                            'va_code'       => $createva,
                             'status'        => '1'
                         );
+                        $updatesongkir = array(
+                            'status'    => '3'
+                        );
 
+                        $now            = date('Y-m-d');
+                        $this->product->stsongkir($user_id, $now, $updatesongkir);
                         $this->product->create_order_items($items);
                         $this->payment->input_va($datava);
                         $this->product->removechartall($kdfaktur);

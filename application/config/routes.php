@@ -112,13 +112,5 @@ $route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost'
 // BRI VA
 $route['admin/brivaws'] = 'admin/brivawsapi';
 
-// $route['generate_signature'] = 'admin/brivawsapi/generate_signature';
-// $route['get_token'] = 'admin/brivawsapi/getToken';
-// $route['debugSignature'] = 'admin/brivawsapi/debugSignature';
-// $route['verifySignature'] = 'admin/brivawsapi/verifySignature';
-// $route['generate_signature'] = 'admin/brivawsapi/generate_signature';
-// $route['generate_asymmetric_signature'] = 'admin/brivawsapi/generate_asymmetric_signature';
-
-
 $route['get_token'] = 'admin/Brivawsapi/get_token';
 $route['create_va'] = 'admin/Brivawsapi/create_va';

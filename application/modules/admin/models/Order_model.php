@@ -466,6 +466,8 @@ class Order_model extends CI_Model
                 WHERE
                     (o.payment_method = 2 AND o.order_status = 1)
                     OR (o.payment_method = 1 &&  o.order_status = 1)
+                    OR (o.payment_method = 1 && o.order_status = 9)
+                    OR (o.payment_method = 1 &&  o.order_status = 3)
                 GROUP BY o.id
                 ORDER BY o.order_date DESC
             ");
@@ -1087,16 +1089,28 @@ class Order_model extends CI_Model
 
     public function verify($data)
     {
-        $status = ($data['payment_method'] == 1) ? '3' : '2';
-        $this->db->where('id', $data['id'])
-            ->update('orders', array(
-                'invoice_number' => $data['invoice_number'],
-                'ttb_number' => $data['ttb_number'],
-                //  'due_date' => $data['due_date'],
-                'shipping_cost' => $data['shipping_cost'],
-                'insurance' => $data['insurance'],
-                'order_status' => $status
-            ));
+        if ($data['order_status'] == 9) {
+            $this->db->where('id', $data['id'])
+                ->update('orders', array(
+                    'invoice_number' => $data['invoice_number'],
+                    'ttb_number' => $data['ttb_number'],
+                    //  'due_date' => $data['due_date'],
+                    'shipping_cost' => $data['shipping_cost'],
+                    'insurance' => $data['insurance'],
+                    'order_status' => 3
+                ));
+        } else {
+            $status = ($data['payment_method'] == 1) ? '3' : '2';
+            $this->db->where('id', $data['id'])
+                ->update('orders', array(
+                    'invoice_number' => $data['invoice_number'],
+                    'ttb_number' => $data['ttb_number'],
+                    //  'due_date' => $data['due_date'],
+                    'shipping_cost' => $data['shipping_cost'],
+                    'insurance' => $data['insurance'],
+                    'order_status' => $status
+                ));
+        }
     }
 
     public function update_harga($data)
