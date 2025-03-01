@@ -41,34 +41,27 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <textarea name="note" class="form-control" id="note"></textarea>
                             </div>
                             <?php foreach ($kdchart as $kd) : ?>
-                                <input type="text" value="<?= $kd->kdchart ?>" name="kdfaktur" id="kdfaktur">
+                                <input type="text" value="<?= $kd->kdchart ?>" name="kdfaktur" id="kdfaktur" hidden>
                             <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
-                <!-- Payment Method Choose-->
                 <div class="shipping-method-choose mb-3">
                     <div class="alert alert-info m-2">Metode Pembayaran</div>
                     <div class="card shipping-method-choose-card">
                         <div class="card-body">
                             <div class="payment-method-choose">
                                 <div class="row">
-                                    <!-- Net Banking Option Start -->
+
                                     <div class="input-box col-6">
-                                        <input type="radio" name="payment" id="kredit" value="1" checked />
-                                        <label class="form-check-label" for="cod">Kredit </label>
-                                    </div>
-                                    <div class="input-box col-6">
-                                        <input type="radio" name="payment" id="transfer" value="2" />
+                                        <input type="radio" name="payment" id="transfer" value="2" checked />
                                         <label class="form-check-label" for="transfer">VA - KARISMA </label>
                                     </div>
-                                    <!-- Net Banking Option End -->
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- shipping method choose-->
                 <div class="shipping-method-choose mb-3">
                     <div class="alert alert-info m-2">Metode Pengiriman</div>
                     <div class="card shipping-method-choose-card">
@@ -83,6 +76,58 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
                     </div>
                 </div>
+                <?php foreach ($jasa_ongkir as $j) :
+                    $now = date('Y-m-d');
+                    $jsongkir = explode(';', $j->jsongkir);
+                    $expedisi = $j->sjasa;
+                    if ($expedisi == "jne") {
+                        $expedisi = 'JNE';
+                    } elseif ($expedisi == "pos") {
+                        $expedisi = 'POS INDONESIA';
+                    } elseif ($expedisi == "tiki") {
+                        $expedisi = 'TIKI';
+                    }
+                ?>
+                    <div hidden>
+                        <input type="text" value="<?= $jsongkir['0'] ?>" name="jns_shipping" id="jns_shipping">
+                        <input type="text" value="<?= $jsongkir['1'] ?> Hari" name="estimasi" id="estimasi">
+                        <input type="text" value="<?= $jsongkir['2'] ?>" name="ongkirprice" id="ongkirprice">
+                        <input type="text" value="<?= $j->kd_faktur ?>" name="kdfaktur" id="kdfaktur">
+                    </div>
+                    <!-- Payment Method Choose-->
+                    <div class="shipping-method-choose mb-3">
+                        <div class="alert alert-info m-2">Metode Pembayaran</div>
+                        <div class="card shipping-method-choose-card">
+                            <div class="card-body">
+                                <div class="payment-method-choose">
+                                    <div class="row">
+
+                                        <div class="input-box col-6">
+                                            <input type="radio" name="payment" id="transfer" value="2" checked />
+                                            <label class="form-check-label" for="transfer">VA - KARISMA </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- shipping method choose-->
+                    <div class="shipping-method-choose mb-3">
+                        <div class="alert alert-info m-2">Metode Pengiriman</div>
+                        <div class="card shipping-method-choose-card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="input-box col-6">
+                                        <input id="expiedisi" name="shipping" type="radio" value="5" checked>
+                                        <label for="karisma"><?= $expedisi ?> - <?= $jsongkir['0'] ?> - Estimasi - <?= $jsongkir['1'] ?> (Rp. <?= number_format($jsongkir['2'], 0) ?>)</label>
+                                        <div class="check"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
 
                 <!-- Cart Amount Area-->
                 <div class="card cart-amount-area mb-10">

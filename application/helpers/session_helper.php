@@ -177,7 +177,7 @@ if (!function_exists('is_member')) {
     {
         $user_data = session_data();
         $user_level = $user_data->user_level;
-        if ($user_level != 1) {
+        if ($user_level > 1) {
             return 1;
         }
         return 0;
@@ -189,10 +189,10 @@ if (!function_exists('is_members')) {
     {
         $user_data = session_data();
         $user_level = $user_data->user_level;
-        if ($user_level < 3) {
-            return 0;
+        if ($user_level == 1) {
+            return 1;
         }
-        return 1;
+        return 0;
     }
 }
 

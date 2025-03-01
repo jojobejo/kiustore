@@ -117,6 +117,7 @@ class Payment_model extends CI_Model
     {
         return $this->db->insert('briva_api', $data);
     }
+    
     public function get_va_code($id)
     {
         $query  = $this->db->query("SELECT 

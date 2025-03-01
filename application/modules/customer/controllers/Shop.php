@@ -37,7 +37,7 @@ class Shop extends CI_Controller
         if (level_user() < 3) {
 
             $ongkir = $cart['ongkir'] = "0";
-            $cart['member']        = is_members();
+            $cart['member']          = is_member();
             $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
             $cart['total_price']     = $cart['total_cart'];
             $cart['tmp_cart']        = $this->product->gettmpshop($cusids, $now)->result();
@@ -49,7 +49,6 @@ class Shop extends CI_Controller
             $this->load->view('shop/cart', $cart);
             $this->load->view('footer');
         } else {
-
             $ongkir = $cart['ongkir'] = "0";
             $cart['member']        = is_members();
             $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
@@ -66,7 +65,7 @@ class Shop extends CI_Controller
     public function cekongkir()
     {
         $kiu        = $this->input->post('kiu');
-        $kec       = $this->input->post('subdis');
+        $kec        = $this->input->post('subdis');
         $berat      = $this->input->post('berat');
         $expedisi   = $this->input->post('kurir');
         $cusids     = $this->session->userdata('user_id');
@@ -420,6 +419,60 @@ class Shop extends CI_Controller
                     $user_id    = get_current_user_id();
                     // untuk metode pembayaran cash order langsung dijadikan 1
                     if (is_member() == '1') {
+                        $total_price = $this->session->userdata('total_price');
+                        $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
+                        $order = array(
+                            'user_id' => $user_id,
+                            'coupon_id' => $coupon_id,
+                            'order_number' => $order_number,
+                            'kd_faktur' => $kdfaktur,
+                            'order_status' => 1,
+                            'order_date' => $order_date,
+                            'total_price' => $total_price,
+                            'total_items' => count($quantity),
+                            'payment_method' => $payment,
+                            'shipping_method' => $shipping,
+                            'delivery_data' => $delivery_data,
+                            'due_date' => $due_date,
+                            'jenis_pengiriman' => 89,
+                            'estimasi_kirim' => 0,
+                            'shipping_cost' => 0
+                        );
+
+                        $order = $this->product->create_order($order);
+                        $n = 0;
+
+                        foreach ($quantity as $id => $data) {
+                            $items[$n]['order_id'] = $order;
+                            $items[$n]['product_id'] = $id;
+                            $items[$n]['order_qty'] = $data['qty'];
+                            $items[$n]['satuan'] = $data['satuan'];
+                            $items[$n]['satuan_text'] = $data['satuan_text'];
+                            $items[$n]['satuan_qty'] = $data['satuan_qty'];
+                            $items[$n]['order_price'] = $data['price'];
+                            $n++;
+                        }
+
+                        // GENERATE KDCHART
+                        $vacode = $this->payment->get_va_code($user_id);
+                        $createva = "2123" . $vacode->id . $vacode->custno;
+
+                        $generatechart = array(
+                            'kdchart'   => $kdfaktur
+                        );
+
+                        $datava = array(
+                            'order_number'  => $order_number,
+                            'user_id'       => $user_id,
+                            'va_code'       => $createva,
+                            'status'        => '1'
+                        );
+
+                        $this->product->create_order_items($items);
+                        $this->payment->input_va($datava);
+                        $this->product->removechartall($kdfaktur);
+                        $this->product->insertgenerate($generatechart);
+                    } elseif (is_member() == '0') {
                         $total_price = $this->session->userdata('total_price');
                         $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
                         $order = array(

@@ -32,7 +32,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <input type="text" name="name" value="<?= $ckongkir->rajaongkir->results[0]->code ?> - <?= $ckongkir->rajaongkir->results[0]->name ?>" class="form-control" id="name" required readonly>
                         </div>
                     </div>
-                    
+
                     <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Jasa Yang Digunakan</label>

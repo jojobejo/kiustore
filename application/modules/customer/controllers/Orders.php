@@ -61,6 +61,7 @@ class Orders extends CI_Controller
             $items = $this->order->order_items($id);
             $banks = json_decode(get_settings('payment_banks'));
             $banks = (array) $banks;
+            $cusid = get_current_user_id();
 
             $params['title'] = 'Order #' . $data->order_number;
 
@@ -68,11 +69,27 @@ class Orders extends CI_Controller
             $order['items'] = $items;
             $order['delivery_data'] = json_decode($data->delivery_data);
             $order['banks'] = $banks;
+            $order['customer'] = $this->order->get_data_customer($cusid);
 
-            // print_r('<pre>');
-            // print_r($order['data']);
-            // print_r('<pre>');
-            // exit;
+            $vacode = $this->order->get_data_customer($cusid);
+
+            if (!empty($vacode) && is_array($vacode)) {
+                foreach ($vacode as $va) {
+                    if (isset($va->user_id) && isset($va->vacode)) {
+                        $custid = $va->user_id;
+                        $codeva = $va->vacode;
+                        $insertva = array(
+                            'order_number' => $data->order_number,
+                            'user_id' => $custid,
+                            'va_code' => $codeva,
+                            'status' => '1'
+                        );
+                        $this->payment->input_va($insertva);
+                    }
+                }
+            } else {
+                log_message('error', 'Data customer tidak ditemukan atau bukan array.');
+            }
 
             $this->load->view('header', $params);
             $this->load->view('orders/view', $order);
