@@ -34,7 +34,7 @@ class Shop extends CI_Controller
         $cart['cartaddons'] = $this->product->count_tmp_cart($cusids, $now)->result();
         $cart['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
 
-        if (level_user() < 3) {
+        if (level_user() >= 2) {
 
             $ongkir = $cart['ongkir'] = "0";
             $cart['member']          = is_member();
@@ -48,13 +48,15 @@ class Shop extends CI_Controller
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
             $this->load->view('footer');
-        } else {
+        } elseif (level_user() == 1) {
             $ongkir = $cart['ongkir'] = "0";
-            $cart['member']        = is_members();
+            $cart['member']          = 0;
             $cart['itm_cart']        = $this->product->get_tmp_cart($cusids, $now)->result();
+            $cart['total_price']     = $cart['total_cart'];
+            $cart['tmp_cart']        = $this->product->gettmpshop($cusids, $now)->result();
+            $cart['ongkirs']         = $this->product->getongkirs($cusids, $now)->result();
             $cart['profilecustomer'] = $this->product->getcustomer($cusids)->result();
-            $cart['total_price']     = $cart['total_cart'] + $ongkir;
-            $cart['profilecustomer'] = $this->product->getcustomer($cusids)->result();
+            $cart['sts_ongkir']      = $this->product->getstatusongkir($cusids, $now)->result();
 
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
@@ -271,10 +273,12 @@ class Shop extends CI_Controller
                     $ongkir         = 0;
                     $user_id        = $this->session->userdata('user_id');
                     $jasa_ongkir    = $this->product->getongkir_checkout($iduser, $now);
+                    $is_ongkir      = $this->product->is_ongkir($iduser);
 
                     $params['customer'] = $this->customer->data();
                     $params['subtotal'] = $subtotal;
                     $params['jasa_ongkir'] = $jasa_ongkir;
+                    $params['is_ongkir'] = $is_ongkir;
                     $params['total']    = $subtotal + $ongkir - $discount;
                     $params['discount'] = $disc;
                     $params['kdchart'] = $this->product->getkdchart($iduser);

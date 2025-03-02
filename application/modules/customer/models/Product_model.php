@@ -320,6 +320,16 @@ class Product_model extends CI_Model
         ")->result();
     }
 
+    public function is_ongkir($id)
+    {
+        return $this->db->query("SELECT
+        COUNT(a.id) as ongkir
+        FROM tbtestongkir a
+        WHERE a.idcustomer = '$id'
+        ")->result();
+    }
+
+
     public function getkdchart($id)
     {
         return $this->db->query("SELECT

@@ -143,10 +143,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
           </div>
         </div>
 
-        <?php foreach ($area as $a) : ?>
-          <?php if ($a->subdistrict_id == '0' && $member == '0') : ?>
+        <?php foreach ($area as $a) :
+          $subid = $a->subdistrict_id;
+        ?>
+          <?php if ($subid == '0') : ?>
             <a href="<?= base_url('profile') ?>" class="btn btn-warning" style="width: 98%; margin-bottom: 10px; margin-left: 12px;"> Verifikasi Alamat Terlebih dahulu</a>
-          <?php elseif ($a->subdistrict_id == '2203') : ?>
+            <!-- AREA TERCOVER -->
+          <?php elseif ($subid == '2201' || $subid == '2211' || $subid == '2227' || $subid == '2218' || $subid == '2214' || $subid == '2215' || $subid == '2208' || $subid == '2216' || $subid == '2203' || $subid == '2204' || $subid == '2219' || $subid == '2202' || $subid == '2231' || $subid == '2229' || $subid == '2222' || $subid == '2220') : ?>
             <div hidden>
               <form action="<?= base_url('checkout'); ?>" method="POST">
                 <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
@@ -170,191 +173,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   </div>
                 <?php endforeach; ?>
             </div>
-
             <?php foreach ($itm_cart as $itm) : ?>
               <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
             <?php endforeach; ?>
             <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
             </form>
-          <?php elseif ($a->subdistrict_id == '2207') : ?>
-            <div hidden>
-              <form action="<?= base_url('checkout'); ?>" method="POST">
-                <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
-                <?php foreach ($carts as $item) : ?>
-                  <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
-                    <div class="product-list media">
-                      <a href="#"><img src="<?php echo get_product_image($item['id']); ?>" alt="offer" /></a>
-                      <div class="media-body">
-                        <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
-                        <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
-                        <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
-                        <div class="plus-minus">
-                          <i class="subs" data-feather="minus"></i>
-                          <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
-                          <i class="adds" data-feather="plus"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-            </div>
-
-            <?php foreach ($itm_cart as $itm) : ?>
-              <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
-            <?php endforeach; ?>
-            <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
-            </form>
-          <?php elseif ($a->subdistrict_id == '2210') : ?>
-            <div hidden>
-              <form action="<?= base_url('checkout'); ?>" method="POST">
-                <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
-                <?php foreach ($carts as $item) : ?>
-                  <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
-                    <div class="product-list media">
-                      <a href="#"><img src="<?php echo get_product_image($item['id']); ?>" alt="offer" /></a>
-                      <div class="media-body">
-                        <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
-                        <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
-                        <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
-                        <div class="plus-minus">
-                          <i class="subs" data-feather="minus"></i>
-                          <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
-                          <i class="adds" data-feather="plus"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-            </div>
-
-            <?php foreach ($itm_cart as $itm) : ?>
-              <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
-            <?php endforeach; ?>
-            <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
-            </form>
-          <?php elseif ($a->subdistrict_id == '2212') : ?>
-            <div hidden>
-              <form action="<?= base_url('checkout'); ?>" method="POST">
-                <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
-                <?php foreach ($carts as $item) : ?>
-                  <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
-                    <div class="product-list media">
-                      <a href="#"><img src="<?php echo get_product_image($item['id']); ?>" alt="offer" /></a>
-                      <div class="media-body">
-                        <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
-                        <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
-                        <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
-                        <div class="plus-minus">
-                          <i class="subs" data-feather="minus"></i>
-                          <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
-                          <i class="adds" data-feather="plus"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-            </div>
-
-            <?php foreach ($itm_cart as $itm) : ?>
-              <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
-            <?php endforeach; ?>
-            <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
-            </form>
-          <?php elseif ($a->subdistrict_id == '2214') : ?>
-            <div hidden>
-              <form action="<?= base_url('checkout'); ?>" method="POST">
-                <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
-                <?php foreach ($carts as $item) : ?>
-                  <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
-                    <div class="product-list media">
-                      <a href="#"><img src="<?php echo get_product_image($item['id']); ?>" alt="offer" /></a>
-                      <div class="media-body">
-                        <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
-                        <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
-                        <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
-                        <div class="plus-minus">
-                          <i class="subs" data-feather="minus"></i>
-                          <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
-                          <i class="adds" data-feather="plus"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-            </div>
-
-            <?php foreach ($itm_cart as $itm) : ?>
-              <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
-            <?php endforeach; ?>
-            <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
-            </form>
-          <?php elseif ($a->subdistrict_id == '2213') : ?>
-            <div hidden>
-              <form action="<?= base_url('checkout'); ?>" method="POST">
-                <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
-                <?php foreach ($carts as $item) : ?>
-                  <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
-                    <div class="product-list media">
-                      <a href="#"><img src="<?php echo get_product_image($item['id']); ?>" alt="offer" /></a>
-                      <div class="media-body">
-                        <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
-                        <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
-                        <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
-                        <div class="plus-minus">
-                          <i class="subs" data-feather="minus"></i>
-                          <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
-                          <i class="adds" data-feather="plus"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-            </div>
-
-            <?php foreach ($itm_cart as $itm) : ?>
-              <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
-            <?php endforeach; ?>
-            <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
-            </form>
-          <?php elseif ($a->subdistrict_id == '2221') : ?>
-            <div hidden>
-              <form action="<?= base_url('checkout'); ?>" method="POST">
-                <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
-                <?php foreach ($carts as $item) : ?>
-                  <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
-                    <div class="product-list media">
-                      <a href="#"><img src="<?php echo get_product_image($item['id']); ?>" alt="offer" /></a>
-                      <div class="media-body">
-                        <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
-                        <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
-                        <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
-                        <div class="plus-minus">
-                          <i class="subs" data-feather="minus"></i>
-                          <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
-                          <i class="adds" data-feather="plus"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
-                    </div>
-                  </div>
-                <?php endforeach; ?>
-                <?php foreach ($itm_cart as $itm) : ?>
-                  <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
-                <?php endforeach; ?>
-                <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
-              </form>
-            </div>
           <?php else : ?>
             <?php foreach ($sts_ongkir as $st) : ?>
               <?php if ($st->sts_ongkir == '0') : ?>
@@ -443,30 +266,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       </div>
                     <?php endforeach; ?>
                 </div>
-                <!-- <div class="card cart-amount-area mb-2">
-                <div class="card-body  d-flex align-items-center justify-content-between">
-                  Biaya Pengiriman
-                  <h5 class="total-price  mb-0">Rp. 0</h5>
-                </div>
-              </div>
-              <div class="card cart-amount-area mb-3">
-                <div class="card-body d-flex align-items-center justify-content-between">
-                  Total <h5 class="total-price n-total mb-0">Rp.0</h5>
-                </div>
-              </div> -->
                 <?php foreach ($itm_cart as $itm) : ?>
                   <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart" hidden>
                 <?php endforeach; ?>
                 <button type="submit" class="btn btn-success" style="width: 98%; margin-bottom: 10px; margin-left: 12px;">checkout</button>
                 </form>
               <?php endif; ?>
-
-
-
-
             <?php endforeach; ?>
           <?php endif; ?>
         <?php endforeach; ?>
+
       </main>
     <?php endif; ?>
 
