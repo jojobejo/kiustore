@@ -387,8 +387,18 @@ class Order_model extends CI_Model
     public function is_order_exist($id)
     {
         $user_id = $this->user_id;
-
         return ($this->db->where(array('id' => $id, 'user_id' => $user_id))->get('orders')->num_rows() > 0) ? TRUE : FALSE;
+    }
+    public function is_ongkir_exist($kd)
+    {
+        $user_id = $this->user_id;
+        return $this->db->query("SELECT
+        COALESCE(a.jsongkir, 'Data tidak ada') AS ongkir_price 
+        FROM tbtestongkir a
+        WHERE a.kd_faktur = '$kd'
+        AND a.idcustomer  = '$user_id'
+        AND a.status 	 = '1'
+        ")->result();
     }
 
     public function order_data($id)

@@ -57,19 +57,21 @@ class Orders extends CI_Controller
     public function view($id = 0)
     {
         if ($this->order->is_order_exist($id)) {
-            $data = $this->order->order_data($id);
-            $items = $this->order->order_items($id);
-            $banks = json_decode(get_settings('payment_banks'));
-            $banks = (array) $banks;
-            $cusid = get_current_user_id();
+            $data   = $this->order->order_data($id);
+            $items  = $this->order->order_items($id);
+            $banks  = json_decode(get_settings('payment_banks'));
+            $banks  = (array) $banks;
+            $cusid  = get_current_user_id();
+            $now        = date('Y-m-d');
+            $kdfaktur   = $this->order->order_items($data->kd_faktur, $now);
 
             $params['title'] = 'Order #' . $data->order_number;
-
             $order['data'] = $data;
             $order['items'] = $items;
-            $order['delivery_data'] = json_decode($data->delivery_data);
             $order['banks'] = $banks;
+            $order['delivery_data'] = json_decode($data->delivery_data);
             $order['customer'] = $this->order->get_data_customer($cusid);
+            $order['is_ongkir'] = $this->order->is_ongkir_exist($data->kd_faktur);
 
             $vacode = $this->order->get_data_customer($cusid);
 

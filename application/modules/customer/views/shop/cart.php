@@ -197,10 +197,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <option value="jne">JNE</option>
                         <option value="pos">POS INDONESIA</option>
                         <option value="tiki">TIKI</option>
-                        <option value="j&t">J&T</option>
-                        <option value="SICEPAT">SICEPAT</option>
-                        <option value="ANTERAJA">ANTERAJA</option>
-                        <option value="KARISMA">KARISMA</option>
                       </select>
                       <button class="btn btn-block btn-primary mt-2" style="width: 100%;">CEK ONGKIR</button>
                     </form>

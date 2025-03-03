@@ -82,27 +82,41 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <span>Rp <?php echo format_rupiah($data->total_belanja); ?></span>
                 </li>
             <?php endif; ?>
-            <li>
-                <span>Ekspedisi</span>
-                <span>Rp <?php echo format_rupiah($data->shipping_cost); ?></span>
-            </li>
+
+            <?php foreach ($is_ongkir as $o) :
+                $jsongkir = explode(';', $o->ongkir_price); ?>
+                <?php if ($o->ongkir_price == '0') : ?>
+                    <li>
+                        <span>Ekspedisi</span>
+                        <span>Rp <?php echo format_rupiah($data->shipping_cost); ?></span>
+                    </li>
+
+                <?php else : ?>
+                    <li>
+                        <span>Ekspedisi</span>
+                        <span>Rp <?php echo format_rupiah($jsongkir['2']); ?></span>
+                    </li>
+                <?php endif; ?>
+            <?php endforeach; ?>
+
             <li>
                 <span>Asuransi</span>
                 <span>Rp <?php echo format_rupiah($data->insurance); ?></span>
             </li>
-            <?php
-            $final_price = $data->insurance + $data->shipping_cost + $data->total_belanja;
+            <?php foreach ($is_ongkir as $o) :
+                $jsongkir = explode(';', $o->ongkir_price);
+                $final_price = $data->insurance + $data->shipping_cost + $data->total_belanja + $jsongkir['2'];
             ?>
+            <?php endforeach; ?>
             <li>
                 <span>Total Keseluruhan</span>
                 <span class="font-theme">Rp <?php echo format_rupiah($final_price); ?></span>
             </li>
-
             <li>
                 <span>Pembayaran</span>
                 <span>
                     <?php echo ($data->payment_method == 1) ? 'Kredit' : ''; ?>
-                    <?php echo ($data->payment_method == 2) ? 'Transfer Bank' : ''; ?>
+                    <?php echo ($data->payment_method == 2) ? 'Virtual Account Karisma' : ''; ?>
                 </span>
             </li>
 
