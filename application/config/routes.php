@@ -56,7 +56,6 @@ $route['translate_uri_dashes'] = FALSE;
 
 $route['dashboard_admin'] = 'admin/dashboard';
 $route['admin'] = 'admin/admin';
-
 $route['send_admin_message'] = 'admin/messages/send';
 $route['generate_va'] = 'admin/customers/generate_va';
 
@@ -69,8 +68,7 @@ $route['cartongkir'] = 'customer/addons/addoncart/cart';
 
 $route['customer'] = 'customer/customer';
 $route['profile'] = 'customer/profile';
-$route['cus_edit_customer/(:any)'] = 'customer/profile/cus_editdata/$1';
-$route['sv_alamatcus'] = 'customer/profile/';
+$route['alamat_coba'] = 'customer/profile/cusalamat';
 $route['change_alamat_customer_profile'] = 'customer/profile/change_alamat_asal';
 $route['message'] = 'customer/message';
 $route['send_message'] = 'customer/message/send';
@@ -95,22 +93,20 @@ $route['checkout'] = 'customer/shop/checkout';
 $route['checkout_submit'] = 'customer/shop/checkout/order';
 
 $route['admin/ongkir'] = 'admin/ongkir';
+
 $route['admin/apibriva'] = 'admin/api_payment_briva';
 
 // COBA
 $route['readonlychange'] = 'customer/profile/toggle_readonly';
 $route['inputlocation'] = 'customer/profile/inputlocation';
+
 $route['get_provinces'] = 'customer/profile/get_provinces';
 
 // RAJAONGKIR 
+
 $route['rajaongkir'] = 'customer/rajaongkir';
+
 $route['rajaongkir/get_provinces'] = 'customer/rajaongkir/get_provinces';
 $route['rajaongkir/get_cities'] = 'customer/rajaongkir/get_cities';
 $route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
 $route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
-
-// BRI VA
-$route['admin/brivaws'] = 'admin/brivawsapi';
-
-$route['get_token'] = 'admin/Brivawsapi/get_token';
-$route['create_va'] = 'admin/Brivawsapi/create_va';

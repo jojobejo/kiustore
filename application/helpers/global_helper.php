@@ -391,8 +391,6 @@ if (!function_exists('get_order_status')) {
             return '<span class="badge bg-danger">Dibatalkan</span>';
         else if ($status == 8)
             return '<span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span>';
-        else if ($status == 9)
-            return '<span class="badge bg-warning">Dalam Pengajuan Kredit</span>';
     }
 }
 
@@ -415,8 +413,6 @@ if (!function_exists('get_payment_methods')) {
             return '<span class="badge bg-danger">Dibatalkan</span>';
         else if ($payment == 8)
             return '<span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span>';
-        else if ($payment == 9)
-            return '<span class="badge bg-warning">Dalam Pengajuan Kredit</span>';
     }
 }
 

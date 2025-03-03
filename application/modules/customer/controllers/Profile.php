@@ -16,13 +16,48 @@ class Profile extends CI_Controller
         $this->load->library('form_validation');
     }
 
+    public $api_key = "197f7e1329685d3ed9d1468c54efc9dd";
+
     public function index()
     {
         $data = $this->profile->get_profile();
+        $loc = $this->profile->detail_loc();
 
         $params['title']    = $data->name;
         $user['user']       = $data;
+        $user['user_loc']   = $loc;
         $user['flash']      = $this->session->flashdata('profile');
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://pro.rajaongkir.com/api/province",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "content-type: application/x-www-form-urlencoded",
+                "key:" . $this->api_key,
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            $user['kota'] = array('error' => true);
+        } else {
+            // DATA AWAL
+            $data = $this->profile->get_profile();
+            $params['title'] = $data->name;
+            // JSON-RAJA-ONGKIR
+            $user['kota'] = json_decode($response);
+        }
 
         $this->load->view('header', $params);
         $this->load->view('profile', $user);
@@ -72,50 +107,19 @@ class Profile extends CI_Controller
         }
     }
 
-    public function cus_editdata($action)
+    public function cusalamat()
     {
-        $id = $action;
-        // 1 = verifikasi alamat
-        // 2 = edit profile 
-        // 3 = save alamat - customer  
+        $data = $this->profile->get_profile();
+        $loc = $this->profile->detail_loc();
 
-        switch ($id) {
-            case '1':
-                $data = $this->profile->get_profile();
+        $params['title']    = $data->name;
+        $user['user']       = $data;
+        $user['user_loc']   = $loc;
+        $user['flash']      = $this->session->flashdata('profile');
 
-                $params['title']    = $data->name;
-                $user['user']       = $data;
-                $user['action']     = $id;
-                $user['flash']      = $this->session->flashdata('profile');
-
-                $this->load->view('header', $params);
-                $this->load->view('profile_edit', $user);
-                $this->load->view('footer');
-                break;
-            case '2':
-
-                break;
-            case '3':
-
-                $pro_id = $this->input->post('pro_id');
-                $kab_id = $this->input->post('kab_id');
-                $kec_id = $this->input->post('kec_id');
-                $data = array(
-                    'province_id'    => $pro_id,
-                    'kota_id'        => $kab_id,
-                    'subdistrict_id' => $kec_id
-                );
-
-                $update = $this->profile->update($data);
-
-                if ($update) {
-                    echo json_encode(['status' => 'success', 'message' => 'Alamat berhasil diperbarui!']);
-                } else {
-                    echo json_encode(['status' => 'error', 'message' => 'Gagal memperbarui alamat!']);
-                }
-
-                break;
-        }
+        $this->load->view('header', $params);
+        $this->load->view('profilebk_rajaongkir', $user);
+        $this->load->view('footer');
     }
 
     public function change_alamat_asal()

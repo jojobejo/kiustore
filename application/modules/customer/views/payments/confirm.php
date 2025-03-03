@@ -16,7 +16,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div>
             <div class="mb-3">
                 <div class="title mb-2"><span>Virtual Account - Payment</span></div>
-                <input type="text" class="form-control" readonly value="<?= $customer->vacode ?>">
+                <input type="text" class="form-control" readonly value="<?= $customer->va_code ?>">
             </div>
             <div class="mb-3">
                 <div class="title mb-2"><span>Cara Pembayaran</span></div>

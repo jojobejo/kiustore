@@ -10,8 +10,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div>
             <div class="media-body">
                 <h2 class="title-color"><?php echo get_user_name(); ?></h2>
+                <!--  <span class="content-color font-md">Batas Kredit : <?php echo get_user_max_credit(); ?></span> -->
                 <span class="content-color font-md">
-                    <a href="<?= base_url('cus_edit_customer') ?>" class="btn btn-sm btn-warning mt-2 mb-2 w-100"><i class="fas fa-pencil-alt"></i></a>
+                    <button type="button" id="toggleReadonly" class="btn btn-sm btn-warning"><i class="fas fa-pencil-alt"></i></button>
+                    <a href="<?= base_url('alamat_coba') ?>" class="btn btn-primary w-100">COBA</a>
                 </span>
             </div>
         </div>
@@ -30,21 +32,37 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <i data-feather="at-sign"></i>
         <input class="form-control" type="email" id="inputEmail" value="<?php echo set_value('name', $user->email); ?>" disabled readonly>
     </div>
-    <div class="input-box">
-        <div class="title mb-2"><i class="lni lni-map-marker"></i><span class="badge bg-danger">Nama Toko</span></div>
-        <input class="form-control" type="text" id="inputAddr" name="shop_name" value="<?php echo set_value('name', $user->shop_name); ?>" readonly>
-    </div>
 
-    <?php if ($user->province_id == '0') :  ?>
+    <?php if ($user_loc->loc_sts == '0') : ?>
 
-        <a href="<?= base_url('cus_edit_customer/1') ?>" class="btn btn-warning w-100">Verifikasi Alamat</a>
+        <div class="input-box mb-2">
+            <select name="city" id="city" class="form-control provinsi input-lg">
+                <?php foreach ($kota->rajaongkir->results as $k) : ?>
+                    <option value="<?= $k->province_id ?>"><?= $k->province ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <!-- <a href="<?= base_url('change_alamat_customer_profile') ?>" class="btn btn-md btn-primary"></a> -->
+
+        <div id="formlocation" style="display: none;">
+            <div class="input-box">
+                <div class="title mb-2"><i class="lni lni-map-marker"></i><span class="badge bg-danger">Alamat Rumah</span></div>
+                <input class="form-control" type="text" id="inputAddr" name="address" value="<?php echo set_value('name', $user->address); ?>">
+            </div>
+            <button class="btn btn-primary mt-2" id="submitBtn" style="display: none;">Submit</button>
+        </div>
+
 
     <?php else : ?>
         <div class="input-box">
             <div class="title mb-2"><i class="lni lni-map-marker"></i><span class="badge bg-danger">Alamat Rumah</span></div>
             <input class="form-control" type="text" id="inputAddr" name="address" value="<?php echo set_value('name', $user->address); ?>">
         </div>
-
+        <div class="input-box">
+            <div class="title mb-2"><i class="lni lni-map-marker"></i><span class="badge bg-danger">Nama Toko</span></div>
+            <input class="form-control" type="text" id="inputAddr" name="shop_name" value="<?php echo set_value('name', $user->shop_name); ?>">
+        </div>
         <div class="input-box">
             <div class="title mb-2"><i class="lni lni-map-marker"></i><span class="badge bg-danger">Alamat Toko / Alamat pengiriman</span></div>
             <input class="form-control" type="text" id="inputAddr" name="shop_address" value="<?php echo set_value('name', $user->shop_address); ?>">
@@ -64,6 +82,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
     </div>
 
+
     <?php if ($flash) : ?>
         <p class="text-center text-success"><?php echo $flash; ?></p>
     <?php endif; ?>
@@ -71,3 +90,71 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <!-- Form Section End -->
 </main>
 <!-- Main End -->
+
+<script>
+    $(document).ready(function() {
+        $("#toggleReadonly").click(function() {
+            var isReadonly = $("#inputName").prop("readonly") ? 0 : 1;
+
+            $.ajax({
+                url: "<?= site_url('readonlychange') ?>",
+                type: "POST",
+                data: {
+                    readonly: isReadonly
+                },
+                success: function(response) {
+                    // Toggle readonly pada semua input text dan email
+                    $("input[type='text'], input[type='email']").each(function() {
+                        $(this).prop("readonly", isReadonly);
+                    });
+
+                    // Jika readonly dimatikan, sembunyikan tombol toggle dan tampilkan tombol baru
+                    if (isReadonly === 0) {
+                        $("#toggleReadonly").hide();
+                        $("#newButton").show();
+                        $("#newButtonclose").show();
+                    }
+                }
+            });
+        });
+
+        $('#provinsi').select2({
+            placeholder: "Pilih Provinsi",
+        });
+
+        $('#inptalamat').click(function() {
+            $('#formlocation').toggle();
+        });
+
+        $('#inputAddr').on('input', function() {
+            if ($(this).val().trim() !== '') {
+                $('#submitBtn').show();
+                $('#inptalamat').hide();
+            } else if ($(this).val().trim() == '') {
+                $('#inptalamat').show();
+                $('#submitBtn').hide();
+            } else {
+                $('#submitBtn').hide();
+            }
+
+        });
+
+        $('#submitBtn').click(function() {
+            var address = $('#inputAddr').val();
+            $.ajax({
+                url: "<?php echo base_url('controller/method'); ?>", // Ganti dengan URL controller yang sesuai
+                type: "POST",
+                data: {
+                    address: address
+                },
+                success: function(response) {
+                    alert("Alamat berhasil disimpan!");
+                },
+                error: function() {
+                    alert("Terjadi kesalahan, coba lagi.");
+                }
+            });
+        });
+
+    });
+</script>

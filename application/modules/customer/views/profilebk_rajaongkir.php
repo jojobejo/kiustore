@@ -70,7 +70,7 @@
     $(document).ready(function() {
         // Inisialisasi Select2 dengan tema Bootstrap 5
         $('.select2').select2({
-            theme: 'bootstrap-5',
+            theme: 'bootstrap-4',
             placeholder: "Pilih opsi",
             allowClear: true
         });
@@ -80,7 +80,7 @@
             $.get("<?= base_url('rajaongkir/get_provinces') ?>", function(data) {
                 $('#province').html('<option value="">Pilih Provinsi</option>');
                 $.each(JSON.parse(data), function(i, prov) {
-                    $('#province').append('<option value="' + prov.province_id + '">' + prov.province + '</option>');
+                    $('#province').append('<option value="'+ prov.province_id +'">'+ prov.province +'</option>');
                 });
             });
         }
@@ -90,11 +90,9 @@
             let province_id = $(this).val();
             $('#city, #subdistrict').html('<option value="">Pilih</option>');
             if (province_id) {
-                $.get("<?= base_url('rajaongkir/get_cities') ?>", {
-                    province_id
-                }, function(data) {
+                $.get("<?= base_url('rajaongkir/get_cities') ?>", {province_id}, function(data) {
                     $.each(JSON.parse(data), function(i, city) {
-                        $('#city').append('<option value="' + city.city_id + '">' + city.type + ' ' + city.city_name + '</option>');
+                        $('#city').append('<option value="'+ city.city_id +'">'+ city.type + ' ' + city.city_name +'</option>');
                     });
                 });
             }
@@ -105,44 +103,30 @@
             let city_id = $(this).val();
             $('#subdistrict').html('<option value="">Pilih</option>');
             if (city_id) {
-                $.get("<?= base_url('rajaongkir/get_subdistricts') ?>", {
-                    city_id
-                }, function(data) {
+                $.get("<?= base_url('rajaongkir/get_subdistricts') ?>", {city_id}, function(data) {
                     $.each(JSON.parse(data), function(i, subdistrict) {
-                        $('#subdistrict').append('<option value="' + subdistrict.subdistrict_id + '">' + subdistrict.subdistrict_name + '</option>');
+                        $('#subdistrict').append('<option value="'+ subdistrict.subdistrict_id +'">'+ subdistrict.subdistrict_name +'</option>');
                     });
                 });
             }
         });
 
+        // Cek biaya pengiriman
         $('#check_shipping').click(function() {
-            let origin = 106; // ID Kecamatan Pengirim (sesuaikan)
+            let origin = 501; // ID Kecamatan Pengirim (sesuaikan)
             let destination = $('#subdistrict').val();
             let weight = $('#weight').val();
             let courier = $('#courier').val();
 
-            $.post("<?= base_url('rajaongkir/get_shipping_cost') ?>", {
-                    origin,
-                    destination,
-                    weight,
-                    courier
-                }, function(data) {
-                    $('#shipping_result').html('');
-
-                    if (data.length === 0) {
-                        $('#shipping_result').html('<p>Tidak ada data ongkir tersedia.</p>');
-                        return;
-                    }
-
-                    $.each(data, function(i, result) {
-                        $.each(result.costs, function(j, cost) {
-                            $('#shipping_result').append('<p><strong>' + cost.service + '</strong>: Rp ' + cost.cost[0].value.toLocaleString() + ' (' + cost.cost[0].etd + ' hari)</p>');
-                        });
+            $.post("<?= base_url('rajaongkir/get_shipping_cost') ?>", {origin, destination, weight, courier}, function(data) {
+                let results = JSON.parse(data);
+                $('#shipping_result').html('');
+                $.each(results, function(i, result) {
+                    $.each(result.costs, function(j, cost) {
+                        $('#shipping_result').append('<p><strong>' + cost.service + '</strong>: Rp ' + cost.cost[0].value + ' (' + cost.cost[0].etd + ' hari)</p>');
                     });
-                }, 'json')
-                .fail(function() {
-                    $('#shipping_result').html('<p>Error mengambil data ongkir.</p>');
                 });
+            });
         });
 
         loadProvinces();
