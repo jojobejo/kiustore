@@ -5,6 +5,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <main class="main-wrap cart-page mb-xxl">
     <!-- Checkout Wrapper-->
     <form action="<?php echo site_url('ongkir'); ?>" method="POST">
+
         <div class="checkout-wrapper-area py-3">
             <!-- Billing Address-->
             <div class="billing-information-card mb-3">
@@ -20,20 +21,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <input type="text" name="name" value="<?php echo $customer->shop_address; ?> , <?= $ckongkir->rajaongkir->origin_details->city_name ?>,<?= $ckongkir->rajaongkir->destination_details->province ?>" class="form-control" id="name" required readonly>
                         </div>
                     </div>
+
                     <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Berat Total</label>
                             <input type="text" name="name" value="<?= ($ckongkir->rajaongkir->query->weight / 1000) ?>" class="form-control" id="name" required readonly>
                         </div>
                     </div>
+
                     <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Jasa Yang Digunakan</label>
                             <input type="text" name="name" value="<?= $ckongkir->rajaongkir->results[0]->code ?> - <?= $ckongkir->rajaongkir->results[0]->name ?>" class="form-control" id="name" required readonly>
                         </div>
                     </div>
-
-                    <div class="card-body">
+                    <?php if (!empty($ckongkir->rajaongkir->results[0]->costs)) : ?>
+                        <?php foreach ($ckongkir->rajaongkir->results[0]->costs as $result) : ?>
+                        <?php endforeach; ?>
+                    <?php else : ?>
+                    <?php endif; ?>
+                    <!-- <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Jasa Yang Digunakan</label>
                             <select name="jasaongkir" id="jasaongkir" class="form-control">
@@ -50,7 +57,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <input type="text" name="kdfaktur" id="kdfaktur" value="<?= $itm->kdchart ?>" hidden>
                             <?php endforeach; ?>
                         </div>
-                    </div>
+                    </div> -->
+
                 </div>
             </div>
             <!-- Cart Amount Area-->

@@ -93,15 +93,16 @@ class Shop extends CI_Controller
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
-
         curl_close($curl);
 
         if ($err) {
             $data['ckongkir'] = array('error' => true);
         } else {
+
             $data['ckongkir'] = json_decode($response);
             $data['customer'] = $this->customer->data();
             $data['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
+            echo json_encode($data['ckongkir'], JSON_PRETTY_PRINT);
         }
 
         $this->load->view('header');
