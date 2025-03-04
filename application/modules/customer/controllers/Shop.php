@@ -102,7 +102,6 @@ class Shop extends CI_Controller
             $data['ckongkir'] = json_decode($response);
             $data['customer'] = $this->customer->data();
             $data['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
-            echo json_encode($data['ckongkir'], JSON_PRETTY_PRINT);
         }
 
         $this->load->view('header');
