@@ -15,6 +15,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </div>
                 </div>
                 <div class="card user-data-card">
+
                     <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Alamat Lengkap</label>
@@ -57,6 +58,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
                     <?php else : ?>
                     <?php endif; ?>
+                    
                 </div>
             </div>
             <!-- Cart Amount Area-->
