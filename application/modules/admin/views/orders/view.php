@@ -129,7 +129,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <input type="hidden" value="<?php echo $item->order_qty; ?>" name="qty[]">
                         <?php if ($data->order_status == 9) : ?>
                           <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]">
-                        <?php elseif ($data->order_status != 1) : ?>
+                        <?php elseif ($data->order_status == 1) : ?>
+                          <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]">
+                        <?php else : ?>
                           <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]" readonly>
                         <?php endif; ?>
                       </td>

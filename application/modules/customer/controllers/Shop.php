@@ -299,10 +299,10 @@ class Shop extends CI_Controller
                     $this->load->view('footer');
                 }
                 break;
+
             case 'order':
 
                 $quantity   = $this->session->userdata('order_quantity');
-
                 $user_id    = get_current_user_id();
                 $coupon_id  = $this->session->userdata('coupon_id');
                 $order_date = date('Y-m-d H:i:s');
