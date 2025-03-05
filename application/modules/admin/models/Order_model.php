@@ -995,7 +995,7 @@ class Order_model extends CI_Model
             ON c.id = o.coupon_id
         LEFT JOIN payments p
             ON p.order_id = o.id
-            JOIN tbtestongkir ongs
+        LEFT JOIN tbtestongkir ongs
             ON ongs.kd_faktur = o.kd_faktur
         WHERE o.id = '$id'
 

@@ -72,6 +72,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="input-box col-6">
+                                            <input type="text" value="KARISMA" name="jns_shipping" id="jns_shipping" hidden>
                                             <input id="karisma" name="shipping" type="radio" value="1" checked>
                                             <label for="karisma">PT. Karisma Indoagro Universal</label>
                                             <div class="check"></div>
@@ -140,7 +141,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <div class="card-body d-flex align-items-center justify-content-between">
                         <!--    <h5 class="total-price mb-0">Rp <?php echo format_rupiah($total); ?></h5> -->
                         <input type="text" name="usrid" id="usrid" class="btn btn-warning" value="<?= $this->session->userdata('user_id') ?>" hidden>
-                        <input type="submit" class="btn btn-warning" value="Buat Pesanan">
+                        <input type="submit" class="btn btn-warning w-100" value="Buat Pesanan">
                     </div>
                 </div>
             </div>

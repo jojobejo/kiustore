@@ -66,12 +66,17 @@ class Shop extends CI_Controller
 
     public function cekongkir()
     {
-        $kiu        = $this->input->post('kiu');
-        $kec        = $this->input->post('subdis');
-        $berat      = $this->input->post('berat');
-        $expedisi   = $this->input->post('kurir');
-        $cusids     = $this->session->userdata('user_id');
-        $now        = date('Y-m-d');
+        $kiu            = $this->input->post('kiu');
+        $kec            = $this->input->post('subdis');
+        $expedisi       = $this->input->post('kurir');
+        $cusids         = $this->session->userdata('user_id');
+        $now            = date('Y-m-d');
+        $cart           = $this->cart->contents();
+        $total_weight   = 0;
+
+        foreach ($cart as $item) {
+            $total_weight += $item['product_weight'] * $item['qty'];
+        }
 
         $curl = curl_init();
 
@@ -83,7 +88,7 @@ class Shop extends CI_Controller
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "origin=" . $kiu . "&originType=city&destination=" . $kec . "&destinationType=subdistrict&weight=" . $berat . "&courier=" . $expedisi,
+            CURLOPT_POSTFIELDS => "origin=" . $kiu . "&originType=city&destination=" . $kec . "&destinationType=subdistrict&weight=" . $total_weight . "&courier=" . $expedisi,
 
             CURLOPT_HTTPHEADER => array(
                 "content-type: application/x-www-form-urlencoded",
@@ -99,8 +104,9 @@ class Shop extends CI_Controller
             $data['ckongkir'] = array('error' => true);
         } else {
 
-            $data['ckongkir'] = json_decode($response);
-            $data['customer'] = $this->customer->data();
+            $data['ckongkir']   = json_decode($response);
+            $data['customer']   = $this->customer->data();
+            $data['weight']     = $total_weight;
             $data['itm_cart']   = $this->product->get_tmp_cart($cusids, $now)->result();
         }
 
@@ -484,7 +490,7 @@ class Shop extends CI_Controller
                             'coupon_id' => $coupon_id,
                             'order_number' => $order_number,
                             'kd_faktur' => $kdfaktur,
-                            'order_status' => 1,
+                            'order_status' => 2,
                             'order_date' => $order_date,
                             'total_price' => $total_price,
                             'total_items' => count($quantity),
@@ -492,7 +498,7 @@ class Shop extends CI_Controller
                             'shipping_method' => $shipping,
                             'delivery_data' => $delivery_data,
                             'due_date' => $due_date,
-                            'jenis_pengiriman' => 89,
+                            'jenis_pengiriman' => $jnkirim,
                             'estimasi_kirim' => 0,
                             'shipping_cost' => 0
                         );
@@ -526,6 +532,11 @@ class Shop extends CI_Controller
                             'status'        => '1'
                         );
 
+                        $updatesongkir = array(
+                            'status'    => '3'
+                        );
+                        $now = date('Y-m-d');
+                        $this->product->stsongkir($user_id, $now, $updatesongkir);
                         $this->product->create_order_items($items);
                         $this->payment->input_va($datava);
                         $this->product->removechartall($kdfaktur);
@@ -629,13 +640,13 @@ class Shop extends CI_Controller
                 $now    = date('Y-m-d');
 
                 if ($satuan == 1) {
-                    $price = $this->input->post('price');
-                    $qty_pcs = $qty;
-                    $weight = $product_weight * $qty;
+                    $price      = $this->input->post('price');
+                    $qty_pcs    = $qty;
+                    $weight     = $product_weight * $qty_pcs;
                 } else {
                     $price      = $this->input->post('price') * $this->input->post('satuan_qty');
                     $qty_pcs    = $qty * $satuan_qty;
-                    $weight     = $product_weight * $qty;
+                    $weight     = $product_weight * $qty_pcs;
                 }
 
                 // TOTAL PRICE
@@ -693,7 +704,7 @@ class Shop extends CI_Controller
 
                     $response = array('code' => 200, 'message' => 'Item dimasukkan dalam keranjang', 'total_item' => $total_item);
                 } else {
-                    $response = array('code' => 202, 'message' => 'Gagal memasukkan dalam keranjang. Stok barang hanya ' . $satuan_qty . ' ' . $qty);
+                    $response = array('code' => 202, 'message' => 'Gagal memasukkan dalam keranjang. Stok Tidak Tersedia , Hubungi Admin Sales Anda');
                 }
 
                 break;

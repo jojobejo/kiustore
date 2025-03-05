@@ -195,7 +195,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <td>Ongkir</td>
                     <td>
                       <input type="text" value="<?php echo $data->shipping_cost; ?>" class="form-control form-control-sm" name="shipping_cost">
-                      <input type="text" value="<?php echo $data->shipping_cost; ?>" class="form-control form-control-sm" name="shipping_cost">
                     </td>
                   </tr>
                   <tr>

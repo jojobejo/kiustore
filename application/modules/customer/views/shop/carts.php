@@ -26,7 +26,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <div class="card-body">
                         <div class="">
                             <label for="exampleFormControlInput1" class="form-label">Berat Total</label>
-                            <input type="text" name="name" value="<?= ($ckongkir->rajaongkir->query->weight / 1000) ?>" class="form-control" id="name" required readonly>Kg
+                            <input type="text" name="name" value="<?= ($weight / 1000) ?>" class="form-control" id="name" required readonly>
                         </div>
                     </div>
 
@@ -58,7 +58,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
                     <?php else : ?>
                     <?php endif; ?>
-                    
+
                 </div>
             </div>
             <!-- Cart Amount Area-->

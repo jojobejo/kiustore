@@ -105,13 +105,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </li>
             <?php foreach ($is_ongkir as $o) :
                 $jsongkir = explode(';', $o->ongkir_price);
-                $final_price = $data->insurance + $data->shipping_cost + $data->total_belanja + $jsongkir['2'];
+                $final_price = 0;
+                $ongkir_value = isset($jsongkir[2]) ? $jsongkir[2] : 0;
+                $final_price = $data->insurance + $data->shipping_cost + $data->total_belanja + $ongkir_value;
             ?>
+
+                <li>
+                    <span>Total Keseluruhan</span>
+                    <span class="font-theme">Rp <?php echo format_rupiah($final_price); ?></span>
+                </li>
             <?php endforeach; ?>
-            <li>
-                <span>Total Keseluruhan</span>
-                <span class="font-theme">Rp <?php echo format_rupiah($final_price); ?></span>
-            </li>
             <li>
                 <span>Pembayaran</span>
                 <span>
