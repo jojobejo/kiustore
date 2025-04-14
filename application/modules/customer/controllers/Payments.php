@@ -69,8 +69,8 @@ class Payments extends CI_Controller
 
     public function confirm()
     {
-        $order_id = $this->input->get('order');
-        $cusid  = $this->session->userdata('user_id');
+        $order_id   = $this->input->get('order');
+        $cusid      = $this->session->userdata('user_id');
 
         $params['title'] = 'Konfirmasi Pembayaran';
 

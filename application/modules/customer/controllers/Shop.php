@@ -478,8 +478,9 @@ class Shop extends CI_Controller
                             'status'        => '1'
                         );
 
-                        $this->product->create_order_items($items);
                         $this->payment->input_va($datava);
+
+                        $this->product->create_order_items($items);
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);
                     } elseif (is_member() == '0') {
