@@ -1,0 +1,10 @@
+CATATAN PENTING
+
+
+1. EXTERNAL-ID pada header HARUS BERBEDA
+
+
+
+
+"customerNo": "8982264054709",
+        "virtualAccountNo": "   911188982264054709",

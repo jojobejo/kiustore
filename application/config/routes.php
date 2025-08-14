@@ -110,7 +110,9 @@ $route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
 $route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
 
 // BRI VA
-$route['admin/brivaws'] = 'admin/brivawsapi';
+$route['admin/brivaws'] = 'admin/Brivawsapi';
 
 $route['get_token'] = 'admin/Brivawsapi/get_token';
 $route['create_va'] = 'admin/Brivawsapi/create_va';
+
+$route['brivaws']   = 'admin/Brivawsapi/create_va';
