@@ -1,10 +1,5 @@
-CATATAN PENTING
-
-
-1. EXTERNAL-ID pada header HARUS BERBEDA
-
-
-
-
-"customerNo": "8982264054709",
-        "virtualAccountNo": "   911188982264054709",
+TODO : 
+1. fungsi get token (V)
+2. random external-id (X)
+3. token expired 15 Menit (V)
+4. masukan logika ongkir (X)
