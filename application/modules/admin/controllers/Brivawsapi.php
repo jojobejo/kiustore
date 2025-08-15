@@ -7,19 +7,14 @@ class Brivawsapi extends CI_Controller
     private $client_id;
     private $url;
     private $privateKey;
-    private $secret_key;
-    private $xPartnerId = 'kuionline';
-    private $partnerServiceId = '22123';
-    private $customerNo = '00218322';
-    private $idcus = '111';
 
     public function __construct()
     {
         parent::__construct();
-        $this->client_id    = 'APRGrJBHviW0cLSKZlJDZ4AHXXW9JAki';
+        $this->client_id    = 'RVGRlE9qZ6JWXo15soVDmWGJHwyXZIw6';
         $this->privateKey   = file_get_contents(FCPATH . 'key/private.pem');
-        $this->url          = 'https://sandbox.partner.api.bri.co.id';
-        $this->secret_key   = 'oSsY5SM5svjj2mY9';
+        $this->url          = 'https://partner.api.bri.co.id';
+        $this->secret_key   = 'FLnBAZ5Di1I5GqfS';
     }
 
     private function asymmetricSignature($client_id, $timestamp)
@@ -47,7 +42,7 @@ class Brivawsapi extends CI_Controller
             $timestamp
         ]);
 
-        $signature = hash_hmac('sha512', $stringToSign, $client_secret, true);
+        $signature = hash_hmac('sha512', $stringToSign, true);
 
         return base64_encode($signature);
     }
@@ -58,9 +53,9 @@ class Brivawsapi extends CI_Controller
         $fullurl = $this->url . $patch;
         $method = 'POST';
         $timestamp  = gmdate('Y-m-d\TH:i:s.000\Z');
-        $cust = '102030';
-
+        // $cust = '102030';
         // Ambil access token
+
         $token_response = $this->get_token();
         $token_data = json_decode($token_response, true);
 
@@ -129,7 +124,6 @@ class Brivawsapi extends CI_Controller
 
         $createva = json_decode($response, true);
 
-        // Response handling lebih rapi
         if ($httpCode == 200 && isset($createva['virtualAccountNo'])) {
             return json_encode([
                 "status" => "success",
@@ -144,25 +138,24 @@ class Brivawsapi extends CI_Controller
                 "response" => $createva
             ], JSON_PRETTY_PRINT);
         }
+        if (isset($token_data['status']) && $token_data['status'] === 'success') {
+            $access_token = $token_data['access_token'];
+
+            $response = [
+                "status" => "success",
+                "message" => "Virtual Account berhasil dibuat",
+                "access_token" => $access_token
+            ];
+        } else {
+            $response = [
+                "status" => "error",
+                "message" => "Gagal membuat Virtual Account, tidak bisa mendapatkan access token",
+                "error_detail" => $token_data
+            ];
+        }
+        header('Content-Type: application/json');
+        echo json_encode($response, JSON_PRETTY_PRINT);
     }
-
-    // if (isset($token_data['status']) && $token_data['status'] === 'success') {
-    //         $access_token = $token_data['access_token'];
-
-    //         $response = [
-    //             "status" => "success",
-    //             "message" => "Virtual Account berhasil dibuat",
-    //             "access_token" => $access_token
-    //         ];
-    //     } else {
-    //         $response = [
-    //             "status" => "error",
-    //             "message" => "Gagal membuat Virtual Account, tidak bisa mendapatkan access token",
-    //             "error_detail" => $token_data
-    //         ];
-    //     }
-    //     header('Content-Type: application/json');
-    //     echo json_encode($response, JSON_PRETTY_PRINT);
 
     public function get_token()
     {
@@ -170,6 +163,8 @@ class Brivawsapi extends CI_Controller
         $patch      = '/snap/v1.0/access-token/b2b';
         $fullurl    = $this->url . $patch;
         $timestamp  = gmdate('Y-m-d\TH:i:s.000\Z');
+        $body = array();
+        $body = json_encode(['grantType' => 'client_credentials']);
 
         $signature = $this->asymmetricSignature($clientid, $timestamp);
 

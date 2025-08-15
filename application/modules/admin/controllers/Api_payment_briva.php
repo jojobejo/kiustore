@@ -3,42 +3,34 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class api_payment_briva extends CI_Controller
 {
+    private $client_id;
+    private $url;
+    private $privateKey;
 
     public function __construct()
     {
         parent::__construct();
 
-        verify_session('admin');
+        date_default_timezone_set("Asia/Jakarta");
 
         $this->load->model(array(
             'order_model' => 'order',
             'payment_model' => 'payment'
         ));
-        date_default_timezone_set("Asia/Jakarta");
 
-        
-        $url = 'https://sandbox.partner.api.bri.co.id';
-        $privateKey = file_get_contents('private_key_rsa.pem');
-        $client_secret = 'HYhwDH5dgBqisXJ7'; //Consumer Secret
-        $client_id = '8vXZAhvethvJvKa1rmNDbH9ZxlX2Xmen'; //Consumer Key 
-        $xPartnerId = 'kuionline'; // di generate oleh bri
-        $partnerServiceId = '   22001'; // di generate oleh bri
-        $customerNo = '00218322'; // di generate oleh partner                                                   
+        verify_session('admin');
 
-        #getToken();die;
-        #createVa();die;
-        #updateVa();
-        // inquiryVa();
-        die;
-        #updateStatusVa();die;
-        #inquiryStatusVa();die;
-        #deleteVa();die;
+        $this->client_id    = 'RVGRlE9qZ6JWXo15soVDmWGJHwyXZIw6';
+        $this->privateKey   =  file_get_contents(FCPATH . 'key/private.pem');
+        $this->url          = 'https://partner.api.bri.co.id';
+        $this->secret_key   = 'FLnBAZ5Di1I5GqfS';
+        $this->partnerServiceId = '   91118';
     }
 
     public function index()
     {
-        $params['title'] = 'Payment VIA BRIVA-API';
-        $data['briva']   = $this->payment->payment_bri();
+        $params['title']    = 'Payment VIA BRIVA-API';
+        $data['briva']      = $this->payment->payment_bri();
 
         $this->load->view('header', $params);
         $this->load->view('payments/brivapayments', $data);
@@ -74,7 +66,6 @@ class api_payment_briva extends CI_Controller
         $method = 'DELETE';
         $timestamp = date('c');
         $token = getToken();
-
 
         $body = array(
             'partnerServiceId'  => $partnerServiceId,
@@ -123,7 +114,6 @@ class api_payment_briva extends CI_Controller
             'trxId'             => 'trx12346', // di generate oleh partner 
             'paidStatus'        => 'Y',
         );
-
         curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body, '-- update status va --');
     }
 
@@ -156,29 +146,47 @@ class api_payment_briva extends CI_Controller
         curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body, '-- update va --');
     }
 
+    public function preview_briva()
+    {
+        $params['title']    = 'Preview - BRIVA';
+        $data['cust_no'] = $this->input->post('cust_no');
+        $data['custname'] = $this->input->post('custname');
+        $data['totprice'] = $this->input->post('totprice');
+        $data['transaksi_all'] = $this->input->post('transaksi_all');
+
+        $this->load->view('header', $params);
+        $this->load->view('payments/createva_preview', $data);
+        $this->load->view('footer');
+    }
+
     function createVa()
     {
-        global $url, $partnerServiceId, $customerNo;
+        global $url, $partnerServiceId;
 
         $patch = '/snap/v1.0/transfer-va/create-va';
         $fullUrl = $url . $patch;
         $method = 'POST';
-        $timestamp = date('c');
+        $timestamp  = gmdate('Y-m-d\TH:i:s.000\Z');
         $token = getToken();
+
+        $customerNo  = $this->input->post('cust_no');
+        $custname    = $this->input->post('custname');
+        $tot_price   = $this->input->post('totprice');
+        $trid        = $this->input->post('transaksi_all');
 
         $body = array(
             'partnerServiceId'  => $partnerServiceId,
             'customerNo'        => $customerNo,
             'virtualAccountNo'  => $partnerServiceId . $customerNo,
-            'virtualAccountName' => 'tes lagi ite malang',
+            'virtualAccountName' => $custname,
             'totalAmount'       => array(
-                'value'     => '11000.00',
+                'value'     => $tot_price,
                 'currency'  => 'IDR'
             ),
-            'expiredDate'       => date('c', strtotime('2024-06-30 23:00')),
-            'trxId'             => 'trx12346', // di generate oleh partner 
+            'expiredDate'       => date('c', strtotime('2025-08-30 23:00')),
+            'trxId'             => $trid,
             'additionalInfo'    => array(
-                'description'   => 'keterangan'
+                'description'   => 'UJI COBA'
             )
         );
 
@@ -191,7 +199,6 @@ class api_payment_briva extends CI_Controller
         $patch = '/snap/v1.0/access-token/b2b';
         $fullUrl = $url . $patch;
         $timestamp = date('c');
-
 
         $headers = array(
             'X-SIGNATURE:' . asymmetricSignature($client_id, $timestamp),
@@ -210,7 +217,6 @@ class api_payment_briva extends CI_Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        #curl_setopt($ch, CURLOPT_HEADER,true);
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);

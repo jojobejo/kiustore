@@ -21,6 +21,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
     </div>
 </div>
+
 <!-- Page content -->
 <div class="container-fluid mt--6">
     <div class="row">
@@ -31,11 +32,30 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <h3>BRIVA API</h3>
                 </div>
                 <div class="card-body">
+                    <form action="<?= base_url('createva/preview') ?>" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Nomor Customer</label>
+                            <input type="number" name="cust_no" id="cust_no" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nama Customer</label>
+                            <input type="text" name="custname" id="custname" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Harga</label>
+                            <input type="number" name="totprice" id="totprice" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Kode Faktur</label>
+                            <input type="text" name="transaksi_all" id="transaksi_all" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Preview</button>
+                    </form>
 
+                    <h3></h3>
                 </div>
                 <div class="card-footer">
                 </div>
-
             </div>
         </div>
     </div>

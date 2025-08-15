@@ -97,6 +97,8 @@ $route['checkout_submit'] = 'customer/shop/checkout/order';
 $route['admin/ongkir'] = 'admin/ongkir';
 $route['admin/apibriva'] = 'admin/api_payment_briva';
 
+$route['createva/preview'] = 'admin/api_payment_briva/preview_briva';
+
 // COBA
 $route['readonlychange'] = 'customer/profile/toggle_readonly';
 $route['inputlocation'] = 'customer/profile/inputlocation';

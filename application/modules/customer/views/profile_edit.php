@@ -177,7 +177,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 success: function(response) {
                     if (response.status === "success") {
                         alert("Data berhasil diperbarui!");
-                        window.location.href = "<?= base_url('profile') ?>"; // Ganti dengan URL yang sesuai
+                        window.location.href = "<?= base_url('profile') ?>";
                     } else {
                         alert("Gagal menyimpan data. Silakan coba lagi.");
                     }

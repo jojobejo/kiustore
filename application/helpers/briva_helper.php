@@ -7,11 +7,9 @@ if (!function_exists('get_token')) {
         $CI = &get_instance();
         $CI->load->config('briva');
 
-        $url = 'https://sandbox.partner.api.bri.co.id/snap/v1.0/access-token/b2b';
+        $url = 'https://partner.api.bri.co.id/snap/v1.0/access-token/b2b';
         $client_id = $CI->config->item('briva')['client_id'];
         $client_secret = $CI->config->item('briva')['client_secret'];
-
-
 
         $headers = [
             'Content-Type: application/x-www-form-urlencoded'
@@ -38,36 +36,10 @@ if (!function_exists('get_token')) {
     }
 }
 
-// if (!function_exists('curl_request')) {
-//     function curl_request($url, $token, $method, $body = null)
-//     {
-//         $headers = [
-//             'Content-Type: application/json',
-//             'Authorization: Bearer ' . $token,
-//             'BRI-Timestamp: ' . gmdate('Y-m-d\TH:i:s\Z'),
-//         ];
-
-//         $ch = curl_init();
-//         curl_setopt($ch, CURLOPT_URL, $url);
-//         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-//         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-//         if ($method === 'POST') {
-//             curl_setopt($ch, CURLOPT_POST, true);
-//             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-//         }
-
-//         $response = curl_exec($ch);
-//         curl_close($ch);
-
-//         return json_decode($response, true);
-//     }
-// }
-
 if (!function_exists('curl_request')) {
     function curl_request($url, $endpoint, $timestamp, $token, $method, $body = [])
     {
-        $xPartnerId = 'kuionline';
+        $xPartnerId = 'KARISMA';
 
         $headers = [
             'Authorization:BearerToken ' . $token,
@@ -115,7 +87,6 @@ if (!function_exists('curl_request')) {
 
             $signature = hash_hmac('sha512', $stringToSign, $client_secret, true);
 
-            // X-SIGNATURE
             return base64_encode($signature);
         }
     }
