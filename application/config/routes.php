@@ -94,8 +94,12 @@ $route['cart_api'] = 'customer/shop/cart_api';
 $route['checkout'] = 'customer/shop/checkout';
 $route['checkout_submit'] = 'customer/shop/checkout/order';
 
-$route['admin/ongkir'] = 'admin/ongkir';
+
+// payment
 $route['admin/apibriva'] = 'admin/api_payment_briva';
+$route['admin/brivaws'] = 'admin/api_payment_briva';
+
+$route['createva'] = 'admin/api_payment_briva/createVa';
 
 $route['createva/preview'] = 'admin/api_payment_briva/preview_briva';
 
@@ -110,11 +114,4 @@ $route['rajaongkir/get_provinces'] = 'customer/rajaongkir/get_provinces';
 $route['rajaongkir/get_cities'] = 'customer/rajaongkir/get_cities';
 $route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
 $route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
-
-// BRI VA
-$route['admin/brivaws'] = 'admin/Brivawsapi';
-
-$route['get_token'] = 'admin/Brivawsapi/get_token';
-$route['create_va'] = 'admin/Brivawsapi/create_va';
-
-$route['brivaws']   = 'admin/Brivawsapi/create_va';
+$route['admin/ongkir'] = 'admin/ongkir';

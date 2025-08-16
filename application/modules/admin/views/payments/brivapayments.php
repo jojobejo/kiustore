@@ -32,7 +32,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <h3>BRIVA API</h3>
                 </div>
                 <div class="card-body">
-                    <form action="<?= base_url('createva/preview') ?>" method="post" enctype="multipart/form-data">
+                    <form action="<?= base_url('createva') ?>" method="post" enctype="multipart/form-data">
                         <div class="form-group">
                             <label>Nomor Customer</label>
                             <input type="number" name="cust_no" id="cust_no" class="form-control" required>
