@@ -32,6 +32,7 @@ class api_payment_briva extends CI_Controller
         $this->url          = 'https://partner.api.bri.co.id';
         $this->secret_key   = 'FLnBAZ5Di1I5GqfS';
         $this->partnerServiceId = '   91118';
+        $this->expartnerid = 'KARISMA';
     }
 
     public function index()
@@ -203,8 +204,6 @@ class api_payment_briva extends CI_Controller
 
     function getToken()
     {
-        global $url, $client_id;
-
         $patch = '/snap/v1.0/access-token/b2b';
         $fullUrl = $this->url . $patch;
         $timestamp = date('c');
@@ -234,7 +233,7 @@ class api_payment_briva extends CI_Controller
         $this->echoPre('-- create token --');
         $this->echoPre($response);
 
-        // Tambahan cek || Cek apakah response valid JSON
+        // Cek response valid JSON
         $token = json_decode($response, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -242,7 +241,7 @@ class api_payment_briva extends CI_Controller
             return false;
         }
 
-        // Cek apakah accessToken ada
+        // Cek accessToken ada
         if (!isset($token['accessToken'])) {
             log_message('error', "getToken() gagal, tidak ada accessToken. Response: " . $response);
             return false;
@@ -253,14 +252,14 @@ class api_payment_briva extends CI_Controller
 
     function curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body, $remark = 'API Request')
     {
-        global $xPartnerId;
+
 
         $headers = array(
             'Authorization:Bearer ' . $token,
             'X-TIMESTAMP:' . $timestamp,
             'X-SIGNATURE:' . $this->symmetricSignature($method, $patch, $body, $timestamp, $token),
             'Content-Type:application/json',
-            'X-PARTNER-ID:' . $xPartnerId,
+            'X-PARTNER-ID:' . $this->expartnerid,
             'CHANNEL-ID:00001',
             'X-EXTERNAL-ID:' . rand(100000000, 999999999)
         );
@@ -283,8 +282,6 @@ class api_payment_briva extends CI_Controller
 
     function symmetricSignature($method, $path, $body, $timestamp, $accessToken)
     {
-        global $client_secret; //Consumer Secret
-
         $hashBody = json_encode($body); // Body minify
         $hashBody = hash('sha256', $hashBody); // Calculate Hash with sha256
         $signedBody = strtolower($hashBody); // Convert to lowercase
@@ -297,7 +294,7 @@ class api_payment_briva extends CI_Controller
             $timestamp
         ]);
 
-        $signature = hash_hmac('sha512', $stringToSign, $this->, true);
+        $signature = hash_hmac('sha512', $stringToSign, $this->secret_key, true);
 
         return base64_encode($signature);
     }
