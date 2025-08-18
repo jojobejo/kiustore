@@ -3,69 +3,59 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Rajaongkir_model extends CI_Model
 {
-
-    private $api_key;
-    private $base_url;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->config->load('rajaongkir');
-        $this->api_key = $this->config->item('rajaongkir_api_key');
-        $this->base_url = $this->config->item('rajaongkir_base_url');
-    }
+    private $api_key = "197f7e1329685d3ed9d1468c54efc9dd";
+    private $base_url = "https://rajaongkir.komerce.id/api/v1/";
 
     private function request($endpoint, $params = [])
     {
+        $ch = curl_init();
         $url = $this->base_url . $endpoint;
-        $curl = curl_init();
 
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $url . '?' . http_build_query($params),
+        if (!empty($params)) {
+            $url .= '?' . http_build_query($params);
+        }
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => ["key: $this->api_key"],
+            CURLOPT_HTTPHEADER => [
+                "Key:" . $this->api_key,
+                "Content-Type: application/json"
+            ]
         ]);
 
-        $response = curl_exec($curl);
-        curl_close($curl);
+        $response = curl_exec($ch);
+        curl_close($ch);
 
         return json_decode($response, true);
     }
 
     public function get_provinces()
     {
-        return $this->request('province');
+        return $this->request("destination/province");
     }
+
 
     public function get_cities($province_id)
     {
-        return $this->request('city', ['province' => $province_id]);
+        return $this->request("city", ["province" => $province_id]);
     }
+
 
     public function get_subdistricts($city_id)
     {
-        return $this->request('subdistrict', ['city' => $city_id]);
+        return $this->request("destination/district", ["city_id" => $city_id]);
     }
 
-    public function get_shipping_cost($origin, $destination, $weight, $courier)
+    public function get_cost($origin_district_id, $destination_district_id, $weight, $courier)
     {
-        $curl = curl_init();
+        $data = [
+            "origin_district_id" => $origin_district_id,
+            "destination_district_id" => $destination_district_id,
+            "weight" => $weight,
+            "courier" => $courier
+        ];
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://pro.rajaongkir.com/api/cost",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "origin=" . $origin . "&originType=subdistrict&destination=" . $destination . "&destinationType=subdistrict&weight=" . $weight . "&courier=" . $courier . "",
-            CURLOPT_HTTPHEADER => ["key: $this->api_key"],
-        ));
-
-        $response = curl_exec($curl);
-        curl_close($curl);
-
-        return json_decode($response, true);
+        return $this->request("calculate/district/domestic-cost", "POST", $data);
     }
 }

@@ -9,148 +9,62 @@ class Ongkir_model extends CI_Model
         $this->user_id = get_current_user_id();
     }
 
-    public function count_all_customers()
+    private $api_key = "197f7e1329685d3ed9d1468c54efc9dd";
+    private $base_url = "https://rajaongkir.komerce.id/api/v1/";
+
+    private function curl($endpoint, $postData = null)
     {
-        return $this->db->get('customers')->num_rows();
-    }
+        $url = $this->base_url . $endpoint;
+        $ch = curl_init($url);
 
-    public function latest_customers()
-    {
-        return $this->db->order_by('id', 'DESC')->get('customers')->result();
-    }
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            "key: {$this->api_key}",
+            "Content-Type: application/json"
+        ]);
 
-    public function get_all_sales()
-    {
-        return $this->db
-            ->where('role', "salesman")
-            ->order_by('name', 'ASC')
-            ->get('users')
-            ->result();
-    }
-
-    public function get_all_customers()
-    {
-        $id = $this->user_id;
-        if (admin_role() == 'admin' || admin_role() == 'keuangan') {
-
-            $customers = $this->db->query("
-                SELECT c.user_id as id, c.profile_picture, c.name, u.email, c.phone_number, c.address, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level
-                FROM customers c
-                JOIN users u
-                    ON u.id = c.user_id
-                LEFT JOIN users s
-                    ON s.id = c.salesman_id
-                ORDER BY u.register_date DESC
-            ");
-
-            return $customers->result();
-        } else {
-            $customers = $this->db->query("
-            SELECT c.user_id as id, c.profile_picture, c.name, u.email, c.phone_number, c.address, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level
-            FROM customers c
-            JOIN users u
-                ON u.id = c.user_id
-            LEFT JOIN users s
-                ON s.id = c.salesman_id
-                WHERE s.id = $id
-                ORDER BY u.register_date DESC
-            ");
-
-            return $customers->result();
+        if ($postData) {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
         }
+
+        $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            return ['error' => curl_error($ch)];
+        }
+        curl_close($ch);
+
+        return json_decode($result, true);
     }
 
-    public function register_user($data)
+    public function get_provinces()
     {
-        $this->db->insert('users', $data);
-
-        return $this->db->insert_id();
+        return $this->curl("destination/province");
     }
 
-    public function register_customer($data)
+    public function get_cities($province_id)
     {
-        $this->db->insert('customers', $data);
-
-        return $this->db->insert_id();
+        return $this->curl("destination/city?province={$province_id}");
     }
 
-    public function delete_customer($id)
+    public function get_districts($city_id)
     {
-        $this->db->query("SET FOREIGN_KEY_CHECKS=0;");
-        $this->db->where('user_id', $id)->delete('customers');
-        $this->db->where('id', $id)->delete('users');
-        $this->db->where('user_id', $id)->delete('orders');
-        $this->db->query("
-            DELETE order_item
-            FROM order_item
-            JOIN orders
-                ON orders.id = order_item.order_id
-            WHERE orders.user_id = '$id'");
-        $this->db->query("
-            DELETE payments
-            FROM payments
-            INNER JOIN orders ON orders.id = payments.order_id
-            WHERE orders.user_id = '$id'");
-        $this->db->query("DELETE orders FROM orders WHERE user_id = '$id'");
+        return $this->curl("destination/district/{$city_id}");
     }
 
-    public function deactivate_customer($id)
+    public function get_sub_districts($district_id)
     {
-        $this->db->where('id', $id)->update('users', array('status' => 0));
+        return $this->curl("destination/sub-district?district={$district_id}");
     }
 
-    public function activate_customer($id)
+    public function calculate_cost($origin_subdistrict, $destination_subdistrict, $weight, $courier)
     {
-        $this->db->where('id', $id)->update('users', array('status' => 1));
-    }
-
-    public function is_customer_exist($id)
-    {
-        return ($this->db->where('user_id', $id)->get('customers')->num_rows() > 0) ? TRUE : FALSE;
-    }
-
-    public function customer_data($id)
-    {
-        $customer = $this->db->query("
-        SELECT c.user_id as id, c.max_credit, c.profile_picture, c.name, u.email, c.phone_number, c.shop_name, c.shop_address, c.address, c.salesman_id, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level , c.kota_id
-        FROM customers c
-        JOIN users u
-            ON u.id = c.user_id
-        LEFT JOIN users s
-            ON s.id = c.salesman_id
-            WHERE c.user_id = '$id'
-        ");
-
-        return $customer->row();
-    }
-
-    public function pengiriman_data($ttb_number)
-    {
-        $customer = $this->db->query("
-        SELECT
-            ttb_number
-            ,	DATE_FORMAT(`delivered_date`, '%d %b %Y') AS delivered_date
-            , deliver_by
-        FROM
-            orders
-        WHERE ttb_number = '$ttb_number'
-        ");
-
-        return $customer->row();
-    }
-
-    public function edit($customer)
-    {
-        $this->db->where('user_id', $customer['user_id'])
-            ->update('customers', array(
-                'name' => $customer['name'],
-                //    'email' => $customer['email'],
-                'phone_number' => $customer['phone_number'],
-                'kota_id' => $customer['kota'],
-                'salesman_id' => $customer['salesman_id'],
-                'address' => $customer['address'],
-                'level' => $customer['level'],
-                'max_credit' => $customer['max_credit']
-            ));
+        $postData = [
+            'origin_subdistrict' => $origin_subdistrict,
+            'destination_subdistrict' => $destination_subdistrict,
+            'weight' => $weight,
+            'courier' => $courier
+        ];
+        return $this->curl("calculate/district/domestic-cost", $postData);
     }
 }

@@ -114,4 +114,11 @@ $route['rajaongkir/get_provinces'] = 'customer/rajaongkir/get_provinces';
 $route['rajaongkir/get_cities'] = 'customer/rajaongkir/get_cities';
 $route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
 $route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
-$route['admin/ongkir'] = 'admin/ongkir';
+
+
+$route['admin/ongkir']                  = 'admin/Ongkir';
+$route['Ongkir/province']               = 'admin/Ongkir/province';
+$route['Ongkir/city/(:num)']            = 'admin/Ongkir/city/$1';
+$route['Ongkir/district/(:num)']        = 'admin/Ongkir/district/$1';
+$route['Ongkir/sub_district/(:num)']    = 'admin/Ongkir/sub_district/$1';
+$route['Ongkir/cost']                   = 'admin/Ongkir/cost';

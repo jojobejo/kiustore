@@ -123,7 +123,7 @@ class Profile extends CI_Controller
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://pro.rajaongkir.com/api/province",
+            CURLOPT_URL => "https://rajaongkir.komerce.id/api/v1/destination/province",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,

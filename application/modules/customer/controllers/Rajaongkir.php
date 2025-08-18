@@ -20,21 +20,24 @@ class Rajaongkir extends CI_Controller
     public function get_provinces()
     {
         $data = $this->Rajaongkir_model->get_provinces();
-        echo json_encode($data['rajaongkir']['results']);
+        header('Content-Type: application/json');
+        echo json_encode($data, JSON_PRETTY_PRINT);
     }
 
     public function get_cities()
     {
         $province_id = $this->input->get('province_id');
         $data = $this->Rajaongkir_model->get_cities($province_id);
-        echo json_encode($data['rajaongkir']['results']);
+        header('Content-Type: application/json');
+        echo json_encode($data, JSON_PRETTY_PRINT);
     }
 
     public function get_subdistricts()
     {
         $city_id = $this->input->get('city_id');
         $data = $this->Rajaongkir_model->get_subdistricts($city_id);
-        echo json_encode($data['rajaongkir']['results']);
+        header('Content-Type: application/json');
+        echo json_encode($data, JSON_PRETTY_PRINT);
     }
 
     // public function get_shipping_cost()

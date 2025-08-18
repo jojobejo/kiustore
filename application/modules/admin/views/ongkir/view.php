@@ -25,29 +25,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <div class="card-header">
                     </div>
                     <div class="card-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>id_city</th>
-                                    <th>Nama Provinsi</th>
-                                    <th>#</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if ($province) : ?>
-                                    <?php foreach ($province->rajaongkir->results as $r) : ?>
-                                        <tr>
-                                            <td><?= $r->province_id ?></td>
-                                            <td><?= $r->province ?></td>
-                                            <td></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                        <h2>Cek Ongkir</h2>
+                        <form method="post" action="<?= base_url('Ongkir/cost') ?>">
+                            <label>Origin District ID:</label>
+                            <input type="text" name="origin_district_id" required><br><br>
+
+                            <label>Destination District ID:</label>
+                            <input type="text" name="destination_district_id" required><br><br>
+
+                            <label>Berat (gram):</label>
+                            <input type="number" name="weight" required><br><br>
+
+                            <label>Kurir (jne, tiki, pos, jnt, sicepat, dll):</label>
+                            <input type="text" name="courier" required><br><br>
+
+                            <button type="submit">Cek Ongkir</button>
+                        </form>
                     </div>
                     <div class="card-footer">
-
                     </div>
                 </div>
             </div>

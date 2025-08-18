@@ -52,6 +52,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <label class="form-label">Provinsi :</label>
                 <select class="kiuselect form-control w-100" name="province" id="province"></select>
             </div>
+
             <div class="input-box mb-2">
                 <label class="form-label">Kota/Kabupaten :</label>
                 <select class="kiuselect form-control w-100" name="city" id="city"></select>
@@ -59,6 +60,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="input-box mb-2">
                 <label class="form-label">Kecamatan :</label>
                 <select class="kiuselect form-control w-100" name="subdistrict" id="subdistrict"></select>
+            </div>
+            <div class="input-box mb-2">
+                <label class="form-label">Kelurahan :</label>
+                <select class="kiuselect form-control w-100" name="village" id="village"></select>
             </div>
             <div class="input-box mb-2" hidden>
                 <label class="form-label">USER ID</label>
@@ -101,58 +106,73 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 <script>
     $(document).ready(function() {
-
         $('.kiuselect').select2({
             allowClear: true
         });
 
+        // Load Provinsi
         function loadProvinces() {
-            $.get("<?= base_url('rajaongkir/get_provinces') ?>", function(data) {
+            $.get("<?= base_url('rajaongkir/get_provinces') ?>", function(res) {
                 $('#province').html('<option value="">Pilih Provinsi</option>');
-                $.each(JSON.parse(data), function(i, prov) {
-                    $('#province').append('<option value="' + prov.province_id + '">' + prov.province + '</option>');
+                $.each(res.data, function(i, prov) {
+                    $('#province').append('<option value="' + prov.id + '">' + prov.name + '</option>');
                 });
-
-            });
+            }, 'json');
         }
 
+        // Jika Provinsi berubah → load Kota/Kabupaten
         $('#province').change(function() {
-            let province_id = $(this).val();
+            let province = $(this).val();
+            $('#city').html('<option value="">Pilih Kota/Kabupaten</option>');
+            $('#subdistrict').html('<option value="">Pilih Kecamatan</option>');
+            $('#village').html('<option value="">Pilih Kelurahan</option>');
 
-            $('#city, #subdistrict').html('<option value="">Pilih</option>');
-            if (province_id) {
+            if (province) {
                 $.get("<?= base_url('rajaongkir/get_cities') ?>", {
-                    province_id
-                }, function(data) {
-                    $.each(JSON.parse(data), function(i, city) {
-                        $('#city').append('<option value="' + city.city_id + '">' + city.type + ' ' + city.city_name + '</option>');
-                        $('#pro_id').val(province_id);
+                    province: province
+                }, function(res) {
+                    $.each(res.data, function(i, city) {
+                        $('#city').append('<option value="' + city.id + '">' + city.type + ' ' + city.name + '</option>');
                     });
-                });
+                }, 'json');
             }
         });
 
+        // Jika Kota berubah → load Kecamatan
         $('#city').change(function() {
             let city_id = $(this).val();
-            $('#subdistrict').html('<option value="">Pilih</option>');
-            $('#subdistrict_id').val('');
+            $('#subdistrict').html('<option value="">Pilih Kecamatan</option>');
+            $('#village').html('<option value="">Pilih Kelurahan</option>');
 
             if (city_id) {
                 $.get("<?= base_url('rajaongkir/get_subdistricts') ?>", {
-                    city_id
-                }, function(data) {
-                    $.each(JSON.parse(data), function(i, subdistrict) {
-                        $('#subdistrict').append('<option value="' + subdistrict.subdistrict_id + '">' + subdistrict.subdistrict_name + '</option>');
-                        $('#kab_id').val(city_id);
+                    city_id: city_id
+                }, function(res) {
+                    $.each(res.data, function(i, subdistrict) {
+                        $('#subdistrict').append('<option value="' + subdistrict.id + '">' + subdistrict.name + '</option>');
                     });
-                });
+                }, 'json');
             }
         });
 
+        // Jika Kecamatan berubah → load Kelurahan (jika ada endpoint)
         $('#subdistrict').change(function() {
             let subdistrict_id = $(this).val();
-            $('#kec_id').val(subdistrict_id);
+            $('#village').html('<option value="">Pilih Kelurahan</option>');
+
+            if (subdistrict_id) {
+                $.get("<?= base_url('rajaongkir/get_villages') ?>", {
+                    subdistrict_id: subdistrict_id
+                }, function(res) {
+                    $.each(res.data, function(i, village) {
+                        $('#village').append('<option value="' + village.id + '">' + village.name + '</option>');
+                    });
+                }, 'json');
+            }
         });
+
+        // Jika Kecamatan berubah → load Kelurahan (jika ada endpoint)
+
 
         $("#selesai").on('click', function() {
             var pro_id = $("#pro_id").val().trim();

@@ -199,6 +199,7 @@ class api_payment_briva extends CI_Controller
         $response = $this->curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body);
 
         header('Content-Type: application/json');
+
         echo $response;
     }
 
