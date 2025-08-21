@@ -49,6 +49,7 @@ class Shop extends CI_Controller
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
             $this->load->view('footer');
+            
         } elseif (level_user() == 1) {
             $ongkir = $cart['ongkir'] = "0";
             $cart['member']          = 0;
@@ -69,14 +70,16 @@ class Shop extends CI_Controller
     {
         $origin         = $this->input->post('kiu');
         $destination    = $this->input->post('subdis');
-        $courier        = $this->input->post('kurir');
-        $cusids         = $this->session->userdata('user_id');
+        $courier        = trim($this->input->post('kurir'));
+        $cusids         = (int) $this->session->userdata('user_id');
         $now            = date('Y-m-d');
-        $cart           = $this->cart->contents();
-        $weight         = 0;
 
+        $cart   = $this->cart->contents();
+        $weight = 0;
         foreach ($cart as $item) {
-            $weight += $item['product_weight'] * $item['qty'];
+            $w = isset($item['product_weight']) ? (int)$item['product_weight'] : 0;
+            $q = isset($item['qty']) ? (int)$item['qty'] : 0;
+            $weight += $w * $q;
         }
 
         $origin      = is_numeric($origin) ? (int)$origin : 0;
@@ -86,17 +89,43 @@ class Shop extends CI_Controller
             return $this->output
                 ->set_content_type('application/json')
                 ->set_output(json_encode([
-                    'meta' => ['message' => 'Semua parameter wajib: origin, destination, weight(gram), courier', 'code' => 400, 'status' => 'error'],
+                    'meta'  => ['message' => 'Semua parameter wajib: origin, destination, weight(gram), courier', 'code' => 400, 'status' => 'error'],
                     'debug' => compact('origin', 'destination', 'weight', 'courier'),
-                    'data' => null
+                    'data'  => null
                 ]));
         }
 
         $api = $this->ongkir->get_cost($origin, $destination, $weight, $courier);
-        
-        return $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($api));
+
+        if (is_string($api)) {
+            $result = json_decode($api, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $result = null;
+            }
+        } elseif (is_array($api)) {
+            $result = $api;
+        } elseif (is_object($api)) {
+            $result = json_decode(json_encode($api), true);
+        } else {
+            $result = null;
+        }
+
+        $ongkir = [];
+        if (is_array($result) && isset($result['meta']['code']) && (int)$result['meta']['code'] === 200) {
+            $ongkir = isset($result['data']) && is_array($result['data']) ? $result['data'] : [];
+        }
+
+        $data = [
+            'ongkir'   => $ongkir,
+            'customer' => $this->customer->data(),
+            'weight'   => $weight,
+            'itm_cart' => $this->product->get_tmp_cart($cusids, $now)->result(),
+            'courier'  => $courier
+        ];
+
+        $this->load->view('header');
+        $this->load->view('shop/carts', $data);
+        $this->load->view('footer');
     }
 
     public function cekongkir()
@@ -156,16 +185,16 @@ class Shop extends CI_Controller
         $action = $this->input->post('action');
         switch ($action) {
             case 'addongkir':
-                $datajasa     =  $this->input->post('jasaongkir');
-                $selectjasa   =  $this->input->post('jasa');
-                $customer     =  $this->input->post('customer');
-                $kdfaktur     =  $this->input->post('kdfaktur');
-                $datenow      =  date('Y-m-d');
+                $datajasa   = $this->input->post('jasaongkir'); // service (REG, JTR, dst)
+                $selectjasa = $this->input->post('jasa');       // code (jne, tiki, pos)
+                $customer   = $this->input->post('customer');
+                $kdfaktur   = $this->input->post('kdfaktur');
+                $datenow    = date('Y-m-d');
 
                 $insrtdata = array(
-                    'jsongkir'   => $datajasa,
-                    'kd_faktur'   => $kdfaktur,
-                    'sjasa'      => $selectjasa,
+                    'jsongkir'   => $datajasa,   // service
+                    'kd_faktur'  => $kdfaktur,
+                    'sjasa'      => $selectjasa, // code
                     'idcustomer' => $customer,
                     'status'     => '1',
                     'create_at'  => $datenow

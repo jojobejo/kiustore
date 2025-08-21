@@ -72,6 +72,7 @@ class Orders extends CI_Controller
             $order['delivery_data'] = json_decode($data->delivery_data);
             $order['customer'] = $this->order->get_data_customer($cusid);
             $order['is_ongkir'] = $this->order->is_ongkir_exist($data->kd_faktur);
+            $order['kdfaktur'] = $data->order_number;
 
             $vacode = $this->order->get_data_customer($cusid);
 

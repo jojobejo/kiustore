@@ -610,7 +610,7 @@ class Order_model extends CI_Model
             c.level,
             c.kota_id,
             c.va_code,
-            CONCAT('22123',c.level,c.user_id,(SELECT LEFT(MAX(c.phone_number), 4))) AS vacode
+            CONCAT('91118',c.user_id,(SELECT RIGHT(MAX(c.phone_number), 5))) AS vacode
         FROM
             customers c
             JOIN users u ON u.id = c.user_id

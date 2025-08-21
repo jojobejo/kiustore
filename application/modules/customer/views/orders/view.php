@@ -230,6 +230,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success">Konfirmasi Pembayaran</a>
                     <?php else : ?>
                         <div class="alert alert-info m-2 w-100">Menunggu konfirmasi pembayaran</div>
+                        <form action="<?= base_url('cust_va'); ?>" method="POST">
+
+                            <div class="form-group">
+                                <label>Nomor Customer</label>
+                                <input type="number" name="cust_no" id="cust_no" class="form-control" value="<?= $customer->vacode ?>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Customer</label>
+                                <input type="text" name="custname" id="custname" class="form-control" value="<?= $customer->name ?>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Total Harga</label>
+                                <input type="number" name="totprice" id="totprice" class="form-control" value="<?= $final_price; ?>" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Kode Faktur</label>
+                                <input type="text" name="transaksi_all" id="transaksi_all" class="form-control" value="<?= $kdfaktur ?>" required>
+                            </div>
+
+                        </form>
                         <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success m-2 w-100">Lakukan Pembayaran</a>
                     <?php endif; ?>
                 <?php elseif ($data->order_status == 3) : ?>
@@ -243,7 +263,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <div class="alert alert-info m-2 w-100">Pesanan dibatalkan</div>
                     <!-- <a href="#" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i> Hapus</a> -->
                 <?php endif; ?>
-
             <?php endif; ?>
         </div>
     </section>

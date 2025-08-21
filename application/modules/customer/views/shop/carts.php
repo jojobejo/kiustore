@@ -3,8 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 
 <main class="main-wrap cart-page mb-xxl">
-    <!-- Checkout Wrapper-->
-
     <form action="<?php echo site_url('ongkir'); ?>" method="POST">
 
         <div class="checkout-wrapper-area py-3">
@@ -17,56 +15,52 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </div>
                 <div class="card user-data-card">
 
+                    <!-- Alamat -->
                     <div class="card-body">
-                        <div class="">
-                            <label for="exampleFormControlInput1" class="form-label">Alamat Lengkap</label>
-                            <input type="text" name="name" value="<?php echo $customer->shop_address; ?> , <?= $ckongkir->rajaongkir->origin_details->city_name ?>,<?= $ckongkir->rajaongkir->destination_details->province ?>" class="form-control" id="name" required readonly>
-                        </div>
+                        <label class="form-label">Alamat Lengkap</label>
+                        <input type="text" value="<?php echo $customer->shop_address; ?>" class="form-control" readonly>
                     </div>
 
+                    <!-- Berat -->
                     <div class="card-body">
-                        <div class="">
-                            <label for="exampleFormControlInput1" class="form-label">Berat Total</label>
-                            <input type="text" name="name" value="<?= ($weight / 1000) ?>" class="form-control" id="name" required readonly>
-                        </div>
+                        <label class="form-label">Berat Total (Kg)</label>
+                        <input type="text" value="<?= ($weight / 1000) ?>" class="form-control" readonly>
                     </div>
 
-                    <div class="card-body">
-                        <div class="">
-                            <label for="exampleFormControlInput1" class="form-label">Jasa Yang Digunakan</label>
-                            <input type="text" name="name" value="<?= $ckongkir->rajaongkir->results[0]->code ?> - <?= $ckongkir->rajaongkir->results[0]->name ?>" class="form-control" id="name" required readonly>
-                        </div>
-                    </div>
-
-                    <?php if (!empty($ckongkir->rajaongkir->results[0]->costs)) : ?>
+                    <!-- Pilihan Ongkir -->
+                    <?php if (!empty($ongkir)) : ?>
                         <div class="card-body">
-                            <div class="">
-                                <label for="exampleFormControlInput1" class="form-label">Jasa Yang Digunakan</label>
-                                <select name="jasaongkir" id="jasaongkir" class="form-control">
-                                    <?php
-                                    $now = date('Y-m-d');
-                                    foreach ($ckongkir->rajaongkir->results[0]->costs as $c) : ?>
-                                        <option value="<?= $c->service . ';' . $c->cost[0]->etd . ';' . $c->cost[0]->value ?>"><?= $c->service ?> - (<?= $c->cost[0]->etd ?>) - Rp. <?= number_format($c->cost[0]->value) ?> </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <input type="text" name="action" id="action" value="addongkir" hidden>
-                                <input type="text" name="jasa" id="jasa" value="<?= $ckongkir->rajaongkir->results[0]->code ?>" hidden>
-                                <input type="text" name="customer" id="customer" value="<?= $this->session->userdata('user_id') ?>" hidden>
-                                <?php foreach ($itm_cart as $itm) : ?>
-                                    <input type="text" name="kdfaktur" id="kdfaktur" value="<?= $itm->kdchart ?>" hidden>
+                            <label class="form-label">Pilih Jasa Ekspedisi</label>
+                            <select name="jasaongkir" id="jasaongkir" class="form-control" required>
+                                <option value="">-- Pilih Jasa --</option>
+                                <?php foreach ($ongkir as $c) : ?>
+                                    <option value="<?= $c['service'] . ';' . $c['etd'] . ';' . $c['cost'] ?>" data-code="<?= $c['code']; ?>" data-cost="<?= $c['cost']; ?>" data-etd="<?= $c['etd']; ?>">
+                                        <?= $c['name']; ?> - <?= $c['service']; ?> (<?= $c['description']; ?>) - Rp <?= number_format($c['cost'], 0, ',', '.'); ?> / Estimasi: <?= $c['etd']; ?>
+                                    </option>
                                 <?php endforeach; ?>
-                            </div>
+                            </select>
+
+                            <!-- hidden input -->
+                            <input type="text" name="jasa" id="jasa" value="">
+                            <input type="text" name="action" value="addongkir">
+                            <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
+                            <?php foreach ($itm_cart as $itm) : ?>
+                                <input type="text" name="kdfaktur" value="<?= $itm->kdchart ?>">
+                            <?php endforeach; ?>
                         </div>
                     <?php else : ?>
+                        <div class="card-body">
+                            <div class="alert alert-warning">Jasa pengiriman tidak tersedia</div>
+                        </div>
                     <?php endif; ?>
-
                 </div>
             </div>
-            <!-- Cart Amount Area-->
-            <?php if (!empty($ckongkir->rajaongkir->results[0]->costs)) : ?>
+
+            <!-- Tombol Submit -->
+            <?php if (!empty($ongkir)) : ?>
                 <div class="card cart-amount-area mb-10">
                     <div class="card-body d-flex align-items-center justify-content-between">
-                        <button class="btn btn-block btn-primary mt-2" style="width: 100%;" type="submit">Confirm Ekspedisi</button>
+                        <button class="btn btn-block btn-primary mt-2 w-100" type="submit">Confirm Ekspedisi</button>
                     </div>
                 </div>
             <?php else : ?>
@@ -76,7 +70,21 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </div>
                 </div>
             <?php endif; ?>
-
         </div>
 
+    </form>
 </main>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const select = document.getElementById("jasaongkir");
+        const inputCode = document.getElementById("jasa");
+
+        select.addEventListener("change", function() {
+            let selectedOption = this.options[this.selectedIndex];
+            let code = selectedOption.getAttribute("data-code");
+            let etd = selectedOption.getAttribute("data-etd");
+            let cost = selectedOption.getAttribute("data-cost");
+            inputCode.value = code + ";" + etd + ";" + cost;
+        });
+    });
+</script>
