@@ -38,14 +38,19 @@ class Rajaongkir_model extends CI_Model
 
     public function get_cities($province_id)
     {
-        return $this->request("city", ["province" => $province_id]);
+        return $this->request("destination/city/" . $province_id);
     }
 
 
-    public function get_subdistricts($city_id)
+    public function get_districts($city_id)
     {
-        return $this->request("destination/district", ["city_id" => $city_id]);
+        return $this->request("destination/district/" . $city_id);
     }
+
+    // public function get_subdistricts($district_id)
+    // {
+    //     return $this->request("destination/district", ["city_id" => $district_id]);
+    // }
 
     public function get_cost($origin_district_id, $destination_district_id, $weight, $courier)
     {

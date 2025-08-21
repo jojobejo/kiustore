@@ -32,13 +32,21 @@ class Rajaongkir extends CI_Controller
         echo json_encode($data, JSON_PRETTY_PRINT);
     }
 
-    public function get_subdistricts()
+    public function get_districts()
     {
         $city_id = $this->input->get('city_id');
-        $data = $this->Rajaongkir_model->get_subdistricts($city_id);
+        $data = $this->Rajaongkir_model->get_districts($city_id);
         header('Content-Type: application/json');
         echo json_encode($data, JSON_PRETTY_PRINT);
     }
+
+    // public function get_subdistricts()
+    // {
+    //     $city_id = $this->input->get('city_id');
+    //     $data = $this->Rajaongkir_model->get_subdistricts($city_id);
+    //     header('Content-Type: application/json');
+    //     echo json_encode($data, JSON_PRETTY_PRINT);
+    // }
 
     // public function get_shipping_cost()
     // {

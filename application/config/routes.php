@@ -112,6 +112,7 @@ $route['get_provinces'] = 'customer/profile/get_provinces';
 $route['rajaongkir'] = 'customer/rajaongkir';
 $route['rajaongkir/get_provinces'] = 'customer/rajaongkir/get_provinces';
 $route['rajaongkir/get_cities'] = 'customer/rajaongkir/get_cities';
+$route['rajaongkir/get_districts'] = 'customer/rajaongkir/get_districts';
 $route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
 $route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
 
