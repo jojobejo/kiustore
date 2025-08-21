@@ -13,7 +13,8 @@ class Shop extends CI_Controller
             'product_model' => 'product',
             'customer_model' => 'customer',
             'profile_model' => 'profile',
-            'Payment_model' => 'payment'
+            'Payment_model' => 'payment',
+            'Rajaongkir_model' => 'ongkir'
         ));
     }
 
@@ -25,7 +26,7 @@ class Shop extends CI_Controller
         $cart['carts']      = $this->cart->contents();
         $cart['total_cart'] = $this->cart->total();
         $cart['user']       = $data;
-        //ADD-ONS
+
         $cusids             = $this->session->userdata('user_id');
         $now                = date('Y-m-d');
 
@@ -64,11 +65,46 @@ class Shop extends CI_Controller
         }
     }
 
+    public function district_calculate_cost()
+    {
+        $origin         = $this->input->post('kiu');
+        $destination    = $this->input->post('subdis');
+        $courier        = $this->input->post('kurir');
+        $cusids         = $this->session->userdata('user_id');
+        $now            = date('Y-m-d');
+        $cart           = $this->cart->contents();
+        $weight         = 0;
+
+        foreach ($cart as $item) {
+            $weight += $item['product_weight'] * $item['qty'];
+        }
+
+        $origin      = is_numeric($origin) ? (int)$origin : 0;
+        $destination = is_numeric($destination) ? (int)$destination : 0;
+
+        if ($origin <= 0 || $destination <= 0 || $weight <= 0 || $courier === '') {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'meta' => ['message' => 'Semua parameter wajib: origin, destination, weight(gram), courier', 'code' => 400, 'status' => 'error'],
+                    'debug' => compact('origin', 'destination', 'weight', 'courier'),
+                    'data' => null
+                ]));
+        }
+
+        $api = $this->ongkir->get_cost($origin, $destination, $weight, $courier);
+        
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($api));
+    }
+
     public function cekongkir()
     {
         $kiu            = $this->input->post('kiu');
         $kec            = $this->input->post('subdis');
         $expedisi       = $this->input->post('kurir');
+
         $cusids         = $this->session->userdata('user_id');
         $now            = date('Y-m-d');
         $cart           = $this->cart->contents();

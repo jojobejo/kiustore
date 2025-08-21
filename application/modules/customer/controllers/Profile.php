@@ -93,7 +93,13 @@ class Profile extends CI_Controller
                 $this->load->view('footer');
                 break;
             case '2':
-
+                $reset_id = [
+                    'province_id'       => '0',
+                    'kota_id'           => '0',
+                    'subdistrict_id'    => '0'
+                ];
+                $this->profile->update($reset_id);
+                redirect('cus_edit_customer/1');
                 break;
             case '3':
 

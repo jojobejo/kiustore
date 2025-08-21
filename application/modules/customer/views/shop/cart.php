@@ -198,11 +198,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <div class="card cart-amount-area mb-3">
                   <div class="card-body">
                     Pilih Ekpedisi
-                    <form action="<?= base_url('cekongkir'); ?>" method="POST">
+                    <form action="<?= base_url('cekongkir_new'); ?>" method="POST">
                       <?php foreach ($tmp_cart as $t) : ?>
                         <div>
-                          <input type="text" name="kiu" value="160" hidden>
-                          <input type="text" name="subdis" value="<?= $t->sub_id ?>" hidden>
+                          <input type="text" name="kiu" value="160">
+                          <input type="text" name="subdis" value="<?= $t->sub_id ?>">
                         </div>
                       <?php endforeach; ?>
                       <select name="kurir" id="kurir" class="form-control mt-2">
@@ -329,3 +329,23 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <!-- Error Section End -->
   </main>
 <?php endif; ?>
+
+<script>
+  $.ajax({
+    url: "<?= base_url('cekongkir_new') ?>",
+    type: "POST",
+    data: {
+      origin_subdistrict: $("#kiu").val(),
+      destination_subdistrict: $("#subdis").val(),
+    },
+    dataType: "json",
+    success: function(res) {
+      console.log("Hasil perhitungan ongkir:", res);
+      if (res.data) {
+        res.data.forEach(function(service) {
+          console.log(service.service, service.cost[0].value);
+        });
+      }
+    }
+  });
+</script>

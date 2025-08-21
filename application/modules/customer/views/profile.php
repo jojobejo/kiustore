@@ -11,7 +11,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="media-body">
                 <h2 class="title-color"><?php echo get_user_name(); ?></h2>
                 <span class="content-color font-md">
-                    <a href="<?= base_url('cus_edit_customer') ?>" class="btn btn-sm btn-warning mt-2 mb-2 w-100"><i class="fas fa-pencil-alt"></i></a>
+                    <a href="<?= base_url('cus_edit_customer/2') ?>" class="btn btn-sm btn-warning mt-2 mb-2 w-100"><i class="fas fa-pencil-alt"></i></a>
                 </span>
             </div>
         </div>

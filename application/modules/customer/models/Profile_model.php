@@ -36,6 +36,12 @@ class Profile_model extends CI_Model
     {
         return $this->db->where('id', $this->user_id)->update('users', $data);
     }
+
+    public function reset_alamat_cust($data)
+    {
+        return $this->db->where('id', $this->user_id)->update('users', $data);
+    }
+
     public function detail_loc()
     {
         $id = $this->user_id;
