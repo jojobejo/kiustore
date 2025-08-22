@@ -139,13 +139,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <h3 class="font-theme font-md">Pembayaran</h3>
 
         <div class="address">
-            <?php if ($data->payment_price == NULL) : ?>
+            <?php if ($data->payment_price == NULL) :
+                $final_price = $data->insurance + $data->shipping_cost + $data->total_belanja + $ongkir_value; ?>
                 <div class="alert alert-info m-2">Tidak ada data pembayaran.</div>
             <?php else : ?>
                 <table class="table table-hover table-striped table-hover">
                     <tr>
                         <td>Transfer</td>
-                        <td><b>Rp <?php echo format_rupiah($data->payment_price); ?></b></td>
+                        <td><b>Rp <?php echo format_rupiah($final_price); ?></b></td>
                     </tr>
                     <tr>
                         <td>Tanggal</td>
@@ -164,7 +165,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             </b></td>
                     </tr>
                     <tr>
-                        <td>Transfer ke</td>
+                        <td>Metode Pembayaran</td>
                         <td><b>
                                 <?php
                                 $bank_data = json_decode($data->payment_data);
@@ -177,10 +178,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <?php echo $transfer_to->bank; ?> a.n <?php echo $transfer_to->name; ?> (<?php echo $transfer_to->number; ?>)
                             </b></td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <td>Transfer dari</td>
                         <td><b><?php echo $transfer_from->bank; ?> a.n <?php echo $transfer_from->name; ?> (<?php echo $transfer_from->number; ?>)</b></td>
-                    </tr>
+                    </tr> -->
                 </table>
             <?php endif; ?>
         </div>
@@ -230,7 +231,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success">Konfirmasi Pembayaran</a>
                     <?php else : ?>
                         <div class="alert alert-info m-2 w-100">Menunggu konfirmasi pembayaran</div>
-                        <form action="<?= base_url('cust_va'); ?>" method="POST">
+                        <!-- <form action="<?= base_url('cust_va'); ?>" method="POST">
 
                             <div class="form-group">
                                 <label>Nomor Customer</label>
@@ -249,7 +250,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <input type="text" name="transaksi_all" id="transaksi_all" class="form-control" value="<?= $kdfaktur ?>" required>
                             </div>
 
-                        </form>
+                        </form> -->
                         <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success m-2 w-100">Lakukan Pembayaran</a>
                     <?php endif; ?>
                 <?php elseif ($data->order_status == 3) : ?>

@@ -41,11 +41,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             </select>
 
                             <!-- hidden input -->
-                            <input type="text" name="jasa" id="jasa" value="">
-                            <input type="text" name="action" value="addongkir">
-                            <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
+                            <input type="hidden" name="jasa" id="jasa" value="">
+                            <input type="hidden" name="action" value="addongkir">
+                            <input type="hidden" name="customer" value="<?= $this->session->userdata('user_id') ?>">
                             <?php foreach ($itm_cart as $itm) : ?>
-                                <input type="text" name="kdfaktur" value="<?= $itm->kdchart ?>">
+                                <input type="hidden" name="kdfaktur" value="<?= $itm->kdchart ?>">
                             <?php endforeach; ?>
                         </div>
                     <?php else : ?>

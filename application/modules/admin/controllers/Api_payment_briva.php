@@ -99,7 +99,7 @@ class api_payment_briva extends CI_Controller
             'partnerServiceId'  => $partnerServiceId,
             'customerNo'        => $customerNo,
             'virtualAccountNo'  => $partnerServiceId . $customerNo,
-            'trxId'             => 'trx12346', // di generate oleh partner 
+            'trxId'             => 'trx12346',
         );
 
         curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body, '-- inquiry va --');
@@ -189,7 +189,7 @@ class api_payment_briva extends CI_Controller
                 'value'     => number_format($tot_price, 2, '.', ''),
                 'currency'  => 'IDR'
             ),
-            'expiredDate'       => date('c', strtotime('2025-08-30 23:00')),
+            'expiredDate'       => date('c', strtotime('2025-08-22 16:00')),
             'trxId'             => $trid,
             'additionalInfo'    => array(
                 'description'   => 'UJI COBA'
@@ -197,9 +197,7 @@ class api_payment_briva extends CI_Controller
         );
 
         $response = $this->curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body);
-
         header('Content-Type: application/json');
-
         echo $response;
     }
 

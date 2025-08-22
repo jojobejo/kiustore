@@ -131,15 +131,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                     </div>
                                 </div>
                             </div>
+
                         <?php endforeach; ?>
                     <?php endif; ?>
                 <?php endforeach; ?>
 
-
                 <!-- Cart Amount Area-->
                 <div class="card cart-amount-area mb-10">
                     <div class="card-body d-flex align-items-center justify-content-between">
-                        <!--    <h5 class="total-price mb-0">Rp <?php echo format_rupiah($total); ?></h5> -->
+                        <?php $custno = substr($customer->phone_number, -10); ?>
+                        <div>
+                            <input type="text" name="custname" id="custname" class="form-control" value="<?= $customer->name ?>">
+                            <input type="text" name="cust_no" id="cust_no" class="form-control" value="<?= $custno ?>">
+                            <input type="text" name="totprice" id="totprice" class="form-control" value="<?= $total ?>">
+                            <input type="text" name="transaksi_all" id="transaksi_all" class="form-control" value="<?= $order_number ?>">
+                        </div>
+                        <!-- <h5 class="total-price mb-0">Rp <?php echo format_rupiah($total); ?></h5> -->
                         <input type="text" name="usrid" id="usrid" class="btn btn-warning" value="<?= $this->session->userdata('user_id') ?>" hidden>
                         <input type="submit" class="btn btn-warning w-100" value="Buat Pesanan">
                     </div>
@@ -239,3 +246,17 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <?php endif; ?>
 
     </div>
+
+    <script>
+        $("form").on("submit", function(e) {
+            e.preventDefault();
+
+            let formData = $(this).serialize();
+            $.post("<?= site_url('checkout_submit'); ?>", formData, function(res) {
+                $.post("<?= site_url('checkout/save_transaction'); ?>", formData, function(res2) {
+                    window.location.href = "<?= site_url('checkout/success'); ?>";
+                });
+
+            });
+        });
+    </script>

@@ -49,7 +49,6 @@ class Shop extends CI_Controller
             $this->load->view('header');
             $this->load->view('shop/cart', $cart);
             $this->load->view('footer');
-            
         } elseif (level_user() == 1) {
             $ongkir = $cart['ongkir'] = "0";
             $cart['member']          = 0;
@@ -345,6 +344,9 @@ class Shop extends CI_Controller
                     $user_id        = $this->session->userdata('user_id');
                     $jasa_ongkir    = $this->product->getongkir_checkout($iduser, $now);
                     $is_ongkir      = $this->product->is_ongkir($iduser);
+                    $coupon_id      = $this->session->userdata('coupon_id');
+
+                    $order_number   = $this->_create_order_number_va($user_id, $coupon_id);
 
                     $params['customer'] = $this->customer->data();
                     $params['subtotal'] = $subtotal;
@@ -353,6 +355,7 @@ class Shop extends CI_Controller
                     $params['total']    = $subtotal + $ongkir - $discount;
                     $params['discount'] = $disc;
                     $params['kdchart'] = $this->product->getkdchart($iduser);
+                    $params['order_number'] = $order_number;
 
                     $this->session->set_userdata('order_quantity', $items);
                     $this->session->set_userdata('order_quantity_multi', $items_multi);
@@ -863,6 +866,19 @@ class Shop extends CI_Controller
 
 
         $number = $alpha . date('j') . date('n') . date('y') . $count_qty . $user_id . $coupon_id . $num;
+        //Random 3 letter . Date . Month . Year . Quantity . User ID . Coupon Used . Numeric
+
+        return $number;
+    }
+
+    public function _create_order_number_va($user_id, $coupon_id)
+    {
+        $this->load->helper('string');
+        $alpha = strtoupper(random_string('alpha', 3));
+        $num = random_string('numeric', 3);
+        $count_qty = random_string('numeric', 1);
+
+        $number = $alpha . date('n') . date('y') . $count_qty . $user_id . $coupon_id . $num;
         //Random 3 letter . Date . Month . Year . Quantity . User ID . Coupon Used . Numeric
 
         return $number;

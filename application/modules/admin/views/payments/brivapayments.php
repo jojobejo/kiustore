@@ -51,10 +51,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
                         <button type="submit" class="btn btn-primary">Preview</button>
                     </form>
-
-                    <h3></h3>
-                </div>
-                <div class="card-footer">
                 </div>
             </div>
         </div>
