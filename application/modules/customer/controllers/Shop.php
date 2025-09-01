@@ -547,7 +547,6 @@ class Shop extends CI_Controller
                         );
 
                         $this->payment->input_va($datava);
-
                         $this->product->create_order_items($items);
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);

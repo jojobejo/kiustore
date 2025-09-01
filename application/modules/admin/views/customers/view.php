@@ -236,8 +236,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
       </div>
 
-
-      <div class="card card-primary">
+      <!-- VIRTUAL ACCOUNT -->
+      <!-- <div class="card card-primary" hidden>
         <div class="card-header">
           <h3 class="mb-0">Virtual Account Payment</h3>
         </div>
@@ -272,7 +272,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <?php endif; ?>
           </div>
         </div>
-      </div>
+      </div> -->
 
 
     </div> <!-- col -->
