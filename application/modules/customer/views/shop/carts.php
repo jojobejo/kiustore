@@ -34,7 +34,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <select name="jasaongkir" id="jasaongkir" class="form-control" required>
                                 <option value="">-- Pilih Jasa --</option>
                                 <?php foreach ($ongkir as $c) : ?>
-                                    <option value="<?= $c['service'] . ';' . $c['etd'] . ';' . $c['cost'] ?>" data-code="<?= $c['code']; ?>" data-cost="<?= $c['cost']; ?>" data-etd="<?= $c['etd']; ?>">
+                                    <option value="<?= $c['name'] . ';' . $c['service'] . ';' . $c['description'] . ';' . $c['etd'] . ';' . $c['cost'] ?>" data-code="<?= $c['code']; ?>" data-cost="<?= $c['cost']; ?>" data-etd="<?= $c['etd']; ?>">
                                         <?= $c['name']; ?> - <?= $c['service']; ?> (<?= $c['description']; ?>) - Rp <?= number_format($c['cost'], 0, ',', '.'); ?> / Estimasi: <?= $c['etd']; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -42,6 +42,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                             <!-- hidden input -->
                             <input type="hidden" name="jasa" id="jasa" value="">
+
                             <input type="hidden" name="action" value="addongkir">
                             <input type="hidden" name="customer" value="<?= $this->session->userdata('user_id') ?>">
                             <?php foreach ($itm_cart as $itm) : ?>
@@ -84,7 +85,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             let code = selectedOption.getAttribute("data-code");
             let etd = selectedOption.getAttribute("data-etd");
             let cost = selectedOption.getAttribute("data-cost");
-            inputCode.value = code + ";" + etd + ";" + cost;
+            inputCode.value = code;
         });
     });
 </script>

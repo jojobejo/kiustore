@@ -404,6 +404,17 @@ class Order_model extends CI_Model
         ")->result();
     }
 
+    public function getongkir_checkout($id, $now)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tbtestongkir a
+        WHERE a.idcustomer = '$id'
+        AND a.status = '3'
+        AND a.create_at = '$now'
+        ")->result();
+    }
+
     public function order_data($id)
     {
         $data = $this->db->query("SELECT
@@ -417,6 +428,8 @@ class Order_model extends CI_Model
                       oi.order_id = '$id'
                   ) as total_belanja,
                 o.*,
+                b.order_number,
+                b.userno,
                 p.id,
                 c.name,
                 c.code,
@@ -427,6 +440,7 @@ class Order_model extends CI_Model
                 p.payment_status,
                 p.confirmed_date,
                 p.payment_data,
+                o.order_number AS number_ordered,
                 SUM(
                     o.total_price + o.shipping_cost + o.insurance
                 ) AS final_price
@@ -436,12 +450,27 @@ class Order_model extends CI_Model
                 c.id = o.coupon_id
             LEFT JOIN payments p ON
                 p.order_id = o.id
+            LEFT JOIN briva_api b ON
+                o.order_number = b.order_number
             WHERE
                 o.id = '$id'
 
     ");
 
         return $data->row();
+    }
+
+    public function delete_va($invoice)
+    {
+        $this->db->where('order_number', $invoice)->delete('briva_api');
+    }
+
+    public function data_va($id, $invoice)
+    {
+        $data = $this->db->query("SELECT 
+        a.* FROM briva_api a WHERE a.user_id = '$id' AND a.order_number = '$invoice' 
+        ");
+        return $data->result();
     }
 
     public function order_data_coba($id)

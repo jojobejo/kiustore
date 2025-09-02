@@ -209,13 +209,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
                         <option value="jne">JNE</option>
                         <option value="jnt">J&T EXPRESS</option>
-                        <option value="sicepat">SICEPAT</option>
-                        <option value="ninja">NINJA EXPRESS</option>
                         <option value="anteraja">ANTER AJA</option>
                         <option value="pos">POS INDONESIA</option>
-                        <option value="pandu">PANDU LOGISTIK</option>
-                        <option value="sentral">SENTRAL CARGO</option>
-                        <option value="star">STAR CARGO</option>
                       </select>
                       <button class="btn btn-block btn-primary mt-2" style="width: 100%;">CEK ONGKIR</button>
                     </form>
@@ -238,13 +233,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <div class="card cart-amount-area mb-2">
                     <div class="card-body  d-flex align-items-center justify-content-between">
                       Biaya Pengiriman
-                      <h5 class="total-price  mb-0">Rp. <?= format_rupiah($jsongkir['2']); ?></h5>
+                      <h5 class="total-price  mb-0">Rp. <?= format_rupiah($jsongkir['4']); ?></h5>
                     </div>
                     <div class="card-body  d-flex align-items-center justify-content-between">
                       Ekpedisi
-                      <input type="text" value="<?= $expedisi ?> - <?= $jsongkir['0'] ?>" hidden>
-                      <input type="text" value="<?= $jsongkir['1'] ?>(Hari)" hidden>
-                      <span class="badge bg-info" style="font-size: medium;"><?= $expedisi ?> (<?= $jsongkir['0'] ?>), Estimasi <?= $jsongkir['1'] ?> Hari</span>
+                      <input type="text" value="<?= $expedisi ?>" hidden>
+                      <input type="text" value="<?= $jsongkir['3'] ?>" hidden>
+                      <span class="badge bg-info" style="font-size: medium;"><?= $expedisi ?> - <?= $jsongkir['1'] ?> (<?= $jsongkir['2'] ?>), Estimasi <?= $jsongkir['3'] ?></span>
                     </div>
                     <form action="<?= base_url('ongkir'); ?>" method="POST">
                       <input type="text" name="action" value="deleteongkir" hidden>
@@ -254,7 +249,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   </div>
                   <div class="card cart-amount-area mb-3">
                     <div class="card-body d-flex align-items-center justify-content-between">
-                      Total <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price + $jsongkir['2']); ?></h5>
+                      Total <h5 class="total-price n-total mb-0">Rp <?php echo format_rupiah($total_price + $jsongkir['4']); ?></h5>
                     </div>
                   </div>
                 <?php endforeach; ?>

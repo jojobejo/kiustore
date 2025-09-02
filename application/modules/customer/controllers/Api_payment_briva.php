@@ -13,13 +13,6 @@ class api_payment_briva extends CI_Controller
 
         date_default_timezone_set("Asia/Jakarta");
 
-        $this->load->model(array(
-            'order_model' => 'order',
-            'payment_model' => 'payment'
-        ));
-
-        verify_session('admin');
-
         $this->client_id    = 'RVGRlE9qZ6JWXo15soVDmWGJHwyXZIw6';
 
         $keyString = file_get_contents(FCPATH . 'key/private.pem');
@@ -199,8 +192,6 @@ class api_payment_briva extends CI_Controller
         $response = $this->curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body);
         header('Content-Type: application/json');
         echo $response;
-
-        redirect('');
     }
 
     function getToken()

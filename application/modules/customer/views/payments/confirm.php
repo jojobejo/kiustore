@@ -70,7 +70,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div>
 
             <center>
-
                 <h3>Bayar Sebelum : </h3>
                 <div id="timer" style="font-size: large; font-weight: bold; background-color: yellow;" class="mt-2 mb-3">
                 </div>
@@ -98,7 +97,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 }, 1000);
             </script>
 
-            <button class="btn btn-success w-100 mb-5" type="submit">Konfirmasi</button>
+            <!-- <button class="btn btn-success w-100 mb-5" type="submit">Konfirmasi</button> -->
+
             <?php if ($flash) : ?>
                 <p class="text-center text-success"><?php echo $flash; ?></p>
             <?php endif; ?>

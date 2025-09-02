@@ -9,6 +9,7 @@ class Shop extends CI_Controller
         parent::__construct();
         verify_session('customer');
         $this->load->library('cart');
+        $this->load->library('Brivaws');
         $this->load->model(array(
             'product_model' => 'product',
             'customer_model' => 'customer',
@@ -329,6 +330,15 @@ class Shop extends CI_Controller
                     $params['total']    = $subtotal + $ongkir - $discount;
                     $params['discount'] = $disc;
 
+                    $customer = $this->customer->data();
+
+                    $brivapi = array(
+                        'customerNo'  => $customer->phone_number,
+                        'vaname'      => $customer->name,
+                        'totalprice'  => $subtotal - $discount
+                    );
+
+                    $this->session->set_userdata('brivadata', $brivapi);
                     $this->session->set_userdata('order_quantity', $items);
                     $this->session->set_userdata('order_quantity_multi', $items_multi);
                     $this->session->set_userdata('total_price', $params['total']);
@@ -346,48 +356,85 @@ class Shop extends CI_Controller
                     $is_ongkir      = $this->product->is_ongkir($iduser);
                     $coupon_id      = $this->session->userdata('coupon_id');
 
-                    $order_number   = $this->_create_order_number_va($user_id, $coupon_id);
+                    if (level_user() >= 2) {
+                        $params['customer']     = $this->customer->data();
+                        $params['subtotal']     = $subtotal;
+                        $params['jasa_ongkir']  = $jasa_ongkir;
+                        $params['is_ongkir']    = $is_ongkir;
+                        $params['total']        = $subtotal + $ongkir - $discount;
+                        $params['discount']     = $disc;
+                        $params['kdchart']      = $this->product->getkdchart($iduser);
 
-                    $params['customer'] = $this->customer->data();
-                    $params['subtotal'] = $subtotal;
-                    $params['jasa_ongkir'] = $jasa_ongkir;
-                    $params['is_ongkir'] = $is_ongkir;
-                    $params['total']    = $subtotal + $ongkir - $discount;
-                    $params['discount'] = $disc;
-                    $params['kdchart'] = $this->product->getkdchart($iduser);
-                    $params['order_number'] = $order_number;
+                        $customer = $this->customer->data();
 
-                    $this->session->set_userdata('order_quantity', $items);
-                    $this->session->set_userdata('order_quantity_multi', $items_multi);
-                    $this->session->set_userdata('total_price', $params['total']);
-                    $this->session->set_userdata('total_price_multi', $total_price_multi);
+                        $brivapi = array(
+                            'customerNo'  => $customer->phone_number,
+                            'vaname'      => $customer->name,
+                            'totalprice'  => $subtotal + $ongkir - $discount
+                        );
 
-                    $this->load->view('header');
-                    $this->load->view('shop/checkout', $params);
-                    $this->load->view('footer');
+                        $this->session->set_userdata('brivadata', $brivapi);
+                        $this->session->set_userdata('order_quantity', $items);
+                        $this->session->set_userdata('order_quantity_multi', $items_multi);
+                        $this->session->set_userdata('total_price', $params['total']);
+                        $this->session->set_userdata('total_price_multi', $total_price_multi);
+
+                        $this->load->view('header');
+                        $this->load->view('shop/checkout', $params);
+                        $this->load->view('footer');
+                    } else {
+                        $params['customer']     = $this->customer->data();
+                        $params['subtotal']     = $subtotal;
+                        $params['jasa_ongkir']  = $jasa_ongkir;
+                        $params['is_ongkir']    = $is_ongkir;
+                        $params['total']        = $subtotal + $ongkir - $discount;
+                        $params['discount']     = $disc;
+                        $params['kdchart']      = $this->product->getkdchart($iduser);
+
+                        $customer = $this->customer->data();
+
+                        foreach ($jasa_ongkir as $j) {
+                            $jsongkir = explode(';', $j->jsongkir);
+                        }
+
+                        $brivapi = array(
+                            'customerNo'  => $customer->phone_number,
+                            'vaname'      => $customer->name,
+                            'totalprice'  => $subtotal + $jsongkir['4'] - $discount
+                        );
+
+                        $this->session->set_userdata('brivadata', $brivapi);
+                        $this->session->set_userdata('order_quantity', $items);
+                        $this->session->set_userdata('order_quantity_multi', $items_multi);
+                        $this->session->set_userdata('total_price', $params['total']);
+                        $this->session->set_userdata('total_price_multi', $total_price_multi);
+
+                        $this->load->view('header');
+                        $this->load->view('shop/checkout', $params);
+                        $this->load->view('footer');
+                    }
                 }
                 break;
 
             case 'order':
 
-                $quantity   = $this->session->userdata('order_quantity');
-                $user_id    = get_current_user_id();
-                $coupon_id  = $this->session->userdata('coupon_id');
-                $order_date = date('Y-m-d H:i:s');
-                $due_date   = date('Y-m-d');
-                $payment    = $this->input->post('payment');
-                $shipping   = $this->input->post('shipping');
-                $ongkirprice   = $this->input->post('ongkirprice');
-                $kdfaktur   = $this->input->post('kdfaktur');
-                $estimasi   = $this->input->post('estimasi');
-                $jnkirim    = $this->input->post('jns_shipping');
-
-                $name       = $this->input->post('name');
-                $phone_number = $this->input->post('phone_number');
-                $address    = $this->input->post('address');
-                $shop_name  = $this->input->post('shop_name');
-                $shop_address = $this->input->post('shop_address');
-                $note       = $this->input->post('note');
+                $quantity       = $this->session->userdata('order_quantity');
+                $user_id        = get_current_user_id();
+                $coupon_id      = $this->session->userdata('coupon_id');
+                $order_date     = date('Y-m-d H:i:s');
+                $due_date       = date('Y-m-d');
+                $payment        = $this->input->post('payment');
+                $shipping       = $this->input->post('shipping');
+                $ongkirprice    = $this->input->post('ongkirprice');
+                $kdfaktur       = $this->input->post('kdfaktur');
+                $estimasi       = $this->input->post('estimasi');
+                $jnkirim        = $this->input->post('jns_shipping');
+                $name           = $this->input->post('name');
+                $phone_number   = $this->input->post('phone_number');
+                $address        = $this->input->post('address');
+                $shop_name      = $this->input->post('shop_name');
+                $shop_address   = $this->input->post('shop_address');
+                $note           = $this->input->post('note');
 
                 $delivery_data = array(
                     'customer' => array(
@@ -498,7 +545,9 @@ class Shop extends CI_Controller
                     // untuk metode pembayaran cash order langsung dijadikan 1
                     if (is_member() == '1') {
                         $total_price = $this->session->userdata('total_price');
+                        $brivacust   = $this->session->userdata('brivadata');
                         $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
+
                         $order = array(
                             'user_id' => $user_id,
                             'coupon_id' => $coupon_id,
@@ -531,28 +580,29 @@ class Shop extends CI_Controller
                             $n++;
                         }
 
-                        // GENERATE KDCHART
-                        $vacode = $this->payment->get_va_code($user_id);
-                        $createva = "2123" . $vacode->id . $vacode->custno;
-
                         $generatechart = array(
                             'kdchart'   => $kdfaktur
                         );
 
                         $datava = array(
-                            'order_number'  => $order_number,
-                            'user_id'       => $user_id,
-                            'va_code'       => $createva,
-                            'status'        => '1'
+                            'order_number'      => $order_number,
+                            'kd_faktur'         => $kdfaktur,
+                            'user_id'           => $user_id,
+                            'name'              => $brivacust['vaname'],
+                            'va_code'           => '91118' . substr($brivacust['customerNo'], -8),
+                            'userno'            => substr($brivacust['customerNo'], -8),
+                            'total_price_topay' => $brivacust['totalprice'],
+                            'exp_date'          => date('c', strtotime('+15 minutes')),
+                            'status'            => '1'
                         );
 
                         $this->payment->input_va($datava);
-
                         $this->product->create_order_items($items);
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);
                     } elseif (is_member() == '0') {
                         $total_price = $this->session->userdata('total_price');
+                        $brivacust   = $this->session->userdata('brivadata');
                         $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
                         $order = array(
                             'user_id' => $user_id,
@@ -586,24 +636,26 @@ class Shop extends CI_Controller
                             $n++;
                         }
 
-                        // GENERATE KDCHART
-                        $vacode = $this->payment->get_va_code($user_id);
-                        $createva = "2123" . $vacode->id . $vacode->custno;
-
                         $generatechart = array(
                             'kdchart'   => $kdfaktur
                         );
 
                         $datava = array(
-                            'order_number'  => $order_number,
-                            'user_id'       => $user_id,
-                            'va_code'       => $createva,
-                            'status'        => '1'
+                            'order_number'      => $order_number,
+                            'kd_faktur'         => $kdfaktur,
+                            'user_id'           => $user_id,
+                            'name'              => $brivacust['vaname'],
+                            'va_code'           => '91118' . substr($brivacust['customerNo'], -8),
+                            'userno'            => substr($brivacust['customerNo'], -8),
+                            'total_price_topay' => $brivacust['totalprice'],
+                            'exp_date'          => date('c', strtotime('+15 minutes')),
+                            'status'            => '1'
                         );
 
                         $updatesongkir = array(
                             'status'    => '3'
                         );
+
                         $now = date('Y-m-d');
                         $this->product->stsongkir($user_id, $now, $updatesongkir);
                         $this->product->create_order_items($items);
@@ -611,9 +663,11 @@ class Shop extends CI_Controller
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);
                     } else {
-                        $user_id    = get_current_user_id();
-                        $total_price = $this->session->userdata('total_price');
-                        $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
+                        $user_id        = get_current_user_id();
+                        $total_price    = $this->session->userdata('total_price');
+                        $brivacust      = $this->session->userdata('brivadata');
+                        $order_number   = $this->_create_order_number($quantity, $user_id, $coupon_id);
+
                         $order = array(
                             'user_id' => $user_id,
                             'coupon_id' => $coupon_id,
@@ -646,24 +700,28 @@ class Shop extends CI_Controller
                             $n++;
                         }
 
-                        // GENERATE KDCHART
-                        $vacode = $this->payment->get_va_code($user_id);
-                        $createva = "2123" . $vacode->id . $vacode->custno;
-
                         $generatechart = array(
                             'kdchart'   => $kdfaktur
                         );
+
                         $datava = array(
-                            'order_number'  => $order_number,
-                            'user_id'       => $user_id,
-                            'va_code'       => $createva,
-                            'status'        => '1'
+                            'order_number'      => $order_number,
+                            'kd_faktur'         => $kdfaktur,
+                            'user_id'           => $user_id,
+                            'name'              => $brivacust['vaname'],
+                            'va_code'           => '91118' . substr($brivacust['customerNo'], -8),
+                            'userno'            => substr($brivacust['customerNo'], -8),
+                            'total_price_topay' => $brivacust['totalprice'],
+                            'exp_date'          => date('c', strtotime('+15 minutes')),
+                            'status'            => '1'
                         );
+
                         $updatesongkir = array(
                             'status'    => '3'
                         );
 
-                        $now            = date('Y-m-d');
+                        $now = date('Y-m-d');
+
                         $this->product->stsongkir($user_id, $now, $updatesongkir);
                         $this->product->create_order_items($items);
                         $this->payment->input_va($datava);
@@ -672,11 +730,19 @@ class Shop extends CI_Controller
                     }
                 }
 
+                $custnobriva    = substr($brivacust['customerNo'], -8);
+                $custnamebriva  = $brivacust['vaname'];
+                $custpriceva    = $brivacust['totalprice'];
+                $idinvoice      = $order_number;
+
+                $this->brivaws->createVa("$custnobriva", "$custnamebriva", "$custpriceva", "$idinvoice");
+
                 $this->cart->destroy();
                 $this->session->unset_userdata('order_quantity');
                 $this->session->unset_userdata('total_price');
                 $this->session->unset_userdata('total_price_muulti');
                 $this->session->unset_userdata('coupon_id');
+                $this->session->unset_userdata('brivadata');
 
                 $this->session->set_flashdata('order_flash', 'Order berhasil ditambahkan');
                 if ($payment == 1) {
@@ -883,4 +949,13 @@ class Shop extends CI_Controller
 
         return $number;
     }
+
+    // DEBUGING - TEST - ERROR
+    // public function test_api_payment()
+    // {
+    //     $response = $this->brivaws->createVa("12345611", "Budi", 30000, "trx002");
+
+    //     $data['response'] = $response;
+    //     $this->load->view('shop/test', $data);
+    // }
 }

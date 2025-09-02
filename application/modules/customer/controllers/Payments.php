@@ -76,7 +76,7 @@ class Payments extends CI_Controller
 
         $payments['orders'] = $this->order->order_with_bank_payments($order_id);
         $payments['customer'] = $this->order->get_data_customer($cusid);
-        $payments['target_time'] = date('Y-m-d H:i:s', strtotime('+2 hour'));
+        $payments['target_time'] = date('Y-m-d H:i:s', strtotime('+15 minutes'));
         $payments['banks'] = (array) json_decode(get_settings('payment_banks'));
         $payments['order_id'] = $order_id;
         $payments['flash'] = $this->session->flashdata('payment_flash');

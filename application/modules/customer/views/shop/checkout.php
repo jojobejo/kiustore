@@ -85,6 +85,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <?php foreach ($jasa_ongkir as $j) :
                             $now = date('Y-m-d');
                             $jsongkir = explode(';', $j->jsongkir);
+                            $expedisis = $j->sjasa;
                             $expedisi = $j->sjasa;
                             if ($expedisi == "jne") {
                                 $expedisi = 'JNE';
@@ -95,9 +96,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             }
                         ?>
                             <div hidden>
-                                <input type="text" value="<?= $jsongkir['0'] ?>" name="jns_shipping" id="jns_shipping">
-                                <input type="text" value="<?= $jsongkir['1'] ?> Hari" name="estimasi" id="estimasi">
-                                <input type="text" value="<?= $jsongkir['2'] ?>" name="ongkirprice" id="ongkirprice">
+                                <input type="text" value="<?= $expedisis ?>" name="jns_shipping" id="jns_shipping">
+                                <input type="text" value="<?= $jsongkir['3'] ?> Hari" name="estimasi" id="estimasi">
+                                <input type="text" value="<?= $jsongkir['4'] ?>" name="ongkirprice" id="ongkirprice">
                                 <input type="text" value="<?= $j->kd_faktur ?>" name="kdfaktur" id="kdfaktur">
                             </div>
                             <!-- Payment Method Choose-->
@@ -124,7 +125,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <div class="row">
                                             <div class="input-box col-6">
                                                 <input id="expiedisi" name="shipping" type="radio" value="5" checked>
-                                                <label for="karisma"><?= $expedisi ?> - <?= $jsongkir['0'] ?> - Estimasi - <?= $jsongkir['1'] ?> (Rp. <?= number_format($jsongkir['2'], 0) ?>)</label>
+                                                <label for="karisma"><?= $expedisi ?> - <?= $jsongkir['1'] ?> (<?= $jsongkir['2'] ?>), Estimasi : <?= $jsongkir['3'] ?> (Rp. <?= number_format($jsongkir['4'], 0) ?>)</label>
                                                 <div class="check"></div>
                                             </div>
                                         </div>
@@ -139,18 +140,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <!-- Cart Amount Area-->
                 <div class="card cart-amount-area mb-10">
                     <div class="card-body d-flex align-items-center justify-content-between">
-                        <?php $custno = substr($customer->phone_number, -10); ?>
-                        <div>
-                            <input type="text" name="custname" id="custname" class="form-control" value="<?= $customer->name ?>">
-                            <input type="text" name="cust_no" id="cust_no" class="form-control" value="<?= $custno ?>">
-                            <input type="text" name="totprice" id="totprice" class="form-control" value="<?= $total ?>">
-                            <input type="text" name="transaksi_all" id="transaksi_all" class="form-control" value="<?= $order_number ?>">
-                        </div>
                         <!-- <h5 class="total-price mb-0">Rp <?php echo format_rupiah($total); ?></h5> -->
                         <input type="text" name="usrid" id="usrid" class="btn btn-warning" value="<?= $this->session->userdata('user_id') ?>" hidden>
                         <input type="submit" class="btn btn-warning w-100" value="Buat Pesanan">
                     </div>
                 </div>
+
             </div>
         </form>
     <?php else : ?>
@@ -192,6 +187,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
                     </div>
                 </div>
+
                 <!-- Payment Method Choose-->
                 <div class="shipping-method-choose mb-3">
                     <div class="alert alert-info m-2">Metode Pembayaran</div>
@@ -246,17 +242,3 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <?php endif; ?>
 
     </div>
-
-    <script>
-        $("form").on("submit", function(e) {
-            e.preventDefault();
-
-            let formData = $(this).serialize();
-            $.post("<?= site_url('checkout_submit'); ?>", formData, function(res) {
-                $.post("<?= site_url('checkout/save_transaction'); ?>", formData, function(res2) {
-                    window.location.href = "<?= site_url('checkout/success'); ?>";
-                });
-
-            });
-        });
-    </script>
