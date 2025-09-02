@@ -17,7 +17,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
       <?php if (count($categories) > 0) : ?>
         <?php foreach ($categories as $category) : ?>
           <div class="product-list media">
-            <a href="<?php echo site_url('category/' . $category->id . '/' . $category->name . '/'); ?>"><img src="<?php echo get_theme_uri('images/catagoeris/' . $category->id . '.png'); ?>" class="img-fluid" alt="offer" /></a>
+            <a href="<?php echo site_url('category/' . $category->id . '/' . $category->name . '/'); ?>"><img src="<?php echo get_theme_uri('images/catagoeris/' . $category->id . '.png'); ?>" class="w-100 h-100 object-fit-cover" alt="offer" /></a>
             <div class="media-body">
               <a href="<?php echo site_url('category/' . $category->id . '/' . $category->name . '/'); ?>"> <?php echo $category->name; ?> </a>
               <p class="content-color"> Deskripsi kategori</p>

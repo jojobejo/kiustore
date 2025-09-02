@@ -39,12 +39,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <div class="col-6">
             <div class="product-card">
               <div class="img-wrap">
-                <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" class="img-fluid" alt="<?php echo $product->name; ?>" /> </a>
+                <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" class="w-100 h-100 object-fit-cover" alt="<?php echo $product->name; ?>" /> </a>
               </div>
               <div class="content-wrap">
                 <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>" class="font-sm title-color"><?php echo $product->name; ?> </a>
                 <span class="title-color font-sm plus-item">Rp <?php echo format_rupiah($product->price); ?>
-                  <!-- <a class="btn btn-success btn-sm add-to-chart add-cart" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->current_discount > 0) ? ($product->price - $product->current_discount) : $product->price; ?>" data-id="<?php echo $product->id; ?>">Beli</a> -->
+                  <a class="btn btn-success btn-sm add-to-chart add-cart w-10" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->current_discount > 0) ? ($product->price - $product->current_discount) : $product->price; ?>" data-id="<?php echo $product->id; ?>">Beli</a>
                 </span>
               </div>
             </div>

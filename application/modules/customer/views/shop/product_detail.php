@@ -28,9 +28,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
     <div class="price">
       <?php if ($product->promo == 1) : ?>
-        <div class="price"><span>Rp <?php echo get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?></span><del><small>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></small></del></div>
+        <div class="price"><span>Rp <?php echo format_rupiah(get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3)); ?></span><del><small>Rp <?php echo format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?></small></del></div>
       <?php else : ?>
-        <span>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></span>
+        <span>Rp <?php echo format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?></span>
       <?php endif; ?>
 
     </div>
@@ -48,17 +48,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
       </div>
 
-      <a class="btn btn-success btn-lg add-to-chart add-cart atc-pd col-12" id="atc" href="#" 
-      data-sku="<?php echo $product->sku; ?>" 
-      data-name="<?php echo $product->name; ?>" 
-      data-price="<?php echo ($product->promo == 1) ? 
-      get_v_price($product->promo_price, $product->promo_price_2, $product->promo_price_3) : 
-      get_v_price($product->price, $product->price_2, $product->price_3); ?>" 
-      data-id="<?php echo $product->id; ?>" 
-      data-satuan-qty="<?php echo $product->product_unit_value; ?>" 
-      data-product-type="<?php echo $product->product_type; ?>" 
-      data-satuan="1" data-satuan-text="<?php echo $product->product_unit_1; ?>" 
-      data-qty="1" data-product-weight="<?php echo $product->product_unit_weight ?>">Beli
+      <a class="btn btn-success btn-lg add-to-chart add-cart atc-pd col-12" id="atc" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->promo == 1) ?
+                                                                                                                                                                                              get_v_price($product->promo_price, $product->promo_price_2, $product->promo_price_3) :
+                                                                                                                                                                                              get_v_price($product->price, $product->price_2, $product->price_3); ?>" data-id="<?php echo $product->id; ?>" data-satuan-qty="<?php echo $product->product_unit_value; ?>" data-product-type="<?php echo $product->product_type; ?>" data-satuan="1" data-satuan-text="<?php echo $product->product_unit_1; ?>" data-qty="1" data-product-weight="<?php echo $product->product_unit_weight ?>">Beli
       </a>
 
     </div>
@@ -153,7 +145,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <div>
             <div class="product-card">
               <div class="img-wrap">
-                <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" class="img-fluid" alt="<?php echo $product->name; ?>" /> </a>
+                <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" class="w-100 h-100 object-fit-cover" alt="<?php echo $product->name; ?>" /> </a>
               </div>
               <div class="content-wrap">
                 <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>" class="font-sm title-color"><?php echo $product->name; ?> </a>
@@ -162,7 +154,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <?php if ($product->promo == 1) : ?>
                     <div class="price"><span>Rp <?php echo get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?></span><del><small>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></small></del></div>
                   <?php else : ?>
-                    <span>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></span>
+                    <span>Rp <?php echo format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?></span>
                   <?php endif; ?>
                   <a class="btn btn-success btn-sm" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a>
 
