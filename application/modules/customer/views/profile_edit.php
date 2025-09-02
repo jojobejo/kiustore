@@ -96,9 +96,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
 
     <?php elseif ($action == '2') : ?>
-
     <?php endif; ?>
-
     <?php if ($flash) : ?>
         <p class="text-center text-success"><?php echo $flash; ?></p>
     <?php endif; ?>

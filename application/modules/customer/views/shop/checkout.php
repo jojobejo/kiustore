@@ -110,7 +110,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                             <div class="row">
                                                 <div class="input-box col-6">
                                                     <input type="radio" name="payment" id="transfer" value="2" checked />
-                                                    <label class="form-check-label" for="transfer">VA - KARISMA </label>
+                                                    <label class="form-check-label" for="transfer">Virtual Account Karisma</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -198,11 +198,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                     <!-- Net Banking Option Start -->
                                     <div class="input-box col-6">
                                         <input type="radio" name="payment" id="kredit" value="1" checked />
-                                        <label class="form-check-label" for="cod">Kredit </label>
+                                        <label class="form-check-label" for="cod">Kredit</label>
                                     </div>
                                     <div class="input-box col-6">
                                         <input type="radio" name="payment" id="transfer" value="2" />
-                                        <label class="form-check-label" for="cod">VA - KARISMA </label>
+                                        <label class="form-check-label" for="cod">Virtual Account Karisma</label>
                                     </div>
                                     <!-- Net Banking Option End -->
                                 </div>
