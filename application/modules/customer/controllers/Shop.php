@@ -603,6 +603,7 @@ class Shop extends CI_Controller
                     } elseif (is_member() == '0') {
                         $total_price = $this->session->userdata('total_price');
                         $brivacust   = $this->session->userdata('brivadata');
+
                         $order_number = $this->_create_order_number($quantity, $user_id, $coupon_id);
                         $order = array(
                             'user_id' => $user_id,
@@ -730,12 +731,13 @@ class Shop extends CI_Controller
                     }
                 }
 
-                $custnobriva    = substr($brivacust['customerNo'], -8);
-                $custnamebriva  = $brivacust['vaname'];
-                $custpriceva    = $brivacust['totalprice'];
-                $idinvoice      = $order_number;
+                // $brivacust      = $this->session->userdata('brivadata');
+                // $custnobriva    = substr($brivacust['customerNo'], -8);
+                // $custnamebriva  = $brivacust['vaname'];
+                // $custpriceva    = $brivacust['totalprice'];
+                // $idinvoice      = $order_number;
 
-                $this->brivaws->createVa("$custnobriva", "$custnamebriva", "$custpriceva", "$idinvoice");
+                // $this->brivaws->createVa("$custnobriva", "$custnamebriva", "$custpriceva", "$idinvoice");
 
                 $this->cart->destroy();
                 $this->session->unset_userdata('order_quantity');
@@ -949,13 +951,4 @@ class Shop extends CI_Controller
 
         return $number;
     }
-
-    // DEBUGING - TEST - ERROR
-    // public function test_api_payment()
-    // {
-    //     $response = $this->brivaws->createVa("12345611", "Budi", 30000, "trx002");
-
-    //     $data['response'] = $response;
-    //     $this->load->view('shop/test', $data);
-    // }
 }

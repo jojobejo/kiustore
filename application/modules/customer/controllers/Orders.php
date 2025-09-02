@@ -65,16 +65,17 @@ class Orders extends CI_Controller
             $now        = date('Y-m-d');
             $getongkir  = $this->order->getongkir_checkout($cusid, $now);
 
-            $params['title'] = 'Order #' . $data->order_number;
-            $order['data'] = $data;
-            $order['items'] = $items;
-            $order['banks'] = $banks;
-            $order['delivery_data'] = json_decode($data->delivery_data);
-            $order['customer'] = $this->order->get_data_customer($cusid);
-            $order['is_ongkir'] = $this->order->is_ongkir_exist($data->kd_faktur);
-            $order['briva'] = $this->order->data_va($cusid, $data->order_number);
-            $order['getongkir'] = $getongkir;
-            $order['kdfaktur'] = $data->order_number;
+            $params['title']            = 'Order #' . $data->order_number;
+            $order['data']              = $data;
+            $order['items']             = $items;
+            $order['banks']             = $banks;
+            $order['delivery_data']     = json_decode($data->delivery_data);
+            $order['customer']          = $this->order->get_data_customer($cusid);
+            $order['is_ongkir']         = $this->order->is_ongkir_exist($data->kd_faktur);
+            $order['briva']             = $this->order->data_va($cusid, $data->order_number);
+            $order['is_briva']          = $this->order->is_va_exist($data->order_number);
+            $order['getongkir']         = $getongkir;
+            $order['kdfaktur']          = $data->order_number;
 
             $this->load->view('header', $params);
             $this->load->view('orders/view', $order);
@@ -102,39 +103,24 @@ class Orders extends CI_Controller
     }
 
 
-    public function get_time_left($order_number)
+    public function get_briva_status($order_number)
     {
-        $cusid = get_current_user_id();
-        $va = $this->order->data_va($cusid, $order_number);
+        $cusid = $this->session->userdata('user_id');
+        $briva = $this->order->data_va($cusid, $order_number);
 
-        if ($va) {
-            $create_at = $va[0]->create_at;
-            $expired_at = date('Y-m-d H:i:s', strtotime($create_at . ' +15 minutes'));
+        if (!empty($briva)) {
+            $brivas = $briva[0];
+            $briva_sts = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
 
-            $now = date('Y-m-d H:i:s');
-            $diff = strtotime($expired_at) - strtotime($now);
-
-            if ($diff <= 0) {
-                $time_left = "00:00:00";
-            } else {
-                $hours   = floor($diff / 3600);
-                $minutes = floor(($diff % 3600) / 60);
-                $seconds = $diff % 60;
-                $time_left = sprintf("%02d:%02d:%02d", $hours, $minutes, $seconds);
-            }
-
-            echo json_encode([
-                'expired_at' => $expired_at,
-                'time_left'  => $time_left
-            ]);
+            header('Content-Type: application/json');
+            echo $briva_sts;
         } else {
             echo json_encode([
-                'expired_at' => null,
-                'time_left'  => "00:00:00"
+                "responseCode" => "404",
+                "responseMessage" => "Data not found"
             ]);
         }
     }
-
 
     public function test_status_va()
     {
@@ -178,23 +164,23 @@ class Orders extends CI_Controller
                 }
                 break;
 
-            case 'do_payment':
-                $id =  $this->input->post('id');
-                $userid = $this->input->post('user_id');
-                $trxid = $this->input->post('order');
-                $kdfaktur = $this->input->post('kdfaktur');
-                $va_no = $this->input->post('va_no');
-                $va_name = $this->input->post('va_name');
-                $va_to_pay = $this->input->post('va_to_pay');
-                $nocust = $this->input->post('nocust');
-                $data = $this->order->order_data($id);
+            case 'create_payment':
+                $id         = $this->input->post('id');
+                $userid     = $this->input->post('userid');
+                $trxid      = $this->input->post('order');
+                $kdfaktur   = $this->input->post('kdfaktur');
+                $va_no      = $this->input->post('nocust');
+                $va_name    = $this->input->post('va_name');
+                $va_to_pay  = $this->input->post('va_to_pay');
+                $nocust     = $this->input->post('nocust');
+                $data       = $this->order->order_data($id);
 
                 $datava = array(
                     'order_number'      => $trxid,
                     'kd_faktur'         => $kdfaktur,
                     'user_id'           => $userid,
                     'name'              => $va_name,
-                    'va_code'           => $va_no,
+                    'va_code'           => '91118' . $nocust,
                     'userno'            => $nocust,
                     'total_price_topay' => $va_to_pay,
                     'exp_date'          => date('c', strtotime('+15 minutes')),
@@ -208,7 +194,6 @@ class Orders extends CI_Controller
                 } else {
                     $response = array('code' => 200, 'error' => TRUE, 'message' => 'Payment tidak dapat di generate');
                 }
-
                 break;
 
             case 'delete_order':

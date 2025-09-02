@@ -389,6 +389,7 @@ class Order_model extends CI_Model
         $user_id = $this->user_id;
         return ($this->db->where(array('id' => $id, 'user_id' => $user_id))->get('orders')->num_rows() > 0) ? TRUE : FALSE;
     }
+
     public function is_ongkir_exist($kd)
     {
         $user_id = $this->user_id;
@@ -468,9 +469,15 @@ class Order_model extends CI_Model
     public function data_va($id, $invoice)
     {
         $data = $this->db->query("SELECT 
-        a.* FROM briva_api a WHERE a.user_id = '$id' AND a.order_number = '$invoice' 
+        a.* FROM briva_api a WHERE a.user_id = '$id' AND a.order_number = '$invoice' AND a.status = '1'
         ");
         return $data->result();
+    }
+
+    public function is_va_exist($id)
+    {
+        $user_id = $this->user_id;
+        return ($this->db->where(array('order_number' => $id, 'user_id' => $user_id))->get('briva_api')->num_rows() > 0) ? TRUE : FALSE;
     }
 
     public function order_data_coba($id)
@@ -580,6 +587,11 @@ class Order_model extends CI_Model
             ");
 
         return $items->result();
+    }
+
+    public function input_va($data)
+    {
+        return $this->db->insert('briva_api', $data);
     }
 
     public function cancel_order($id)

@@ -95,14 +95,12 @@ $route['cart_api'] = 'customer/shop/cart_api';
 $route['checkout'] = 'customer/shop/checkout';
 $route['checkout_submit'] = 'customer/shop/checkout/order';
 
-
 // payment
 $route['admin/apibriva'] = 'admin/api_payment_briva';
 $route['admin/brivaws'] = 'admin/api_payment_briva';
-
 $route['createva'] = 'admin/api_payment_briva/createVa';
-
 $route['createva/preview'] = 'admin/api_payment_briva/preview_briva';
+
 
 // COBA
 $route['readonlychange'] = 'customer/profile/toggle_readonly';
@@ -124,7 +122,6 @@ $route['rajaongkir/get_cities'] = 'customer/rajaongkir/get_cities';
 $route['rajaongkir/get_districts'] = 'customer/rajaongkir/get_districts';
 $route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
 $route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
-
 
 $route['admin/ongkir']                  = 'admin/Ongkir';
 $route['Ongkir/province']               = 'admin/Ongkir/province';

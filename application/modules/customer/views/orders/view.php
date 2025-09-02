@@ -145,23 +145,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <!-- Product Summary End -->
     </section>
 
-    <section hidden>
-        <?php
-        $dataorder = json_decode($data->delivery_data, true);
-        $duedate = date("ym", strtotime($data->due_date));
-        ?>
-        <div class="row">
-            <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id">
-            <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid">
-            <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur">
-            <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name">
-            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) . $duedate ?>" name="no_va" id="no_va">
-            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust">
-            <input type="text" value="<?= $data->final_price ?>" name="total_topay" id="total_topay">
-            <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id">
-        </div>
-    </section>
-
     <!-- Order Summary Section End -->
     <div hidden>
         <section class="address-section p-0">
@@ -241,30 +224,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <!-- Address Section End -->
         <!-- <?= $data->payment_method; ?> <br>
         <?= $data->order_status; ?> -->
-        <!-- Payment Method Section Start -->
     </div>
 
-    <section class="payment-method p-0" hidden>
+    <!-- Payment Method Section Start -->
+    <!-- <section class="payment-method p-0">
         <?php foreach ($briva as $b) : ?>
             <h5 id="userno"><?= $b->userno ?></h5>
             <h5 id="order_number"><?= $b->order_number ?></h5>
-
             <div id="payment_status">Menunggu pembayaran...</div>
         <?php endforeach; ?>
-    </section>
-
-    <section class="payment-method p-0" hidden>
-
-        <?php foreach ($briva as $b) :
-            $expired_time = strtotime($b->create_at . ' +15 minutes') * 1000;
-        ?>
-            <h3>Invoice : <?= $b->order_number ?></h3>
-            <h3>nova : <?= $b->userno ?></h3>
-            <h3>expired : <?= $b->create_at ?></h3>
-            <h3>Time Left : <span class="countdown" data-expired="<?= $expired_time ?>">--:--:--</span></h3>
-        <?php endforeach; ?>
-
-    </section>
+    </section> -->
 
     <section class="payment-method p-0">
         <h3 class="font-theme font-md">Tindakan</h3>
@@ -274,9 +243,30 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <div class="alert alert-info m-2 w-100">Pesanan dalam proses sales</div>
                     <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
                 <?php elseif ($data->order_status == 2) : ?>
-                    <div class="alert alert-info m-2 w-100">Menunggu Pembayaran</div>
-                    <a href="#" id="" class="btn btn-success ml-3 w-100" data-bs-toggle="modal" data-bs-target="#do_payment_kredit">Lakukan Pembayaran Coba</a>
-                    <!-- <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success ml-3 w-100">Lakukan Pembayaran</a> -->
+                    <!-- SHOW START PAYMENT -->
+                    <?php if ($is_briva) : ?>
+                        <div id="briva-status" class="alert alert-info m-2 w-100">
+                            <h3>Status: <span id="briva-message">Loading...</span></h3>
+                        </div>
+                        <button class="btn btn-warning w-100 cancel-payment">Cancel VA</button>
+                    <?php else : ?>
+                        <?php
+                        $dataorder = json_decode($data->delivery_data, true);
+                        $duedate = date("ym", strtotime($data->due_date));
+                        ?>
+                        <div hidden>
+                            <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
+                            <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
+                            <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
+                            <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
+                            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
+                            <input type="text" value="<?= $data->final_price ?>" name="total_topay" id="total_topay" readonly>
+                            <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
+                        </div>
+                        <button class="btn btn-success w-100 payment-btn">Lakukan Pembayaran</button>
+                    <?php endif; ?>
+                    <!-- SHOW END PAYMENT -->
+
                 <?php elseif ($data->order_status == 3) : ?>
                     <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan</div>
                 <?php elseif ($data->order_status == 4) : ?>
@@ -294,6 +284,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <?php elseif ($data->order_status == 7) : ?>
                     <div class="alert alert-info m-2 w-100">Pesanan dibatalkan</div>
                     <!-- <a href="#" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#deleteModal"><iclass="fa fa-trash"></i> Hapus</a> -->
+                <?php elseif ($data->order_status == 9) : ?>
+                    <div class="alert alert-info m-2 w-100">Menunggu Konfirmasi Kredit</div>
                 <?php endif; ?>
 
             <?php elseif ($data->payment_method == 2) : ?>
@@ -326,6 +318,69 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </section>
     <!-- Payment Method Section End -->
 </main>
+
+<script>
+    function loadBrivaStatus(orderNumber) {
+        $.ajax({
+            url: "<?= site_url('customer/orders/get_briva_status/') ?>" + orderNumber,
+            method: "GET",
+            dataType: "json",
+            success: function(res) {
+                if (res.responseMessage === "Successful") {
+                    let expiredDate = new Date(res.virtualAccountData.expiredDate).getTime();
+
+                    $("#briva-status").html(`
+                    <h3>Time Left :
+                        <span class="countdown" data-expired="${expiredDate}">--:--:--</span>
+                        <span>VA Number : <b>${res.virtualAccountData.virtualAccountNo.trim()}</b></span>
+                        <span>Nominal R : <b>${parseInt(res.virtualAccountData.totalAmount.value).toLocaleString("id-ID")}</b></span>
+                    </h3>
+                `);
+                    startCountdown(expiredDate);
+                } else {
+                    $("#briva-status").html(`<h3>Status: ${res.responseMessage}</h3>`);
+                }
+            },
+            error: function() {
+                $("#briva-status").html("<h3>Status: loading data</h3>");
+            }
+        });
+    }
+
+    function startCountdown(expired) {
+        let countdownElement = $(".countdown");
+        let interval = setInterval(function() {
+            let now = new Date().getTime();
+            let distance = expired - now;
+
+            if (distance <= 0) {
+                clearInterval(interval);
+                countdownElement.text("Expired");
+                return;
+            }
+
+            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownElement.text(
+                ("0" + hours).slice(-2) + ":" +
+                ("0" + minutes).slice(-2) + ":" +
+                ("0" + seconds).slice(-2)
+            );
+        }, 1000);
+    }
+
+    $(document).ready(function() {
+        let orderNumber = "<?= $data->order_number ?>";
+        loadBrivaStatus(orderNumber);
+
+        setInterval(function() {
+            loadBrivaStatus(orderNumber);
+        }, 60000);
+    });
+</script>
+
 
 <?php if (($data->payment_method == 2 && $data->order_status == 4) || ($data->payment_method == 1 && $data->order_status == 4)) : ?>
     <div class="modal fade" id="terimaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -393,72 +448,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </script>
 <?php endif; ?>
 
-
-<?php if ($data->payment_method == 2 && $data->order_status == 2) : ?>
-    <div class="modal fade" id="do_payment_kredit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="terimaModalLabel">Lakukan Pembayaran</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <?php
-                        $dataorder = json_decode($data->delivery_data, true);
-                        $duedate = date("ym", strtotime($data->due_date));
-                        ?>
-                        <div class="row">
-                            <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id">
-                            <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid">
-                            <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur">
-                            <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name">
-                            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) . $duedate ?>" name="no_va" id="no_va">
-                            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust">
-                            <input type="text" value="<?= $data->final_price ?>" name="total_topay" id="total_topay">
-                            <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success payment-btn">Lakukan Pembayaran</button>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php endif; ?>
-
 <?php if ($data->payment_method == 1 && $data->order_status == 2) : ?>
-    <div class="modal fade" id="do_payment_kredit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="terimaModalLabel">Lakukan Pembayaran</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <div class="row">
-                            <?php
-                            $dataorder = json_decode($data->delivery_data, true);
-                            $duedate = date("ym", strtotime($data->due_date));
-                            ?>
-                            <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id">
-                            <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid">
-                            <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name">
-                            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) . $duedate ?>" name="no_va" id="no_va">
-                            <input type="text" value="<?= $data->final_price ?>" name="total_topay" id="total_topay">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success payment-btn">Lakukan Pembayaran</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         $('.payment-btn').click(function(e) {
@@ -466,40 +456,44 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             let id = $('#order_id').val();
             let order = $('#trxid').val();
-            let va_no = $('#no_va').val();
+            let kdfaktur = $('#kdfaktur').val();
             let va_name = $('#va_name').val();
             let va_to_pay = $('#total_topay').val();
+            let userid = $('#user_id').val();
+            let nocust = $('#nocust').val();
 
             $(this).html('<i class="fa fa-spin fa-spinner"></i> Generate Payment ...');
 
             $.ajax({
                 method: 'POST',
-                url: '<?php echo site_url('customer/orders/order_api?action=do_payment'); ?>',
+                url: '<?php echo site_url('customer/orders/order_api?action=create_payment'); ?>',
                 data: {
                     id: id,
                     order: order,
-                    va_no: va_no,
+                    kdfaktur: kdfaktur,
                     va_name: va_name,
-                    va_to_pay: va_to_pay
+                    va_to_pay: va_to_pay,
+                    userid: userid,
+                    nocust: nocust
                 },
+                dataType: 'json',
                 context: this,
                 success: function(res) {
-                    if (res.code == 200) {
-                        console.log("Response dari server:", res);
-                        $(this).html('Batalkan');
+                    console.log("Response dari server:", res);
 
-                        if (res.success) {
-                            $('.statusField').text('Prosess');
-                        } else if (res.error) {
-                            $('.actionRow').html(res.message);
-                        }
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000);
+                    $(this).html('Lakukan Pembayaran');
+
+                    if (res.success) {
+                        $('.statusField').text('Proses');
+                    } else if (res.error) {
+                        $('.actionRow').html(res.message);
                     }
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
                 }
-            })
-        })
+            });
+        });
     </script>
 
 <?php endif; ?>
