@@ -584,19 +584,6 @@ class Shop extends CI_Controller
                             'kdchart'   => $kdfaktur
                         );
 
-                        $datava = array(
-                            'order_number'      => $order_number,
-                            'kd_faktur'         => $kdfaktur,
-                            'user_id'           => $user_id,
-                            'name'              => $brivacust['vaname'],
-                            'va_code'           => '91118' . substr($brivacust['customerNo'], -8),
-                            'userno'            => substr($brivacust['customerNo'], -8),
-                            'total_price_topay' => $brivacust['totalprice'],
-                            'exp_date'          => date('c', strtotime('+15 minutes')),
-                            'status'            => '1'
-                        );
-
-                        $this->payment->input_va($datava);
                         $this->product->create_order_items($items);
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);
@@ -660,7 +647,6 @@ class Shop extends CI_Controller
                         $now = date('Y-m-d');
                         $this->product->stsongkir($user_id, $now, $updatesongkir);
                         $this->product->create_order_items($items);
-                        $this->payment->input_va($datava);
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);
                     } else {
@@ -725,19 +711,10 @@ class Shop extends CI_Controller
 
                         $this->product->stsongkir($user_id, $now, $updatesongkir);
                         $this->product->create_order_items($items);
-                        $this->payment->input_va($datava);
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);
                     }
                 }
-
-                // $brivacust      = $this->session->userdata('brivadata');
-                // $custnobriva    = substr($brivacust['customerNo'], -8);
-                // $custnamebriva  = $brivacust['vaname'];
-                // $custpriceva    = $brivacust['totalprice'];
-                // $idinvoice      = $order_number;
-
-                // $this->brivaws->createVa("$custnobriva", "$custnamebriva", "$custpriceva", "$idinvoice");
 
                 $this->cart->destroy();
                 $this->session->unset_userdata('order_quantity');
@@ -755,6 +732,7 @@ class Shop extends CI_Controller
                 break;
         }
     }
+
 
     public function cart_api()
     {

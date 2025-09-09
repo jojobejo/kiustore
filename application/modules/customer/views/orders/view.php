@@ -242,18 +242,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <?php if ($data->order_status == 1) : ?>
                     <div class="alert alert-info m-2 w-100">Pesanan dalam proses sales</div>
                     <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
-                <?php elseif ($data->order_status == 2) : ?>
+                <?php elseif ($data->order_status == 2) :
+                    $dataorder = json_decode($data->delivery_data, true);
+                    $duedate = date("ym", strtotime($data->due_date));
+                ?>
                     <!-- SHOW START PAYMENT -->
                     <?php if ($is_briva) : ?>
                         <div id="briva-status" class="alert alert-info m-2 w-100">
-                            <h3>Status: <span id="briva-message">Loading...</span></h3>
+                            <h3>Status: <span id="va-status">Loading...</span></h3>
+                            <div id="va-detail"></div>
                         </div>
-                        <button class="btn btn-warning w-100 cancel-payment">Cancel VA</button>
+                        <div hidden>
+                            <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
+                            <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
+                            <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
+                            <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
+                            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
+                            <input type="text" value="<?= $data->final_price ?>" name="total_topay" id="total_topay" readonly>
+                            <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
+                        </div>
                     <?php else : ?>
-                        <?php
-                        $dataorder = json_decode($data->delivery_data, true);
-                        $duedate = date("ym", strtotime($data->due_date));
-                        ?>
                         <div hidden>
                             <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
                             <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
@@ -297,11 +305,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <div class="alert alert-info m-2 w-100">Pembayaran Gagal / Kurang Bayar</div>
                         <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success">Konfirmasi Pembayaran</a>
                     <?php else : ?>
-                        <div class="alert alert-info m-2 w-100">Menunggu konfirmasi pembayaran</div>
-                        <!-- <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success m-2 w-100">Lakukan Pembayaran</a> -->
-                        <!-- <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan Pesanan</a> -->
-                        <a href="#" id="" class="btn btn-success ml-3 w-100" data-bs-toggle="modal" data-bs-target="#do_payment_kredit">Lakukan Pembayaran Coba</a>
+                        <!-- SHOW START PAYMENT -->
+                        <?php if ($is_briva) : ?>
+                            <div id="va-detail"></div>
+                        <?php else : ?>
+                            <?php
+                            $dataorder = json_decode($data->delivery_data, true);
+                            $duedate = date("ym", strtotime($data->due_date));
+                            ?>
+                            <div hidden>
+                                <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
+                                <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
+                                <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
+                                <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
+                                <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
+                                <input type="text" value="<?= $data->final_price ?>.00" name="total_topay" id="total_topay" readonly>
+                                <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
+                            </div>
+                            <div id="va-detail"></div>
+                        <?php endif; ?>
+                        <!-- SHOW END PAYMENT -->
                     <?php endif; ?>
+
                 <?php elseif ($data->order_status == 3) : ?>
                     <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan</div>
                 <?php elseif ($data->order_status == 4) : ?>
@@ -320,67 +345,138 @@ defined('BASEPATH') or exit('No direct script access allowed');
 </main>
 
 <script>
-    function loadBrivaStatus(orderNumber) {
+    let lastStatus = null;
+    let countdownInterval = null;
+
+    function cekStatus() {
         $.ajax({
-            url: "<?= site_url('customer/orders/get_briva_status/') ?>" + orderNumber,
-            method: "GET",
+            url: "<?= site_url('customer/orders/cek_va_status/' . $data->number_ordered) ?>",
+            type: "GET",
             dataType: "json",
             success: function(res) {
-                if (res.responseMessage === "Successful") {
-                    let expiredDate = new Date(res.virtualAccountData.expiredDate).getTime();
+                // console.log("AJAX Response:", res); 
+                if (res.data) {
+                    let briva = res.data.virtualAccountData;
+                    $("#va-status").text(res.status);
 
-                    $("#briva-status").html(`
-                    <h3>Time Left :
-                        <span class="countdown" data-expired="${expiredDate}">--:--:--</span>
-                        <span>VA Number : <b>${res.virtualAccountData.virtualAccountNo.trim()}</b></span>
-                        <span>Nominal R : <b>${parseInt(res.virtualAccountData.totalAmount.value).toLocaleString("id-ID")}</b></span>
-                    </h3>
-                `);
-                    startCountdown(expiredDate);
+                    if (res.status === "Successful") {
+                        let expiredDate = new Date(briva.expiredDate).getTime();
+                        let amount = parseInt(briva.totalAmount.value);
+
+                        $("#va-detail").html(`
+                        <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
+                        <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
+                        <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount.currency}</p>
+                    `);
+                        let now = new Date().getTime();
+                        if (now > expiredDate) {
+                            console.log("VA sudah expired, update ke server...");
+                            updateExpired("<?= $data->number_ordered ?>");
+                        }
+                    } else {
+                        $("#va-detail").html(`<button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran 1</button>`);
+                    }
+
+                    if (lastStatus !== null && lastStatus !== res.status) {
+                        alert("Status VA berubah dari " + lastStatus + " ke " + res.status);
+                    }
+                    lastStatus = res.status;
+
                 } else {
-                    $("#briva-status").html(`<h3>Status: ${res.responseMessage}</h3>`);
+                    $("#va-status").text("Unknown");
+                    $("#va-detail").html(`<button class="btn btn-success w-100 create-payment-btn">Lakukan Pembayaran 2</button>`);
                 }
             },
-            error: function() {
-                $("#briva-status").html("<h3>Status: loading data</h3>");
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", status, error);
+                console.log(xhr.responseText);
             }
         });
     }
 
-    function startCountdown(expired) {
-        let countdownElement = $(".countdown");
-        let interval = setInterval(function() {
+    function updateExpired(orderNumber) {
+        $.ajax({
+            url: "<?= site_url('customer/orders/update_expired') ?>/" + orderNumber,
+            type: "POST",
+            dataType: "json",
+            success: function(res) {
+                console.log("Update expired response:", res);
+                if (res.success) {
+                    alert("VA Expired, data sudah diupdate.");
+                    $("#va-status").text("Expired");
+                    $("#va-detail").html(`<button class="btn btn-success w-100 create-payment-btn">Buat Pembayaran Baru</button>`);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Update expired error:", status, error);
+                console.log(xhr.responseText);
+            }
+        });
+    }
+
+    setInterval(function() {
+        $(".countdown").each(function() {
+            let expired = $(this).data("expired");
             let now = new Date().getTime();
             let distance = expired - now;
 
-            if (distance <= 0) {
-                clearInterval(interval);
-                countdownElement.text("Expired");
-                return;
+            if (distance > 0) {
+                let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                $(this).text(`${hours}:${minutes}:${seconds}`);
+            } else {
+                $(this).text("Expired");
             }
+        });
+    }, 1000);
 
-            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    $(document).on('click', '.update-payment-btn', function(e) {
+        e.preventDefault();
 
-            countdownElement.text(
-                ("0" + hours).slice(-2) + ":" +
-                ("0" + minutes).slice(-2) + ":" +
-                ("0" + seconds).slice(-2)
-            );
-        }, 1000);
-    }
+        let $btn = $(this);
+        $btn.html('<i class="fa fa-spin fa-spinner"></i> Generate Payment ...');
+
+        $.ajax({
+            method: 'POST',
+            url: '<?= site_url('customer/orders/update_briva_status'); ?>',
+            data: {
+                id: $('#order_id').val(),
+                order: $('#trxid').val(),
+                kdfaktur: $('#kdfaktur').val(),
+                va_name: $('#va_name').val(),
+                va_to_pay: $('#total_topay').val(),
+                userid: $('#user_id').val(),
+                nocust: $('#nocust').val()
+            },
+            dataType: 'json',
+            success: function(res) {
+                console.log("Response dari server:", res);
+
+                $btn.html('Lakukan Pembayaran');
+
+                if (res.success) {
+                    $('.statusField').text('Proses');
+                    alert(res.message);
+                    cekStatus();
+                } else if (res.error) {
+                    $('.actionRow').html(res.message);
+                    alert(res.message);
+                }
+            }
+        });
+    });
 
     $(document).ready(function() {
+        let lastStatus = null;
         let orderNumber = "<?= $data->order_number ?>";
-        loadBrivaStatus(orderNumber);
+        cekStatus();
 
         setInterval(function() {
-            loadBrivaStatus(orderNumber);
+            cekStatus();
         }, 60000);
     });
 </script>
-
 
 <?php if (($data->payment_method == 2 && $data->order_status == 4) || ($data->payment_method == 1 && $data->order_status == 4)) : ?>
     <div class="modal fade" id="terimaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

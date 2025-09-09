@@ -85,41 +85,103 @@ class Orders extends CI_Controller
         }
     }
 
-    public function check_payment_status($userno, $order_number)
-    {
-        $result = $this->brivaws->inquiryStatusVa($userno, $order_number);
-        $response = json_decode($result, true);
-
-        if (isset($response['additionalInfo']['paidStatus'])) {
-            $status = $response['additionalInfo']['paidStatus'];
-        } else {
-            $status = 'N';
-        }
-
-        echo json_encode([
-            'paidStatus' => $status,
-            'response'   => $response
-        ]);
-    }
-
-
-    public function get_briva_status($order_number)
+    public function cek_va_status($order_number)
     {
         $cusid = $this->session->userdata('user_id');
         $briva = $this->order->data_va($cusid, $order_number);
 
+        $brivas = $briva[0];
+        $result = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
+
+        header('Content-Type: application/json');
+
         if (!empty($briva)) {
             $brivas = $briva[0];
-            $briva_sts = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
+            $result = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
 
-            header('Content-Type: application/json');
-            echo $briva_sts;
+            log_message('debug', 'BRIVA Inquiry Response: ' . print_r($result, true));
+
+            $json = json_decode($result);
+
+            log_message('debug', 'Decoded JSON: ' . print_r($json, true));
+
+            echo json_encode([
+                'status'  => $json->responseMessage ?? 'Unknown',
+                'data'    => $json
+            ]);
         } else {
             echo json_encode([
-                "responseCode" => "404",
-                "responseMessage" => "Data not found"
+                'status' => 'Not Found',
+                'data'   => null
             ]);
         }
+    }
+
+    public function update_expired($order_number)
+    {
+        $this->db->where('order_number', $order_number)
+            ->update('briva_api', ['status' => 3]);
+
+        $this->db->where('order_number', $order_number)
+            ->update('orders', ['order_status' => 7]);
+
+        echo json_encode(['success' => true, 'message' => 'Expired status updated']);
+    }
+
+    public function update_briva_status()
+    {
+        $id         = $this->input->post('id');
+        $userid     = $this->input->post('userid');
+        $trxid      = $this->input->post('order');
+        $kdfaktur   = $this->input->post('kdfaktur');
+        $va_name    = $this->input->post('va_name');
+        $va_to_pay  = $this->input->post('va_to_pay');
+        $nocust     = $this->input->post('nocust');
+        $data       = $this->order->order_data($id);
+
+        if (!$data) {
+            $response = ['code' => 404, 'error' => TRUE, 'message' => 'Order tidak ditemukan'];
+        } else {
+            if ($data->order_status == 2) {
+                $datava = [
+                    'order_number'      => $trxid,
+                    'kd_faktur'         => $kdfaktur,
+                    'user_id'           => $userid,
+                    'name'              => $va_name,
+                    'va_code'           => '91118' . $nocust,
+                    'userno'            => $nocust,
+                    'total_price_topay' => $va_to_pay,
+                    'exp_date'          => date('c', strtotime('+15 minutes')),
+                    'status'            => '1'
+                ];
+
+                $apiResponse = $this->brivaws->updateVa($nocust, $va_name, $trxid, $va_to_pay);
+                $apiResponse = json_decode($apiResponse, true);
+
+                if (isset($apiResponse['responseCode']) && $apiResponse['responseCode'] === "2002800") {
+                    $response = [
+                        'code'    => 200,
+                        'success' => TRUE,
+                        'message' => 'Payment Telah terbuat',
+                        'api'     => $apiResponse
+                    ];
+                    $this->order->input_va($datava);
+                } else {
+                    $response = [
+                        'code'    => 500,
+                        'error'   => TRUE,
+                        'message' => 'Gagal update ke BRIVA',
+                        'api'     => $apiResponse
+                    ];
+                }
+            } else {
+                $response = ['code' => 400, 'error' => TRUE, 'message' => 'Payment tidak dapat di generate'];
+            }
+        }
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($response));
     }
 
     public function test_status_va()

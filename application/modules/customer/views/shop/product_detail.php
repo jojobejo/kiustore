@@ -28,9 +28,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
     <div class="price">
       <?php if ($product->promo == 1) : ?>
-        <div class="price"><span>Rp <?php echo format_rupiah(get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3)); ?></span><del><small>Rp <?php echo format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?></small></del></div>
+        <div class="price"><span>Rp <?php echo get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?></span><del><small>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></small></del></div>
       <?php else : ?>
-        <span>Rp <?php echo format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?></span>
+        <span>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></span>
       <?php endif; ?>
 
     </div>
@@ -154,7 +154,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <?php if ($product->promo == 1) : ?>
                     <div class="price"><span>Rp <?php echo get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?></span><del><small>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></small></del></div>
                   <?php else : ?>
-                    <span>Rp <?php echo format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?></span>
+                    <span>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></span>
                   <?php endif; ?>
                   <a class="btn btn-success btn-sm" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a>
 

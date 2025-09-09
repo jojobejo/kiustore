@@ -469,8 +469,7 @@ class Order_model extends CI_Model
     public function data_va($id, $invoice)
     {
         $data = $this->db->query("SELECT 
-        a.* FROM briva_api a WHERE a.user_id = '$id' AND a.order_number = '$invoice' AND a.status = '1'
-        ");
+        a.* FROM briva_api a WHERE a.user_id = '$id' AND a.order_number = '$invoice' AND a.status = '1'");
         return $data->result();
     }
 
@@ -479,6 +478,27 @@ class Order_model extends CI_Model
         $user_id = $this->user_id;
         return ($this->db->where(array('order_number' => $id, 'user_id' => $user_id))->get('briva_api')->num_rows() > 0) ? TRUE : FALSE;
     }
+
+    public function get_latest_active_va($user_id)
+    {
+        return $this->db->select('briva_api.*, od.id as order_id')
+            ->from('briva_api')
+            ->join('orders od', 'od.order_number = briva_api.order_number', 'left')
+            ->where('briva_api.user_id', $user_id)
+            ->where('briva_api.status', '1')
+            ->where('od.user_id', $user_id)
+            ->order_by('briva_api.id', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row();
+    }
+
+    public function mark_va_expired_by_id($id)
+    {
+        return $this->db->where('id', $id)
+            ->update('briva_api', ['status' => 3]);
+    }
+
 
     public function order_data_coba($id)
     {

@@ -3,7 +3,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Brivaws
 {
-
     private $client_id;
     private $url;
     private $privateKey;
@@ -58,6 +57,33 @@ class Brivaws
         );
 
         return $this->curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body, 'create-va');
+    }
+
+    function updateVa($customerNo, $vaname, $vatrxid, $value)
+    {
+
+        $patch = '/snap/v1.0/transfer-va/update-va';
+        $fullUrl = $this->url . $patch;
+        $method = 'PUT';
+        $timestamp = date('c');
+        $token = $this->getToken();
+
+        $body = array(
+            'partnerServiceId'  => $this->partnerServiceId,
+            'customerNo'        => $customerNo,
+            'virtualAccountNo'  => $this->partnerServiceId . $customerNo,
+            'virtualAccountName' => $vaname,
+            'trxId'             => $vatrxid,
+            'totalAmount'       => array(
+                'value'     => $value,
+                'currency'  => 'IDR'
+            ),
+            'expiredDate'       => date('c', strtotime('+15 minutes')),
+            'additionalInfo'    => array(
+                'description'   => 'KARISMAONLINE#' . $vatrxid
+            )
+        );
+        return $this->curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body, '-- update va --');
     }
 
     function deleteVa($customerNo, $invoice)

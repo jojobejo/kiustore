@@ -200,9 +200,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     Pilih Ekpedisi
                     <form action="<?= base_url('cekongkir_new'); ?>" method="POST">
                       <?php foreach ($tmp_cart as $t) : ?>
-                        <div>
-                          <input type="hidden" name="kiu" value="160">
-                          <input type="hidden" name="subdis" value="<?= $t->sub_id ?>">
+                        <div hidden>
+                          <input type="text" name="kiu" value="2528">
+                          <input type="text" name="subdis" value="<?= $t->sub_id ?>">
                         </div>
                       <?php endforeach; ?>
                       <select name="kurir" id="kurir" class="form-control mt-2">

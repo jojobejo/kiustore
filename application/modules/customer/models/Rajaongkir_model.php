@@ -63,6 +63,11 @@ class Rajaongkir_model extends CI_Model
             ];
         }
         return $decoded;
+    }   
+
+    public function get_detail_alamat($prov_id,$city_id,$sub_districts)
+    {
+        
     }
 
     public function get_provinces()
@@ -74,11 +79,6 @@ class Rajaongkir_model extends CI_Model
     {
         return $this->request("destination/city/" . $province_id);
     }
-
-    // public function calculate_cost()
-    // {
-    // }
-
 
     public function get_districts($city_id)
     {
