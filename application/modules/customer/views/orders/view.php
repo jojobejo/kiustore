@@ -354,42 +354,34 @@ defined('BASEPATH') or exit('No direct script access allowed');
             type: "GET",
             dataType: "json",
             success: function(res) {
-                // console.log("AJAX Response:", res); 
-                if (res.data) {
+                console.log("BRIVA Response:", res);
+
+                if (res.data && res.data.virtualAccountData) {
                     let briva = res.data.virtualAccountData;
                     $("#va-status").text(res.status);
 
-                    if (res.status === "Successful") {
-                        let expiredDate = new Date(briva.expiredDate).getTime();
-                        let amount = parseInt(briva.totalAmount.value);
+                    let expiredDate = new Date(briva.expiredDate).getTime();
+                    let amount = parseInt(briva.totalAmount.value);
 
-                        $("#va-detail").html(`
-                        <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
-                        <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
-                        <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount.currency}</p>
-                    `);
-                        let now = new Date().getTime();
-                        if (now > expiredDate) {
-                            console.log("VA sudah expired, update ke server...");
-                            updateExpired("<?= $data->number_ordered ?>");
-                        }
-                    } else {
-                        $("#va-detail").html(`<button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran 1</button>`);
+                    $("#va-detail").html(`
+                    <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
+                    <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
+                    <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount.currency}</p>
+                `);
+
+                    if (new Date().getTime() > expiredDate) {
+                        console.warn("VA expired, update server...");
+                        updateExpired("<?= $data->number_ordered ?>");
                     }
-
-                    if (lastStatus !== null && lastStatus !== res.status) {
-                        alert("Status VA berubah dari " + lastStatus + " ke " + res.status);
-                    }
-                    lastStatus = res.status;
-
                 } else {
-                    $("#va-status").text("Unknown");
-                    $("#va-detail").html(`<button class="btn btn-success w-100 create-payment-btn">Lakukan Pembayaran 2</button>`);
+                    $("#va-status").text(res.status || "Unknown");
+                    $("#va-detail").html(`
+                    <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
+                `);
                 }
             },
             error: function(xhr, status, error) {
-                console.error("AJAX Error:", status, error);
-                console.log(xhr.responseText);
+                console.error("AJAX Error:", status, error, xhr.responseText);
             }
         });
     }

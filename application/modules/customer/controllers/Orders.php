@@ -47,8 +47,7 @@ class Orders extends CI_Controller
                 $orders['all']++;
             }
         }
-        // print_r($unpaid);
-        // exit;
+
         $this->load->view('header', $params);
         $this->load->view('orders/orders', $orders);
         $this->load->view('footer');
@@ -87,34 +86,102 @@ class Orders extends CI_Controller
 
     public function cek_va_status($order_number)
     {
-        $cusid = $this->session->userdata('user_id');
-        $briva = $this->order->data_va($cusid, $order_number);
 
-        $brivas = $briva[0];
-        $result = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
-
+        $cusid          = $this->session->userdata('user_id');
         header('Content-Type: application/json');
 
-        if (!empty($briva)) {
-            $brivas = $briva[0];
-            $result = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
+        try {
 
-            log_message('debug', 'BRIVA Inquiry Response: ' . print_r($result, true));
+            $briva      = $this->order->data_va($cusid, $order_number);
+            $data_order = $this->order->get_data_order($order_number, $cusid);
 
-            $json = json_decode($result);
+            $dtorder    = !empty($data_order) ? $data_order[0] : null;
+            $brivas     = !empty($briva) ? $briva[0] : null;
 
-            log_message('debug', 'Decoded JSON: ' . print_r($json, true));
+            $createResponse = $this->brivaws->createVa(substr($dtorder->phone_number, -8), $dtorder->name, $dtorder->total_price, $dtorder->order_number);
 
-            echo json_encode([
-                'status'  => $json->responseMessage ?? 'Unknown',
-                'data'    => $json
-            ]);
-        } else {
-            echo json_encode([
-                'status' => 'Not Found',
-                'data'   => null
-            ]);
+            $createJson = json_decode($createResponse);
+
+            log_message('debug', "[BRIVA CREATE] Order: {$order_number}, Response: " . print_r($createJson, true));
+
+            if ($createJson->responseMessage === "Success") {
+                if (!$brivas) {
+
+                    $datava = array(
+                        'order_number'      => $order_number,
+                        'kd_faktur'         => $dtorder->kd_faktur,
+                        'user_id'           => $dtorder->user_id,
+                        'name'              => $dtorder->name,
+                        'va_code'           => '91118' . substr($dtorder->phone_number, -8),
+                        'userno'            => substr($dtorder->phone_number, -8),
+                        'total_price_topay' => $dtorder->total_price,
+                        'exp_date'          => date('c', strtotime('+15 minutes')),
+                        'status'            => '1'
+                    );
+                    $this->order->input_va($datava);
+                }
+                echo json_encode(['status' => 'Created', 'data' => $createJson]);
+                return;
+            }
+
+            // Step 3: Jika VA sudah ada di BRIVA
+            if ($createJson->responseMessage === "Invalid Bill/Virtual Account already exist") {
+                if ($brivas) {
+                    // Update VA
+                    $updateResponse = $this->brivaws->updateVa(substr($dtorder->phone_number, -8), $dtorder->name, $dtorder->order_number, $dtorder->total_price);
+                    $updateJson = json_decode($updateResponse);
+
+                    log_message('debug', "[BRIVA UPDATE] Order: {$order_number}, Response: " . print_r($updateJson, true));
+
+                    echo json_encode(['status' => 'Updated', 'data' => $updateJson]);
+                    return;
+                } else {
+                    $retryResponse =  $this->brivaws->inquiryVa(substr($dtorder->phone_number, -8), $order_number);
+                    $retryJson = json_decode($retryResponse);
+
+                    log_message('error', "[BRIVA RETRY CREATE] Order: {$order_number}, Response: " . print_r($retryJson, true));
+
+                    echo json_encode(['status' => 'Retry Created', 'data' => $retryJson]);
+                    return;
+                }
+            }
+
+            // Step 4: Fallback Inquiry jika tidak jelas
+            $inquiryResponse = $this->brivaws->inquiryVa(substr($dtorder->phone_number, -8), $order_number);
+            $inquiryJson = json_decode($inquiryResponse);
+
+            log_message('debug', "[BRIVA INQUIRY] Order: {$order_number}, Response: " . print_r($inquiryJson, true));
+            echo json_encode(['status' => $inquiryJson->responseMessage ?? 'Unknown', 'data' => $inquiryJson]);
+        } catch (Exception $e) {
+            log_message('error', "[BRIVA ERROR] " . $e->getMessage());
+            echo json_encode(['status' => 'Error', 'message' => $e->getMessage()]);
         }
+
+        // $cusid = $this->session->userdata('user_id');
+        // $briva = $this->order->data_va($cusid, $order_number);
+
+        // header('Content-Type: application/json');
+
+        // if (!empty($briva)) {
+        //     $brivas = $briva[0];
+        //     $result = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
+
+        //     log_message('debug', 'BRIVA Inquiry Response: ' . print_r($result, true));
+
+        //     $json = json_decode($result);
+
+        //     log_message('debug', 'Decoded JSON: ' . print_r($json, true));
+
+        //     echo json_encode([
+        //         'status'  => $json->responseMessage ?? 'briva tidak ditemukan',
+        //         'data'    => $json
+        //     ]);
+        // } else {
+        //     echo json_encode([
+        //         'status' => 'Data Tidak Ditemukan',
+        //         'data'   => null
+        //     ]);
+        // }
     }
 
     public function update_expired($order_number)

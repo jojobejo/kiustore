@@ -469,7 +469,29 @@ class Order_model extends CI_Model
     public function data_va($id, $invoice)
     {
         $data = $this->db->query("SELECT 
-        a.* FROM briva_api a WHERE a.user_id = '$id' AND a.order_number = '$invoice' AND a.status = '1'");
+        a.* FROM briva_api a WHERE a.user_id = '$id' AND a.order_number = '$invoice'");
+        return $data->result();
+    }
+
+    public function get_data_order($invoice, $idcust)
+    {
+        $data = $this->db->query("SELECT 
+        a.order_number,
+        a.kd_faktur,
+        b.name,
+        b.phone_number,
+        a.total_price,
+        a.user_id
+        FROM orders a
+        LEFT JOIN customers b ON b.user_id = a.user_id
+        WHERE a.order_number = '$invoice' AND a.user_id = '$idcust'");
+        return $data->result();
+    }
+
+    public function get_by_order_number($invoice)
+    {
+        $data = $this->db->query("SELECT 
+        a.* FROM briva_api a WHERE a.order_number = '$invoice'");
         return $data->result();
     }
 
