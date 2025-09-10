@@ -368,16 +368,31 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
                     <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount.currency}</p>
                 `);
-
                     if (new Date().getTime() > expiredDate) {
-                        console.warn("VA expired, update server...");
                         updateExpired("<?= $data->number_ordered ?>");
                     }
                 } else {
                     $("#va-status").text(res.status || "Unknown");
-                    $("#va-detail").html(`
-                    <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
-                `);
+                    // Kondisi 1: jika benar-benar "Data Tidak Ditemukan"
+                    if (res.status === "Data Tidak Ditemukan") {
+                        $("#va-detail").html(`
+                        <div class="row">
+                            <div class="col-12">
+                                <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
+                            </div>
+                        </div>
+                    `);
+                        // Kondisi 2: jika ada responseMessage / 'briva tidak ditemukan'
+                        // <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
+                    } else {
+                        $("#va-detail").html(`
+                        <div class="row">
+                            <div class="col-12">
+                            
+                            </div>
+                        </div>
+                    `);
+                    }
                 }
             },
             error: function(xhr, status, error) {
@@ -394,9 +409,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
             success: function(res) {
                 console.log("Update expired response:", res);
                 if (res.success) {
-                    alert("VA Expired, data sudah diupdate.");
+                    // alert("VA Expired, data sudah diupdate.");
                     $("#va-status").text("Expired");
                     $("#va-detail").html(`<button class="btn btn-success w-100 create-payment-btn">Buat Pembayaran Baru</button>`);
+                    // location.reload();
                 }
             },
             error: function(xhr, status, error) {
@@ -463,10 +479,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
         let lastStatus = null;
         let orderNumber = "<?= $data->order_number ?>";
         cekStatus();
-
         setInterval(function() {
             cekStatus();
-        }, 60000);
+        }, 25000);
     });
 </script>
 
