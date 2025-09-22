@@ -347,6 +347,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <script>
     let lastStatus = null;
     let countdownInterval = null;
+    let expiredHandled = false;
+
 
     function cekStatus() {
         $.ajax({
@@ -356,43 +358,42 @@ defined('BASEPATH') or exit('No direct script access allowed');
             success: function(res) {
                 console.log("BRIVA Response:", res);
 
-                if (res.data && res.data.virtualAccountData) {
-                    let briva = res.data.virtualAccountData;
+                if (res.vaData) {
+                    let briva = res.vaData;
                     $("#va-status").text(res.status);
 
-                    let expiredDate = new Date(briva.expiredDate).getTime();
-                    let amount = parseInt(briva.totalAmount.value);
+                    let expiredDate = res.expiredDate ? new Date(res.expiredDate).getTime() : null;
+                    let amount = parseInt(briva.totalAmount?.value ?? 0);
 
                     $("#va-detail").html(`
                     <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
                     <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
-                    <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount.currency}</p>
+                    <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount?.currency ?? ''}</p>
                 `);
-                    if (new Date().getTime() > expiredDate) {
-                        updateExpired("<?= $data->number_ordered ?>");
+
+                    // 🚀 Case 1: langsung reload jika sudah dibayar
+                    if (res.paidStatus === "Y") {
+                        console.warn("Transaksi Sukses");
+                        alert("Transaksi berhasil");
+                        location.reload(); // reload halaman langsung
+                        return;
+                    }
+
+                    // 🚀 Case 2: handle expired
+                    if (expiredDate && new Date().getTime() > expiredDate && !expiredHandled) {
+                        expiredHandled = true;
+
+                        if (res.paidStatus === "N") {
+                            console.warn("Transaksi Dibatalkan");
+                            alert("VA Expired - Pembayaran Tidak Dilakukan - Order Di Batalkan");
+                            location.reload();
+                        }
                     }
                 } else {
                     $("#va-status").text(res.status || "Unknown");
-                    // Kondisi 1: jika benar-benar "Data Tidak Ditemukan"
-                    if (res.status === "Data Tidak Ditemukan") {
-                        $("#va-detail").html(`
-                        <div class="row">
-                            <div class="col-12">
-                                <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
-                            </div>
-                        </div>
-                    `);
-                        // Kondisi 2: jika ada responseMessage / 'briva tidak ditemukan'
-                        // <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
-                    } else {
-                        $("#va-detail").html(`
-                        <div class="row">
-                            <div class="col-12">
-                            
-                            </div>
-                        </div>
-                    `);
-                    }
+                    $("#va-detail").html(`
+                    <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
+                `);
                 }
             },
             error: function(xhr, status, error) {
@@ -401,18 +402,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
         });
     }
 
-    function updateExpired(orderNumber) {
+
+
+    function updateExpired(orderNumber, paidStatus) {
         $.ajax({
             url: "<?= site_url('customer/orders/update_expired') ?>/" + orderNumber,
             type: "POST",
+            data: {
+                paidStatus: paidStatus
+            },
             dataType: "json",
             success: function(res) {
                 console.log("Update expired response:", res);
                 if (res.success) {
-                    // alert("VA Expired, data sudah diupdate.");
+                    if (paidStatus === "N") {
+                        alert("VA Expired - Pembayaran Tidak Dilakukan - Order Di Batalkan");
+                    } else if (paidStatus === "Y") {
+                        alert("VA Expired - Transaksi Suksess");
+                    }
                     $("#va-status").text("Expired");
-                    $("#va-detail").html(`<button class="btn btn-success w-100 create-payment-btn">Buat Pembayaran Baru</button>`);
-                    // location.reload();
+
+                    // Redirect setelah user klik OK di alert
+                    window.location.href = "<?= site_url('order_history') ?>";
                 }
             },
             error: function(xhr, status, error) {
@@ -421,6 +432,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
             }
         });
     }
+
+
 
     setInterval(function() {
         $(".countdown").each(function() {
@@ -479,9 +492,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
         let lastStatus = null;
         let orderNumber = "<?= $data->order_number ?>";
         cekStatus();
+
         setInterval(function() {
             cekStatus();
-        }, 25000);
+        }, 60000);
     });
 </script>
 

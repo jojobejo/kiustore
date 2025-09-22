@@ -8,7 +8,7 @@ class Orders extends CI_Controller
         parent::__construct();
 
         verify_session('admin');
-
+        $this->load->library('Brivaws');
         $this->load->model(array(
             'order_model' => 'order'
         ));
@@ -65,6 +65,61 @@ class Orders extends CI_Controller
             show_404();
         }
     }
+
+    public function inquiry_status_va()
+    {
+        $invoice = $this->input->post('invoice');
+        $cusno   = $this->input->post('cusno');
+
+        $order = $this->order->get_order_by_invoice($invoice);
+
+        if (!$order) {
+            echo json_encode([
+                'status' => false,
+                'message' => 'Order tidak ditemukan.'
+            ]);
+            return;
+        }
+        $result = $this->brivaws->inquiryStatusVa($cusno, $invoice);
+        if (is_string($result)) {
+            $result = json_decode($result);
+        }
+
+        if ($result && isset($result->additionalInfo->paidStatus)) {
+            $paidStatus = $result->additionalInfo->paidStatus;
+
+            if ($paidStatus === 'Y') {
+                $payment_data = [
+                    'order_id'          => $order->id,
+                    'payment_price'     => $invoice,
+                    'payment_date'      => '-',
+                    'picture_name'      => '-',
+                    'payment_status'    => '1',
+                    'confirmed_date'    => date('Y-m-d H:i:s'),
+                    'payment_data'      => 'paid'
+                ];
+                $this->db->insert('payments', $payment_data);
+
+                echo json_encode([
+                    'status'      => true,
+                    'paid_status' => 'Y',
+                    'message'     => 'Pembayaran berhasil diverifikasi.'
+                ]);
+            } else {
+                echo json_encode([
+                    'status'      => true,
+                    'paid_status' => 'N',
+                    'message'     => 'Tidak ada data pembayaran.'
+                ]);
+            }
+        } else {
+            echo json_encode([
+                'status'  => false,
+                'message' => 'Response tidak valid dari BRIVA.'
+            ]);
+        }
+    }
+
 
     public function api($action = '')
     {

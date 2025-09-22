@@ -61,7 +61,6 @@ class Brivaws
 
     function updateVa($customerNo, $vaname, $vatrxid, $value)
     {
-
         $patch = '/snap/v1.0/transfer-va/update-va';
         $fullUrl = $this->url . $patch;
         $method = 'PUT';
@@ -84,6 +83,24 @@ class Brivaws
             )
         );
         return $this->curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body, '-- update va --');
+    }
+
+    function updateStatusVa($customerNo, $vatrxid)
+    {
+        $patch = '/snap/v1.0/transfer-va/update-status';
+        $fullUrl = $this->url . $patch;
+        $method = 'PUT';
+        $timestamp = date('c');
+        $token = $this->getToken();
+
+        $body = array(
+            'partnerServiceId'  => $this->partnerServiceId,
+            'customerNo'        => $customerNo,
+            'virtualAccountNo'  => $this->partnerServiceId . $customerNo,
+            'trxId'             => $vatrxid,
+            'paidStatus'        => 'N',
+        );
+        return $this->curlEndpoint($fullUrl, $token, $timestamp, $method, $patch, $body, '-- update status va --');
     }
 
     function deleteVa($customerNo, $invoice)

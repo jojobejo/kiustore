@@ -246,23 +246,33 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <?php if (admin_role() != 'distribusi') { ?>
           <div class="card card-primary" id="#payments">
             <div class="card-header">
-              <h3 class="mb-0">Pembayaran</h3>
+              <div class="row">
+                <div class="col-auto">
+                  <h3 class="mb-0">Pembayaran</h3>
+                </div>
+                <div class="col-auto">
+                  <input type="text" class="form-control" name="invoice" id="invoice" value="<?= $data->order_number ?>">
+                  <input type="text" class="form-control" name="cusno" id="cusno" value="<?= substr($delivery_data->customer->phone_number, -8) ?>">
+                  <input type="text" class="form-control" name="orderid" id="orderid" value="<?= $data->id ?>">
+                  <input type="text" class="form-control" name="pricepay" id="pricepay" value="<?= $data->total_price ?>">
+                  <input type="text" class="form-control" name="orderdate" id="orderdate" value="<?= $data->order_date ?>">
+                  <button class="btn btn-primary btn-sm cek_va">Cek Pembayaran</button>
+                </div>
+              </div>
             </div>
             <div class="card-body <?php echo ($data->payment_method == 1) ? 'p-0' : ''; ?>">
               <?php if ($data->payment_method == 2) : ?>
                 <?php if ($data->payment_price == NULL) : ?>
-                  <div class="alert alert-info m-2">Tidak ada data pembayaran.</div>
+                  <div id="payment-result" class="alert alert-info m-2"></div>
                 <?php else : ?>
 
-                  <div>
+                  <!-- <div>
                     <img class="img img-fluid" src="<?php echo base_url('assets/uploads/payments/' . $data->picture_name); ?>">
                   </div>
-
                   <?php if ($payment_flash) : ?>
                     <br>
                     <div class="alert alert-info" id="payment_flash"><?php echo $payment_flash; ?></div>
                   <?php endif; ?>
-
                   <table class="table align-items-center table-flush table-hover">
                     <tr>
                       <td>Transfer</td>
@@ -308,7 +318,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
                       </td>
                     </tr>
-                  </table>
+                  </table> -->
                 <?php endif; ?>
               <?php elseif ($data->payment_method == 1) : ?>
                 <?php if ($data->payment_price == NULL) : ?>
@@ -414,3 +424,38 @@ defined('BASEPATH') or exit('No direct script access allowed');
       </div>
     <?php endif; ?>
   </div>
+
+  <script>
+    $(document).on("click", ".cek_va", function(e) {
+      e.preventDefault();
+
+      let invoice = $("#invoice").val();
+      let cusno = $("#cusno").val();
+
+      $.ajax({
+        url: "<?= site_url('admin/orders/inquiry_status_va') ?>",
+        type: "POST",
+        dataType: "json",
+        data: {
+          invoice: invoice,
+          cusno: cusno
+        },
+        success: function(res) {
+          if (res.paid_status === "Y") {
+            $("#payment-result").html(
+              '<div class="alert alert-success m-2">' + res.message + '</div>'
+            );
+          } else {
+            $("#payment-result").html(
+              '<div class="alert alert-info m-2">' + res.message + '</div>'
+            );
+          }
+        },
+        error: function() {
+          $("#payment-result").html(
+            '<div class="alert alert-danger m-2">Terjadi kesalahan server.</div>'
+          );
+        }
+      });
+    });
+  </script>

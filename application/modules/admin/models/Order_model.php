@@ -997,11 +997,27 @@ class Order_model extends CI_Model
             ON p.order_id = o.id
         LEFT JOIN tbtestongkir ongs
             ON ongs.kd_faktur = o.kd_faktur
+        LEFT JOIN briva_api briva
+            ON briva.order_number = o.order_number
         WHERE o.id = '$id'
-
     ");
 
         // AND p.id IN (SELECT MAX(id) FROM `payments`)
+        return $data->row();
+    }
+
+    public function get_order_by_invoice($invoice)
+    {
+        $data = $this->db->query("SELECT o.*, c.name, c.code, ongs.jsongkir AS ongkir_ekspedisi
+        FROM orders o
+        LEFT JOIN coupons c
+            ON c.id = o.coupon_id
+        LEFT JOIN tbtestongkir ongs
+            ON ongs.kd_faktur = o.kd_faktur
+        LEFT JOIN briva_api briva
+            ON briva.order_number = o.order_number
+        WHERE o.order_number = '$invoice'
+    ");
         return $data->row();
     }
 
