@@ -346,11 +346,19 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 <script>
     let lastStatus = null;
-    let countdownInterval = null;
     let expiredHandled = false;
-
+    let statusInterval = null;
+    let countdownInterval = null;
+    let orderStatus = "<?= $data->order_status ?>";
 
     function cekStatus() {
+        if (expiredHandled) return;
+        if (orderStatus == 3) {
+            console.warn("Order Diterima Admin");
+            clearInterval(statusInterval);
+            clearInterval(countdownInterval);
+            return;
+        }
         $.ajax({
             url: "<?= site_url('customer/orders/cek_va_status/' . $data->number_ordered) ?>",
             type: "GET",
@@ -366,34 +374,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     let amount = parseInt(briva.totalAmount?.value ?? 0);
 
                     $("#va-detail").html(`
-                    <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
-                    <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
-                    <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount?.currency ?? ''}</p>
-                `);
-
-                    // 🚀 Case 1: langsung reload jika sudah dibayar
+                            <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
+                            <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
+                            <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount?.currency ?? ''}</p>
+                        `);
+                    // TRANSAKSI SUKSES
                     if (res.paidStatus === "Y") {
                         console.warn("Transaksi Sukses");
                         alert("Transaksi berhasil");
-                        location.reload(); // reload halaman langsung
+                        clearInterval(statusInterval);
+                        location.reload();
                         return;
                     }
-
-                    // 🚀 Case 2: handle expired
+                    // TRANSAKSI EXPIRED
                     if (expiredDate && new Date().getTime() > expiredDate && !expiredHandled) {
-                        expiredHandled = true;
-
-                        if (res.paidStatus === "N") {
-                            console.warn("Transaksi Dibatalkan");
-                            alert("VA Expired - Pembayaran Tidak Dilakukan - Order Di Batalkan");
-                            location.reload();
-                        }
+                        updateExpired("<?= $data->order_number ?>", res.paidStatus);
                     }
+
                 } else {
                     $("#va-status").text(res.status || "Unknown");
                     $("#va-detail").html(`
-                    <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
-                `);
+                            <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
+                        `);
                 }
             },
             error: function(xhr, status, error) {
@@ -402,9 +404,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
         });
     }
 
-
-
     function updateExpired(orderNumber, paidStatus) {
+        if (expiredHandled) return;
+        expiredHandled = true;
+
         $.ajax({
             url: "<?= site_url('customer/orders/update_expired') ?>/" + orderNumber,
             type: "POST",
@@ -418,11 +421,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     if (paidStatus === "N") {
                         alert("VA Expired - Pembayaran Tidak Dilakukan - Order Di Batalkan");
                     } else if (paidStatus === "Y") {
-                        alert("VA Expired - Transaksi Suksess");
+                        alert("VA Expired - Transaksi Sukses");
                     }
                     $("#va-status").text("Expired");
-
-                    // Redirect setelah user klik OK di alert
+                    clearInterval(statusInterval);
                     window.location.href = "<?= site_url('order_history') ?>";
                 }
             },
@@ -431,11 +433,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 console.log(xhr.responseText);
             }
         });
+
     }
 
-
-
-    setInterval(function() {
+    // 🚀 Countdown dengan trigger expired langsung
+    countdownInterval = setInterval(function() {
         $(".countdown").each(function() {
             let expired = $(this).data("expired");
             let now = new Date().getTime();
@@ -489,11 +491,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
     });
 
     $(document).ready(function() {
-        let lastStatus = null;
         let orderNumber = "<?= $data->order_number ?>";
         cekStatus();
 
-        setInterval(function() {
+        statusInterval = setInterval(function() {
             cekStatus();
         }, 60000);
     });
