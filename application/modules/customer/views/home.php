@@ -170,7 +170,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
       <?php if (count($banner_product) > 0) : ?>
         <?php foreach (array_slice($banner_product, 0, 3) as $banner) : ?>
-
           <div>
             <div class="banner-box">
               <a href="<?php echo site_url('product/' . $banner->id . '/' . $banner->sku . '/'); ?>">

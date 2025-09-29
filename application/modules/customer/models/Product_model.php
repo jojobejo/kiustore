@@ -264,7 +264,6 @@ class Product_model extends CI_Model
             JOIN products b
                 ON b.id = a.product_id
         ")->result();
-
         return $data;
     }
 
