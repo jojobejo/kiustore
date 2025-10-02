@@ -60,7 +60,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <div class="product-detail section-p-t">
       <div class="product-detail-box">
         <h2 class="title-color">Detail Produk</h2>
-        <p class="content-color font-base"><?php echo $product->description; ?>
+        <p class="content-color font-base"><?php echo nl2br($product->description); ?>
       </div>
 
     </div>
