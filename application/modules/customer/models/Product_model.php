@@ -74,6 +74,7 @@ class Product_model extends CI_Model
         ");
     }
 
+
     // COBA LAGI
     public function getstatusongkirss($id, $tgl)
     {
@@ -146,9 +147,14 @@ class Product_model extends CI_Model
     //     return $this->db->get('products')->limit(10)->result();
     // }
 
+    // public function get_home_categories()
+    // {
+    //     return $this->db->limit(15)->get('product_category')->result();
+    // }
+
     public function get_home_categories()
     {
-        return $this->db->limit(15)->get('product_category')->result();
+        return $this->db->get('product_category')->result();
     }
 
     public function get_all_categories()

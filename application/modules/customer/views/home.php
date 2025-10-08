@@ -261,10 +261,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
       <?php if (count($categories) > 0) : ?>
         <?php $i = 1;
         foreach ($categories as $category) : ?>
-          <div class="col-1">
+          <div class="col-2">
             <div class="category-wrap">
               <div class="bg-shape bg-theme-blue border-blue"></div>
-              <a href="<?php echo site_url('category/' . $category->id . '/' . $category->name . '/'); ?>"> <img class="category img-fluid" src="<?php echo get_theme_uri('images/catagoeris/' . $i . '.png'); ?>" alt="category" /> </a>
+              <a href="<?php echo site_url('category/' . $category->id . '/' . $category->name . '/'); ?>"><img src="<?php echo get_theme_uri('images/catagoeris/' . $category->id . '.png'); ?>" class="w-100 h-100 object-fit-cover" alt="offer" /></a>
               <span class="title-color"><?php echo $category->name; ?></span>
             </div>
           </div>

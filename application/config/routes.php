@@ -101,19 +101,16 @@ $route['admin/brivaws'] = 'admin/api_payment_briva';
 $route['createva'] = 'admin/api_payment_briva/createVa';
 $route['createva/preview'] = 'admin/api_payment_briva/preview_briva';
 
-
 // COBA
 $route['readonlychange'] = 'customer/profile/toggle_readonly';
 $route['inputlocation'] = 'customer/profile/inputlocation';
 $route['get_provinces'] = 'customer/profile/get_provinces';
-
 
 $route['test_api_payment'] = 'customer/shop/test_api_payment';
 $route['test_status_va'] = 'customer/orders/test_status_va';
 
 $route['get_time_left/(:any)'] = 'customer/orders/get_time_left/$1';
 $route['check_payment_status/(:any)/(:any)'] = 'customer/orders/check_payment_status/$1/$2';
-
 
 // RAJAONGKIR 
 $route['rajaongkir'] = 'customer/rajaongkir';
