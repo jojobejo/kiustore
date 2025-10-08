@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.0.4
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 02 Okt 2025 pada 10.37
--- Versi server: 10.4.27-MariaDB
--- Versi PHP: 7.4.33
+-- Waktu pembuatan: 08 Okt 2025 pada 04.52
+-- Versi server: 10.4.17-MariaDB
+-- Versi PHP: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +32,7 @@ CREATE TABLE `banner_product` (
   `product_id` int(11) NOT NULL,
   `banner_image` varchar(255) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `banner_product`
@@ -61,24 +61,7 @@ CREATE TABLE `briva_api` (
   `exp_date` text NOT NULL,
   `status` int(2) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `briva_api`
---
-
-INSERT INTO `briva_api` (`id`, `order_number`, `kd_faktur`, `user_id`, `name`, `va_code`, `userno`, `total_price_topay`, `exp_date`, `status`, `create_at`) VALUES
-(7, 'LLB1925185380', 'KIU850109250008', 85, 'maulana malik', '9111864054784', '64054784', '333000', '2025-09-01T15:39:55+07:00', 3, '2025-09-04 08:40:10'),
-(11, 'GCJ3925185205', 'KIU850309250001', 85, 'maulana malik', '9111864054784', '64054784', '1115000.00', '2025-09-03T14:41:56+07:00', 3, '2025-09-04 07:32:28'),
-(13, 'SKC4925285390', 'KIU850409250001', 85, 'maulana malik', '9111864054784', '64054784', '2711500.00', '2025-09-04T16:02:16+07:00', 1, '2025-09-04 08:47:17'),
-(14, 'WUX10925187536', 'KIU871009250001', 87, 'cumum1', '9111834567489', '34567489', '2880000.00', '2025-09-10T09:22:57+07:00', 3, '2025-09-10 02:27:21'),
-(15, 'QAE10925187697', 'KIU871009250003', 87, 'cumum1', '9111834567489', '34567489', '2650000.00', '2025-09-10T13:09:25+07:00', 3, '2025-09-10 06:11:31'),
-(17, 'IPA10925187751', 'KIU871009250005', 87, 'cumum1', '9111834567489', '34567489', '4400000.00', '2025-09-10T15:11:44+07:00', 3, '2025-09-10 08:11:55'),
-(18, 'DPL11925187460', 'KIU871109250001', 87, 'cumum1', '9111834567489', '34567489', '2650000.00', '2025-09-11T09:20:15+07:00', 3, '2025-09-11 02:20:18'),
-(19, 'FHK11925287746', 'KIU871109250002', 87, 'cumum1', '9111834567489', '34567489', '4850000.00', '2025-09-11T09:37:27+07:00', 3, '2025-09-11 02:46:48'),
-(21, 'LSI29925185807', 'KIU852909250001', 85, 'maulana malik', '9111864054784', '64054784', '2650000.00', '2025-09-29T11:12:54+07:00', 2, '2025-09-29 04:06:04'),
-(22, 'HFO29925185516', 'KIU852909250002', 85, 'maulana malik', '9111864054784', '64054784', '144000.00', '2025-09-29T11:33:28+07:00', 1, '2025-09-29 04:18:28'),
-(23, 'HKR29925187605', 'KIU872909250003', 87, 'cumum1', '9111834567489', '34567489', '220000.00', '2025-09-29T12:18:30+07:00', 3, '2025-09-29 05:18:59');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -91,24 +74,23 @@ CREATE TABLE `ci_sessions` (
   `ip_address` varchar(45) NOT NULL,
   `timestamp` int(10) UNSIGNED NOT NULL DEFAULT 0,
   `data` blob NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `ci_sessions`
 --
 
 INSERT INTO `ci_sessions` (`id`, `ip_address`, `timestamp`, `data`) VALUES
-('49jus7l4nj80cdie60bbddimsej9lbgh', '::1', 1759378740, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393337383734303b),
-('hfu5poruv8bopeegtdhuete13a008u10', '::1', 1759379057, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393337393035373b7265646972656374696f6e7c4e3b5f5f4143544956455f53455353494f4e5f444154417c733a3238303a2263363065646631356235653937353764643964326439343834366336656661323331616536323630623239636434363538666638393536343633363533383136653261636162653734643231633062303063316236623134393362396233333238383666666163656464636130326336303539326664373736363532363532306d2f524f68396d38566a2f344a5064416242743947564f373359495947426a557574726a506a39696c5832387248527161524d3835686336334549556d495450315459434a70697774643771664a715647454770652b6a35684556794842346379303845613664382f2b43526a2b4571504543457670646d6a63785049366d79473056477a2b6c58304d676c34434133314e666e6c673d3d223b),
-('duuu241kk7u1lvc545e6selef66j8sej', '127.0.0.1', 1759378917, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393337383931303b),
-('0nogp83l1ng11r52mifskm7ovi9949m9', '::1', 1759379447, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393337393434373b7265646972656374696f6e7c4e3b5f5f4143544956455f53455353494f4e5f444154417c733a3238303a2263363065646631356235653937353764643964326439343834366336656661323331616536323630623239636434363538666638393536343633363533383136653261636162653734643231633062303063316236623134393362396233333238383666666163656464636130326336303539326664373736363532363532306d2f524f68396d38566a2f344a5064416242743947564f373359495947426a557574726a506a39696c5832387248527161524d3835686336334549556d495450315459434a70697774643771664a715647454770652b6a35684556794842346379303845613664382f2b43526a2b4571504543457670646d6a63785049366d79473056477a2b6c58304d676c34434133314e666e6c673d3d223b),
-('qc3di427oni7goi1m4cki2ps70pduaom', '::1', 1759382003, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393338323030333b7265646972656374696f6e7c4e3b5f5f4143544956455f53455353494f4e5f444154417c733a3238303a2263363065646631356235653937353764643964326439343834366336656661323331616536323630623239636434363538666638393536343633363533383136653261636162653734643231633062303063316236623134393362396233333238383666666163656464636130326336303539326664373736363532363532306d2f524f68396d38566a2f344a5064416242743947564f373359495947426a557574726a506a39696c5832387248527161524d3835686336334549556d495450315459434a70697774643771664a715647454770652b6a35684556794842346379303845613664382f2b43526a2b4571504543457670646d6a63785049366d79473056477a2b6c58304d676c34434133314e666e6c673d3d223b),
-('qmtaprjmckj9em70um6g7bb5n6jgohjc', '::1', 1759382012, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393338323030333b7265646972656374696f6e7c4e3b6c6f67696e5f666c6173687c733a31363a22426572686173696c206c6f676f757421223b5f5f63695f766172737c613a313a7b733a31313a226c6f67696e5f666c617368223b733a333a226f6c64223b7d),
-('i6de73ac5k0gmed1nrvh2nbc5369foi1', '::1', 1759382111, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393338323032303b),
-('9163jib2mvo71udv4e73mubebivfqarj', '::1', 1759386527, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393338363532373b7265646972656374696f6e7c4e3b757365725f69647c733a323a223835223b73616c65736d616e5f69647c733a323a223539223b757365725f6c6576656c7c733a313a2231223b6c6f67696e5f666c6173687c733a31363a22426572686173696c206c6f676f757421223b5f5f63695f766172737c613a313a7b733a31313a226c6f67696e5f666c617368223b733a333a226f6c64223b7d),
-('d4b6u3vkaciptk9le18sb44qr6vvuc5k', '::1', 1759386870, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393338363837303b7265646972656374696f6e7c4e3b757365725f69647c733a323a223835223b73616c65736d616e5f69647c733a323a223539223b757365725f6c6576656c7c733a313a2231223b5f5f4143544956455f53455353494f4e5f444154417c733a3334343a2265376665326534316465656231376166663536376433613261356434306232303962386535613830666238363164636536376663613632393362373333613762613735376361653564366433666361333836366135303237376331633764363438333064616165326230346535323464323738653864636439343164396338376571736f7a7778315a49717252364b4251705247332f526262722b754668754752492f4f5643383963545a2b7265494c5a555559486b546830737a466f752f64793169426575516966594342515654546b6a6d6f644e644c6b776e7432796d66325945617445542f316e44456d6f6f372f66696172576c4b4f4d423261336c4b3756364e6a31692f5752467275686d3470676946644d5330797a42396e34614e6c777655484a633477635838754454465a686f6f616d7435724e4b6e63436d6863712f385845627544686738412f6a455236546a4e673d3d223b),
-('3t22tbov9u2dorsi9l05sk9ktqns7lsq', '::1', 1759394197, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393339343139373b7265646972656374696f6e7c4e3b757365725f69647c733a323a223835223b73616c65736d616e5f69647c733a323a223539223b757365725f6c6576656c7c733a313a2231223b5f5f4143544956455f53455353494f4e5f444154417c733a3334343a2265376665326534316465656231376166663536376433613261356434306232303962386535613830666238363164636536376663613632393362373333613762613735376361653564366433666361333836366135303237376331633764363438333064616165326230346535323464323738653864636439343164396338376571736f7a7778315a49717252364b4251705247332f526262722b754668754752492f4f5643383963545a2b7265494c5a555559486b546830737a466f752f64793169426575516966594342515654546b6a6d6f644e644c6b776e7432796d66325945617445542f316e44456d6f6f372f66696172576c4b4f4d423261336c4b3756364e6a31692f5752467275686d3470676946644d5330797a42396e34614e6c777655484a633477635838754454465a686f6f616d7435724e4b6e63436d6863712f385845627544686738412f6a455236546a4e673d3d223b),
-('vcaialpc2e5ktrf0s8julgn3ag0un5kc', '::1', 1759394202, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393339343139373b7265646972656374696f6e7c4e3b757365725f69647c733a323a223835223b73616c65736d616e5f69647c733a323a223539223b757365725f6c6576656c7c733a313a2231223b5f5f4143544956455f53455353494f4e5f444154417c733a3334343a2265376665326534316465656231376166663536376433613261356434306232303962386535613830666238363164636536376663613632393362373333613762613735376361653564366433666361333836366135303237376331633764363438333064616165326230346535323464323738653864636439343164396338376571736f7a7778315a49717252364b4251705247332f526262722b754668754752492f4f5643383963545a2b7265494c5a555559486b546830737a466f752f64793169426575516966594342515654546b6a6d6f644e644c6b776e7432796d66325945617445542f316e44456d6f6f372f66696172576c4b4f4d423261336c4b3756364e6a31692f5752467275686d3470676946644d5330797a42396e34614e6c777655484a633477635838754454465a686f6f616d7435724e4b6e63436d6863712f385845627544686738412f6a455236546a4e673d3d223b);
+('bnna9rer6up7qop6sfg2qp18qk5fbdct', '::1', 1759885881, ''),
+('mgod0dr96v21hor217cibv9pn76l1k3b', '::1', 1759885881, ''),
+('km9h43d6h6im3ep5si8epuh05povrvhs', '::1', 1759885881, ''),
+('emsq5vhbu74tn32igoef1ridq009s0eh', '::1', 1759886381, 0x7265646972656374696f6e7c733a38303a226148523063484d364c79397362324e68624768766333517661326c3163335276636d55765957527461573476634746356257567564484d765a3256305833527664474673583342686557316c626e513d223b),
+('e4begpbiag779q5kt6vvc3ee8hmepqpg', '::1', 1759887762, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393838373736323b),
+('bj0ls9lcuijfdu8gr4meno3ja9i2uc43', '::1', 1759888099, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393838383039393b7265646972656374696f6e7c4e3b757365725f69647c733a323a223835223b73616c65736d616e5f69647c733a323a223539223b757365725f6c6576656c7c733a313a2231223b5f5f4143544956455f53455353494f4e5f444154417c733a3334343a226534323438333866333033623133643665636631633431656363626237633165373833376230326530656565643637376333376138663939323435373866333165303731333362303166616163636539376530313738363433373761333638313062656264313763346261653736396330396461336234313364313666316162493249593545665a563853524e754b582b7161354249734231704136494b744448624c59353379613461592f3571643175634e326769416b724e5038303170383968415a672f2b2f586972696945544638425231484f4d363667614f4839526c7a76664f657a617139376365694e3475462f454169776a555672565454677864504c6e67426a54542f7a4d2f546d79504e65372f54564b764533306236316e4b394b335865636456794968323767305635726373476743635758773844466935537a2f317a39646d464f477270676577736b584167773d3d223b),
+('tbmp5tk39k8irabuhaknk0otmaa3eo9e', '::1', 1759890276, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393839303237363b7265646972656374696f6e7c4e3b757365725f69647c733a323a223835223b73616c65736d616e5f69647c733a323a223539223b757365725f6c6576656c7c733a313a2231223b5f5f4143544956455f53455353494f4e5f444154417c733a3238303a22616334623534356132303261663166316231313166623239393664373935326366346234386462393334623836616339306335653166643934323063646138343431363032326263653438326638373265653164636133353565663065363930633935313138666663336563653033613462623935373061626331353837666342692f4d5a617950493665633554685766544655396a6630623155414e734c737062584661664a693830512b79374a48546e53785035774648323739746b6c32724c3358653974304c7735713843346b334b6d6f443835725267766e7835585945456943536258377044384862446575396f3230597954326e366d56774e656b5a7a3854686a2b3443416f49384e5061776d656149773d3d223b),
+('subbohhjtlarrjpgocec6jscm60vhhpf', '127.0.0.1', 1759890945, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393839303934353b),
+('cvv4raiup0glmtsqv3qtllll6iiiib58', '::1', 1759890330, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393839303237363b7265646972656374696f6e7c4e3b757365725f69647c733a323a223835223b73616c65736d616e5f69647c733a323a223539223b757365725f6c6576656c7c733a313a2231223b5f5f4143544956455f53455353494f4e5f444154417c733a3238303a22616334623534356132303261663166316231313166623239393664373935326366346234386462393334623836616339306335653166643934323063646138343431363032326263653438326638373265653164636133353565663065363930633935313138666663336563653033613462623935373061626331353837666342692f4d5a617950493665633554685766544655396a6630623155414e734c737062584661664a693830512b79374a48546e53785035774648323739746b6c32724c3358653974304c7735713843346b334b6d6f443835725267766e7835585945456943536258377044384862446575396f3230597954326e366d56774e656b5a7a3854686a2b3443416f49384e5061776d656149773d3d223b),
+('a2nf5l0qrujfuk2ntnb11il1k0j087mb', '127.0.0.1', 1759891037, 0x5f5f63695f6c6173745f726567656e65726174657c693a313735393839303934353b);
 
 -- --------------------------------------------------------
 
@@ -126,7 +108,7 @@ CREATE TABLE `contacts` (
   `contact_date` datetime DEFAULT NULL,
   `status` tinyint(1) DEFAULT 1,
   `reply_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `contacts`
@@ -149,7 +131,7 @@ CREATE TABLE `coupons` (
   `start_date` date NOT NULL,
   `expired_date` date NOT NULL,
   `is_active` tinyint(4) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `coupons`
@@ -189,7 +171,7 @@ CREATE TABLE `customers` (
   `salesman_id` int(11) NOT NULL,
   `kode_customer` varchar(10) NOT NULL,
   `va_code` int(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `customers`
@@ -201,7 +183,10 @@ INSERT INTO `customers` (`id`, `user_id`, `nik`, `npwp`, `name`, `phone_number`,
 (16, 85, '12345678945613654321', '12345678945613654321', 'maulana malik', '082264054784', 18, 391, 3944, 'Jl.Semangka 31 A', 'trial umum ', 'Jl.Semangka 31 A', 0, 1, NULL, 59, '', 2147483647),
 (17, 86, '123456', '123456', 'diana', '085655909900', 0, 160, 0, 'patrang', 'dianatoko', 'jember', 1000000, 2, NULL, 59, '', 0),
 (18, 87, '123123', '123123', 'cumum1', '681234567489', 18, 258, 2558, 'Jember', '-', '-', 0, 1, NULL, 59, '', 0),
-(25, 94, '', '', 'customer-coba-lagi1', '082296054781', 18, 577, 5874, 'Jl.Surabaya , Jawa Timur , Surabaya , Benowo', '', NULL, 0, 1, NULL, 59, '', 0);
+(25, 94, '', '', 'customer-coba-lagi1', '082296054781', 18, 577, 5874, 'Jl.Surabaya , Jawa Timur , Surabaya , Benowo', '', NULL, 0, 1, NULL, 59, '', 0),
+(26, 95, '', '', 'Agus Santoso', '082234505684', 18, 256, 2531, 'alamat coba ', '', NULL, 0, 1, NULL, 62, '', 0),
+(27, 96, '', '', 'Customer Coba 1', '08523945622', 5, 55, 423, 'Jl.Semangka 31 A', '', NULL, 0, 1, NULL, 62, '', 0),
+(28, 97, '', '', 'Customer Coba 2', '084663857245', 18, 391, 3896, 'Jl. Anggur', '', NULL, 0, 1, NULL, 62, '', 0);
 
 -- --------------------------------------------------------
 
@@ -223,7 +208,7 @@ CREATE TABLE `customers_bk` (
   `level` int(11) NOT NULL,
   `profile_picture` varchar(191) DEFAULT NULL,
   `salesman_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -237,7 +222,7 @@ CREATE TABLE `customer_location` (
   `provinsi` int(5) NOT NULL,
   `kota` int(5) NOT NULL,
   `sub_kota` int(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -249,45 +234,31 @@ CREATE TABLE `generate_kdchart` (
   `id` int(11) NOT NULL,
   `kdchart` varchar(255) NOT NULL,
   `create_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `generate_kdchart`
 --
 
 INSERT INTO `generate_kdchart` (`id`, `kdchart`, `create_at`) VALUES
-(1, 'KIU560807250001', '2025-07-08 04:16:06'),
-(2, 'KIU850109250001', '2025-09-01 04:30:34'),
-(3, 'KIU850109250002', '2025-09-01 04:35:33'),
-(4, 'KIU850109250003', '2025-09-01 05:00:41'),
-(5, 'KIU850109250004', '2025-09-01 05:13:54'),
-(6, 'KIU850109250005', '2025-09-01 08:08:09'),
-(7, 'KIU850109250006', '2025-09-01 08:13:51'),
-(8, 'KIU850109250007', '2025-09-01 08:23:18'),
-(9, 'KIU850109250008', '2025-09-01 08:24:55'),
-(10, 'KIU850309250001', '2025-09-03 02:23:40'),
-(11, 'KIU850309250002', '2025-09-03 08:02:17'),
-(12, 'KIU850409250001', '2025-09-04 05:05:43'),
-(13, 'KIU940409250002', '2025-09-04 08:58:22'),
-(14, 'KIU870509250001', '2025-09-05 09:07:15'),
-(15, 'KIU870609250001', '2025-09-06 06:07:50'),
-(16, 'KIU870909250001', '2025-09-09 05:48:09'),
-(17, 'KIU870909250002', '2025-09-09 05:51:55'),
-(18, 'KIU870909250002', '2025-09-09 05:51:55'),
-(19, 'KIU870909250003', '2025-09-09 06:02:56'),
-(20, 'KIU870909250004', '2025-09-09 07:44:37'),
-(21, 'KIU871009250001', '2025-09-10 01:34:47'),
-(22, 'KIU871009250002', '2025-09-10 02:41:07'),
-(23, 'KIU871009250003', '2025-09-10 05:42:28'),
-(24, 'KIU871009250004', '2025-09-10 06:57:04'),
-(25, 'KIU871009250005', '2025-09-10 07:40:16'),
-(26, 'KIU871109250001', '2025-09-11 02:04:16'),
-(27, 'KIU871109250002', '2025-09-11 02:21:40'),
-(28, 'KIU871109250003', '2025-09-11 06:42:30'),
-(29, 'KIU561109250004', '2025-09-11 07:06:51'),
-(30, 'KIU852909250001', '2025-09-29 03:57:39'),
-(31, 'KIU852909250002', '2025-09-29 04:17:41'),
-(32, 'KIU872909250003', '2025-09-29 05:03:25');
+(1, 'KIU850610250001', '2025-10-06 02:32:34'),
+(2, 'KIU850610250002', '2025-10-06 06:53:32'),
+(3, 'KIU850710250001', '2025-10-07 05:48:36'),
+(4, 'KIU850710250002', '2025-10-07 07:16:57'),
+(5, 'KIU950710250003', '2025-10-07 07:29:19'),
+(6, 'KIU950710250004', '2025-10-07 08:00:29'),
+(7, 'KIU950710250005', '2025-10-07 08:18:52'),
+(8, 'KIU950710250006', '2025-10-07 10:47:56'),
+(9, 'KIU950710250007', '2025-10-07 11:11:22'),
+(10, 'KIU950710250008', '2025-10-07 11:22:01'),
+(11, 'KIU950710250009', '2025-10-07 13:18:00'),
+(12, 'KIU950710250010', '2025-10-07 13:35:16'),
+(13, 'KIU960710250011', '2025-10-07 14:14:52'),
+(14, 'KIU970710250012', '2025-10-07 15:35:20'),
+(15, 'KIU940710250013', '2025-10-07 15:36:27'),
+(16, 'KIU940710250014', '2025-10-07 16:34:26'),
+(17, 'KIU940710250015', '2025-10-07 16:37:15'),
+(18, 'KIU940810250001', '2025-10-07 17:30:47');
 
 -- --------------------------------------------------------
 
@@ -304,7 +275,7 @@ CREATE TABLE `message` (
   `created_at` datetime DEFAULT NULL,
   `status` tinyint(1) DEFAULT 1,
   `reply_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -337,45 +308,7 @@ CREATE TABLE `orders` (
   `insurance` text DEFAULT '0',
   `rating` int(11) DEFAULT NULL,
   `rating_desc` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `orders`
---
-
-INSERT INTO `orders` (`id`, `user_id`, `coupon_id`, `order_number`, `kd_faktur`, `invoice_number`, `ttb_number`, `order_status`, `order_date`, `total_price`, `total_items`, `payment_method`, `shipping_method`, `delivery_data`, `delivered_date`, `deliver_by`, `finish_date`, `due_date`, `jenis_pengiriman`, `estimasi_kirim`, `shipping_cost`, `insurance`, `rating`, `rating_desc`) VALUES
-(1, 85, NULL, 'KRT1925185326', 'KIU850109250002', '', NULL, '7', '2025-09-01 11:35:33', '16500.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-01', 'jnt', '0', '0', '0', NULL, NULL),
-(2, 85, NULL, 'HAL1925185495', 'KIU850109250003', '', NULL, '7', '2025-09-01 12:00:41', '99000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-01', 'jne', '0', '0', '0', NULL, NULL),
-(3, 85, NULL, 'ZOQ1925185402', 'KIU850109250004', '', NULL, '7', '2025-09-01 12:13:54', '20000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-01', 'pos', '0', '0', '0', NULL, NULL),
-(4, 56, NULL, 'GVS1925156683', 'KIU560109250005', 'GVS192515', NULL, '2', '2025-09-01 12:46:22', '190000.00', 1, 1, 1, '{\"customer\":{\"name\":\"cwahyu\",\"phone_number\":\"081122334455\",\"address\":\"alamatcwahyu7\",\"shop_name\":\"tokowahyu7\",\"shop_address\":\"jatimulyo gang ampel no 167\"},\"note\":\"\"}', '2025-09-01 00:00:00', 'k12', '2025-09-01 12:51:53', '2025-10-01', '89', '0', '0', '0', 5, ''),
-(5, 85, NULL, 'HZW1925185128', 'KIU850109250005', '', NULL, '7', '2025-09-01 15:08:09', '25000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-01', 'jne', '0', '0', '0', NULL, NULL),
-(6, 85, NULL, 'EBL1925185470', 'KIU850109250006', '', NULL, '7', '2025-09-01 15:13:51', '99000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-01', 'jne', '0', '0', '0', NULL, NULL),
-(7, 56, NULL, 'BOS1925156108', 'KIU560109250007', '', NULL, '9', '2025-09-01 15:21:59', '19000.00', 1, 1, 1, '{\"customer\":{\"name\":\"cwahyu\",\"phone_number\":\"081122334455\",\"address\":\"alamatcwahyu7\",\"shop_name\":\"tokowahyu7\",\"shop_address\":\"jatimulyo gang ampel no 167\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-10-01', '89', '0', '0', '0', NULL, NULL),
-(8, 85, NULL, 'NCL1925185602', 'KIU850109250007', '', NULL, '7', '2025-09-01 15:23:18', '20000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-01', 'jne', '0', '0', '0', NULL, NULL),
-(9, 85, NULL, 'LLB1925185380', 'KIU850109250008', '', NULL, '7', '2025-09-01 15:24:55', '250000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-01', 'jne', '0', '0', '0', NULL, NULL),
-(10, 85, NULL, 'GCJ3925185205', 'KIU850309250001', '', NULL, '7', '2025-09-03 09:23:40', '1115000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-03', 'jne', '0', '0', '0', NULL, NULL),
-(11, 85, NULL, 'QCK3925185168', 'KIU850309250002', '', NULL, '2', '2025-09-03 15:02:17', '144000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-03', 'jne', '0', '0', '0', NULL, NULL),
-(12, 85, NULL, 'SKC4925285390', 'KIU850409250001', '', NULL, '2', '2025-09-04 12:05:43', '2711500.00', 2, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-04', 'jne', '0', '0', '0', NULL, NULL),
-(13, 94, NULL, 'DAM4925194025', 'KIU940409250002', '', NULL, '2', '2025-09-04 15:58:22', '2650000.00', 1, 2, 5, '{\"customer\":{\"name\":\"customer-coba-lagi1\",\"phone_number\":\"082296054781\",\"address\":\"Jl.Surabaya , Jawa Timur , Surabaya , Benowo\",\"shop_name\":\"Toko customer 1\",\"shop_address\":\"Jl.Surabaya , Jawa Timur , Surabaya , Benowo\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-04', 'pos', '0', '0', '0', NULL, NULL),
-(14, 87, NULL, 'ACV5925187053', 'KIU870509250001', '', NULL, '7', '2025-09-05 16:07:15', '695000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-05', 'jne', '0', '0', '0', NULL, NULL),
-(15, 87, NULL, 'YLA6925187706', 'KIU870609250001', '', NULL, '7', '2025-09-06 13:07:50', '34750.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-06', 'jnt', '0', '0', '0', NULL, NULL),
-(16, 87, NULL, 'AUY9925187205', 'KIU870909250001', '', NULL, '7', '2025-09-09 12:48:09', '1440000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-09', 'jne', '0', '0', '0', NULL, NULL),
-(17, 87, NULL, 'KVO9925187763', 'KIU870909250002', '', NULL, '7', '2025-09-09 12:51:55', '605000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-09', 'jne', '0', '0', '0', NULL, NULL),
-(18, 87, NULL, 'FBT9925187695', 'KIU870909250003', '', NULL, '7', '2025-09-09 13:02:56', '2200000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-09', 'jne', '0', '0', '0', NULL, NULL),
-(19, 87, NULL, 'AYZ9925187981', 'KIU870909250004', '', NULL, '7', '2025-09-09 14:44:37', '1115000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-09', 'jne', '0', '0', '0', NULL, NULL),
-(20, 87, NULL, 'WUX10925187536', 'KIU871009250001', '', NULL, '7', '2025-09-10 08:34:47', '2880000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-10', 'jne', '0', '0', '0', NULL, NULL),
-(21, 87, NULL, 'EXW10925287718', 'KIU871009250002', '', NULL, '7', '2025-09-10 09:41:07', '1386500.00', 2, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-10', 'jne', '0', '0', '0', NULL, NULL),
-(22, 87, NULL, 'QAE10925187697', 'KIU871009250003', '', NULL, '7', '2025-09-10 12:42:28', '2650000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-10', 'jne', '0', '0', '0', NULL, NULL),
-(23, 87, NULL, 'KMI10925187812', 'KIU871009250004', '', NULL, '7', '2025-09-10 13:57:04', '423500.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-10', 'jne', '0', '0', '0', NULL, NULL),
-(24, 87, NULL, 'IPA10925187751', 'KIU871009250005', '', NULL, '7', '2025-09-10 14:40:16', '4400000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-10', 'jne', '0', '0', '0', NULL, NULL),
-(25, 87, NULL, 'DPL11925187460', 'KIU871109250001', '', NULL, '7', '2025-09-11 09:04:16', '2650000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-11', 'jne', '0', '0', '0', NULL, NULL),
-(26, 87, NULL, 'FHK11925287746', 'KIU871109250002', '', NULL, '7', '2025-09-11 09:21:40', '4850000.00', 2, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-11', 'jne', '0', '0', '0', NULL, NULL),
-(27, 87, NULL, 'OBU11925187208', 'KIU871109250003', '', NULL, '7', '2025-09-11 13:42:30', '1325000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-11', 'jne', '0', '0', '0', NULL, NULL),
-(28, 56, NULL, 'XOZ11925156213', 'KIU561109250004', '', NULL, '1', '2025-09-11 14:06:51', '2703000.00', 1, 2, 1, '{\"customer\":{\"name\":\"cwahyu\",\"phone_number\":\"081122334455\",\"address\":\"alamatcwahyu7\",\"shop_name\":\"tokowahyu7\",\"shop_address\":\"jatimulyo gang ampel no 167\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-11', '89', '0', '0', '0', NULL, NULL),
-(29, 56, NULL, 'UAP22925156985', 'KIU562209250001', '', NULL, '4', '2025-09-22 13:28:26', '354450.00', 1, 2, 1, '{\"customer\":{\"name\":\"cwahyu\",\"phone_number\":\"081122334455\",\"address\":\"alamatcwahyu7\",\"shop_name\":\"tokowahyu7\",\"shop_address\":\"jatimulyo gang ampel no 167\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-22', '89', '0', '0', '0', NULL, NULL),
-(30, 85, NULL, 'LSI29925185807', 'KIU852909250001', '', NULL, '3', '2025-09-29 10:57:39', '2650000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-29', 'jne', '0', '0', '0', NULL, NULL),
-(31, 85, NULL, 'HFO29925185516', 'KIU852909250002', '', NULL, '2', '2025-09-29 11:17:41', '144000.00', 1, 2, 5, '{\"customer\":{\"name\":\"maulana malik\",\"phone_number\":\"082264054784\",\"address\":\"Jl.Semangka 31 A\",\"shop_name\":\"trial umum \",\"shop_address\":\"Jl.Semangka 31 A\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-29', 'jne', '0', '0', '0', NULL, NULL),
-(32, 87, NULL, 'HKR29925187605', 'KIU872909250003', '', NULL, '7', '2025-09-29 12:03:25', '220000.00', 1, 2, 5, '{\"customer\":{\"name\":\"cumum1\",\"phone_number\":\"681234567489\",\"address\":\"Jember\",\"shop_name\":\"-\",\"shop_address\":\"-\"},\"note\":\"\"}', NULL, NULL, NULL, '2025-09-29', 'jne', '0', '0', '0', NULL, NULL);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -405,7 +338,7 @@ CREATE TABLE `orders_bk` (
   `insurance` text DEFAULT '0',
   `rating` int(11) DEFAULT NULL,
   `rating_desc` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -422,16 +355,7 @@ CREATE TABLE `order_items` (
   `satuan` int(11) NOT NULL,
   `satuan_text` text NOT NULL,
   `satuan_qty` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `order_items`
---
-
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `order_qty`, `order_price`, `satuan`, `satuan_text`, `satuan_qty`) VALUES
-(34, 30, 5, 1, '2650000.00', 2, 'Box', 10),
-(35, 31, 2, 1, '144000.00', 1, 'Pcs', 10),
-(36, 32, 7, 1, '220000.00', 1, 'Pcs', 10);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -448,7 +372,7 @@ CREATE TABLE `order_items_bk` (
   `satuan` int(11) NOT NULL,
   `satuan_text` text NOT NULL,
   `satuan_qty` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -465,14 +389,7 @@ CREATE TABLE `payments` (
   `payment_status` enum('1','2','3') DEFAULT '1',
   `confirmed_date` datetime DEFAULT NULL,
   `payment_data` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `payments`
---
-
-INSERT INTO `payments` (`id`, `order_id`, `payment_price`, `payment_date`, `picture_name`, `payment_status`, `confirmed_date`, `payment_data`) VALUES
-(1, 4, '190000.00', '2025-09-01 12:57:11', '-', '1', NULL, '{\"transfer_to\":\"bank-bca\",\"source\":{\"bank\":\"VA-BRI\",\"name\":\"cwahyu\",\"number\":\"012345\"}}');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -490,7 +407,7 @@ CREATE TABLE `piutang` (
   `payment_date` date NOT NULL,
   `payment_status` int(11) NOT NULL,
   `confirm_date` date DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -519,7 +436,7 @@ CREATE TABLE `products` (
   `is_available` tinyint(1) DEFAULT 1,
   `add_date` datetime DEFAULT NULL,
   `user_level` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `products`
@@ -698,7 +615,7 @@ INSERT INTO `products` (`id`, `category_id`, `sku`, `name`, `description`, `pict
 CREATE TABLE `product_category` (
   `id` int(10) NOT NULL,
   `name` varchar(191) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `product_category`
@@ -732,7 +649,7 @@ CREATE TABLE `promo` (
   `start_date` date NOT NULL,
   `expired_date` date NOT NULL,
   `is_active` tinyint(4) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `promo`
@@ -759,7 +676,7 @@ CREATE TABLE `reviews` (
   `review_text` mediumtext NOT NULL,
   `review_date` datetime NOT NULL,
   `status` tinyint(1) NOT NULL DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -771,7 +688,7 @@ CREATE TABLE `settings` (
   `id` int(10) NOT NULL,
   `key` varchar(32) NOT NULL,
   `content` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data untuk tabel `settings`
@@ -805,41 +722,7 @@ CREATE TABLE `tbtestongkir` (
   `idcustomer` varchar(255) NOT NULL,
   `status` int(2) NOT NULL,
   `create_at` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data untuk tabel `tbtestongkir`
---
-
-INSERT INTO `tbtestongkir` (`id`, `jsongkir`, `kd_faktur`, `sjasa`, `idcustomer`, `status`, `create_at`) VALUES
-(1, 'J&T Express;EZ;Reguler;;66000', 'KIU850109250002', 'jnt', '85', 3, '2025-09-01'),
-(2, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;6 day;83000', 'KIU850109250003', 'jne', '85', 3, '2025-09-01'),
-(3, 'POS Indonesia (POS);Pos Reguler;240;11 day;77500', 'KIU850109250004', 'pos', '85', 3, '2025-09-01'),
-(4, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;6 day;83000', 'KIU850109250005', 'jne', '85', 3, '2025-09-01'),
-(5, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;6 day;83000', 'KIU850109250006', 'jne', '85', 3, '2025-09-01'),
-(6, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;6 day;83000', 'KIU850109250007', 'jne', '85', 3, '2025-09-01'),
-(7, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;6 day;83000', 'KIU850109250008', 'jne', '85', 3, '2025-09-01'),
-(8, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;6 day;83000', 'KIU850309250001', 'jne', '85', 3, '2025-09-03'),
-(9, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;11 day;83000', 'KIU850309250002', 'jne', '85', 3, '2025-09-03'),
-(10, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;3 day;20000', 'KIU850409250001', 'jne', '85', 3, '2025-09-04'),
-(11, 'POS Indonesia (POS);Pos Reguler;240;8 day;44000', 'KIU940409250002', 'pos', '94', 3, '2025-09-04'),
-(12, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;20000', 'KIU870509250001', 'jne', '87', 3, '2025-09-05'),
-(13, 'J&T Express;EZ;Reguler;;12000', 'KIU870609250001', 'jnt', '87', 3, '2025-09-06'),
-(14, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;10000', 'KIU870909250001', 'jne', '87', 3, '2025-09-09'),
-(15, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;10000', 'KIU870909250002', 'jne', '87', 3, '2025-09-09'),
-(16, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;10000', 'KIU870909250003', 'jne', '87', 3, '2025-09-09'),
-(17, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;10000', 'KIU870909250004', 'jne', '87', 3, '2025-09-09'),
-(18, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;20000', 'KIU871009250001', 'jne', '87', 3, '2025-09-10'),
-(19, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;60000', 'KIU871009250002', 'jne', '87', 3, '2025-09-10'),
-(20, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;10000', 'KIU871009250003', 'jne', '87', 3, '2025-09-10'),
-(21, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;70000', 'KIU871009250004', 'jne', '87', 3, '2025-09-10'),
-(22, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;20000', 'KIU871009250005', 'jne', '87', 3, '2025-09-10'),
-(23, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;10000', 'KIU871109250001', 'jne', '87', 3, '2025-09-11'),
-(24, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;20000', 'KIU871109250002', 'jne', '87', 3, '2025-09-11'),
-(25, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;50000', 'KIU871109250003', 'jne', '87', 3, '2025-09-11'),
-(26, 'Jalur Nugraha Ekakurir (JNE);REG;Layanan Reguler;3 day;10000', 'KIU852909250001', 'jne', '85', 3, '2025-09-29'),
-(27, 'Jalur Nugraha Ekakurir (JNE);JTR;JNE Trucking;5 day;100000', 'KIU852909250002', 'jne', '85', 3, '2025-09-29'),
-(28, 'Jalur Nugraha Ekakurir (JNE);CTC;JNE City Courier;8 day;10000', 'KIU872909250003', 'jne', '87', 3, '2025-09-29');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -864,7 +747,7 @@ CREATE TABLE `tmp_cart` (
   `sts_ongkir` int(2) NOT NULL,
   `create_at` text NOT NULL,
   `last_action` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -874,12 +757,12 @@ CREATE TABLE `tmp_cart` (
 
 CREATE TABLE `users` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(50) DEFAULT NULL,
-  `email` varchar(191) NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(191) NOT NULL,
-  `profile_picture` varchar(128) DEFAULT NULL,
-  `role` varchar(32) DEFAULT '0' COMMENT '1 = admin, 2 = customer',
+  `password` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `profile_picture` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '0' COMMENT '1 = admin, 2 = customer',
   `register_date` datetime DEFAULT NULL,
   `status` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -905,7 +788,10 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `pr
 (85, NULL, 'cumum@gmail.com', NULL, '$2y$10$JdC3psY/Y1wrRdRedKykP.Y1FYMYcoQ66ZCOw2fYl8RhI2NTfm2hy', NULL, 'customer', '2024-10-07 21:46:12', 1),
 (86, NULL, 'diana_w@gmail.com', NULL, '$2y$10$Rqr2B94rDR/e61fg8Uq45eS85sp7DJjRla43uiSqkLSJDQoTYfYma', NULL, 'customer', '2025-02-28 13:04:24', 1),
 (87, NULL, 'cumum1@gmail.com', NULL, '$2y$10$YdLJCYIlC5wFJX6zhBT5yO7OdiWGUFYkHCoaxR003w61K4MRIlXD2', NULL, 'customer', '2025-02-28 14:51:17', 1),
-(94, NULL, 'customer1@gmail.com', NULL, '$2y$10$/RifMTeib65OKDHmq5dfX.cxP49ay3XykOT4WH9j9FBchEkCmmTYi', NULL, 'customer', '2025-09-04 15:51:05', 1);
+(94, NULL, 'customer1@gmail.com', NULL, '$2y$10$/RifMTeib65OKDHmq5dfX.cxP49ay3XykOT4WH9j9FBchEkCmmTYi', NULL, 'customer', '2025-09-04 15:51:05', 1),
+(95, NULL, 'ckiu1@gmail.com', NULL, '$2y$10$MmOGo/yoYWESdNiD2V7TeOnQQJ2Eg8S.Bqc5kgyG2ImaShVoLtxVu', NULL, 'customer', '2025-10-05 15:43:27', 1),
+(96, NULL, 'customer_baru@gmail.com', NULL, '$2y$10$YwklloxMFD0/Nj.wGOv5H.aU89R8Z51K73OV1heJiFrNkAL6QdTBm', NULL, 'customer', '2025-10-07 21:12:57', 1),
+(97, NULL, 'customer_baru1@gmail.com', NULL, '$2y$10$vZpIJn1D582ReSMRf/Z.5O4OJtszQCOnCTbz3a1UlC5opVSq4PHgy', NULL, 'customer', '2025-10-07 22:27:19', 1);
 
 -- --------------------------------------------------------
 
@@ -915,13 +801,13 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `pr
 
 CREATE TABLE `users_bk` (
   `id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(50) DEFAULT NULL,
-  `email` varchar(191) NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `email` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `username` varchar(16) NOT NULL,
-  `password` varchar(191) NOT NULL,
-  `profile_picture` varchar(128) DEFAULT NULL,
-  `role` varchar(32) DEFAULT '0' COMMENT '1 = admin, 2 = customer',
+  `username` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `profile_picture` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT '0' COMMENT '1 = admin, 2 = customer',
   `register_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1111,7 +997,7 @@ ALTER TABLE `banner_product`
 -- AUTO_INCREMENT untuk tabel `briva_api`
 --
 ALTER TABLE `briva_api`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `contacts`
@@ -1129,7 +1015,7 @@ ALTER TABLE `coupons`
 -- AUTO_INCREMENT untuk tabel `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT untuk tabel `customer_location`
@@ -1141,7 +1027,7 @@ ALTER TABLE `customer_location`
 -- AUTO_INCREMENT untuk tabel `generate_kdchart`
 --
 ALTER TABLE `generate_kdchart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT untuk tabel `message`
@@ -1153,7 +1039,7 @@ ALTER TABLE `message`
 -- AUTO_INCREMENT untuk tabel `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `orders_bk`
@@ -1165,7 +1051,7 @@ ALTER TABLE `orders_bk`
 -- AUTO_INCREMENT untuk tabel `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `order_items_bk`
@@ -1177,7 +1063,7 @@ ALTER TABLE `order_items_bk`
 -- AUTO_INCREMENT untuk tabel `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `piutang`
@@ -1219,19 +1105,19 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT untuk tabel `tbtestongkir`
 --
 ALTER TABLE `tbtestongkir`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `tmp_cart`
 --
 ALTER TABLE `tmp_cart`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
