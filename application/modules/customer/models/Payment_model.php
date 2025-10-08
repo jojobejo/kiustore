@@ -137,4 +137,11 @@ class Payment_model extends CI_Model
         WHERE a.user_id = '$id'
         ")->result();
     }
+    public function briva_is_active($user_id)
+    {
+        return $this->db->get_where('briva_api', [
+            'user_id' => $user_id,
+            'status'  => '1'
+        ])->result();
+    }
 }

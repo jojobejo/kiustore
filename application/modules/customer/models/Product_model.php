@@ -148,7 +148,7 @@ class Product_model extends CI_Model
 
     public function get_home_categories()
     {
-        return $this->db->limit(7)->get('product_category')->result();
+        return $this->db->limit(15)->get('product_category')->result();
     }
 
     public function get_all_categories()

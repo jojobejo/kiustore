@@ -3,7 +3,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 <!-- Main Start -->
 <main class="main-wrap index-page mb-xxl">
+    <form id="navbar-search-main" action="<?php echo site_url('search'); ?>" required>
+        <!-- <div class="form-group mb-0">
+      <div class="input-group input-group-alternative input-group-merge">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+        </div>
+        <input class="form-control" value="" name="search_query" placeholder="Cari..." type="text" required>
+      </div>
+    </div>
+    <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main" aria-label="Close">
+      <span aria-hidden="true">×</span>
+    </button> -->
 
+        <div class="search-box mb-4">
+            <i class="iconly-Search icli search"></i>
+            <input class="form-control" type="search" value="" name="search_query" placeholder="Cari disini..." required autocomplete="off" />
+        </div>
+    </form>
 
 
     <!-- Everyday Essentials Start -->

@@ -28,7 +28,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <?php endforeach; ?>
       <?php else : ?>
       <?php endif; ?>
-
     </div>
   </div>
   <!-- Catagories Section End -->

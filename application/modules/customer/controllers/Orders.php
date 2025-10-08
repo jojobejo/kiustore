@@ -184,6 +184,7 @@ class Orders extends CI_Controller
         $va_to_pay  = $this->input->post('va_to_pay');
         $nocust     = $this->input->post('nocust');
         $data       = $this->order->order_data($id);
+        // $briva_d    = $this->order->get_briva_byid($id);
 
         if (!$data) {
             $response = ['code' => 404, 'error' => TRUE, 'message' => 'Order tidak ditemukan'];
@@ -212,6 +213,29 @@ class Orders extends CI_Controller
                         'api'     => $apiResponse
                     ];
                     $this->order->input_va($datava);
+                } else if (isset($apiResponse['responseCode']) && $apiResponse['responseCode'] === "4042812") {
+
+                    $datava = array(
+                        'order_number'      => $trxid,
+                        'kd_faktur'         => $kdfaktur,
+                        'user_id'           => $userid,
+                        'name'              => $va_name,
+                        'va_code'           => '91118' . $nocust,
+                        'userno'            => $nocust,
+                        'total_price_topay' => $va_to_pay,
+                        'exp_date'          => date('c', strtotime('+15 minutes')),
+                        'status'            => '1'
+                    );
+
+                    $response = [
+                        'code'    => 200,
+                        'success' => TRUE,
+                        'message' => 'Payment VA Telah terbuat',
+                        'api'     => $apiResponse
+                    ];
+
+                    $this->order->input_va($datava);
+                    $this->brivaws->createVa($nocust, $va_name, $va_to_pay, $trxid);
                 } else {
                     $response = [
                         'code'    => 500,

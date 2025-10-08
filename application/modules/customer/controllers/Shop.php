@@ -244,6 +244,15 @@ class Shop extends CI_Controller
             redirect('home', 'refresh');
         }
 
+        $cusid = $this->session->userdata('user_id');
+        $briva_active = $this->payment->briva_is_active($cusid);
+
+        if (!empty($briva_active)) {
+            $this->session->set_flashdata('error', 'Terdapat transaksi berjalan. Selesaikan pesanan anda atau batalkan order terlebih dahulu.');
+            redirect('cart');
+            return;
+        }
+
         switch ($action) {
             default:
 

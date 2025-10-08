@@ -5,6 +5,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
   <?php if (count($carts) > 0) : ?>
     <?php if ($member == '1') : ?>
       <main class="main-wrap cart-page mb-xxl">
+        <?php if ($this->session->flashdata('error')) : ?>
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <?= $this->session->flashdata('error'); ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        <?php endif; ?>
         <?php if ($this->session->flashdata('limit')) : ?>
           <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <?= $this->session->flashdata('limit'); ?>
@@ -92,6 +100,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
       </main>
     <?php elseif ($member == '0') : ?>
       <main class="main-wrap cart-page mb-xxl">
+        <?php if ($this->session->flashdata('error')) : ?>
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <?= $this->session->flashdata('error'); ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        <?php endif; ?>
         <?php foreach ($sts_ongkir as $st) : ?>
           <?php if ($st->sts_ongkir == '0') : ?>
             <div class="cart-item-wrap pt-0 mb-3">

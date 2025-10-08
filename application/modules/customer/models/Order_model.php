@@ -416,6 +416,9 @@ class Order_model extends CI_Model
         ")->result();
     }
 
+    
+
+
     public function order_data($id)
     {
         $data = $this->db->query("SELECT
@@ -461,6 +464,17 @@ class Order_model extends CI_Model
         return $data->row();
     }
 
+    public function is_created($cusid)
+    {
+        $this->db->select('*');
+        $this->db->from('briva_api');
+        $this->db->where('user_id', $cusid);
+        $this->db->where('exp_date <', date('Y-m-d H:i:s'));
+        $this->db->order_by('exp_date', 'DESC');
+        $query = $this->db->get();
+        return $query->result();
+    }
+
     public function delete_va($invoice)
     {
         $this->db->where('order_number', $invoice)->delete('briva_api');
@@ -481,11 +495,30 @@ class Order_model extends CI_Model
         b.name,
         b.phone_number,
         a.total_price,
-        a.user_id
+        a.user_id,
+        c.jsongkir
         FROM orders a
         LEFT JOIN customers b ON b.user_id = a.user_id
+        LEFT JOIN tbtestongkir c ON c.kd_faktur = a.kd_faktur
         WHERE a.order_number = '$invoice' AND a.user_id = '$idcust'");
         return $data->result();
+    }
+
+    public function get_data_order_by_va($invoice, $idcust)
+    {
+        $data = $this->db->query("SELECT 
+        a.order_number,
+        a.kd_faktur,
+        b.name,
+        b.phone_number,
+        a.total_price,
+        a.user_id,
+        c.jsongkir
+        FROM orders a
+        LEFT JOIN customers b ON b.user_id = a.user_id
+        LEFT JOIN tbtestongkir c ON c.kd_faktur = a.kd_faktur
+        WHERE a.order_number = '$invoice' AND a.user_id = '$idcust'");
+        return $data->row();
     }
 
     public function get_by_order_number($invoice)

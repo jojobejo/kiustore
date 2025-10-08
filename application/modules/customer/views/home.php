@@ -103,6 +103,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <span class="font-white">Kategori</span>
         </div>
       </div> -->
+
       <div class="col-3">
         <div class="menu-wrap">
           <div class="bg-shape"></div>
