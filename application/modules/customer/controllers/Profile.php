@@ -103,13 +103,18 @@ class Profile extends CI_Controller
                 break;
             case '3':
 
-                $pro_id = $this->input->post('pro_id');
-                $kab_id = $this->input->post('kab_id');
-                $kec_id = $this->input->post('kec_id');
+                $pro_id     = $this->input->post('pro_id');
+                $kab_id     = $this->input->post('kab_id');
+                $kec_id     = $this->input->post('kec_id');
+                $pro_name   = $this->input->post('pro_name');
+                $kab_name   = $this->input->post('kab_name');
+                $kec_name   = $this->input->post('kec_name');
+
                 $data = array(
                     'province_id'    => $pro_id,
                     'kota_id'        => $kab_id,
-                    'subdistrict_id' => $kec_id
+                    'subdistrict_id' => $kec_id,
+                    'alamat_kirim'   => $pro_name . ',' . $kab_name . ',' . $kec_name
                 );
 
                 $update = $this->profile->update($data);

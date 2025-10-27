@@ -524,8 +524,7 @@ class Order_model extends CI_Model
 
     public function get_order_packing()
     {
-        $orders = $this->db->query("
-        SELECT
+        $orders = $this->db->query("SELECT
                 o.id
                 , o.order_number
                 , o.order_date
@@ -563,7 +562,8 @@ class Order_model extends CI_Model
             ON py.order_id = o.id
             WHERE
                 (o.payment_method = 1 &&  o.order_status = 3)
-                OR (o.payment_method = 2 AND o.order_status = 3 AND py.payment_status = 2)
+                -- OR (o.payment_method = 2 AND o.order_status = 3 AND py.payment_status = 2)
+                OR (o.payment_method = 2 AND o.order_status = 3 )
             GROUP BY o.id
             ORDER BY o.order_date DESC
         ");
@@ -573,8 +573,7 @@ class Order_model extends CI_Model
 
     public function get_order_packing1()
     {
-        $orders = $this->db->query("
-            SELECT
+        $orders = $this->db->query("SELECT
                 o.id
                 , o.order_number
                 , o.order_date
@@ -613,7 +612,8 @@ class Order_model extends CI_Model
             JOIN payments py
                 ON py.order_id = o.id
             WHERE (o.payment_method = 1 &&  o.order_status = 3)
-            OR (o.payment_method = 2 AND o.order_status = 3 AND py.payment_status = 2)
+            -- OR (o.payment_method = 2 AND o.order_status = 3 AND py.payment_status = 2)
+            OR (o.payment_method = 2 AND o.order_status = 3
             GROUP BY o.id
             ORDER BY o.order_date DESC
         ");

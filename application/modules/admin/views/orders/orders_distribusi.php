@@ -222,80 +222,80 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
       var role = '<?= admin_role(); ?>';
 
-      // var table1 = $('#orderList1').DataTable({
-      //   "ajax": "<?php echo site_url('admin/orders/api/order_all_distribusi'); ?>",
-      //   "columns": [{
-      //       "data": "id",
-      //       render: function(data, type, row, meta) {
-      //         return meta.row + meta.settings._iDisplayStart + 1;
-      //       }
-      //     },
-      //     {
-      //       "data": function(data, type, row) {
-      //         var url = base_url + 'admin/orders/view/' + data.id;
+      var table1 = $('#orderList1').DataTable({
+        "ajax": "<?php echo site_url('admin/orders/api/order_all_distribusi'); ?>",
+        "columns": [{
+            "data": "id",
+            render: function(data, type, row, meta) {
+              return meta.row + meta.settings._iDisplayStart + 1;
+            }
+          },
+          {
+            "data": function(data, type, row) {
+              var url = base_url + 'admin/orders/view/' + data.id;
 
-      //         return '<a href="' + url + '"> #' + data.order_number + '</a>';
-      //       }
-      //     },
-      //     {
-      //       "data": "customer"
-      //     },
-      //     {
-      //       "data": "alamat"
-      //     },
-      //     {
-      //       "data": "order_date"
-      //     },
-      //     {
-      //       "data": "total_items"
-      //     },
-      //     {
-      //       "data": "final_price"
-      //     },
-      //     {
-      //       "data": "payment_method"
-      //     },
-      //     {
-      //       "data": "order_status"
-      //     },
-      //   ],
-      //   "dom": '<"float-left mb-2"B><"float-right search1"f>rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
-      //   buttons: [
-      //     'print',
-      //     'copyHtml5',
-      //     'excelHtml5',
-      //     'pdfHtml5'
-      //   ],
-      //   initComplete: function() {
-      //     // Apply the search
-      //     this.api()
-      //       .columns()
-      //       .every(function() {
-      //         var that = this;
+              return '<a href="' + url + '"> #' + data.order_number + '</a>';
+            }
+          },
+          {
+            "data": "customer"
+          },
+          {
+            "data": "alamat"
+          },
+          {
+            "data": "order_date"
+          },
+          {
+            "data": "total_items"
+          },
+          {
+            "data": "final_price"
+          },
+          {
+            "data": "payment_method"
+          },
+          {
+            "data": "order_status"
+          },
+        ],
+        "dom": '<"float-left mb-2"B><"float-right search1"f>rt<"row"<"col-sm-4"l><"col-sm-4"i><"col-sm-4"p>>',
+        buttons: [
+          'print',
+          'copyHtml5',
+          'excelHtml5',
+          'pdfHtml5'
+        ],
+        initComplete: function() {
+          // Apply the search
+          this.api()
+            .columns()
+            .every(function() {
+              var that = this;
 
-      //         $('input.search1', this.footer()).on('keyup change clear', function() {
-      //           if (that.search() !== this.value) {
-      //             that.search(this.value).draw();
-      //           }
-      //         });
-      //       });
-      //     $('#info-all').text(this.api().data().length);
-      //   },
-      //   "language": {
-      //     "search": "Cari:",
-      //     "lengthMenu": "_MENU_",
-      //     "info": "Menampilkan _START_ sampai _END_ data dari _TOTAL_ data",
-      //     "infoEmpty": "Tidak ada data yang ditampilkan",
-      //     "infoFiltered": "(dari total _MAX_ data)",
-      //     "zeroRecords": "Tidak ada hasil pencarian ditemukan",
-      //     "paginate": {
-      //       "first": "&laquo;",
-      //       "last": "&raquo;",
-      //       "next": "&rsaquo;",
-      //       "previous": "&lsaquo;"
-      //     },
-      //   }
-      // });
+              $('input.search1', this.footer()).on('keyup change clear', function() {
+                if (that.search() !== this.value) {
+                  that.search(this.value).draw();
+                }
+              });
+            });
+          $('#info-all').text(this.api().data().length);
+        },
+        "language": {
+          "search": "Cari:",
+          "lengthMenu": "_MENU_",
+          "info": "Menampilkan _START_ sampai _END_ data dari _TOTAL_ data",
+          "infoEmpty": "Tidak ada data yang ditampilkan",
+          "infoFiltered": "(dari total _MAX_ data)",
+          "zeroRecords": "Tidak ada hasil pencarian ditemukan",
+          "paginate": {
+            "first": "&laquo;",
+            "last": "&raquo;",
+            "next": "&rsaquo;",
+            "previous": "&lsaquo;"
+          },
+        }
+      });
 
       var table2 = $('#orderList2').DataTable({
           "ajax": "<?php echo site_url('admin/orders/api/order_packing'); ?>",

@@ -20,7 +20,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                     <div class="card-body">
                         <label class="form-label">Alamat Lengkap</label>
-                        <input type="text" id="" name="" value="<?php echo $customer->shop_address; ?>" class="form-control" readonly>
+                        <input type="text" id="" name="" value="<?php echo $customer->alamat_kirim; ?>" class="form-control" readonly>
                     </div>
 
                     <!-- Berat -->

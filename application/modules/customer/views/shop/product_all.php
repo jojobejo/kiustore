@@ -48,7 +48,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <span class="title-color font-sm plus-item">Rp <?php echo ($product->promo == 1) ? get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3) : get_price($product->price, $product->price_2, $product->price_3); ?>
                                         <?php endif; ?>
 
-                                        <a class="btn btn-success" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a>
+                                        <!-- <a class="btn btn-success" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a> -->
                                         </span>
                             </div>
                         </div>

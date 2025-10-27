@@ -91,76 +91,92 @@ class Orders extends CI_Controller
 
         header('Content-Type: application/json');
 
-        if (!empty($briva)) {
-            $brivas     = $briva[0];
-            $result     = $this->brivaws->inquiryStatusVa($brivas->userno, $brivas->order_number);
-            $resultexp  = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
-
-            $json  = json_decode($result);
-            $json1 = json_decode($resultexp);
-
-            if (!$json || !$json1) {
-                echo json_encode([
-                    'status' => 'Response tidak valid',
-                    'data'   => ['statusVa' => $result, 'inquiryVa' => $resultexp]
-                ]);
-                return;
-            }
-
-            $expiredDate = $json1->virtualAccountData->expiredDate ?? null;
-            $paidStatus  = $json->additionalInfo->paidStatus ?? "N";
-
-
-            // Case 1: Sudah bayar & belum expired
-            if ($paidStatus === "Y" && $expiredDate && strtotime($expiredDate) > time()) {
-                $this->brivaws->updateStatusVa($brivas->userno, $brivas->order_number);
-                $this->db->where('order_number', $order_number)
-                    ->update('briva_api', ['status' => 2]);
-
-                $this->db->where('order_number', $order_number)
-                    ->update('orders', ['order_status' => 3]); // 3 = paid
-
-                echo json_encode([
-                    'status'       => $json->responseMessage ?? 'BRIVA sukses',
-                    'paidStatus'   => 'Y',
-                    'expiredDate'  => $expiredDate,
-                    'vaData'       => $json1->virtualAccountData ?? null
-                ]);
-                return;
-            }
-
-            // Case 2: Belum bayar & sudah expired
-            if ($paidStatus === "N" && $expiredDate && strtotime($expiredDate) <= time()) {
-                $this->brivaws->updateStatusVa($brivas->userno, $brivas->order_number);
-                $this->db->where('order_number', $order_number)
-                    ->update('briva_api', ['status' => 3]);
-
-                $this->db->where('order_number', $order_number)
-                    ->update('orders', ['order_status' => 7]); // 7 = cancelled
-
-                echo json_encode([
-                    'status'       => 'VA expired & transaksi dibatalkan',
-                    'paidStatus'   => 'N',
-                    'expiredDate'  => $expiredDate,
-                    'vaData'       => $json1->virtualAccountData ?? null
-                ]);
-                return;
-            }
-
-            // Default response
-            echo json_encode([
-                'status'       => $json->responseMessage ?? 'BRIVA tidak ditemukan',
-                'paidStatus'   => $paidStatus,
-                'expiredDate'  => $expiredDate,
-                'vaData'       => $json1->virtualAccountData ?? null
-            ]);
-        } else {
+        if (empty($briva)) {
             echo json_encode([
                 'status' => 'Data Tidak Ditemukan',
                 'data'   => null
             ]);
+            return;
         }
+
+        $brivas = $briva[0];
+
+        $order = $this->db->get_where('orders', ['order_number' => $order_number])->row();
+        if ($order) {
+            if ($order->order_status == 7) { // 7 = cancelled
+                echo json_encode([
+                    'status'       => 'Order dibatalkan',
+                    'paidStatus'   => 'N',
+                    'expiredDate'  => null,
+                    'vaData'       => null
+                ]);
+                return;
+            } elseif ($order->order_status == 3) { // 3 = paid
+                echo json_encode([
+                    'status'       => 'Order sudah dibayar',
+                    'paidStatus'   => 'Y',
+                    'expiredDate'  => null,
+                    'vaData'       => null
+                ]);
+                return;
+            }
+        }
+
+        $result     = $this->brivaws->inquiryStatusVa($brivas->userno, $brivas->order_number);
+        $resultexp  = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
+
+        $json  = json_decode($result);
+        $json1 = json_decode($resultexp);
+
+        if (!$json || !$json1) {
+            echo json_encode([
+                'status' => 'Response tidak valid',
+                'data'   => ['statusVa' => $result, 'inquiryVa' => $resultexp]
+            ]);
+            return;
+        }
+
+        $expiredDate = $json1->virtualAccountData->expiredDate ?? null;
+        $paidStatus  = $json->additionalInfo->paidStatus ?? "N";
+
+        if ($paidStatus === "Y" && $expiredDate && strtotime($expiredDate) > time()) {
+            $this->brivaws->updateStatusVa($brivas->userno, $brivas->order_number);
+            $this->db->where('order_number', $order_number)->update('briva_api', ['status' => 2]);
+            $this->db->where('order_number', $order_number)->update('orders', ['order_status' => 3]);
+
+            echo json_encode([
+                'status'       => $json->responseMessage ?? 'BRIVA sukses',
+                'paidStatus'   => 'Y',
+                'expiredDate'  => $expiredDate,
+                'vaData'       => $json1->virtualAccountData ?? null
+            ]);
+            return;
+        }
+
+        if ($paidStatus === "N" && $expiredDate && strtotime($expiredDate) <= time()) {
+            if ($order->order_status != 7) {
+                $this->brivaws->updateStatusVa($brivas->userno, $brivas->order_number);
+                $this->db->where('order_number', $order_number)->update('briva_api', ['status' => 3]);
+                $this->db->where('order_number', $order_number)->update('orders', ['order_status' => 7]);
+            }
+
+            echo json_encode([
+                'status'       => 'VA expired & transaksi dibatalkan',
+                'paidStatus'   => 'N',
+                'expiredDate'  => $expiredDate,
+                'vaData'       => $json1->virtualAccountData ?? null
+            ]);
+            return;
+        }
+
+        echo json_encode([
+            'status'       => $json->responseMessage ?? 'BRIVA tidak ditemukan',
+            'paidStatus'   => $paidStatus,
+            'expiredDate'  => $expiredDate,
+            'vaData'       => $json1->virtualAccountData ?? null
+        ]);
     }
+
 
 
     public function update_expired($order_number)

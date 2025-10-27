@@ -31,7 +31,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                         <span class="title-color font-sm plus-item">Rp <?php echo ($product->promo == 1) ? format_rupiah(get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3))  : format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?>
                                         <?php endif; ?>
 
-                                        <a class="btn btn-success btn-sm add-to-chart add-cart" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->current_discount > 0) ? ($product->price - $product->current_discount) : $product->price; ?>" data-id="<?php echo $product->id; ?>">Beli</a>
+                                        <!-- <a class="btn btn-success btn-sm add-to-chart add-cart" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->current_discount > 0) ? ($product->price - $product->current_discount) : $product->price; ?>" data-id="<?php echo $product->id; ?>">Beli</a> -->
                                         </span>
                             </div>
                         </div>

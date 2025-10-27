@@ -29,21 +29,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <div class="user-panel">
         <div class="media">
             <div class="avatar-wrap">
-                <a href="javascript:void(0)"> <img src="<?= get_user_image(); ?>" alt="<?php echo get_user_name(); ?>"></a>
+                <a href="javascript:void(0)">
+                    <img src="<?= get_user_image(); ?>" alt="<?php echo get_user_name(); ?>">
+                </a>
             </div>
             <div class="media-body">
                 <h2 class="title-color"><?php echo get_user_name(); ?></h2>
-                <span class="content-color font-md">
-                </span>
             </div>
         </div>
     </div>
-    <!-- KETERANGAN ACTION 
-    #1  = inputan awal alamat 
-    #2  = edit profile all kecuali alamat 
-    #3  = simpan inputan alamat
-    #4  = edit inputan alamat 
-    -->
 
     <?php if ($action == '1') : ?>
 
@@ -51,38 +45,27 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="input-box mb-2">
                 <label class="form-label">Provinsi :</label>
                 <select class="kiuselect form-control w-100" name="province" id="province"></select>
+                <input type="text" class="form-control mt-2" id="pro_name" name="pro_name" placeholder="Nama Provinsi" readonly hidden>
+                <input type="hidden" id="pro_id" name="pro_id">
             </div>
 
             <div class="input-box mb-2">
                 <label class="form-label">Kota/Kabupaten :</label>
                 <select class="kiuselect form-control w-100" name="city" id="city"></select>
+                <input type="text" class="form-control mt-2" id="kab_name" name="kab_name" placeholder="Nama Kota/Kabupaten" readonly hidden>
+                <input type="hidden" id="kab_id" name="kab_id">
             </div>
+
             <div class="input-box mb-2">
                 <label class="form-label">Kecamatan :</label>
                 <select class="kiuselect form-control w-100" name="district" id="district"></select>
+                <input type="text" class="form-control mt-2" id="kec_name" name="kec_name" placeholder="Nama Kecamatan" readonly hidden>
+                <input type="hidden" id="kec_id" name="kec_id">
             </div>
-            <!-- <div class="input-box mb-2">
-                <label class="form-label">Kelurahan :</label>
-                <select class="kiuselect form-control w-100" name="village" id="village"></select>
-            </div> -->
+
             <div class="input-box mb-2" hidden>
                 <label class="form-label">USER ID</label>
                 <input type="text" class="form-control" name="idcust" id="idcust" value="<?= $user->id ?>">
-            </div>
-        </div>
-
-        <div class="row" hidden>
-            <div class="col">
-                <label class="form-label w-100">provinsi_id :</label>
-                <input type="text" id="pro_id" name="pro_id" value="">
-            </div>
-            <div class="col">
-                <label class="form-label w-100">city_id :</label>
-                <input type="text" id="kab_id" name="kab_id" value="">
-            </div>
-            <div class="col">
-                <label class="form-label w-100">distric_id</label>
-                <input type="text" id="kec_id" name="kec_id" value="">
             </div>
         </div>
 
@@ -95,12 +78,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div>
         </div>
 
-    <?php elseif ($action == '2') : ?>
     <?php endif; ?>
+
     <?php if ($flash) : ?>
         <p class="text-center text-success"><?php echo $flash; ?></p>
     <?php endif; ?>
-    </form>
 </main>
 
 <script>
@@ -113,28 +95,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
             $.get("<?= base_url('rajaongkir/get_provinces') ?>", function(res) {
                 $('#province').html('<option value="">Pilih Provinsi</option>');
                 $.each(res.data, function(i, prov) {
-                    $('#province').append('<option value="' + prov.id + '">' + prov.name + '</option>');
+                    $('#province').append('<option value="' + prov.id + '" data-name="' + prov.name + '">' + prov.name + '</option>');
                 });
             }, 'json');
         }
 
         $('#province').change(function() {
             let province = $(this).val();
+            let province_name = $('#province option:selected').data('name') || '';
 
             $('#pro_id').val(province);
+            $('#pro_name').val(province_name);
 
             $('#city').html('<option value="">Pilih Kota/Kabupaten</option>');
             $('#district').html('<option value="">Pilih Kecamatan</option>');
-            $('#kab_id').val('');
-            $('#kec_id').val('');
-
+            $('#kab_id, #kab_name, #kec_id, #kec_name').val('');
 
             if (province) {
                 $.get("<?= base_url('rajaongkir/get_cities') ?>", {
                     province_id: province
                 }, function(res) {
                     $.each(res.data, function(i, city) {
-                        $('#city').append('<option value="' + city.id + '">' + city.name + '</option>');
+                        $('#city').append('<option value="' + city.id + '" data-name="' + city.name + '">' + city.name + '</option>');
                     });
                 }, 'json');
             }
@@ -142,17 +124,20 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
         $('#city').change(function() {
             let city_id = $(this).val();
+            let city_name = $('#city option:selected').data('name') || '';
 
             $('#kab_id').val(city_id);
+            $('#kab_name').val(city_name);
+
             $('#district').html('<option value="">Pilih Kecamatan</option>');
-            $('#kec_id').val('');
+            $('#kec_id, #kec_name').val('');
 
             if (city_id) {
                 $.get("<?= base_url('rajaongkir/get_districts') ?>", {
                     city_id: city_id
                 }, function(res) {
                     $.each(res.data, function(i, district) {
-                        $('#district').append('<option value="' + district.id + '">' + district.name + '</option>');
+                        $('#district').append('<option value="' + district.id + '" data-name="' + district.name + '">' + district.name + '</option>');
                     });
                 }, 'json');
             }
@@ -160,38 +145,19 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
         $('#district').change(function() {
             let subdistrict_id = $(this).val();
+            let subdistrict_name = $('#district option:selected').data('name') || '';
+
             $('#kec_id').val(subdistrict_id);
-
-            if (subdistrict_id) {
-                $.get("<?= base_url('rajaongkir/') ?>", {
-                    subdistrict_id: subdistrict_id
-                }, function(res) {
-                    $.each(res.data, function(i, village) {
-                        $('#village').append('<option value="' + village.id + '">' + village.name + '</option>');
-                    });
-                }, 'json');
-            }
-        });
-
-        $('#subdistrict').change(function() {
-            let subdistrict_id = $(this).val();
-            $('#village').html('<option value="">Pilih Kelurahan</option>');
-
-            if (subdistrict_id) {
-                $.get("<?= base_url('rajaongkir/get_villages') ?>", {
-                    subdistrict_id: subdistrict_id
-                }, function(res) {
-                    $.each(res.data, function(i, village) {
-                        $('#village').append('<option value="' + village.id + '">' + village.name + '</option>');
-                    });
-                }, 'json');
-            }
+            $('#kec_name').val(subdistrict_name);
         });
 
         $("#selesai").on('click', function() {
             var pro_id = $("#pro_id").val().trim();
+            var pro_name = $("#pro_name").val().trim();
             var kab_id = $("#kab_id").val().trim();
+            var kab_name = $("#kab_name").val().trim();
             var kec_id = $("#kec_id").val().trim();
+            var kec_name = $("#kec_name").val().trim();
 
             if (pro_id === "" || kab_id === "" || kec_id === "") {
                 alert("Harap isi semua field sebelum menyimpan.");
@@ -203,8 +169,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 type: "POST",
                 data: {
                     pro_id: pro_id,
+                    pro_name: pro_name,
                     kab_id: kab_id,
-                    kec_id: kec_id
+                    kab_name: kab_name,
+                    kec_id: kec_id,
+                    kec_name: kec_name
                 },
                 dataType: "JSON",
                 cache: false,
@@ -220,8 +189,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     alert("Terjadi kesalahan. Silakan coba lagi.");
                 }
             });
-
         });
+
         loadProvinces();
     });
 </script>

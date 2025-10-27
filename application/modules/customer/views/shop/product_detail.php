@@ -156,7 +156,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <?php else : ?>
                     <span>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></span>
                   <?php endif; ?>
-                  <a class="btn btn-success btn-sm" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a>
+                  <!-- <a class="btn btn-success btn-sm" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a> -->
 
               </div>
             </div>

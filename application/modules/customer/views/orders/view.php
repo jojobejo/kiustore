@@ -387,7 +387,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         return;
                     }
                     // TRANSAKSI EXPIRED
-                    if (expiredDate && new Date().getTime() > expiredDate && !expiredHandled) {
+                    if (
+                        expiredDate &&
+                        new Date().getTime() > expiredDate &&
+                        !expiredHandled &&
+                        orderStatus != 'Canceled' &&
+                        orderStatus != 'Expired'
+                    ) {
                         updateExpired("<?= $data->order_number ?>", res.paidStatus);
                     }
 

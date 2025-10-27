@@ -46,9 +46,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
 
         <div class="input-box">
-            <div class="title mb-2"><i class="lni lni-map-marker"></i><span class="badge bg-danger">Alamat Toko / Alamat pengiriman</span></div>
-            <input class="form-control" type="text" id="inputAddr" name="shop_address" value="<?php echo set_value('name', $user->shop_address); ?>">
+            <div class="title mb-2"><i class="lni lni-map-marker"></i><span class="badge bg-danger"> Alamat pengiriman</span></div>
+            <input class="form-control" type="text" id="inputAddr" name="shop_address" value="<?php echo set_value('name', $user->alamat_kirim); ?>">
         </div>
+
         <div class="input-box">
             <div class="title mb-2"><i class="lni lni-user"></i><span>Foto Profil</span></div>
             <input type="file" class="form-control" id="inputFoto" name="file">

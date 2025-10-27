@@ -34,7 +34,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             </div>
                             <div class="mb-3">
                                 <label for="exampleFormControlInput1" class="form-label">Alamat Toko / Alamat Pengiriman</label>
-                                <textarea name="shop_address" class="form-control" id="shop_address" required><?php echo $customer->shop_address; ?></textarea>
+                                <textarea name="shop_address" class="form-control" id="shop_address" required><?php echo $customer->alamat_kirim; ?></textarea>
                             </div>
                             <div class="mb-3">
                                 <label for="exampleFormControlInput1" class="form-label">Catatan</label>
