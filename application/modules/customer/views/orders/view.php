@@ -344,6 +344,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <!-- Payment Method Section End -->
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     let lastStatus = null;
     let expiredHandled = false;
@@ -359,6 +360,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             clearInterval(countdownInterval);
             return;
         }
+
         $.ajax({
             url: "<?= site_url('customer/orders/cek_va_status/' . $data->number_ordered) ?>",
             type: "GET",
@@ -374,34 +376,35 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     let amount = parseInt(briva.totalAmount?.value ?? 0);
 
                     $("#va-detail").html(`
-                            <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
-                            <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
-                            <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount?.currency ?? ''}</p>
-                        `);
+                        <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
+                        <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
+                        <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount?.currency ?? ''}</p>
+                    `);
+
                     // TRANSAKSI SUKSES
                     if (res.paidStatus === "Y") {
-                        console.warn("Transaksi Sukses");
-                        alert("Transaksi berhasil");
-                        clearInterval(statusInterval);
-                        location.reload();
+                        Swal.fire({
+                            icon: "success",
+                            title: "Transaksi Berhasil",
+                            text: "Pembayaran Anda telah dikonfirmasi.",
+                            confirmButtonColor: "#198754"
+                        }).then(() => {
+                            clearInterval(statusInterval);
+                            location.reload();
+                        });
                         return;
                     }
+
                     // TRANSAKSI EXPIRED
-                    if (
-                        expiredDate &&
-                        new Date().getTime() > expiredDate &&
-                        !expiredHandled &&
-                        orderStatus != 'Canceled' &&
-                        orderStatus != 'Expired'
-                    ) {
+                    if (expiredDate && new Date().getTime() > expiredDate && !expiredHandled) {
                         updateExpired("<?= $data->order_number ?>", res.paidStatus);
                     }
 
                 } else {
                     $("#va-status").text(res.status || "Unknown");
                     $("#va-detail").html(`
-                            <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
-                        `);
+                        <button class="btn btn-success w-100 update-payment-btn">Lakukan Pembayaran</button>
+                    `);
                 }
             },
             error: function(xhr, status, error) {
@@ -424,14 +427,27 @@ defined('BASEPATH') or exit('No direct script access allowed');
             success: function(res) {
                 console.log("Update expired response:", res);
                 if (res.success) {
+                    let message = "";
+                    let icon = "info";
+
                     if (paidStatus === "N") {
-                        alert("VA Expired - Pembayaran Tidak Dilakukan - Order Di Batalkan");
+                        message = "VA sudah expired dan pembayaran tidak dilakukan. Order Anda dibatalkan.";
+                        icon = "warning";
                     } else if (paidStatus === "Y") {
-                        alert("VA Expired - Transaksi Sukses");
+                        message = "Transaksi sudah dibayar sebelum VA expired.";
+                        icon = "success";
                     }
-                    $("#va-status").text("Expired");
-                    clearInterval(statusInterval);
-                    window.location.href = "<?= site_url('order_history') ?>";
+
+                    Swal.fire({
+                        icon: icon,
+                        title: "Informasi",
+                        text: message,
+                        confirmButtonColor: "#198754"
+                    }).then(() => {
+                        $("#va-status").text("Expired");
+                        clearInterval(statusInterval);
+                        window.location.href = "<?= site_url('order_history') ?>";
+                    });
                 }
             },
             error: function(xhr, status, error) {
@@ -439,10 +455,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 console.log(xhr.responseText);
             }
         });
-
     }
 
-    // 🚀 Countdown dengan trigger expired langsung
+    // 🚀 Countdown
     countdownInterval = setInterval(function() {
         $(".countdown").each(function() {
             let expired = $(this).data("expired");
@@ -481,16 +496,25 @@ defined('BASEPATH') or exit('No direct script access allowed');
             dataType: 'json',
             success: function(res) {
                 console.log("Response dari server:", res);
-
                 $btn.html('Lakukan Pembayaran');
 
                 if (res.success) {
                     $('.statusField').text('Proses');
-                    alert(res.message);
+                    Swal.fire({
+                        icon: "success",
+                        title: "Berhasil",
+                        text: res.message,
+                        confirmButtonColor: "#198754"
+                    });
                     cekStatus();
                 } else if (res.error) {
                     $('.actionRow').html(res.message);
-                    alert(res.message);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Gagal",
+                        text: res.message,
+                        confirmButtonColor: "#dc3545"
+                    });
                 }
             }
         });
@@ -504,7 +528,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
             cekStatus();
         }, 60000);
     });
+    
 </script>
+
 
 <?php if (($data->payment_method == 2 && $data->order_status == 4) || ($data->payment_method == 1 && $data->order_status == 4)) : ?>
     <div class="modal fade" id="terimaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
