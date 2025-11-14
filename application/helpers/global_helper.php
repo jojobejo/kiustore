@@ -432,6 +432,18 @@ if (!function_exists('get_payment_status')) {
     }
 }
 
+if (!function_exists('get_payment_status_va')) {
+    function get_payment_status_va($status)
+    {
+        if ($status == 2)
+            return '<span class="badge bg-warning">Menunggu konfirmasi</span>';
+        else if ($status == 3 || $status == 4 || $status == 5 || $status == 6)
+            return '<span class="badge bg-success">Pembayaran Diterima</span>';
+        else if ($status == 7)
+            return '<span class="badge bg-warning">Pembayaran tidak ditemukan / Kurang Bayar</span>';
+    }
+}
+
 if (!function_exists('get_payment_status1')) {
     function get_payment_status1($status)
     {

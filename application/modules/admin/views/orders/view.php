@@ -176,7 +176,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <input type="hidden" value="<?php echo $data->id; ?>" name="id">
                     <input type="hidden" value="<?php echo $data->payment_method; ?>" name="payment_method">
                     <input type="hidden" value="<?php echo $data->order_status; ?>" name="order_status">
-                    <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number">
+                    <?php if ($data->order_status == '2') : ?>
+                      <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number">
+                    <?php else : ?>
+                      <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" readonly>
+                    <?php endif; ?>
                   </td>
                 </tr>
                 <!--  <tr>
@@ -193,24 +197,44 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <input type="date" value="<?php echo $data->due_date; ?>" class="form-control form-control-sm" name="due_date">
                     </td>
                   </tr> -->
-                  <tr>
-                    <td>Ongkir</td>
-                    <td>
-                      <input type="text" value="<?php echo $data->shipping_cost; ?>" class="form-control form-control-sm" name="shipping_cost">
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Asuransi</td>
-                    <td>
-                      <input type="text" value="<?php echo $data->insurance; ?>" class="form-control form-control-sm" name="insurance">
-                    </td>
-                  </tr>
+                  <?php if ($data->order_status == '2') : ?>
+                    <tr>
+                      <td>Ongkir</td>
+                      <td>
+                        <input type="text" value="<?php echo $data->shipping_cost; ?>" class="form-control form-control-sm" name="shipping_cost">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Asuransi</td>
+                      <td>
+                        <input type="text" value="<?php echo $data->insurance; ?>" class="form-control form-control-sm" name="insurance">
+                      </td>
+                    </tr>
+                  <?php else : ?>
+                    <tr>
+                      <td>Ongkir</td>
+                      <td>
+                        <input type="text" value="<?php echo $data->shipping_cost; ?>" class="form-control form-control-sm" name="shipping_cost" readonly>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Asuransi</td>
+                      <td>
+                        <input type="text" value="<?php echo $data->insurance; ?>" class="form-control form-control-sm" name="insurance" readonly>
+                      </td>
+                    </tr>
+                  <?php endif; ?>
                   <tr>
                     <td></td>
                     <td>
-                      <div class="col-md-3 text-right">
-                        <input type="submit" class="btn btn-primary" value="OK">
-                      </div>
+                      <?php if ($data->order_status == '2') : ?>
+                        <div class="col-md-3 text-right">
+                          <input type="submit" class="btn btn-primary" value="OK">
+                        </div>
+                      <?php else : ?>
+                        <div class="col-md-3 text-right">
+                        </div>
+                      <?php endif; ?>
                     </td>
                   </tr>
                 <?php } ?>
@@ -250,25 +274,26 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <div class="col-auto">
                   <h3 class="mb-0">Pembayaran</h3>
                 </div>
-                <div class="col-auto">
-                  <input type="text" class="form-control" name="invoice" id="invoice" value="<?= $data->order_number ?>">
-                  <input type="text" class="form-control" name="cusno" id="cusno" value="<?= substr($delivery_data->customer->phone_number, -8) ?>">
-                  <input type="text" class="form-control" name="orderid" id="orderid" value="<?= $data->id ?>">
-                  <input type="text" class="form-control" name="pricepay" id="pricepay" value="<?= $data->total_price ?>">
-                  <input type="text" class="form-control" name="orderdate" id="orderdate" value="<?= $data->order_date ?>">
-                  <button class="btn btn-primary btn-sm cek_va">Cek Pembayaran</button>
-                </div>
+                <?php if ($data->order_status == '2') : ?>
+                  <div class="col-auto">
+                    <input type="text" class="form-control" name="invoice" id="invoice" value="<?= $data->order_number ?>">
+                    <input type="text" class="form-control" name="cusno" id="cusno" value="<?= substr($delivery_data->customer->phone_number, -8) ?>">
+                    <input type="text" class="form-control" name="orderid" id="orderid" value="<?= $data->id ?>">
+                    <input type="text" class="form-control" name="pricepay" id="pricepay" value="<?= $data->total_price ?>">
+                    <input type="text" class="form-control" name="orderdate" id="orderdate" value="<?= $data->order_date ?>">
+                    <button class="btn btn-primary btn-sm cek_va">Cek Pembayaran</button>
+                  </div>
+                <?php else : ?>
+                <?php endif; ?>
               </div>
             </div>
             <div class="card-body <?php echo ($data->payment_method == 1) ? 'p-0' : ''; ?>">
               <?php if ($data->payment_method == 2) : ?>
                 <?php if ($data->payment_price == NULL) : ?>
-                  <div id="payment-result" class="alert alert-info m-2"></div>
-                <?php else : ?>
-
-                  <!-- <div>
-                    <img class="img img-fluid" src="<?php echo base_url('assets/uploads/payments/' . $data->picture_name); ?>">
+                  <div id="payment-result" class="alert alert-info m-2">
+                    <h3>Pembayaran Telah Diterima</h3>
                   </div>
+                <?php else : ?>
                   <?php if ($payment_flash) : ?>
                     <br>
                     <div class="alert alert-info" id="payment_flash"><?php echo $payment_flash; ?></div>
@@ -318,7 +343,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
                       </td>
                     </tr>
-                  </table> -->
+                  </table>
                 <?php endif; ?>
               <?php elseif ($data->payment_method == 1) : ?>
                 <?php if ($data->payment_price == NULL) : ?>
@@ -383,6 +408,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <?php endif; ?>
               <?php endif; ?>
             </div>
+
             <?php if ($data->payment_price != NULL) : ?>
               <div class="card-footer">
                 <form action="<?php echo site_url('admin/payments/verify'); ?>" method="POST">

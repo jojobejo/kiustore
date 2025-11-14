@@ -80,7 +80,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <td>
                           Rp <?php echo format_rupiah($payment->payment_price); ?>
                         </td>
-                        <td><?php echo get_payment_status_va($payment->status); ?></td>
+                        <td><?php echo get_payment_status($payment->status); ?></td>
                       </tr>
                     <?php $i++;
                     endforeach; ?>
@@ -119,7 +119,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <td>
                           Rp <?php echo format_rupiah($payment->payment_price); ?>
                         </td>
-                        <td><?php echo get_payment_status_va($payment->status); ?></td>
+                        <td><?php echo get_payment_status($payment->status); ?></td>
                       </tr>
                     <?php $i++;
                     endforeach; ?>

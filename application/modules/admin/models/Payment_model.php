@@ -84,16 +84,31 @@ class Payment_model extends CI_Model
         $id = $this->user_id;
         if (admin_role() == 'admin' || admin_role() == 'keuangan') {
 
-            $payments = $this->db->query("
-                SELECT p.id, p.payment_date, p.order_id, p.payment_price, p.payment_status as status, o.order_number, c.name AS customer
-                FROM payments p
-                JOIN orders o
-                    ON o.id = p.order_id
-                JOIN customers c
-                    ON c.user_id = o.user_id
-                ORDER BY p.payment_date DESC
-            ");
+            // $payments = $this->db->query("
+            //     SELECT p.id, p.payment_date, p.order_id, p.payment_price, p.payment_status as status, o.order_number, c.name AS customer
+            //     FROM payments p
+            //     JOIN orders o
+            //         ON o.id = p.order_id
+            //     JOIN customers c
+            //         ON c.user_id = o.user_id
+            //     ORDER BY p.payment_date DESC
+            // ");
 
+            $payments = $this->db->query("SELECT 
+            b.id,
+            b.order_number,
+            b.kd_faktur,
+            c.name as customer,
+            b.total_price_topay AS payment_price,
+            o.order_status as status,
+            o.order_date as payment_date
+            FROM briva_api b
+            JOIN orders o
+            ON o.order_number = b.order_number
+            JOIN customers c
+            ON c.user_id = b.user_id
+            WHERE o.order_status != '7'
+            ");
             return $payments->result();
         } else {
             $payments = $this->db->query("
@@ -134,30 +149,39 @@ class Payment_model extends CI_Model
         $id = $this->user_id;
         if (admin_role() == 'admin' || admin_role() == 'keuangan') {
 
-            $payments = $this->db->query("
-                SELECT p.id, p.payment_date, p.order_id, p.payment_price, p.payment_status as status, o.order_number, c.name AS customer
-                FROM payments p
-                JOIN orders o
-                    ON o.id = p.order_id
-                JOIN customers c
-                    ON c.user_id = o.user_id
-                WHERE p.payment_status=2
-                ORDER BY p.payment_date DESC
+            $payments = $this->db->query("SELECT
+            b.id,
+            b.order_number,
+            b.kd_faktur,
+            c.name as customer,
+            b.total_price_topay AS payment_price,
+            o.order_status as status,
+            o.order_date as payment_date
+            FROM briva_api b
+            JOIN orders o
+            ON o.order_number = b.order_number
+            JOIN customers c
+            ON c.user_id = b.user_id
+            WHERE o.order_status != '7' AND o.order_status != '2'  
+                
             ");
 
             return $payments->result();
         } else {
-            $payments = $this->db->query("
-                SELECT p.id, p.payment_date, p.order_id, p.payment_price, p.payment_status as status, o.order_number, c.name AS customer
-                FROM payments p
-                JOIN orders o
-                    ON o.id = p.order_id
-                JOIN customers c
-                    ON c.user_id = o.user_id
-                JOIN users us
-                    ON us.id = c.salesman_id
-                WHERE us.id = $id and p.payment_status=2
-                ORDER BY p.payment_date DESC
+            $payments = $this->db->query("SELECT 
+            b.id,
+            b.order_number,
+            b.kd_faktur,
+            c.name as customer,
+            b.total_price_topay AS payment_price,
+            o.order_status as status,
+            o.order_date as payment_date
+            FROM briva_api b
+            JOIN orders o
+            ON o.order_number = b.order_number
+            JOIN customers c
+            ON c.user_id = b.user_id
+            WHERE o.order_status != '7' AND o.order_status != '2'
             ");
 
             return $payments->result();
@@ -185,15 +209,20 @@ class Payment_model extends CI_Model
         $id = $this->user_id;
         if (admin_role() == 'admin' || admin_role() == 'keuangan') {
 
-            $payments = $this->db->query("
-                SELECT p.id, p.payment_date, p.order_id, p.payment_price, p.payment_status as status, o.order_number, c.name AS customer
-                FROM payments p
-                JOIN orders o
-                    ON o.id = p.order_id
-                JOIN customers c
-                    ON c.user_id = o.user_id
-                WHERE p.payment_status=1
-                ORDER BY p.payment_date DESC
+            $payments = $this->db->query("SELECT
+            b.id,
+            b.order_number,
+            b.kd_faktur,
+            c.name as customer,
+            b.total_price_topay AS payment_price,
+            o.order_status as status,
+            o.order_date as payment_date
+            FROM briva_api b
+            JOIN orders o
+            ON o.order_number = b.order_number
+            JOIN customers c
+            ON c.user_id = b.user_id
+            WHERE o.order_status = '2'
             ");
 
             return $payments->result();

@@ -258,7 +258,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
                             <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
                             <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
-                            <input type="text" value="<?= $data->final_price ?>" name="total_topay" id="total_topay" readonly>
+                            <input type="text" value="<?= $final_price ?>" name="total_topay" id="total_topay" readonly>
                             <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
                         </div>
                     <?php else : ?>
@@ -268,7 +268,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
                             <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
                             <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
-                            <input type="text" value="<?= $data->final_price ?>" name="total_topay" id="total_topay" readonly>
+                            <input type="text" value="<?= $final_price ?>" name="total_topay" id="total_topay" readonly>
                             <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
                         </div>
                         <button class="btn btn-success w-100 payment-btn">Lakukan Pembayaran</button>
@@ -319,7 +319,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
                                 <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
                                 <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
-                                <input type="text" value="<?= $data->final_price ?>.00" name="total_topay" id="total_topay" readonly>
+                                <input type="text" value="<?= $final_price ?>.00" name="total_topay" id="total_topay" readonly>
                                 <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
                             </div>
                             <div id="va-detail"></div>
@@ -356,6 +356,31 @@ defined('BASEPATH') or exit('No direct script access allowed');
         if (expiredHandled) return;
         if (orderStatus == 3) {
             console.warn("Order Diterima Admin");
+            clearInterval(statusInterval);
+            clearInterval(countdownInterval);
+            return;
+        } else if (orderStatus == 4) {
+            console.warn("Order Dalam Pengiriman");
+            clearInterval(statusInterval);
+            clearInterval(countdownInterval);
+            return;
+        } else if (orderStatus == 5) {
+            console.warn("Order Telah Diterima");
+            clearInterval(statusInterval);
+            clearInterval(countdownInterval);
+            return;
+        } else if (orderStatus == 6) {
+            console.warn("Order Telah Selesai");
+            clearInterval(statusInterval);
+            clearInterval(countdownInterval);
+            return;
+        } else if (orderStatus == 8) {
+            console.warn("Menunggu Konfirmasi Pembayaran");
+            clearInterval(statusInterval);
+            clearInterval(countdownInterval);
+            return;
+        } else if (orderStatus == 9) {
+            console.warn("Dalam Pengjuan Kredit");
             clearInterval(statusInterval);
             clearInterval(countdownInterval);
             return;
@@ -528,7 +553,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
             cekStatus();
         }, 60000);
     });
-    
 </script>
 
 
