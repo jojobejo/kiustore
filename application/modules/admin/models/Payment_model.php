@@ -162,7 +162,7 @@ class Payment_model extends CI_Model
             ON o.order_number = b.order_number
             JOIN customers c
             ON c.user_id = b.user_id
-            WHERE o.order_status != '7' AND o.order_status != '2'  
+            WHERE o.order_status != '7' AND o.order_status != '2' AND o.order_status != '10'  
                 
             ");
 
@@ -222,7 +222,7 @@ class Payment_model extends CI_Model
             ON o.order_number = b.order_number
             JOIN customers c
             ON c.user_id = b.user_id
-            WHERE o.order_status = '2'
+            WHERE o.order_status = '2' OR o.order_status = '10'
             ");
 
             return $payments->result();

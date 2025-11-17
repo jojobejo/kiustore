@@ -84,6 +84,10 @@ class Orders extends CI_Controller
         if (is_string($result)) {
             $result = json_decode($result);
         }
+        echo json_encode([
+            'debug_raw' => $result
+        ]);
+        return;
 
         if ($result && isset($result->additionalInfo->paidStatus)) {
             $paidStatus = $result->additionalInfo->paidStatus;
@@ -91,13 +95,14 @@ class Orders extends CI_Controller
             if ($paidStatus === 'Y') {
                 $payment_data = [
                     'order_id'          => $order->id,
-                    'payment_price'     => $invoice,
-                    'payment_date'      => '-',
+                    'payment_price'     => $order->total_price,
+                    'payment_date'      => $order->create_at,
                     'picture_name'      => '-',
                     'payment_status'    => '1',
                     'confirmed_date'    => date('Y-m-d H:i:s'),
                     'payment_data'      => 'paid'
                 ];
+
                 $this->db->insert('payments', $payment_data);
 
                 echo json_encode([
@@ -120,6 +125,68 @@ class Orders extends CI_Controller
         }
     }
 
+    public function cek_va_status()
+    {
+        $order_number = $this->input->post('invoice');
+        $cusno        = $this->input->post('cusno');
+        $orderid      = $this->input->post('orderid');
+        $pricepay     = $this->input->post('pricepay');
+        $orderdate    = $this->input->post('orderdate');
+
+        $data = $this->order->data_va($order_number);
+
+        if (!$data) {
+            echo json_encode([
+                'status' => 'ERROR',
+                'message' => 'Data VA tidak ditemukan'
+            ]);
+            return;
+        }
+
+        if ($data->status == 1) {
+            echo json_encode([
+                'status' => 'UNPAID',
+                'message' => 'Pembayaran belum dilakukan'
+            ]);
+            return;
+        }
+
+        // Status 2 = pending, update ke 4 + insert ke payment
+        if ($data->status == 2) {
+
+            // 1. UPDATE STATUS KE 4
+            $this->order->update_status($order_number, 4);
+
+            // 2. INSERT PAYMENT
+            $insertData = [
+                'order_id'        => $orderid,
+                'payment_price'   => $pricepay,
+                'payment_date'    => date('Y-m-d H:i:s'),
+                'picture_name'    => "-",
+                'payment_status'  => '2',
+                'confirmed_date'  => date('Y-m-d H:i:s'),
+                'payment_data'    => json_encode([
+                    'invoice'    => $order_number,
+                    'cusno'      => $cusno,
+                    'orderdate'  => $orderdate
+                ])
+            ];
+
+            $this->order->insert_payment($insertData);
+            $this->order->update_status_order($order_number, 3, 2);
+
+            echo json_encode([
+                'status' => 'UPDATED',
+                'message' => 'Status berhasil diperbarui dan data payment berhasil dibuat'
+            ]);
+            return;
+        }
+
+        echo json_encode([
+            'status' => 'OK',
+            'message' => 'Status tidak memerlukan tindakan'
+        ]);
+    }
 
     public function api($action = '')
     {

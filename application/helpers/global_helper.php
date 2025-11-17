@@ -393,6 +393,8 @@ if (!function_exists('get_order_status')) {
             return '<span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span>';
         else if ($status == 9)
             return '<span class="badge bg-warning">Dalam Pengajuan Kredit</span>';
+        else if ($status == 10)
+            return '<span class="badge bg-warning">Payment Verify</span>';
     }
 }
 
@@ -417,6 +419,8 @@ if (!function_exists('get_payment_methods')) {
             return '<span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span>';
         else if ($payment == 9)
             return '<span class="badge bg-warning">Dalam Pengajuan Kredit</span>';
+        else if ($payment == 10)
+            return '<span class="badge bg-warning">Payment Verify</span>';
     }
 }
 
@@ -429,6 +433,8 @@ if (!function_exists('get_payment_status')) {
             return '<span class="badge bg-warning">Berhasil dikonfirmasi</span>';
         else if ($status == 3)
             return '<span class="badge bg-warning">Pembayaran tidak ditemukan / Kurang Bayar</span>';
+        else if ($status == 10)
+            return '<span class="badge bg-warning">Menunggu konfirmasi</span>';
     }
 }
 
@@ -441,6 +447,8 @@ if (!function_exists('get_payment_status_va')) {
             return '<span class="badge bg-success">Pembayaran Diterima</span>';
         else if ($status == 7)
             return '<span class="badge bg-warning">Pembayaran tidak ditemukan / Kurang Bayar</span>';
+        else if ($status == 10)
+            return '<span class="badge bg-warning">Menunggu konfirmasi</span>';
     }
 }
 

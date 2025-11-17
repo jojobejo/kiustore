@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <!-- Header -->
 <div class="header bg-primary pb-6">
   <div class="container-fluid">
@@ -22,6 +24,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </div>
   </div>
 </div>
+
 
 <!-- Page content -->
 <div class="container-fluid mt--6">
@@ -176,7 +179,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <input type="hidden" value="<?php echo $data->id; ?>" name="id">
                     <input type="hidden" value="<?php echo $data->payment_method; ?>" name="payment_method">
                     <input type="hidden" value="<?php echo $data->order_status; ?>" name="order_status">
-                    <?php if ($data->order_status == '2') : ?>
+                    <?php if ($data->order_status == '1') : ?>
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number">
                     <?php else : ?>
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" readonly>
@@ -197,7 +200,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <input type="date" value="<?php echo $data->due_date; ?>" class="form-control form-control-sm" name="due_date">
                     </td>
                   </tr> -->
-                  <?php if ($data->order_status == '2') : ?>
+                  <?php if ($data->order_status == '1') : ?>
                     <tr>
                       <td>Ongkir</td>
                       <td>
@@ -227,7 +230,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <tr>
                     <td></td>
                     <td>
-                      <?php if ($data->order_status == '2') : ?>
+                      <?php if ($data->order_status == '1') : ?>
                         <div class="col-md-3 text-right">
                           <input type="submit" class="btn btn-primary" value="OK">
                         </div>
@@ -274,25 +277,43 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <div class="col-auto">
                   <h3 class="mb-0">Pembayaran</h3>
                 </div>
-                <?php if ($data->order_status == '2') : ?>
-                  <div class="col-auto">
-                    <input type="text" class="form-control" name="invoice" id="invoice" value="<?= $data->order_number ?>">
-                    <input type="text" class="form-control" name="cusno" id="cusno" value="<?= substr($delivery_data->customer->phone_number, -8) ?>">
-                    <input type="text" class="form-control" name="orderid" id="orderid" value="<?= $data->id ?>">
-                    <input type="text" class="form-control" name="pricepay" id="pricepay" value="<?= $data->total_price ?>">
-                    <input type="text" class="form-control" name="orderdate" id="orderdate" value="<?= $data->order_date ?>">
-                    <button class="btn btn-primary btn-sm cek_va">Cek Pembayaran</button>
-                  </div>
-                <?php else : ?>
-                <?php endif; ?>
+
               </div>
             </div>
             <div class="card-body <?php echo ($data->payment_method == 1) ? 'p-0' : ''; ?>">
               <?php if ($data->payment_method == 2) : ?>
                 <?php if ($data->payment_price == NULL) : ?>
-                  <div id="payment-result" class="alert alert-info m-2">
-                    <h3>Pembayaran Telah Diterima</h3>
-                  </div>
+                  <?php if ($data->order_status == '2') : ?>
+                    <div class="col-auto" hidden>
+                      <input type="text" class="form-control" name="invoice" id="invoice" value="<?= $data->order_number ?>" readonly>
+                      <input type="text" class="form-control" name="cusno" id="cusno" value="<?= substr($delivery_data->customer->phone_number, -8) ?>" readonly>
+                      <input type="text" class="form-control" name="orderid" id="orderid" value="<?= $data->id ?>" readonly>
+                      <input type="text" class="form-control" name="pricepay" id="pricepay" value="<?= $data->total_price ?>" readonly>
+                      <input type="text" class="form-control" name="orderdate" id="orderdate" value="<?= $data->order_date ?>" readonly>
+                    </div>
+                    <div id="payment-result" class="alert alert-info m-2">
+                      <h3>Belum Ada Data</h3>
+                    </div>
+                    <button class="btn btn-primary btn-lg cek_va w-100">Cek Pembayaran</button>
+                  <?php else : ?>
+                    <div>
+                      <input type="hidden" id="invoice" value="<?= $data->order_number ?>">
+                      <input type="hidden" id="cusno" value="<?= $delivery_data->customer->phone_number ?>">
+                      <input type="hidden" id="orderid" value="<?= $data->id ?>">
+                      <input type="hidden" id="pricepay" value="<?= $data->total_price ?>">
+                      <input type="hidden" id="orderdate" value="<?= $data->order_date ?>">
+                    </div>
+                    <tr>
+                      <td>Cek Pembayaran</td>
+                      <td>
+                        <button type="button" class="btn btn-warning btn-sm" id="btnCekVA">
+                          Cek Pembayaran (VA)
+                        </button>
+                      </td>
+                    </tr>
+
+                  <?php endif; ?>
+
                 <?php else : ?>
                   <?php if ($payment_flash) : ?>
                     <br>
@@ -319,7 +340,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                           <?php endif; ?>
                         </b></td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                       <td>Transfer ke</td>
                       <td>
                         <div style="white-space: initial;"><b>
@@ -342,7 +363,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                           <b><?php echo $transfer_from->bank; ?> a.n <?php echo $transfer_from->name; ?> (<?php echo $transfer_from->number; ?>)</b>
                         </div>
                       </td>
-                    </tr>
+                    </tr> -->
                   </table>
                 <?php endif; ?>
               <?php elseif ($data->payment_method == 1) : ?>
@@ -467,6 +488,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
           cusno: cusno
         },
         success: function(res) {
+          console.log("RAW RESPONSE: ", res);
+
           if (res.paid_status === "Y") {
             $("#payment-result").html(
               '<div class="alert alert-success m-2">' + res.message + '</div>'
@@ -483,5 +506,53 @@ defined('BASEPATH') or exit('No direct script access allowed');
           );
         }
       });
+    });
+  </script>
+  <script>
+    document.getElementById('btnCekVA').addEventListener('click', function() {
+
+      Swal.fire({
+        title: "Memeriksa...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      $.ajax({
+        url: "<?= base_url('admin/orders/cek_va_status') ?>",
+        type: "POST",
+        dataType: "json",
+        data: {
+          invoice: $('#invoice').val(),
+          cusno: $('#cusno').val(),
+          orderid: $('#orderid').val(),
+          pricepay: $('#pricepay').val(),
+          orderdate: $('#orderdate').val()
+        },
+
+        success: function(res) {
+          Swal.close();
+
+          if (res.status === "UNPAID") {
+            Swal.fire("Info", res.message, "warning");
+          }
+
+          if (res.status === "UPDATED") {
+            Swal.fire("Sukses", res.message, "success").then(() => {
+              location.reload();
+            });
+          }
+
+          if (res.status === "ERROR") {
+            Swal.fire("Error", res.message, "error");
+          }
+        },
+
+        error: function(xhr) {
+          Swal.close();
+          console.log("XHR ERROR:", xhr.responseText);
+          Swal.fire("Gagal", "Server bermasalah", "error");
+        }
+      });
+
     });
   </script>

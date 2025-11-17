@@ -252,7 +252,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <h3>Status: <span id="va-status">Loading...</span></h3>
                             <div id="va-detail"></div>
                         </div>
-                        <div hidden>
+                        <div>
                             <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
                             <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
                             <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
@@ -262,7 +262,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
                         </div>
                     <?php else : ?>
-                        <div hidden>
+                        <div>
                             <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
                             <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
                             <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
@@ -336,7 +336,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <div class="alert alert-info m-2 w-100">Pesanan selesai</div>
                 <?php elseif ($data->order_status == 7) : ?>
                     <div class="alert alert-info m-2 w-100">Pesanan dibatalkan</div>
-                    <!-- <a href="#" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i> Hapus</a> -->
+                <?php elseif ($data->order_status == 10) : ?>
+                    <div class="alert alert-info m-2 w-100">Verifikasi pembayaran oleh admin</div>
                 <?php endif; ?>
             <?php endif; ?>
         </div>
@@ -381,6 +382,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
             return;
         } else if (orderStatus == 9) {
             console.warn("Dalam Pengjuan Kredit");
+            clearInterval(statusInterval);
+            clearInterval(countdownInterval);
+            return;
+        } else if (orderStatus == 10) {
+            console.warn("Dalam Verifikasi Admin");
             clearInterval(statusInterval);
             clearInterval(countdownInterval);
             return;

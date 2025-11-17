@@ -142,7 +142,7 @@ class Orders extends CI_Controller
         if ($paidStatus === "Y" && $expiredDate && strtotime($expiredDate) > time()) {
             $this->brivaws->updateStatusVa($brivas->userno, $brivas->order_number);
             $this->db->where('order_number', $order_number)->update('briva_api', ['status' => 2]);
-            $this->db->where('order_number', $order_number)->update('orders', ['order_status' => 3]);
+            $this->db->where('order_number', $order_number)->update('orders', ['order_status' => 10]);
 
             echo json_encode([
                 'status'       => $json->responseMessage ?? 'BRIVA sukses',
@@ -200,7 +200,6 @@ class Orders extends CI_Controller
         $va_to_pay  = $this->input->post('va_to_pay');
         $nocust     = $this->input->post('nocust');
         $data       = $this->order->order_data($id);
-        // $briva_d    = $this->order->get_briva_byid($id);
 
         if (!$data) {
             $response = ['code' => 404, 'error' => TRUE, 'message' => 'Order tidak ditemukan'];

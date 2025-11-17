@@ -1002,7 +1002,21 @@ class Order_model extends CI_Model
         WHERE o.id = '$id'
     ");
 
-        // AND p.id IN (SELECT MAX(id) FROM `payments`)
+        return $data->row();
+    }
+
+    public function verivy_payments($invoice)
+    {
+        $data = $this->db->query("SELECT o.*, c.name, c.code, ongs.jsongkir AS ongkir_ekspedisi
+        FROM orders o
+        LEFT JOIN coupons c
+            ON c.id = o.coupon_id
+        LEFT JOIN tbtestongkir ongs
+            ON ongs.kd_faktur = o.kd_faktur
+        LEFT JOIN briva_api briva
+            ON briva.order_number = o.order_number
+        WHERE o.order_number = '$invoice'
+    ");
         return $data->row();
     }
 
@@ -1019,6 +1033,35 @@ class Order_model extends CI_Model
         WHERE o.order_number = '$invoice'
     ");
         return $data->row();
+    }
+
+    public function data_va($order_number)
+    {
+        return $this->db->get_where('briva_api', [
+            'order_number' => $order_number
+        ])->row();
+    }
+
+    public function update_status($order_number, $status)
+    {
+        return $this->db->update(
+            'briva_api',
+            ['status' => $status],
+            ['order_number' => $order_number]
+        );
+    }
+    public function update_status_order($order_number, $status)
+    {
+        return $this->db->update(
+            'orders',
+            ['order_status' => $status],
+            ['order_number' => $order_number]
+        );
+    }
+
+    public function insert_payment($data)
+    {
+        return $this->db->insert('payments', $data);
     }
 
     public function order_items($id)
