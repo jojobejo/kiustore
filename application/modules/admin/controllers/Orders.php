@@ -46,9 +46,12 @@ class Orders extends CI_Controller
         if ($this->order->is_order_exist($id)) {
             $data = $this->order->order_data($id);
             $items = $this->order->order_items($id);
-            $kredit = $this->order->score_kredit($id);
+
             $banks = json_decode(get_settings('payment_banks'));
             $banks = (array) $banks;
+
+            $user_id = $data->user_id;
+            $kredit = $this->order->score_kredit($user_id);
 
             $params['title'] = 'Order #' . $data->order_number;
 

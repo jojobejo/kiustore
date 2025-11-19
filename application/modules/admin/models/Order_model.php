@@ -1007,7 +1007,26 @@ class Order_model extends CI_Model
 
     public function score_kredit($id)
     {
-        
+        return  $this->db->query("SELECT 
+            c.user_id,
+            SUM(
+                IFNULL(o.total_price, 0) 
+                + IFNULL(o.shipping_cost, 0) 
+                + IFNULL(o.insurance, 0)
+            ) AS tagihan,
+            c.max_credit
+        FROM 
+            kiucoid_kiustore.customers c
+        LEFT JOIN 
+            kiucoid_kiustore.orders o
+            ON c.user_id = o.user_id
+            AND o.payment_method = 1
+            AND (o.order_status < 6 OR o.order_status = 9)
+        WHERE 
+            c.user_id = '$id'
+        GROUP BY 
+            c.user_id, c.max_credit;
+        ")->row();
     }
 
     public function verivy_payments($invoice)

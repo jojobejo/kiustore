@@ -34,7 +34,23 @@ defined('BASEPATH') or exit('No direct script access allowed');
       <div class="card-wrapper">
         <div class="card">
           <div class="card-header">
-            <h3 class="mb-0">Data Pengiriman</h3>
+            <div class="row">
+              <div class="col-auto">
+                <h3 class="mb-0">Data Pengiriman</h3>
+              </div>
+              <div class="col-auto">
+                <b class="statusField"><?php echo get_order_status($data->order_status, $data->payment_method); ?></b>
+              </div>
+              <div class="col-auto">
+                <form action="<?php echo  base_url('admin/orders/status'); ?>" method="POST">
+                  <div class="col-auto" hidden>
+                    <input type="text" name="status" id="status" value="7">
+                    <input type="text" name="order" id="order" value="<?= $data->id ?>">
+                  </div>
+                  <input type="submit" class="btn btn-danger btn-sm" value="Batalkan Pesanan">
+                </form>
+              </div>
+            </div>
             <?php if ($order_flash) : ?>
               <span class="float-right text-success font-weight-bold" style="margin-top: -30px;"><?php echo $order_flash; ?></span>
             <?php endif; ?>
@@ -155,6 +171,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   </tr>
                 </tbody>
               </table>
+
+
             </form>
           </div>
         </div>
@@ -238,12 +256,21 @@ defined('BASEPATH') or exit('No direct script access allowed');
                           <input type="submit" class="btn btn-primary" value="OK">
                         </div>
                       <?php elseif ($data->order_status == '9') : ?>
-                        <div class="col-md-3 text-right">
 
-                          <h3>Score Credit Aman</h3>
+                        <?php if (!empty($kredit)) : ?>
+                          <?php
+                          $selisih = $kredit->max_credit - $kredit->tagihan;
+                          ?>
+                          <?php if ($selisih < 0) : ?>
+                            <button class="btn btn-danger btn-block mt-2" disabled>Plafon Kredit Tidak Mencukupi</button>
+                          <?php else : ?>
+                            <input type="submit" class="btn btn-primary" value="OK">
+                            <button class="btn btn-success btn-block mt-2">Order Dapat Dilanjutkan</button>
+                          <?php endif; ?>
+                        <?php else : ?>
+                          0
+                        <?php endif; ?>
 
-                          <input type="submit" class="btn btn-primary" value="Konfirmasi Kredit">
-                        </div>
                       <?php else : ?>
                         <div class="col-md-3 text-right">
                         </div>
