@@ -210,6 +210,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         </div>
                     </div>
                 </div>
+
                 <!-- shipping method choose-->
                 <div class="shipping-method-choose mb-3">
                     <div class="alert alert-info m-2">Metode Pengiriman</div>

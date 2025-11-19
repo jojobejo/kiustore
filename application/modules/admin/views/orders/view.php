@@ -173,19 +173,21 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <div class="card-body p-0">
             <form action="<?php echo site_url('admin/orders/api/verify'); ?>" method="POST">
               <table class="table align-items-center table-flush table-hover">
+
                 <tr>
                   <td>No. Faktur</td>
                   <td>
                     <input type="hidden" value="<?php echo $data->id; ?>" name="id">
                     <input type="hidden" value="<?php echo $data->payment_method; ?>" name="payment_method">
                     <input type="hidden" value="<?php echo $data->order_status; ?>" name="order_status">
-                    <?php if ($data->order_status == '1') : ?>
+                    <?php if ($data->order_status == '1' || $data->order_status == '9') : ?>
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number">
                     <?php else : ?>
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" readonly>
                     <?php endif; ?>
                   </td>
                 </tr>
+
                 <!--  <tr>
                           <td>No. TTB</td>
                           <td>
@@ -200,7 +202,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <input type="date" value="<?php echo $data->due_date; ?>" class="form-control form-control-sm" name="due_date">
                     </td>
                   </tr> -->
-                  <?php if ($data->order_status == '1') : ?>
+
+                  <?php if ($data->order_status == '1' || $data->order_status == '9') : ?>
                     <tr>
                       <td>Ongkir</td>
                       <td>
@@ -233,6 +236,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <?php if ($data->order_status == '1') : ?>
                         <div class="col-md-3 text-right">
                           <input type="submit" class="btn btn-primary" value="OK">
+                        </div>
+                      <?php elseif ($data->order_status == '9') : ?>
+                        <div class="col-md-3 text-right">
+
+                          <h3>Score Credit Aman</h3>
+
+                          <input type="submit" class="btn btn-primary" value="Konfirmasi Kredit">
                         </div>
                       <?php else : ?>
                         <div class="col-md-3 text-right">
@@ -272,15 +282,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div> -->
         <?php if (admin_role() != 'distribusi') { ?>
           <div class="card card-primary" id="#payments">
-            <div class="card-header">
-              <div class="row">
-                <div class="col-auto">
-                  <h3 class="mb-0">Pembayaran</h3>
+            <?php if ($data->order_status == '9') : ?>
+            <?php else : ?>
+              <div class="card-header">
+                <div class="row">
+                  <div class="col-auto">
+                    <h3 class="mb-0">Pembayaran</h3>
+                  </div>
                 </div>
-
               </div>
-            </div>
+            <?php endif; ?>
+
             <div class="card-body <?php echo ($data->payment_method == 1) ? 'p-0' : ''; ?>">
+              <?php if ($data->payment_method == 1) : ?>
+
+              <?php else : ?>
+              <?php endif; ?>
               <?php if ($data->payment_method == 2) : ?>
                 <?php if ($data->payment_price == NULL) : ?>
                   <?php if ($data->order_status == '2') : ?>
@@ -295,6 +312,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <h3>Belum Ada Data</h3>
                     </div>
                     <button class="btn btn-primary btn-lg cek_va w-100">Cek Pembayaran</button>
+                  <?php elseif ($data->order_status == '9') : ?>
                   <?php else : ?>
                     <div>
                       <input type="hidden" id="invoice" value="<?= $data->order_number ?>">
@@ -319,6 +337,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <br>
                     <div class="alert alert-info" id="payment_flash"><?php echo $payment_flash; ?></div>
                   <?php endif; ?>
+
                   <table class="table align-items-center table-flush table-hover">
                     <tr>
                       <td>Transfer</td>
@@ -370,11 +389,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <?php if ($data->payment_price == NULL) : ?>
                   <div class="alert alert-info m-2">Tidak ada data pembayaran.</div>
                 <?php else : ?>
-
                   <div>
                     <img class="img img-fluid" src="<?php echo base_url('assets/uploads/payments/' . $data->picture_name); ?>">
                   </div>
-
                   <?php if ($payment_flash) : ?>
                     <br>
                     <div class="alert alert-info" id="payment_flash"><?php echo $payment_flash; ?></div>
@@ -437,26 +454,29 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <input type="hidden" name="id" value="<?php echo $data->payment_id; ?>">
                     <input type="hidden" name="payment_method" value="<?php echo $data->payment_method; ?>">
                     <input type="hidden" name="order" value="<?php echo $data->id; ?>">
-                    <div class="col-md-9">
-                      <select class="form-control" name="action">
-                        <?php if ($data->payment_status == 1) : ?>
-                          <option value="1">Konfirmasi Pembayaran</option>
-                          <option value="2">Pembayaran Tidak Ada</option>
-                        <?php else : ?>
-                          <option value="4" readonly>Tidak ada pilihan</option>
-                        <?php endif; ?>
-                      </select>
-                    </div>
-                    <div class="col-md-3 text-right">
-                      <input type="submit" class="btn btn-primary" value="OK">
-                    </div>
+
+                    <!-- FORM VERIFY PAYMENTS  -->
+                    <!-- <div class="col-md-9">
+                        <select class="form-control" name="action">
+                          <?php if ($data->payment_status == 1) : ?>
+                            <option value="1">Konfirmasi Pembayaran</option>
+                            <option value="2">Pembayaran Tidak Ada</option>
+                          <?php else : ?>
+                            <option value="4" readonly>Tidak ada pilihan</option>
+                          <?php endif; ?>
+                        </select>
+                      </div>
+                      <div class="col-md-3 text-right">
+                        <input type="submit" class="btn btn-primary" value="OK">
+                      </div> -->
+
                   </div>
                 </form>
               </div>
             <?php endif; ?>
           </div>
 
-          <div class="card card-primary" id="#briva">
+          <!-- <div class="card card-primary" id="#briva">
             <div class="card-header">
               <h3 class="mb-0">Virtual Account BRI</h3>
             </div>
@@ -465,7 +485,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <form action="" method="POST">
               </form>
             </div>
-          </div>
+          </div> -->
 
         <?php } ?>
       </div>

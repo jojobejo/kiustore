@@ -1005,6 +1005,11 @@ class Order_model extends CI_Model
         return $data->row();
     }
 
+    public function score_kredit($id)
+    {
+        
+    }
+
     public function verivy_payments($invoice)
     {
         $data = $this->db->query("SELECT o.*, c.name, c.code, ongs.jsongkir AS ongkir_ekspedisi
