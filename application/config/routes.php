@@ -63,7 +63,7 @@ $route['generate_va'] = 'admin/customers/generate_va';
 $route['login'] = 'auth/login';
 $route['logout'] = 'auth/logout';
 $route['register'] = 'auth/register';
-$route['policy'] = 'pages/policy';
+$route['policy'] = 'customer/home/policy_privacy';
 
 $route['cartongkir'] = 'customer/addons/addoncart/cart';
 

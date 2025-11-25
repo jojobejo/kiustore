@@ -35,6 +35,16 @@ class Home extends CI_Controller
         // get_footer();
     }
 
+    public function policy_privacy()
+    {
+        $params['title']            = 'Selamat Datang di Official Store PT. KARISMA INDOAGRO UNIVERSAL';
+        $params['page_name']        = 'Privacy & Policy';
+
+        $this->load->view('header');
+        $this->load->view('policy_privacy');
+        $this->load->view('footer_single');
+    }
+
     public function search()
     {
         $query = $this->input->get('search_query');

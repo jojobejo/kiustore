@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Pages extends CI_Controller {
+class Pages extends CI_Controller
+{
     public function __construct()
     {
         parent::__construct();
@@ -16,6 +17,27 @@ class Pages extends CI_Controller {
     public function policy()
     {
         $this->load->view('policy');
+    }
+
+    public function policy_privacy()
+    {
+        $params['title']            = 'Selamat Datang di Official Store PT. KARISMA INDOAGRO UNIVERSAL';
+        $params['page_name']        = 'home';
+
+        $products['products']       = $this->product->get_all_products();
+        $products['banner_product'] = $this->product->get_all_banner();
+        $products['categories']     = $this->product->get_home_categories();
+        $products['promo_products'] = $this->product->promo_products();
+        $products['best_products']  = $this->product->best_products();
+        $products['last_order']     = $this->product->last_order();
+        $products['invoice']        = $this->payment->invoice();
+        $products['tagihan']        = $this->payment->tagihan();
+
+        // get_header($params);
+        $this->load->view('header', $products);
+        $this->load->view('home', $products);
+        $this->load->view('footer', $products);
+        // get_footer();
     }
 
     public function about()
@@ -48,12 +70,9 @@ class Pages extends CI_Controller {
         $this->form_validation->set_rules('email', 'Email', 'required|min_length[10]');
         $this->form_validation->set_rules('message', 'Pesan', 'required');
 
-        if ($this->form_validation->run() === FALSE)
-        {
+        if ($this->form_validation->run() === FALSE) {
             $this->contact();
-        }
-        else
-        {
+        } else {
             $name = $this->input->post('name');
             $email = $this->input->post('email');
             $subject = $this->input->post('subject');

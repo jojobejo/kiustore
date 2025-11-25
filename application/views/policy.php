@@ -195,7 +195,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <main class="main-wrap terms-condition mb-xxl">
       <!-- Introduction Section start -->
       <section class="p-0">
-        <h1 class="title-color">Terms and Conditions for Youngpreneur Indonesia</h1>
+        <h1 class="title-color">Terms and Conditions for Karisma Indoagro Universal</h1>
         <h2 class="title-sub title-color fw-600 title-mb">Introduction</h2>
         <p class="content-color">These Website Standard Terms and Conditions written on this webpage shall manage your use of our website, Youngpreneur Indonesia accessible at www.Youngpreneur Indonesia.com.</p>
         <p class="content-color mb-0">

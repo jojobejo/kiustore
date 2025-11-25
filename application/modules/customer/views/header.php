@@ -153,6 +153,14 @@
             <a class="arrow" href="<?= site_url('profile') ?>"><i data-feather="chevron-right"></i></a>
           </li>
 
+          <li>
+            <a href="<?= site_url('policy') ?>" class="nav-link title-color font-sm">
+              <i class="iconly-Info-Circle icli"></i>
+              <span>Privacy & Policy</span>
+            </a>
+            <a class="arrow" href="<?= site_url('profile') ?>"><i data-feather="chevron-right"></i></a>
+          </li>
+
           <?php if (!empty($_SESSION['__ACTIVE_SESSION_DATA'])) : ?>
             <li>
               <a href="<?= site_url('logout') ?>" class="nav-link title-color font-sm">
