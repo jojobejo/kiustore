@@ -1016,9 +1016,9 @@ class Order_model extends CI_Model
             ) AS tagihan,
             c.max_credit
         FROM 
-            kiucoid_kiustore.customers c
+            customers c
         LEFT JOIN 
-            kiucoid_kiustore.orders o
+            orders o
             ON c.user_id = o.user_id
             AND o.payment_method = 1
             AND (o.order_status < 6 OR o.order_status = 9)
