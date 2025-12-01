@@ -395,6 +395,8 @@ if (!function_exists('get_order_status')) {
             return '<span class="badge bg-warning">Dalam Pengajuan Kredit</span>';
         else if ($status == 10)
             return '<span class="badge bg-warning">Payment Verify</span>';
+        else if ($status == null)
+            return '<span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span>';
     }
 }
 

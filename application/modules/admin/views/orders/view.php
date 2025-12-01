@@ -199,7 +199,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <input type="hidden" value="<?php echo $data->payment_method; ?>" name="payment_method">
                     <input type="hidden" value="<?php echo $data->order_status; ?>" name="order_status">
                     <?php if ($data->order_status == '1' || $data->order_status == '9') : ?>
-                      <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number">
+                      <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" required>
                     <?php else : ?>
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" readonly>
                     <?php endif; ?>
@@ -225,13 +225,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <tr>
                       <td>Ongkir</td>
                       <td>
-                        <input type="text" value="<?php echo $data->shipping_cost; ?>" class="form-control form-control-sm" name="shipping_cost">
+                        <input type="text" value="<?php echo $data->shipping_cost; ?>" class="form-control form-control-sm" name="shipping_cost" required>
                       </td>
                     </tr>
                     <tr>
                       <td>Asuransi</td>
                       <td>
-                        <input type="text" value="<?php echo $data->insurance; ?>" class="form-control form-control-sm" name="insurance">
+                        <input type="text" value="<?php echo $data->insurance; ?>" class="form-control form-control-sm" name="insurance" required>
                       </td>
                     </tr>
                   <?php else : ?>
@@ -264,8 +264,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                           <?php if ($selisih < 0) : ?>
                             <button class="btn btn-danger btn-block mt-2" disabled>Plafon Kredit Tidak Mencukupi</button>
                           <?php else : ?>
-                            <input type="submit" class="btn btn-primary" value="OK">
-                            <button class="btn btn-success btn-block mt-2">Order Dapat Dilanjutkan</button>
+                            <input type="submit" class="btn btn-primary" value="OK" hidden>
+                            <button class="btn btn-primary btn-block mt-2">Order Dapat Dilanjutkan</button>
                           <?php endif; ?>
                         <?php else : ?>
                           0

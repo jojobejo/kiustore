@@ -52,7 +52,8 @@ class Register extends CI_Controller
                 'email' => $email,
                 'password' => $password,
                 'role' => 'customer',
-                'register_date' => date('Y-m-d H:i:s')
+                'register_date' => date('Y-m-d H:i:s'),
+                'status' => '1'
             );
 
             $user = $this->register->register_user($user_data);
@@ -64,7 +65,7 @@ class Register extends CI_Controller
                 'address' => $alamat,
                 'level' => 1,
                 'max_credit' => 0,
-                'salesman_id' => 62,
+                'salesman_id' => 79,
             );
 
             $this->register->register_customer($customer_data);

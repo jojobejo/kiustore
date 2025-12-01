@@ -252,24 +252,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <h3>Status: <span id="va-status">Loading...</span></h3>
                             <div id="va-detail"></div>
                         </div>
-                        <div>
-                            <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
-                            <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
-                            <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
-                            <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
-                            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
-                            <input type="text" value="<?= $final_price ?>" name="total_topay" id="total_topay" readonly>
-                            <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
+                        <div hidden>
+                            <input type="hidden" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
+                            <input type="hidden" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
+                            <input type="hidden" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
+                            <input type="hidden" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
+                            <input type="hidden" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
+                            <input type="hidden" value="<?= $final_price ?>" name="total_topay" id="total_topay" readonly>
+                            <input type="hidden" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
                         </div>
                     <?php else : ?>
-                        <div>
-                            <input type="text" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
-                            <input type="text" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
-                            <input type="text" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
-                            <input type="text" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
-                            <input type="text" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
-                            <input type="text" value="<?= $final_price ?>" name="total_topay" id="total_topay" readonly>
-                            <input type="text" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
+                        <div hidden>
+                            <input type="hidden" value="<?= $data->order_id ?>" name="order_id" id="order_id" readonly>
+                            <input type="hidden" value="<?= $data->number_ordered ?>" name="trxid" id="trxid" readonly>
+                            <input type="hidden" value="<?= $data->kd_faktur ?>" name="kdfaktur" id="kdfaktur" readonly>
+                            <input type="hidden" value="<?= $dataorder['customer']['name'] ?>" name="va_name" id="va_name" readonly>
+                            <input type="hidden" value="<?= substr($dataorder['customer']['phone_number'], -8) ?>" name="nocust" id="nocust" readonly>
+                            <input type="hidden" value="<?= $final_price ?>" name="total_topay" id="total_topay" readonly>
+                            <input type="hidden" value="<?= $data->user_id ?>" name="user_id" id="user_id" readonly>
                         </div>
                         <button class="btn btn-success w-100 payment-btn">Lakukan Pembayaran</button>
                     <?php endif; ?>

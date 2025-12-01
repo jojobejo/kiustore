@@ -11,8 +11,9 @@
   <meta name="keywords" content="Fastkart" />
   <meta name="author" content="Fastkart" />
   <link rel="manifest" href="manifest.json" />
-  <title>Fastkart PWA App</title>
-  <link rel="icon" href="<?php echo site_url('assets/themes/fastkart/images/favicon.png" type="image/x-icon'); ?>" />
+  <title>Karisma Online</title>
+  <!-- <link rel="icon" href="<?php echo site_url('assets/themes/fastkart/images/favicon.png" type="image/x-icon'); ?>" /> -->
+  <link rel="icon" href="<?php echo site_url('assets/images/favicon.png'); ?>" type="image/png">
   <link rel="apple-touch-icon" href="<?php echo site_url('assets/themes/fastkart/images/favicon.png'); ?>" />
   <meta name="theme-color" content="#0baf9a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -63,7 +64,7 @@
       <!-- Error Section Start -->
       <section class="error mb-large">
         <h2 class="font-lg">Pendaftaran berhasil !</h2>
-        <p class="content-color font-md">Silahkan tunggu konfirmasi dari admin, data akan di approve terlebih dahulu. Terima kasih...</p>
+        <p class="content-color font-md">Anda dapat memulai belanja di toko kami, Terima kasih...</p>
         <a href="<?= site_url(); ?>" class="btn-solid">Kembali ke Halaman Login</a>
       </section>
       <!-- Error Section End -->
@@ -92,7 +93,7 @@
     <!-- Error Section Start -->
     <section class="error mb-large">
       <h2 class="font-lg">Pendaftaran berhasil !</h2>
-      <p class="content-color font-md">Silahkan tunggu konfirmasi dari admin, data akan di approve terlebih dahulu. Terima kasih...</p>
+      <p class="content-color font-md">Anda dapat memulai belanja di toko kami, Terima kasih...</p>
       <a href="<?= site_url() ?>" class="btn-solid">Kembali ke Halaman Login</a>
     </section>
     <!-- Error Section End -->
