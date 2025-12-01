@@ -89,6 +89,36 @@ if (!function_exists('get_user_name')) {
     }
 }
 
+if (!function_exists('get_user_name_id')) {
+    function get_user_name_id()
+    {
+        $CI = init();
+        $id = get_current_user_id();
+
+        // if($id == 0){
+        //     return  '';
+        // }
+
+        if (is_customer()) {
+            $user = $CI->db->query("
+            SELECT u.*, c.*
+            FROM users u
+            JOIN customers c
+                ON c.user_id = u.id
+            WHERE u.id = '$id'
+        ")->row();
+        } else {
+            $user = $CI->db->query("
+            SELECT u.*
+            FROM users u
+            WHERE u.id = '$id'
+        ")->row();
+        }
+
+        return $user->id;
+    }
+}
+
 if (!function_exists('get_user_email')) {
     function get_user_email()
     {

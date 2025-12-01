@@ -180,6 +180,19 @@ class Profile extends CI_Controller
         $this->load->view('footer');
     }
 
+    public function cus_edit_profile()
+    {
+        $data = $this->profile->get_profile();
+
+        $params['title']    = $data->name;
+        $user['user']       = $data;
+        $user['flash']      = $this->session->flashdata('profile');
+
+        $this->load->view('header', $params);
+        $this->load->view('change_profile_customer', $user);
+        $this->load->view('footer');
+    }
+
     public function edit_name()
     {
         $this->form_validation->set_rules('name', 'Nama lengkap', 'required|max_length[32]|min_length[4]');

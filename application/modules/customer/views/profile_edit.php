@@ -26,6 +26,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 <!-- Main Start -->
 <main class="main-wrap setting-page mb-xxl">
+
     <div class="user-panel">
         <div class="media">
             <div class="avatar-wrap">

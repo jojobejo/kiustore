@@ -371,7 +371,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </div>
 
     <div class="row gy-3">
-
       <?php if (count($products) > 0) : ?>
         <?php foreach (array_slice($products, 0, 8) as $product) : ?>
           <div class="col-6 col-md-4 col-sm-6">

@@ -70,6 +70,7 @@ $route['cartongkir'] = 'customer/addons/addoncart/cart';
 $route['customer'] = 'customer/customer';
 $route['profile'] = 'customer/profile';
 $route['cus_edit_customer/(:any)'] = 'customer/profile/cus_editdata/$1';
+$route['edit_profile_cust/(:any)'] = 'customer/profile/cus_edit_profile/$1';
 $route['sv_alamatcus'] = 'customer/profile/';
 $route['change_alamat_customer_profile'] = 'customer/profile/change_alamat_asal';
 $route['message'] = 'customer/message';
