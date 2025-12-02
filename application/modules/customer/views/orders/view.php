@@ -407,10 +407,44 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     let amount = parseInt(briva.totalAmount?.value ?? 0);
 
                     $("#va-detail").html(`
-                        <p>Time Left: <span class="countdown" data-expired="${expiredDate}">--:--:--</span></p>
-                        <p>VA Number: <b>${briva.virtualAccountNo.trim()}</b></p>
-                        <p>Amount: <b>${amount.toLocaleString("id-ID")}</b> ${briva.totalAmount?.currency ?? ''}</p>
+                        <div style="font-size: 1.35rem; line-height: 1.7; font-weight: 500;">
+                            
+                            <div class="mb-3">
+                                <div class="text-muted" style="font-size: 1.1rem;">Time Left</div>
+                                <div class="countdown text-danger fw-bold" 
+                                    data-expired="${expiredDate}" 
+                                    style="font-size: 2rem;">
+                                    --:--:--
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="text-muted" style="font-size: 1.1rem;">VA Number</div>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span id="va-number" 
+                                        class="fw-bold"
+                                        style="font-size: 1.9rem; letter-spacing: 1px;">
+                                        ${briva.virtualAccountNo.trim()}
+                                    </span>
+
+                                    <button class="btn btn-light shadow-sm copy-va" 
+                                            data-va="${briva.virtualAccountNo.trim()}"
+                                            style="border-radius: 8px;">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="text-muted" style="font-size: 1.1rem;">Amount</div>
+                                <div class="fw-bold mt-1" style="font-size: 1.8rem;">
+                                    ${amount.toLocaleString("id-ID")} ${briva.totalAmount?.currency ?? ''}
+                                </div>
+                            </div>
+                            <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
+                        </div>
                     `);
+
 
                     // TRANSAKSI SUKSES
                     if (res.paidStatus === "Y") {
@@ -505,6 +539,30 @@ defined('BASEPATH') or exit('No direct script access allowed');
             }
         });
     }, 1000);
+
+    $(document).on("click", ".copy-va", function() {
+        let va = $(this).data("va");
+
+        navigator.clipboard.writeText(va)
+            .then(() => {
+                Swal.fire({
+                    icon: "success",
+                    title: "Tersalin",
+                    text: "Nomor VA berhasil disalin.",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            })
+            .catch(() => {
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal Menyalin",
+                    text: "Coba lagi.",
+                    confirmButtonColor: "#d33"
+                });
+            });
+    });
+
 
     $(document).on('click', '.update-payment-btn', function(e) {
         e.preventDefault();
