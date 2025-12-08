@@ -168,6 +168,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 $expedisi = 'POS INDONESIA';
                             } elseif ($expedisi == "tiki") {
                                 $expedisi = 'TIKI';
+                            } elseif ($expedisi == "sicepat") {
+                                $expedisi = 'SiCepat';
+                            } elseif ($expedisi == "ide") {
+                                $expedisi = 'IDExpress';
+                            } elseif ($expedisi == "sap") {
+                                $expedisi = 'SAP Express';
+                            } elseif ($expedisi == "ninja") {
+                                $expedisi = 'Ninja';
+                            } elseif ($expedisi == "jnt") {
+                                $expedisi = 'J&T Express';
+                            } elseif ($expedisi == "wahana") {
+                                $expedisi = 'Wahana Express';
+                            } elseif ($expedisi == "sentral") {
+                                $expedisi = 'Sentral Cargo';
+                            } elseif ($expedisi == "lion") {
+                                $expedisi = 'Lion Parcel';
+                            } elseif ($expedisi == "rex") {
+                                $expedisi = 'Royal Express Asia';
                             }
                         ?>
                             <tr>
@@ -299,7 +317,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <?php elseif ($data->payment_method == 2) : ?>
                 <?php if ($data->order_status == 1) : ?>
                     <div class="alert alert-info m-2 w-100">Pesanan dalam proses sales</div>
-                    <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
+                    <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
                 <?php elseif ($data->order_status == 2) : ?>
                     <?php if ($data->payment_status == 3) : ?>
                         <div class="alert alert-info m-2 w-100">Pembayaran Gagal / Kurang Bayar</div>
@@ -328,7 +346,17 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <?php endif; ?>
 
                 <?php elseif ($data->order_status == 3) : ?>
-                    <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan</div>
+                    <?php if ($data->shipping_method == 1) : ?>
+                        <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan</div>
+                    <?php else : ?>
+                        <?php foreach ($resi as $gt) : ?>
+                            <?php if ($gt->resi_sts == '0') : ?>
+                                <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan - Resi Akan diupdate Sales</div>
+                            <?php else : ?>
+                                <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan - Resi Anda : <?= $gt->no_resi ?></div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 <?php elseif ($data->order_status == 4) : ?>
                     <div class="alert alert-info m-2 w-100">Pesanan dalam pengiriman</div>
                     <a href="#" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#terimaModal"><i class="fa fa-thumbs-o-up"></i> Terima Barang</a>
@@ -441,7 +469,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                     ${amount.toLocaleString("id-ID")} ${briva.totalAmount?.currency ?? ''}
                                 </div>
                             </div>
-                            <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
+                            <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
                         </div>
                     `);
 

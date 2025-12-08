@@ -61,8 +61,10 @@ class Orders extends CI_Controller
             $order['items'] = $items;
             $order['delivery_data'] = json_decode($data->delivery_data);
             $order['banks'] = $banks;
+            $order['resi'] = $this->order->resi_order($data->kd_faktur);
             $order['order_flash'] = $this->session->flashdata('order_flash');
             $order['payment_flash'] = $this->session->flashdata('payment_flash');
+
             $this->load->view('header', $params);
             $this->load->view('orders/view', $order);
             $this->load->view('footer');
@@ -404,6 +406,25 @@ class Orders extends CI_Controller
                 $orders['data'] = $orders;
                 $response = $orders;
                 break;
+
+            case 'update_resi':
+                $data['id'] = $this->input->post('id');
+                $kd         = $this->input->post('kd_faktur');
+                $resi       = $this->input->post('resi_customer');
+                $this->order->update_resi($kd, $resi);
+
+                redirect('admin/orders/view/' . $data['id']);
+                break;
+
+            case 'reset_resi':
+                $data['id'] = $this->input->post('id');
+                $kd         = $this->input->post('kd_faktur');
+                $resi       = $this->input->post('resi_customer');
+                $this->order->reset_resi($kd, $resi);
+
+                redirect('admin/orders/view/' . $data['id']);
+                break;
+
             case 'order_cancel':
                 $orders = $this->order->get_order_cancel();
                 $n = 0;

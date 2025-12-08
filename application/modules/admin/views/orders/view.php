@@ -515,8 +515,45 @@ defined('BASEPATH') or exit('No direct script access allowed');
           </div> -->
 
         <?php } ?>
+
+        <?php foreach ($resi as $resi) : ?>
+          <div class="card card-primary">
+            <div class="card-header">
+              <div class="row">
+                <div class="col-auto">
+                  <h3 class="mb-0">Resi Customer : <?= $resi->no_resi ?> </h3>
+                </div>
+              </div>
+            </div>
+            <?php if ($resi->resi_sts == '0') : ?>
+              <form action="<?php echo site_url('admin/orders/api/update_resi'); ?>" method="POST">
+                <table class="table align-items-center table-flush table-hover">
+                  <tr>
+                    <td>Resi Customer</td>
+                    <td>
+                      <input type="text" value="<?= $resi->no_resi ?>" class="form-control form-control-sm" name="resi_customer" required>
+                      <input type="text" value="<?= $data->id ?>" class="form-control form-control-sm" name="id" required readonly hidden>
+                      <input type="text" value="<?= $data->kd_faktur ?>" class="form-control form-control-sm" name="kd_faktur" required readonly hidden>
+                    </td>
+                  </tr>
+                </table>
+                <center>
+                  <input type="submit" class="btn btn-primary w-75 m-2" value="Update Resi Customer">
+                </center>
+              </form>
+            <?php else : ?>
+              <form action="<?php echo site_url('admin/orders/api/reset_resi'); ?>" method="POST">
+                <input type="text" value="<?= $resi->no_resi ?>" class="form-control form-control-sm" name="resi_customer" required hidden>
+                <input type="text" value="<?= $data->id ?>" class="form-control form-control-sm" name="id" required readonly hidden>
+                <input type="text" value="<?= $data->kd_faktur ?>" class="form-control form-control-sm" name="kd_faktur" required readonly hidden>
+                <input type="submit" class="btn btn-primary w-75 m-2" value="Revisi">
+              </form>
+            <?php endif; ?>
+          </div>
       </div>
-    <?php endif; ?>
+    <?php endforeach; ?>
+
+  <?php endif; ?>
   </div>
 
   <script>

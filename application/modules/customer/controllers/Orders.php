@@ -63,6 +63,7 @@ class Orders extends CI_Controller
             $cusid      = get_current_user_id();
             $now        = date('Y-m-d');
             $getongkir  = $this->order->getongkir_checkout($cusid, $now);
+            $resi       = $this->order->resi_order($data->kd_faktur);
 
             $params['title']            = 'Order #' . $data->order_number;
             $order['data']              = $data;
@@ -74,6 +75,7 @@ class Orders extends CI_Controller
             $order['briva']             = $this->order->data_va($cusid, $data->order_number);
             $order['is_briva']          = $this->order->is_va_exist($data->order_number);
             $order['getongkir']         = $getongkir;
+            $order['resi']              = $resi;
             $order['kdfaktur']          = $data->order_number;
 
             $this->load->view('header', $params);

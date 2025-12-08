@@ -416,8 +416,15 @@ class Order_model extends CI_Model
         ")->result();
     }
 
-    
-
+    public function resi_order($kd)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tbtestongkir a
+        WHERE a.kd_faktur = '$kd'
+        AND a.status = '3'
+        ")->result();
+    }
 
     public function order_data($id)
     {

@@ -224,9 +224,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <select name="kurir" id="kurir" class="form-control mt-2">
                         <option value="-" selected disabled>-- PILIH EKPEDISI --</option>
                         <option value="jne">JNE</option>
-                        <option value="jnt">J&T EXPRESS</option>
-                        <option value="anteraja">ANTER AJA</option>
+                        <option value="sicepat">SiCepat</option>
+                        <option value="ide">IDExpress</option>
+                        <option value="sap">SAP Express</option>
+                        <option value="ninja">Ninja</option>
+                        <option value="jnt">J&T Express</option>
+                        <option value="tiki">TIKI</option>
+                        <option value="wahana">Wahana Express</option>
                         <option value="pos">POS INDONESIA</option>
+                        <option value="lion">Lion Parcel</option>
+                        <option value="rex">Royal Express Asia</option>
                       </select>
                       <button class="btn btn-block btn-primary mt-2" style="width: 100%;">CEK ONGKIR</button>
                     </form>
@@ -244,6 +251,24 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     $expedisi = 'POS INDONESIA';
                   } elseif ($expedisi == "tiki") {
                     $expedisi = 'TIKI';
+                  } elseif ($expedisi == "sicepat") {
+                    $expedisi = 'SiCepat';
+                  } elseif ($expedisi == "ide") {
+                    $expedisi = 'IDExpress';
+                  } elseif ($expedisi == "sap") {
+                    $expedisi = 'SAP Express';
+                  } elseif ($expedisi == "ninja") {
+                    $expedisi = 'Ninja';
+                  } elseif ($expedisi == "jnt") {
+                    $expedisi = 'J&T Express';
+                  } elseif ($expedisi == "wahana") {
+                    $expedisi = 'Wahana Express';
+                  } elseif ($expedisi == "sentral") {
+                    $expedisi = 'Sentral Cargo';
+                  } elseif ($expedisi == "lion") {
+                    $expedisi = 'Lion Parcel';
+                  } elseif ($expedisi == "rex") {
+                    $expedisi = 'Royal Express Asia';
                   }
                 ?>
                   <div class="card cart-amount-area mb-2">

@@ -1074,6 +1074,34 @@ class Order_model extends CI_Model
             ['order_number' => $order_number]
         );
     }
+
+    public function resi_order($kd)
+    {
+        return $this->db->query("SELECT
+        a.*
+        FROM tbtestongkir a
+        WHERE a.kd_faktur = '$kd'
+        AND a.status = '3'
+        ")->result();
+    }
+
+    public function update_resi($kd, $resi)
+    {
+        $this->db->where('kd_faktur', $kd)
+            ->update('tbtestongkir', array(
+                'no_resi' => $resi,
+                'resi_sts'  => '1'
+            ));
+    }
+    public function reset_resi($kd)
+    {
+        $this->db->where('kd_faktur', $kd)
+            ->update('tbtestongkir', array(
+                'no_resi' => '',
+                'resi_sts'  => '0'
+            ));
+    }
+
     public function update_status_order($order_number, $status)
     {
         return $this->db->update(
