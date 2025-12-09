@@ -12,8 +12,8 @@ class Home extends CI_Controller
             'review_model' => 'review'
         ));
 
-        if (!$this->session->userdata('user_id')) redirect('login');
-        check_agreement();
+        // if (!$this->session->userdata('user_id')) redirect('login');
+        // check_agreement();
     }
 
     public function index()
