@@ -7,7 +7,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <section class="p-0">
         <h1 class="title-color">Terms and Conditions for Karisma Online</h1>
         <h2 class="title-sub title-color fw-600 title-mb">Introduction</h2>
-        <p class="content-color">These Website Standard Terms and Conditions written on this webpage shall manage your use of our website, PT.Karisma Indoagro Universal accessible at https://karismaonline.id/ .</p>
+        <p class="content-color">These Website Standard Terms and Conditions written on this webpage shall manage your use of our website.</p>
         <p class="content-color mb-0">
             These Terms will be applied fully and affect to your use of this Website. By using this Website, you agreed to accept all terms and conditions written in here. You must not use this Website
             if you disagree with any of these Website Standard Terms and Conditions. These Terms and Conditions have been generated with the help of the Terms And Conditiions Sample Generator.
