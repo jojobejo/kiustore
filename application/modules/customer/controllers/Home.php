@@ -6,12 +6,14 @@ class Home extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        // verify_session('customer');
         $this->load->model(array(
             'product_model' => 'product',
             'payment_model' => 'payment',
             'review_model' => 'review'
         ));
+
+        if (!$this->session->userdata('user_id')) redirect('login');
+        check_agreement();
     }
 
     public function index()
@@ -28,21 +30,9 @@ class Home extends CI_Controller
         $products['invoice']        = $this->payment->invoice();
         $products['tagihan']        = $this->payment->tagihan();
 
-        // get_header($params);
         $this->load->view('header', $products);
         $this->load->view('home', $products);
         $this->load->view('footer', $products);
-        // get_footer();
-    }
-
-    public function policy_privacy()
-    {
-        $params['title']            = 'Selamat Datang di Official Store PT. KARISMA INDOAGRO UNIVERSAL';
-        $params['page_name']        = 'Privacy & Policy';
-
-        $this->load->view('header');
-        $this->load->view('policy_privacy');
-        $this->load->view('footer_single');
     }
 
     public function search()

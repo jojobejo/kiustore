@@ -1,6 +1,51 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
+function check_agreement()
+{
+    $ci = &get_instance();
+    $ci->load->database();
+
+    $controller = strtolower($ci->router->class);
+    $method     = strtolower($ci->router->method);
+
+    $allowed = [
+        'terms/policy_privacy',
+        'terms/accept',
+        'auth/login',
+        'auth/logout',
+        'auth/register'
+    ];
+
+    $current = $controller . '/' . $method;
+
+    if (in_array($current, $allowed)) {
+        return;
+    }
+
+    // Pastikan session tersedia
+    $customer_id = $ci->session->userdata('customer_id');
+    if (!$customer_id) {
+        return; // jangan redirect; biarkan controller login yang handle
+    }
+
+    // Ambil user
+    $user = $ci->db->get_where('customer', [
+        'id' => $customer_id
+    ])->row();
+
+    // Jika user tidak ditemukan, jangan redirect secara paksa
+    if (!$user) {
+        return;
+    }
+
+    // Jika belum setuju policy
+    if ((int)$user->user_agreement !== 2) {
+        redirect('terms/policy_privacy');
+    }
+}
+
+
 if (!function_exists('get_settings')) {
     function get_settings($key = '')
     {

@@ -7,7 +7,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <section class="p-0">
         <h1 class="title-color">Terms and Conditions for Karisma Online</h1>
         <h2 class="title-sub title-color fw-600 title-mb">Introduction</h2>
-        <p class="content-color">These Website Standard Terms and Conditions written on this webpage shall manage your use of our website, PT.Karisma Indoagro Universal accessible at https://kiu.co.id/ .</p>
+        <p class="content-color">These Website Standard Terms and Conditions written on this webpage shall manage your use of our website, PT.Karisma Indoagro Universal accessible at https://karismaonline.id/ .</p>
         <p class="content-color mb-0">
             These Terms will be applied fully and affect to your use of this Website. By using this Website, you agreed to accept all terms and conditions written in here. You must not use this Website
             if you disagree with any of these Website Standard Terms and Conditions. These Terms and Conditions have been generated with the help of the Terms And Conditiions Sample Generator.
@@ -56,6 +56,49 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </p>
     </section>
     <!-- Your Content Section End -->
+
+    <!-- Agreement Section Start -->
+    <!-- <section class="mt-4">
+        <div class="card p-3">
+            <h5 class="title-color fw-600 mb-2">User Agreement</h5>
+            <p class="content-color mb-3">
+                Dengan melanjutkan, Anda menyatakan telah membaca, memahami, dan menyetujui
+                <strong>Terms & Conditions</strong> serta <strong>Privacy Policy</strong> Karisma Online,
+                termasuk pengelolaan dan transparansi data yang dijelaskan pada halaman ini.
+            </p>
+
+            <form action="<?= site_url('auth/agreement_accept'); ?>" method="POST">
+                <input type="hidden" name="setuju" value="2">
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="agreeCheck">
+                    <label class="form-check-label content-color" for="agreeCheck">
+                        Saya setuju dan menerima seluruh ketentuan.
+                    </label>
+                </div>
+
+                <button id="agreeBtn" class="btn btn-primary w-100" disabled>
+                    Accept & Continue
+                </button>
+            </form>
+
+            <script>
+                document.getElementById('agreeCheck').addEventListener('change', function() {
+                    document.getElementById('agreeBtn').disabled = !this.checked;
+                });
+            </script>
+
+        </div>
+    </section> -->
+
+    <!-- Agreement Section End -->
+    <!-- 
+    <script>
+        document.getElementById('agreeCheck').addEventListener('change', function() {
+            document.getElementById('agreeBtn').disabled = !this.checked;
+        });
+    </script> -->
+
 </main>
 <!-- Main End -->
 <!-- Main End -->
