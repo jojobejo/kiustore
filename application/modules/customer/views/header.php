@@ -154,7 +154,7 @@
           </li>
 
           <li>
-            <a href="<?= site_url('policy') ?>" class="nav-link title-color font-sm">
+            <a href="<?= site_url('policys') ?>" class="nav-link title-color font-sm">
               <i class="iconly-Info-Circle icli"></i>
               <span>Privacy & Policy</span>
             </a>

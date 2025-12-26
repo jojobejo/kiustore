@@ -310,7 +310,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <span class="title-color font-sm">Rp <?php echo format_rupiah(get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3)); ?> <del><small> <?php echo format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?></small></del>
                   <!-- <span class="badges-round bg-theme-theme font-xs">50% off</span> --></span>
                 <div class="plus-minus d-xs-none">
-                  <a class="btn btn-success" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a>
+                  <!-- <a class="btn btn-success" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a> -->
                 </div>
               </div>
             </div>
@@ -389,7 +389,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <?php else : ?>
                     <span class="title-color font-sm plus-item">Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?>
                     <?php endif; ?>
-                    <a class="btn btn-success" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a>
+                    <!-- <a class="btn btn-success" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a> -->
                     </span>
               </div>
             </div>

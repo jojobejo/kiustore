@@ -24,6 +24,7 @@ class Shop extends CI_Controller
     public function cart()
     {
         $data = $this->profile->get_profile();
+
         $cart['carts']      = $this->cart->contents();
         $cart['total_cart'] = $this->cart->total();
         $cart['user']       = $data;

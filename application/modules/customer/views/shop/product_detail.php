@@ -47,11 +47,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <span><i data-feather="chevron-right"></i></span>
         </div>
       </div>
-
-      <a class="btn btn-success btn-lg add-to-chart add-cart atc-pd col-12" id="atc" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->promo == 1) ?
-                                                                                                                                                                                              get_v_price($product->promo_price, $product->promo_price_2, $product->promo_price_3) :
-                                                                                                                                                                                              get_v_price($product->price, $product->price_2, $product->price_3); ?>" data-id="<?php echo $product->id; ?>" data-satuan-qty="<?php echo $product->product_unit_value; ?>" data-product-type="<?php echo $product->product_type; ?>" data-satuan="1" data-satuan-text="<?php echo $product->product_unit_1; ?>" data-qty="1" data-product-weight="<?php echo $product->product_unit_weight ?>">Beli
-      </a>
+      <?php if (!is_login()) : ?>
+        <a class="btn btn-success btn-lg add-to-chart add-cart atc-pd col-12" href="<?= base_url('login') ?>">Beli</a>
+      <?php else : ?>
+        <a class="btn btn-success btn-lg add-to-chart add-cart atc-pd col-12" id="atc" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->promo == 1) ?
+                                                                                                                                                                                                get_v_price($product->promo_price, $product->promo_price_2, $product->promo_price_3) :
+                                                                                                                                                                                                get_v_price($product->price, $product->price_2, $product->price_3); ?>" data-id="<?php echo $product->id; ?>" data-satuan-qty="<?php echo $product->product_unit_value; ?>" data-product-type="<?php echo $product->product_type; ?>" data-satuan="1" data-satuan-text="<?php echo $product->product_unit_1; ?>" data-qty="1" data-product-weight="<?php echo $product->product_unit_weight ?>">Beli</a>
+      <?php endif; ?>
 
     </div>
 
@@ -66,68 +68,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </div>
     <!-- Product Detail End -->
   </section>
-  <!-- Product Section Section End -->
 
-  <!-- Product Review Section Start -->
-  <!--  <section class="product-review pb-0">
-        <div class="top-content">
-          <h3 class="title-color">Ulasan Produk(15)</h3>
-          <a href="javascript:void(0)" data-bs-toggle="offcanvas" data-bs-target="#all-review" class="font-xs">Lihat Semua</a>
-        </div>
-        <div class="review-wrap">
-          <div class="review-box">
-            <div class="media">
-              <img src="<?php echo get_theme_uri('images/avatar/avatar.jpg'); ?>" alt="avatar" />
-              <div class="media-body">
-                <h4 class="font-sm title-color">Andrea Joanne</h4>
-                <div class="rating">
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                </div>
-              </div>
-            </div>
-            <p class="font-sm content-color">Produk Bagus, pengiriman cepat</p>
-          </div>
-          <div class="review-box">
-            <div class="media">
-              <img src="<?php echo get_theme_uri('images/avatar/avatar.jpg'); ?>" alt="avatar" />
-              <div class="media-body">
-                <h4 class="font-sm title-color">Andrea Joanne</h4>
-                <div class="rating">
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                  <i data-feather="star"></i>
-                </div>
-              </div>
-            </div>
-            <p class="font-sm content-color">Toppppppp....</p>
-          </div>
-        </div>
-      </section>
-      <!-- Product Review Section End -->
-
-  <!-- <section class="check-delivery-section">
-        <div class="title-section">
-          <h4>Check Delivery</h4>
-          <p class="font-xs content-color">Enter Pincode to check delivery date / pickup option</p>
-        </div>
-        <div class="custom-form">
-          <input class="form-control" type="number" placeholder="Pin code" />
-          <a href="javascript:void(0)">Check</a>
-        </div>
-        <div class="service-section">
-          <ul>
-            <li class="font-sm content-color"><img src="<?php echo get_theme_uri('icons/svg/delivery.svg'); ?>" class="img-fluid" alt="" />Free Delivery on order above $200.00</li>
-            <li class="font-sm content-color"><img src="<?php echo get_theme_uri('icons/svg/payment.svg'); ?>" class="img-fluid" alt="" />Cash On delivery Available</li>
-            <li class="font-sm content-color"><img src="<?php echo get_theme_uri('icons/svg/refund.svg'); ?>" class="img-fluid" alt="" />Easy 21 days returns and exchanges</li>
-          </ul>
-        </div>
-      </section> -->
 
   <!-- Lowest Price 2 Start -->
   <section class="recently-viewed">
