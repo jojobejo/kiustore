@@ -74,7 +74,6 @@ class Product_model extends CI_Model
         ");
     }
 
-    // COBA LAGI
     public function getstatusongkirss($id, $tgl)
     {
         return $this->db->query("SELECT 
