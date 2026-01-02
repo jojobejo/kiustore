@@ -128,3 +128,11 @@ $route['Ongkir/city/(:num)']            = 'admin/Ongkir/city/$1';
 $route['Ongkir/district/(:num)']        = 'admin/Ongkir/district/$1';
 $route['Ongkir/sub_district/(:num)']    = 'admin/Ongkir/sub_district/$1';
 $route['Ongkir/cost']                   = 'admin/Ongkir/cost';
+
+
+
+$route['ongkirdev']                   = 'admin/Admin/dev_ongkir';
+$route['admin/ajax_provinces']        = 'admin/Admin/ajax_provinces';
+$route['admin/ajax_cities']           = 'admin/Admin/ajax_cities';
+$route['admin/ajax_subdistricts']     = 'admin/Admin/ajax_subdistricts';
+$route['rajaongkir/ajax_hitung_ongkir']        = 'admin/Admin/ajax_hitung_ongkir';

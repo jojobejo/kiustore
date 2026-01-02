@@ -13,6 +13,7 @@ class Profile extends CI_Controller
             'profile_model' => 'profile',
             'rajaongkir_model' => 'ongkirapi'
         ));
+
         $this->load->library('form_validation');
     }
 

@@ -14,10 +14,13 @@ class Admin extends CI_Controller
             'order_model' => 'order',
             'salesman_model' => 'salesman',
             'payment_model' => 'payment',
+            'rajaongkir_model' => 'ongkirapi',
             'admin_model' => 'users'
         ));
         $this->load->library('form_validation');
     }
+
+    public $api_key = "197f7e1329685d3ed9d1468c54efc9dd";
 
     public function index()
     {
@@ -218,5 +221,140 @@ class Admin extends CI_Controller
         $response = json_encode($response);
         $this->output->set_content_type('application/json')
             ->set_output($response);
+    }
+
+    public function dev_ongkir()
+    {
+        $params['title'] = "Edit";
+
+
+        $this->load->view('header', $params);
+        $this->load->view('admin/admin/dev_ongkir');
+        $this->load->view('footer');
+    }
+
+    public function ajax_provinces()
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://pro.rajaongkir.com/api/province",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array(
+                "content-type: application/x-www-form-urlencoded",
+                "key: " . $this->api_key,
+            ),
+        ));
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        if ($response) {
+            $data = json_decode($response, true);
+            $provinces = [];
+            if (isset($data['rajaongkir']['results'])) {
+                foreach ($data['rajaongkir']['results'] as $prov) {
+                    $provinces[] = [
+                        "id" => $prov['province_id'],
+                        "text" => $prov['province']
+                    ];
+                }
+            }
+            echo json_encode($provinces);
+        } else {
+            echo json_encode([]);
+        }
+    }
+
+
+    public function ajax_cities()
+    {
+        $province_id = $this->input->post('province_id');
+
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://pro.rajaongkir.com/api/city?province={$province_id}",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => ["key:" . $this->api_key],
+        ]);
+        $res = json_decode(curl_exec($curl), true);
+        curl_close($curl);
+
+        echo json_encode($res['rajaongkir']['results']);
+    }
+    public function ajax_subdistricts()
+    {
+        $city_id = $this->input->post('city_id');
+
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://pro.rajaongkir.com/api/subdistrict?city={$city_id}",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => ["key:" . $this->api_key],
+        ]);
+        $res = json_decode(curl_exec($curl), true);
+        curl_close($curl);
+
+        echo json_encode($res['rajaongkir']['results']);
+    }
+
+
+    public function ajax_hitung_ongkir()
+    {
+        $destination = $this->input->post('kec_id');
+        $courier     = $this->input->post('courier');
+        $weight      = (int) $this->input->post('weight');
+
+        if ($destination == '' || $courier == '' || $weight <= 0) {
+            echo json_encode(['status' => 'error']);
+            return;
+        }
+
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://pro.rajaongkir.com/api/cost",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => http_build_query([
+                'origin' => "2528",
+                'originType' => 'subdistrict',
+                'destination' => $destination,
+                'destinationType' => 'subdistrict',
+                'weight' => $weight,
+                'courier' => $courier
+            ]),
+            CURLOPT_HTTPHEADER => [
+                "content-type: application/x-www-form-urlencoded",
+                "key:" . $this->api_key
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        $res = json_decode($response, true);
+
+        $results = $res['rajaongkir']['results'] ?? [];
+
+        $hasCost = false;
+        foreach ($results as $r) {
+            if (!empty($r['costs'])) {
+                $hasCost = true;
+                break;
+            }
+        }
+
+        if (!$hasCost) {
+            echo json_encode([
+                'status' => 'empty',
+                'message' => 'Layanan tidak tersedia',
+                'data' => []
+            ]);
+            return;
+        }
+
+        echo json_encode([
+            'status' => 'success',
+            'weight' => $weight,
+            'data'   => $results
+        ]);
     }
 }
