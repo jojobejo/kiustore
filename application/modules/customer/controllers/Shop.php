@@ -410,7 +410,8 @@ class Shop extends CI_Controller
                         $brivapi = array(
                             'customerNo'  => $customer->phone_number,
                             'vaname'      => $customer->name,
-                            'totalprice'  => $subtotal + $jsongkir['4'] - $discount
+                            'totalprice'  => $subtotal - $discount
+                            // 'totalprice'  => $subtotal + $jsongkir['4'] - $discount
                         );
 
                         $this->session->set_userdata('brivadata', $brivapi);
@@ -607,7 +608,7 @@ class Shop extends CI_Controller
                             'coupon_id' => $coupon_id,
                             'order_number' => $order_number,
                             'kd_faktur' => $kdfaktur,
-                            'order_status' => 2,
+                            'order_status' => 1,
                             'order_date' => $order_date,
                             'total_price' => $total_price,
                             'total_items' => count($quantity),

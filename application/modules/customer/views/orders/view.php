@@ -316,7 +316,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             <?php elseif ($data->payment_method == 2) : ?>
                 <?php if ($data->order_status == 1) : ?>
-                    <div class="alert alert-info m-2 w-100">Pesanan dalam proses sales</div>
+                    <div class="alert alert-info m-2 w-100">Pesanan dalam proses sales , Sales Akan melakukan Update Ongkir</div>
                     <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
                 <?php elseif ($data->order_status == 2) : ?>
                     <?php if ($data->payment_status == 3) : ?>
@@ -774,8 +774,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </div>
                 <div class="modal-body">
                     <p>Anda yakin ingin membatalkan pesanan? </p>
-                    <input type="text" name="del_va" id="del_va" value="<?= $data->order_number ?>" hidden>
-                    <input type="text" name="del_no" id="del_no" value="<?= $data->userno ?>" hidden>
+                    <input type="text" name="del_va" id="del_va" value="<?= $data->order_number ?>" >
+                    <input type="text" name="del_no" id="del_no" value="<?= $data->userno ?>" >
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
