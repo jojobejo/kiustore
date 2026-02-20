@@ -1,104 +1,130 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 ?>
-<!-- Main Start -->
-<main class="main-wrap terms-condition mb-xxl">
-    <!-- Introduction Section start -->
-    <section class="p-0">
-        <h1 class="title-color">Terms and Conditions for Karisma Online</h1>
-        <h2 class="title-sub title-color fw-600 title-mb">Introduction</h2>
-        <p class="content-color">These Website Standard Terms and Conditions written on this webpage shall manage your use of our website.</p>
-        <p class="content-color mb-0">
-            These Terms will be applied fully and affect to your use of this Website. By using this Website, you agreed to accept all terms and conditions written in here. You must not use this Website
-            if you disagree with any of these Website Standard Terms and Conditions. These Terms and Conditions have been generated with the help of the Terms And Conditiions Sample Generator.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Privacy Policy - <?= html_escape($developer_name); ?></title>
+    <style>
+        body {
+            margin: 0;
+            padding: 24px 16px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #222;
+            line-height: 1.6;
+            background: #fff;
+        }
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            margin: 0 0 12px 0;
+            line-height: 1.3;
+        }
+        h2 {
+            margin-top: 24px;
+            font-size: 20px;
+        }
+        p, li {
+            font-size: 16px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .meta {
+            margin-bottom: 18px;
+            color: #555;
+            font-size: 14px;
+        }
+        a {
+            color: #0a58ca;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>Privacy Policy</h1>
+        <p class="meta"><strong>Last updated:</strong> <?= html_escape($last_updated); ?></p>
+        <p>
+            This Privacy Policy explains how <strong><?= html_escape($developer_name); ?></strong> collects, uses,
+            stores, and shares personal data when you use the Kiustore application and related services.
         </p>
-    </section>
-    <!-- Introduction Section End -->
 
-    <!-- Intellectual Property Rights Section Start -->
-    <section class="pb-0">
-        <h3 class="title-sub title-color fw-600 title-mb">Intellectual Property Rights</h3>
-        <p class="content-color">Other than the content you own, under these Terms, PT.Karisma Indoagro Universal and/or its licensors own all the intellectual property rights and materials contained in this Website.</p>
-        <p class="content-color mb-0">You are granted limited license only for purposes of viewing the material contained on this Website.</p>
-    </section>
-    <!-- Intellectual Property Rights Section End -->
-
-    <!-- Restrictions Section Start -->
-    <section class="pb-0">
-        <h4 class="title-sub title-color fw-600 title-mb">Restrictions</h4>
-        <p class="content-color">You are specifically restricted from all of the following:</p>
-        <ul class="list-section mb-2">
-            <li class="content-color">publishing any Website material in any other media;</li>
-            <li class="content-color">selling, sublicensing and/or otherwise any Website material;</li>
-            <li class="content-color">publicly performing and/or showing any Website material;</li>
-            <li class="content-color">using this Website in any way that is or may be damaging to this Website;</li>
-            <li class="content-color">using this Website in any way that impacts user access to this Website;</li>
-            <li class="content-color">using this Website contrary to applicable laws and regulations, or in any way may cause harm to the Website, or to any person or business entity;</li>
-            <li class="content-color">engaging in any data mining, data harvesting, data extracting or any other similar activity in relation to this Website;</li>
-            <li class="content-color">using this Website to engage in any advertising or marketing.</li>
+        <h2>1. Data We Collect</h2>
+        <ul>
+            <li>Account information: name, email address, phone number, and login credentials.</li>
+            <li>Profile and shipping data: billing/shipping address and recipient details.</li>
+            <li>Transaction data: order details, purchased products, payment status, invoice information.</li>
+            <li>Technical data: IP address, browser/app version, device information, usage logs.</li>
+            <li>Communication data: messages, support requests, and feedback you send through our service.</li>
+            <li>Location-related data that you provide for delivery cost calculation and shipment processing.</li>
         </ul>
-        <p class="content-color mb-0">
-            Certain areas of this Website are restricted from being access by you and PT.Karisma Indoagro Universal may further restrict access by you to any areas of this Website, at any time, in absolute discretion. Any
-            user ID and password you may have for this Website are confidential and you must maintain confidentiality as well.
+
+        <h2>2. How We Use Data</h2>
+        <ul>
+            <li>To create and manage user accounts.</li>
+            <li>To process orders, payments, shipping, and customer support.</li>
+            <li>To provide features and improve application performance and security.</li>
+            <li>To communicate service updates, transaction notifications, and support responses.</li>
+            <li>To comply with legal obligations and prevent fraud or abuse.</li>
+        </ul>
+
+        <h2>3. How We Share Data</h2>
+        <p>We may share data only when necessary with:</p>
+        <ul>
+            <li>Payment service providers to process transactions.</li>
+            <li>Shipping and logistics partners to fulfill deliveries.</li>
+            <li>Technology providers (hosting, infrastructure, analytics, and support tools).</li>
+            <li>Government/regulatory authorities when required by law.</li>
+        </ul>
+        <p>We do not sell your personal data to third parties.</p>
+
+        <h2>4. Data Retention and Storage</h2>
+        <ul>
+            <li>We retain personal data for as long as needed to provide services and meet legal requirements.</li>
+            <li>Data is stored on secured systems with access controls.</li>
+            <li>When retention is no longer required, data is deleted or anonymized where feasible.</li>
+        </ul>
+
+        <h2>5. Security Measures</h2>
+        <p>
+            We implement reasonable technical and organizational safeguards to protect data from unauthorized access,
+            alteration, disclosure, or destruction.
         </p>
-    </section>
-    <!-- Restrictions Section End -->
 
-    <!-- Your Content Section Start -->
-    <section class="pb-0">
-        <h5 class="title-color title-sub fw-600 title-mb">Your Content</h5>
-        <p class="content-color">
-            In these Website Standard Terms and Conditions, "Your Content" shall mean any audio, video text, images or other material you choose to display on this Website. By displaying Your Content,
-            you grant PT.Karisma Indoagro Universal a non-exclusive, worldwide irrevocable, sub licensable license to use, reproduce, adapt, publish, translate and distribute it in any and all media.
+        <h2>6. Your Rights</h2>
+        <p>
+            You may request access, correction, or deletion of your personal data by contacting us through the
+            contact details below.
         </p>
-        <p class="content-color mb-0">
-            Your Content must be your own and must not be invading any third-party’s rights. PT.Karisma Indoagro Universal reserves the right to remove any of Your Content from this Website at any time without notice.
+
+        <h2>7. Children&apos;s Privacy</h2>
+        <p>
+            Our services are not intended for children under the applicable minimum age. We do not knowingly collect
+            personal data from children without appropriate consent.
         </p>
-    </section>
-    <!-- Your Content Section End -->
 
-    <!-- Agreement Section Start -->
-    <!-- <section class="mt-4">
-        <div class="card p-3">
-            <h5 class="title-color fw-600 mb-2">User Agreement</h5>
-            <p class="content-color mb-3">
-                Dengan melanjutkan, Anda menyatakan telah membaca, memahami, dan menyetujui
-                <strong>Terms & Conditions</strong> serta <strong>Privacy Policy</strong> Karisma Online,
-                termasuk pengelolaan dan transparansi data yang dijelaskan pada halaman ini.
-            </p>
+        <h2>8. Changes to This Policy</h2>
+        <p>
+            We may update this Privacy Policy from time to time. Any changes will be posted on this page with an
+            updated effective date.
+        </p>
 
-            <form action="<?= site_url('auth/agreement_accept'); ?>" method="POST">
-                <input type="hidden" name="setuju" value="2">
-
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="agreeCheck">
-                    <label class="form-check-label content-color" for="agreeCheck">
-                        Saya setuju dan menerima seluruh ketentuan.
-                    </label>
-                </div>
-
-                <button id="agreeBtn" class="btn btn-primary w-100" disabled>
-                    Accept & Continue
-                </button>
-            </form>
-
-            <script>
-                document.getElementById('agreeCheck').addEventListener('change', function() {
-                    document.getElementById('agreeBtn').disabled = !this.checked;
-                });
-            </script>
-
-        </div>
-    </section> -->
-
-    <!-- Agreement Section End -->
-    <!-- 
-    <script>
-        document.getElementById('agreeCheck').addEventListener('change', function() {
-            document.getElementById('agreeBtn').disabled = !this.checked;
-        });
-    </script> -->
-
-</main>
-<!-- Main End -->
-<!-- Main End -->
+        <h2>9. Developer and Contact Information</h2>
+        <p><strong>Developer/Company:</strong> <?= html_escape($developer_name); ?></p>
+        <?php if (!empty($store_email)) : ?>
+            <p><strong>Email:</strong> <a href="mailto:<?= html_escape($store_email); ?>"><?= html_escape($store_email); ?></a></p>
+        <?php endif; ?>
+        <?php if (!empty($store_phone)) : ?>
+            <p><strong>Phone:</strong> <?= html_escape($store_phone); ?></p>
+        <?php endif; ?>
+        <?php if (!empty($store_address)) : ?>
+            <p><strong>Address:</strong> <?= nl2br(html_escape($store_address)); ?></p>
+        <?php endif; ?>
+        <p><strong>Contact page:</strong> <a href="<?= site_url('contact'); ?>"><?= site_url('contact'); ?></a></p>
+    </main>
+</body>
+</html>

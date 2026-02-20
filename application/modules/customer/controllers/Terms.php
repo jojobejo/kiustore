@@ -6,24 +6,38 @@ class Terms extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
-        // load model jika perlu
-        $this->load->model([
-            'product_model' => 'product',
-            'payment_model' => 'payment',
-            'review_model'  => 'review'
-        ]);
     }
 
     // PAGE PRIVACY & POLICY
     public function policy_privacy()
     {
-        $params['title']     = 'Selamat Datang di Official Store PT. KARISMA INDOAGRO UNIVERSAL';
-        $params['page_name'] = 'Privacy & Policy';
+        $developer_name = 'PT. KARISMA INDOAGRO UNIVERSAL';
+        $data = [
+            'developer_name' => $developer_name,
+            'store_email' => '',
+            'store_phone' => '',
+            'store_address' => '',
+            'last_updated' => date('F j, Y')
+        ];
 
-        $this->load->view('header');
-        $this->load->view('policy_privacy');
-        $this->load->view('footer_single');
+        $settings = $this->db
+            ->select('`key`, content')
+            ->where_in('`key`', ['store_email', 'store_phone_number', 'store_address'])
+            ->get('settings')
+            ->result();
+
+        foreach ($settings as $setting) {
+            if ($setting->key === 'store_email') {
+                $data['store_email'] = trim((string) $setting->content);
+            } elseif ($setting->key === 'store_phone_number') {
+                $data['store_phone'] = trim((string) $setting->content);
+            } elseif ($setting->key === 'store_address') {
+                $data['store_address'] = trim((string) $setting->content);
+            }
+        }
+
+        $this->output->set_content_type('text/html', 'utf-8');
+        $this->load->view('policy_privacy', $data);
     }
 
     // SIMPAN AGREEMENT

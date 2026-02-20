@@ -8,7 +8,6 @@ $store_website = site_url();
 $flash_message = isset($flash) ? trim((string) $flash) : '';
 $user_email = (isset($user) && isset($user->email)) ? (string) $user->email : '';
 ?>
-
 <style>
   .contact-mobile-card {
     background: #fff;
@@ -91,7 +90,7 @@ $user_email = (isset($user) && isset($user->email)) ? (string) $user->email : ''
         <div class="alert alert-success text-center mb-3"><?php echo html_escape($flash_message); ?></div>
       <?php endif; ?>
 
-      <form action="<?php echo site_url('pages/send_message'); ?>" method="POST" novalidate>
+      <form action="<?php echo site_url('contact/send'); ?>" method="POST" novalidate>
         <div class="mb-2">
           <input type="text" name="name" class="form-control" value="<?php echo set_value('name', (is_login() ? get_user_name() : '')); ?>" placeholder="Nama" required>
           <?php echo form_error('name'); ?>

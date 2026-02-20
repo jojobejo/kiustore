@@ -8,10 +8,7 @@ class Pages extends CI_Controller
         parent::__construct();
         // verify_session('customer');
         $this->load->library('form_validation');
-        // $this->load->model(array(
-        //     'contact_model' => 'contact',
-        //     'review_model' => 'review'
-        // ));
+        $this->load->model('contact_model', 'contact');
     }
 
     public function policy()

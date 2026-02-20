@@ -50,89 +50,91 @@ defined('BASEPATH') or exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 
-$route['default_controller'] = 'customer/home';
-$route['404_override'] = '';
-$route['translate_uri_dashes'] = FALSE;
+$route['default_controller']                = 'customer/home';
+$route['404_override']                      = '';
+$route['translate_uri_dashes']              = FALSE;
 
-$route['dashboard_admin'] = 'admin/dashboard';
-$route['admin'] = 'admin/admin';
+$route['dashboard_admin']                   = 'admin/dashboard';
+$route['admin']                             = 'admin/admin';
 
-$route['send_admin_message'] = 'admin/messages/send';
-$route['generate_va'] = 'admin/customers/generate_va';
+$route['send_admin_message']                = 'admin/messages/send';
+$route['generate_va']                       = 'admin/customers/generate_va';
 
-$route['login'] = 'auth/login';
-$route['logout'] = 'auth/logout';
-$route['register'] = 'auth/register';
+$route['login']                             = 'auth/login';
+$route['logout']                            = 'auth/logout';
+$route['register']                          = 'auth/register';
 
-$route['policys'] = 'customer/terms/policy_privacy';
+$route['policys']                           = 'customer/terms/policy_privacy';
+$route['privacy-policy']                    = 'customer/terms/policy_privacy';
+$route['customer/terms/policy_privacy']     = 'customer/terms/policy_privacy';
 
-$route['cartongkir'] = 'customer/addons/addoncart/cart';
+$route['cartongkir']                        = 'customer/addons/addoncart/cart';
 
-$route['customer'] = 'customer/customer';
-$route['profile'] = 'customer/profile';
-$route['cus_edit_customer/(:any)'] = 'customer/profile/cus_editdata/$1';
-$route['edit_profile_cust/(:any)'] = 'customer/profile/cus_edit_profile/$1';
-$route['sv_alamatcus'] = 'customer/profile/';
-$route['change_alamat_customer_profile'] = 'customer/profile/change_alamat_asal';
-$route['message'] = 'customer/message';
-$route['send_message'] = 'customer/message/send';
-$route['count_unread_messages'] = 'customer/message/count_unread';
-$route['home'] = 'customer/home';
-$route['shop'] = 'customer/shop';
-$route['order_history'] = 'customer/orders';
-$route['invoice'] = 'customer/invoice';
-$route['order_view/(:num)'] = 'customer/orders/view/$1';
-$route['category'] = 'customer/product/all_categories';
-$route['category/(:num)/(:any)'] = 'customer/product/products_in_category/$1/$2';
-$route['all_products'] = 'customer/product/all_products';
-$route['search'] = 'customer/home/search';
-$route['promo'] = 'customer/product/promo';
-$route['product/(:num)/(:any)'] = 'customer/product/product/$1/$2';
-$route['cart'] = 'customer/shop/cart';
-$route['cekongkir'] = 'customer/shop/cekongkir';
-$route['cekongkir_new'] = 'customer/shop/district_calculate_cost';
-$route['ongkir'] = 'customer/shop/ongkir';
+$route['customer']                          = 'customer/customer';
+$route['profile']                           = 'customer/profile';
+$route['cus_edit_customer/(:any)']          = 'customer/profile/cus_editdata/$1';
+$route['edit_profile_cust/(:any)']          = 'customer/profile/cus_edit_profile/$1';
+$route['sv_alamatcus']                      = 'customer/profile/';
+$route['change_alamat_customer_profile']    = 'customer/profile/change_alamat_asal';
+$route['message']                           = 'customer/message';
+$route['send_message']                      = 'customer/message/send';
+$route['count_unread_messages']             = 'customer/message/count_unread';
+$route['home']                              = 'customer/home';
+$route['contact']                           = 'customer/home/contact';
+$route['contact/send']                      = 'customer/home/send_contact';
+$route['shop']                              = 'customer/shop';
+$route['order_history']                     = 'customer/orders';
+$route['invoice']                           = 'customer/invoice';
+$route['order_view/(:num)']                 = 'customer/orders/view/$1';
+$route['category']                          = 'customer/product/all_categories';
+$route['category/(:num)/(:any)']            = 'customer/product/products_in_category/$1/$2';
+$route['all_products']                      = 'customer/product/all_products';
+$route['search']                            = 'customer/home/search';
+$route['promo']                             = 'customer/product/promo';
+$route['product/(:num)/(:any)']             = 'customer/product/product/$1/$2';
+$route['cart']                              = 'customer/shop/cart';
+$route['cekongkir']                         = 'customer/shop/cekongkir';
+$route['cekongkir_new']                     = 'customer/shop/district_calculate_cost';
+$route['ongkir']                            = 'customer/shop/ongkir';
 
-$route['cart_api'] = 'customer/shop/cart_api';
-$route['checkout'] = 'customer/shop/checkout';
-$route['checkout_submit'] = 'customer/shop/checkout/order';
+$route['cart_api']                          = 'customer/shop/cart_api';
+$route['checkout']                          = 'customer/shop/checkout';
+$route['checkout_submit']                   = 'customer/shop/checkout/order';
 
 // payment
-$route['admin/apibriva'] = 'admin/api_payment_briva';
-$route['admin/brivaws'] = 'admin/api_payment_briva';
-$route['createva'] = 'admin/api_payment_briva/createVa';
-$route['createva/preview'] = 'admin/api_payment_briva/preview_briva';
+$route['admin/apibriva']                    = 'admin/api_payment_briva';
+$route['admin/brivaws']                     = 'admin/api_payment_briva';
+$route['createva']                          = 'admin/api_payment_briva/createVa';
+$route['createva/preview']                  = 'admin/api_payment_briva/preview_briva';
 
 // COBA
-$route['readonlychange'] = 'customer/profile/toggle_readonly';
-$route['inputlocation'] = 'customer/profile/inputlocation';
-$route['get_provinces'] = 'customer/profile/get_provinces';
+$route['readonlychange']                    = 'customer/profile/toggle_readonly';
+$route['inputlocation']                     = 'customer/profile/inputlocation';
+$route['get_provinces']                     = 'customer/profile/get_provinces';
 
-$route['test_api_payment'] = 'customer/shop/test_api_payment';
-$route['test_status_va'] = 'customer/orders/test_status_va';
+$route['test_api_payment']                  = 'customer/shop/test_api_payment';
+$route['test_status_va']                    = 'customer/orders/test_status_va';
 
-$route['get_time_left/(:any)'] = 'customer/orders/get_time_left/$1';
+$route['get_time_left/(:any)']              = 'customer/orders/get_time_left/$1';
 $route['check_payment_status/(:any)/(:any)'] = 'customer/orders/check_payment_status/$1/$2';
 
 // RAJAONGKIR 
-$route['rajaongkir'] = 'customer/rajaongkir';
-$route['rajaongkir/get_provinces'] = 'customer/rajaongkir/get_provinces';
-$route['rajaongkir/get_cities'] = 'customer/rajaongkir/get_cities';
-$route['rajaongkir/get_districts'] = 'customer/rajaongkir/get_districts';
-$route['rajaongkir/get_subdistricts'] = 'customer/rajaongkir/get_subdistricts';
-$route['rajaongkir/get_shipping_cost'] = 'customer/rajaongkir/get_shipping_cost';
+$route['rajaongkir']                        = 'customer/rajaongkir';
+$route['rajaongkir/get_provinces']          = 'customer/rajaongkir/get_provinces';
+$route['rajaongkir/get_cities']             = 'customer/rajaongkir/get_cities';
+$route['rajaongkir/get_districts']          = 'customer/rajaongkir/get_districts';
+$route['rajaongkir/get_subdistricts']       = 'customer/rajaongkir/get_subdistricts';
+$route['rajaongkir/get_shipping_cost']      = 'customer/rajaongkir/get_shipping_cost';
 
-$route['admin/ongkir']                  = 'admin/Ongkir';
-$route['Ongkir/province']               = 'admin/Ongkir/province';
-$route['Ongkir/city/(:num)']            = 'admin/Ongkir/city/$1';
-$route['Ongkir/district/(:num)']        = 'admin/Ongkir/district/$1';
-$route['Ongkir/sub_district/(:num)']    = 'admin/Ongkir/sub_district/$1';
-$route['Ongkir/cost']                   = 'admin/Ongkir/cost';
+$route['admin/ongkir']                      = 'admin/Ongkir';
+$route['Ongkir/province']                   = 'admin/Ongkir/province';
+$route['Ongkir/city/(:num)']                = 'admin/Ongkir/city/$1';
+$route['Ongkir/district/(:num)']            = 'admin/Ongkir/district/$1';
+$route['Ongkir/sub_district/(:num)']        = 'admin/Ongkir/sub_district/$1';
+$route['Ongkir/cost']                       = 'admin/Ongkir/cost';
 
-
-
-$route['ongkirdev']                   = 'admin/Admin/dev_ongkir';
-$route['admin/ajax_provinces']        = 'admin/Admin/ajax_provinces';
-$route['admin/ajax_cities']           = 'admin/Admin/ajax_cities';
-$route['admin/ajax_subdistricts']     = 'admin/Admin/ajax_subdistricts';
-$route['rajaongkir/ajax_hitung_ongkir']        = 'admin/Admin/ajax_hitung_ongkir';
+$route['ongkirdev']                         = 'admin/Admin/dev_ongkir';
+$route['admin/ajax_provinces']              = 'admin/Admin/ajax_provinces';
+$route['admin/ajax_cities']                 = 'admin/Admin/ajax_cities';
+$route['admin/ajax_subdistricts']           = 'admin/Admin/ajax_subdistricts';
+$route['rajaongkir/ajax_hitung_ongkir']     = 'admin/Admin/ajax_hitung_ongkir';

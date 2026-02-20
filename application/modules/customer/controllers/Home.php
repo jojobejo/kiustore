@@ -9,8 +9,10 @@ class Home extends CI_Controller
         $this->load->model(array(
             'product_model' => 'product',
             'payment_model' => 'payment',
-            'review_model' => 'review'
+            'review_model' => 'review',
+            'contact_model' => 'contact'
         ));
+        $this->load->library('form_validation');
 
         // if (!$this->session->userdata('user_id')) redirect('login');
         // check_agreement();
@@ -127,5 +129,42 @@ class Home extends CI_Controller
         $this->load->view('header', $params);
         $this->load->view('search', $products);
         $this->load->view('footer');
+    }
+
+    public function contact()
+    {
+        $data = [
+            'user' => user_data(),
+            'flash' => $this->session->flashdata('contact_flash')
+        ];
+
+        $this->load->view('header');
+        $this->load->view('contact', $data);
+        $this->load->view('footer');
+    }
+
+    public function send_contact()
+    {
+        $this->form_validation->set_error_delimiters('<div class="text-danger font-weight-bold"><small>', '</small></div>');
+        $this->form_validation->set_rules('name', 'Nama lengkap', 'required');
+        $this->form_validation->set_rules('subject', 'Subjek pesan', 'required');
+        $this->form_validation->set_rules('email', 'Email', 'required|min_length[5]');
+        $this->form_validation->set_rules('message', 'Pesan', 'required');
+
+        if ($this->form_validation->run() === FALSE) {
+            return $this->contact();
+        }
+
+        $payload = [
+            'name' => $this->input->post('name', TRUE),
+            'email' => $this->input->post('email', TRUE),
+            'subject' => $this->input->post('subject', TRUE),
+            'message' => $this->input->post('message', TRUE),
+            'contact_date' => date('Y-m-d H:i:s')
+        ];
+
+        $this->contact->register_contact($payload);
+        $this->session->set_flashdata('contact_flash', 'Pesan berhasil dikirimkan. Kami akan membalas dalam waktu 2x24 jam');
+        redirect('contact');
     }
 }
