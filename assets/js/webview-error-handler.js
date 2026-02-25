@@ -6,6 +6,20 @@
     var appErrorUrl = config.appErrorUrl || '/error/app';
     var notifyTarget = document.getElementById(config.notifyElementId || 'internetStatus');
     var timeoutMs = parseInt(config.timeoutMs, 10);
+    var captureRuntimeErrors = config.captureRuntimeErrors === true;
+    var captureAjax5xx = config.captureAjax5xx === true;
+    var onlyWebView = config.onlyWebView !== false;
+
+    function isLikelyWebView() {
+        var ua = navigator.userAgent || '';
+        var isAndroidWebView = /; wv\)/i.test(ua) || /Version\/[\d.]+/i.test(ua) && /Android/i.test(ua);
+        var isIOSWebView = /iPhone|iPad|iPod/i.test(ua) && /AppleWebKit/i.test(ua) && !/Safari/i.test(ua);
+        return isAndroidWebView || isIOSWebView;
+    }
+
+    if (onlyWebView && !isLikelyWebView()) {
+        return;
+    }
 
     if (isNaN(timeoutMs) || timeoutMs <= 0) {
         timeoutMs = 20000;
@@ -56,17 +70,19 @@
                 return;
             }
 
-            if (isServerError) {
+            if (captureAjax5xx && isServerError) {
                 redirect(appErrorUrl);
             }
         });
     }
 
-    window.addEventListener('error', function () {
-        redirect(appErrorUrl);
-    });
+    if (captureRuntimeErrors) {
+        window.addEventListener('error', function () {
+            redirect(appErrorUrl);
+        });
 
-    window.addEventListener('unhandledrejection', function () {
-        redirect(appErrorUrl);
-    });
+        window.addEventListener('unhandledrejection', function () {
+            redirect(appErrorUrl);
+        });
+    }
 })();

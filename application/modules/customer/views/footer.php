@@ -81,10 +81,13 @@ $controller = $this->router->fetch_class();
     noInternetUrl: '<?php echo site_url('error/no-internet'); ?>',
     appErrorUrl: '<?php echo site_url('error/app'); ?>',
     notifyElementId: 'internetStatus',
-    timeoutMs: 20000
+    timeoutMs: 20000,
+    captureRuntimeErrors: false,
+    captureAjax5xx: false,
+    onlyWebView: true
   };
 </script>
-<script src="<?php echo site_url('assets/js/webview-error-handler.js'); ?>"></script>
+<script src="<?php echo site_url('assets/js/webview-error-handler.js?v=20260225_2'); ?>"></script>
 
 
 <script>
