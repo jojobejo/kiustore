@@ -51,8 +51,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
 */
 
 $route['default_controller']                = 'customer/home';
-$route['404_override']                      = '';
+$route['404_override']                      = 'errors/not_found';
 $route['translate_uri_dashes']              = FALSE;
+
+$route['error/no-internet']                 = 'errors/no_internet';
+$route['error/timeout']                     = 'errors/timeout';
+$route['error/app']                         = 'errors/app';
 
 $route['dashboard_admin']                   = 'admin/dashboard';
 $route['admin']                             = 'admin/admin';

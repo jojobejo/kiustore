@@ -76,6 +76,15 @@ $controller = $this->router->fetch_class();
 
 <script src="<?php echo get_theme_uri('js/bs5-toast.min.js'); ?>"></script>
 <script src="<?php echo site_url('assets/js/offline.js'); ?>"></script>
+<script>
+  window.WEBVIEW_ERROR_CONFIG = {
+    noInternetUrl: '<?php echo site_url('error/no-internet'); ?>',
+    appErrorUrl: '<?php echo site_url('error/app'); ?>',
+    notifyElementId: 'internetStatus',
+    timeoutMs: 20000
+  };
+</script>
+<script src="<?php echo site_url('assets/js/webview-error-handler.js'); ?>"></script>
 
 
 <script>
