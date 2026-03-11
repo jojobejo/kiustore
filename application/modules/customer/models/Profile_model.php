@@ -52,4 +52,38 @@ class Profile_model extends CI_Model
 
         return $data->row();
     }
+
+    public function get_total_silver_points()
+    {
+        $id = $this->user_id;
+        $data = $this->db->query("SELECT
+                (
+                    COALESCE((
+                        SELECT FLOOR(SUM(oi.order_qty * oi.order_price) / 10000000)
+                        FROM orders o
+                        JOIN order_items oi
+                            ON oi.order_id = o.id
+                        JOIN products pr
+                            ON pr.id = oi.product_id
+                        WHERE o.user_id = '$id'
+                            AND o.order_status = '6'
+                            AND pr.product_type IN (1,2,3)
+                    ), 0)
+                    +
+                    COALESCE((
+                        SELECT FLOOR(SUM(oi.order_qty * oi.order_price) / 100000000)
+                        FROM orders o
+                        JOIN order_items oi
+                            ON oi.order_id = o.id
+                        JOIN products pr
+                            ON pr.id = oi.product_id
+                        WHERE o.user_id = '$id'
+                            AND o.order_status = '6'
+                            AND pr.product_type IN (4)
+                    ), 0)
+                ) AS total_silver
+        ");
+
+        return $data->row();
+    }
 }

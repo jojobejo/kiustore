@@ -236,6 +236,210 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
       </div>
 
+      <div class="card card-primary" id="section_extravaganza_point">
+        <div class="card-header">
+          <h3 class="mb-0">Point Extravaganza</h3>
+        </div>
+        <div class="card-body">
+          <?php
+          $has_abc = count($extravaganza_summary_abc) > 0;
+          $has_fastmoving = count($extravaganza_summary_fastmoving) > 0;
+          $total_silver = 0;
+          $total_gold = 0;
+          $total_platinum = 0;
+          $konv_silver = 0;
+          $konv_gold = 0;
+          $konv_platinum = 0;
+
+          if ($has_abc) {
+            foreach ($extravaganza_summary_abc as $summary) {
+              $total_silver += (int)$summary->total_silver;
+              $total_gold += (int)$summary->total_gold;
+              $total_platinum += (int)$summary->total_platinum;
+            }
+          }
+          if ($has_fastmoving) {
+            foreach ($extravaganza_summary_fastmoving as $summary) {
+              $total_silver += (int)$summary->total_silver;
+              $total_gold += (int)$summary->total_gold;
+              $total_platinum += (int)$summary->total_platinum;
+            }
+          }
+
+          if ($total_silver > 0) {
+            $konv_platinum = (int)floor($total_silver / 100);
+            $sisa_after_platinum = $total_silver - ($konv_platinum * 100);
+            $konv_gold = (int)floor($sisa_after_platinum / 50);
+            $konv_silver = (int)($sisa_after_platinum - ($konv_gold * 50));
+          }
+          ?>
+          <?php if ($has_abc || $has_fastmoving) : ?>
+            <div class="table-responsive mt-3">
+              <table class="table align-items-center table-flush table-striped table-hover">
+                <thead class="thead-light bg-primary text-white">
+                  <tr>
+                    <th scope="col">Kategori</th>
+                    <th scope="col">Nominal</th>
+                    <th scope="col">POINT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php if ($has_abc) : ?>
+                    <?php foreach ($extravaganza_summary_abc as $summary) : ?>
+                      <tr>
+                        <td><span class="badge badge-primary">ABC</span></td>
+                        <td>Rp <?= number_format($summary->total_nominal) ?></td>
+                        <td><?= number_format($summary->total_silver) ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                  <?php if ($has_fastmoving) : ?>
+                    <?php foreach ($extravaganza_summary_fastmoving as $summary) : ?>
+                      <tr>
+                        <td><span class="badge badge-success">fastmoving</span></td>
+                        <td>Rp <?= number_format($summary->total_nominal) ?></td>
+                        <td><?= number_format($summary->total_silver) ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                </tbody>
+              </table>
+              <table class="table align-items-center table-flush table-striped table-hover">
+                <thead class="thead-light bg-primary text-white">
+                  <tr>
+                    <th scope="col">TOT</th>
+                    <th scope="col">SILVER</th>
+                    <th scope="col">GOLD</th>
+                    <th scope="col">PLATINUM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="font-weight-bold">
+                    <td>Total</td>
+                    <td><?= number_format($total_silver) ?></td>
+                    <td><?= number_format($total_gold) ?></td>
+                    <td><?= number_format($total_platinum) ?></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- <table class="table align-items-center table-flush table-striped table-hover" id="tbkonversi">
+                <thead class="thead-light bg-primary text-white">
+                  <tr>
+                    <th scope="col">TOT</th>
+                    <th scope="col">SILVER</th>
+                    <th scope="col">GOLD</th>
+                    <th scope="col">PLATINUM</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="font-weight-bold">
+                    <td>Total</td>
+                    <td><?= number_format($konv_silver) ?></td>
+                    <td><?= number_format($konv_gold) ?></td>
+                    <td><?= number_format($konv_platinum) ?></td>
+                  </tr>
+                </tbody>
+              </table> -->
+
+            </div>
+          <?php else : ?>
+            <div class="alert alert-info">Belum ada data point.</div>
+          <?php endif; ?>
+
+          <ul class="nav nav-tabs mt-4" role="tablist" id="extravaganza-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" href="#" data-extravaganza-filter="all">Semua</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-extravaganza-filter="ABC">ABC</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-extravaganza-filter="fastmoving">Fastmoving</a>
+            </li>
+          </ul>
+
+          <div class="table-responsive mt-3">
+            <table class="table align-items-center table-flush table-striped table-hover">
+              <thead class="thead-light bg-primary text-white">
+                <tr>
+                  <th scope="col">Order</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Kategori</th>
+                  <th scope="col">Qty</th>
+                  <th scope="col">Harga</th>
+                  <th scope="col">Nominal</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php if (count($extravaganza_history) > 0) : ?>
+                  <?php foreach ($extravaganza_history as $row) : ?>
+                    <tr data-category="<?= $row->product_category ?>">
+                      <td><?= $row->order_number ?></td>
+                      <td><?= $row->order_status ?></td>
+                      <td>
+                        <?php if ($row->product_category == 'ABC') : ?>
+                          <span class="badge badge-primary">ABC</span>
+                        <?php elseif ($row->product_category == 'fastmoving') : ?>
+                          <span class="badge badge-success">fastmoving</span>
+                        <?php else : ?>
+                          <span class="badge badge-secondary"><?= $row->product_category ?></span>
+                        <?php endif; ?>
+                      </td>
+                      <td><?= number_format($row->order_qty) ?></td>
+                      <td>Rp <?= format_rupiah($row->order_price) ?></td>
+                      <td>Rp <?= format_rupiah($row->nominal_belanja) ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                  <tr class="extravaganza-empty" style="display:none;">
+                    <td colspan="9">Tidak ada data untuk kategori ini.</td>
+                  </tr>
+                <?php else : ?>
+                  <tr>
+                    <td colspan="9">Belum ada data riwayat invoice.</td>
+                  </tr>
+                <?php endif; ?>
+              </tbody>
+            </table>
+          </div>
+
+          <script>
+            (function() {
+              var tabContainer = document.getElementById('extravaganza-tabs');
+              if (!tabContainer) return;
+
+              var rows = document.querySelectorAll('#section_extravaganza_point tbody tr[data-category]');
+              var emptyRow = document.querySelector('#section_extravaganza_point tbody tr.extravaganza-empty');
+
+              function applyFilter(filter) {
+                var visible = 0;
+                rows.forEach(function(row) {
+                  var match = (filter === 'all' || row.getAttribute('data-category') === filter);
+                  row.style.display = match ? '' : 'none';
+                  if (match) visible++;
+                });
+                if (emptyRow) {
+                  emptyRow.style.display = (visible === 0 && rows.length > 0) ? '' : 'none';
+                }
+              }
+
+              tabContainer.querySelectorAll('[data-extravaganza-filter]').forEach(function(tab) {
+                tab.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  tabContainer.querySelectorAll('.nav-link').forEach(function(t) {
+                    t.classList.remove('active');
+                  });
+                  tab.classList.add('active');
+                  applyFilter(tab.getAttribute('data-extravaganza-filter'));
+                });
+              });
+
+              applyFilter('all');
+            })();
+          </script>
+        </div>
+      </div>
+
       <!-- VIRTUAL ACCOUNT -->
       <!-- <div class="card card-primary" hidden>
         <div class="card-header">

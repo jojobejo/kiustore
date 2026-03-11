@@ -19,11 +19,24 @@ class Profile extends CI_Controller
 
     public function index()
     {
-        $data = $this->profile->get_profile();
+        $data           = $this->profile->get_profile();
+        $point          = $this->profile->get_total_silver_points();
+        $total_silver   = (int)($point->total_silver ?? 0);
+        $konv_silver    = (int)($point->total_silver ?? 0);
+        $konv_gold      = (int)floor($konv_silver / 50);
+        $konv_platinum  = (int)floor($konv_silver / 50) / 2;
+
+        // $sisa_after_platinum = $total_silver - ($konv_platinum * 100);
+
+
 
         $params['title']    = $data->name;
         $user['user']       = $data;
         $user['flash']      = $this->session->flashdata('profile');
+        $user['point_total_silver'] = $total_silver;
+        $user['point_konv_silver'] = $konv_silver;
+        $user['point_konv_gold'] = $konv_gold;
+        $user['point_konv_platinum'] = $konv_platinum;
 
         $this->load->view('header', $params);
         $this->load->view('profile', $user);

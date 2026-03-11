@@ -774,8 +774,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </div>
                 <div class="modal-body">
                     <p>Anda yakin ingin membatalkan pesanan? </p>
-                    <input type="text" name="del_va" id="del_va" value="<?= $data->order_number ?>" >
-                    <input type="text" name="del_no" id="del_no" value="<?= $data->userno ?>" >
+                    <input type="text" name="del_va" id="del_va" value="<?= $data->order_number ?>">
+                    <input type="text" name="del_no" id="del_no" value="<?= $data->userno ?>">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

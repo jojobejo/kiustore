@@ -321,6 +321,24 @@ class Payment_model extends CI_Model
         return $payments->result();
     }
 
+    public function total_payment_by_id($id)
+    {
+        $totpayments = $this->db->query("SELECT 
+            o.user_id,
+            c.name AS customer,
+            SUM(p.payment_price) AS total_pembelian
+        FROM payments p
+        JOIN orders o
+            ON o.id = p.order_id
+        JOIN customers c
+            ON c.user_id = o.user_id
+        WHERE o.user_id = '$id' and o.order_status = '6'
+        GROUP BY o.user_id, c.name;
+        ");
+
+        return $totpayments->result();
+    }
+
     public function payment_bri()
     {
         $payment_briva = $this->db->query("SELECT 
@@ -328,5 +346,158 @@ class Payment_model extends CI_Model
         FROM payments a ");
 
         return $payment_briva->result();
+    }
+
+    public function riwayat_invoice($id)
+    {
+        return $this->db->query("SELECT 
+            o.order_number,
+            o.id AS order_id,
+            o.user_id,
+            c.name AS customer,
+            CASE 
+                WHEN o.order_status = 1 THEN 'Proses oleh Sales'
+                WHEN o.order_status = 2 THEN 'Menunggu Pembayaran'
+                WHEN o.order_status = 3 THEN 'Pengemasan'
+                WHEN o.order_status = 4 THEN 'Pengiriman'
+                WHEN o.order_status = 5 THEN 'Barang Diterima'
+                WHEN o.order_status = 6 THEN 'Selesai'
+                WHEN o.order_status = 7 THEN 'Dibatalkan'
+                WHEN o.order_status = 8 THEN 'Menunggu Konfirmasi Pembayaran'
+                WHEN o.order_status = 9 THEN 'Dalam Pengajuan Kredit'
+                ELSE 'Unknown'
+            END AS order_status,
+            oi.product_id,
+            CASE 
+                WHEN pr.product_type IN (1,2,3) THEN 'ABC'
+                WHEN pr.product_type = 4 THEN 'fastmoving'
+                ELSE 'other'
+            END AS product_category,
+            oi.order_qty,
+            oi.order_price,
+            (oi.order_qty * oi.order_price) AS nominal_belanja,
+            -- silver point
+            CASE 
+                WHEN pr.product_type IN (1,2,3)
+                THEN FLOOR((oi.order_qty * oi.order_price) / 10000000)
+                WHEN pr.product_type = 4
+                THEN FLOOR((oi.order_qty * oi.order_price) / 100000000)
+                ELSE 0
+            END AS silver_point,
+            -- gold point
+            FLOOR(
+                CASE 
+                    WHEN pr.product_type IN (1,2,3)
+                    THEN FLOOR((oi.order_qty * oi.order_price) / 10000000)
+                    WHEN pr.product_type = 4
+                    THEN FLOOR((oi.order_qty * oi.order_price) / 100000000)
+                    ELSE 0
+                END / 50
+            ) AS gold_point,
+            -- platinum point
+            FLOOR(
+                FLOOR(
+                    CASE 
+                        WHEN pr.product_type IN (1,2,3)
+                        THEN FLOOR((oi.order_qty * oi.order_price) / 10000000)
+                        WHEN pr.product_type = 4
+                        THEN FLOOR((oi.order_qty * oi.order_price) / 100000000)
+                        ELSE 0
+                    END / 50
+                ) / 2
+            ) AS platinum_point
+        FROM orders o
+        JOIN order_items oi
+            ON oi.order_id = o.id
+        JOIN products pr
+            ON pr.id = oi.product_id
+        JOIN customers c
+            ON c.user_id = o.user_id
+        WHERE o.user_id = '$id' AND o.order_status = '6'
+        ORDER BY o.id DESC;
+        ")->result();
+    }
+
+    public function konversi_point_extravaganza_ABC($id)
+    {
+        return $this->db->query("SELECT 
+            t.user_id,
+            t.customer,
+            t.total_nominal,
+            FLOOR(t.total_nominal / 10000000) AS total_silver,
+            FLOOR(FLOOR(t.total_nominal / 10000000) / 50) AS total_gold,
+            FLOOR(FLOOR(FLOOR(t.total_nominal / 10000000) / 50) / 2) AS total_platinum
+        FROM 
+        (
+            SELECT 
+                o.user_id,
+                c.name AS customer,
+                SUM(oi.order_qty * oi.order_price) AS total_nominal
+            FROM orders o
+            JOIN order_items oi
+                ON oi.order_id = o.id
+            JOIN products pr
+                ON pr.id = oi.product_id
+            JOIN customers c
+                ON c.user_id = o.user_id
+            WHERE 
+                o.user_id = '$id'
+                AND o.order_status = 6
+                AND pr.product_type IN (1,2,3)
+            GROUP BY 
+                o.user_id,
+                c.name) t")->result();
+    }
+
+    public function konversi_point_extravaganza_fastmoving($id)
+    {
+        return $this->db->query("SELECT 
+            t.user_id,
+            t.customer,
+            t.total_nominal,
+            FLOOR(t.total_nominal / 100000000) AS total_silver,
+            FLOOR(FLOOR(t.total_nominal / 100000000) / 50) AS total_gold,
+            FLOOR(FLOOR(FLOOR(t.total_nominal / 100000000) / 50) / 2) AS total_platinum
+        FROM 
+        (
+            SELECT 
+                o.user_id,
+                c.name AS customer,
+                SUM(oi.order_qty * oi.order_price) AS total_nominal
+            FROM orders o
+            JOIN order_items oi
+                ON oi.order_id = o.id
+            JOIN products pr
+                ON pr.id = oi.product_id
+            JOIN customers c
+                ON c.user_id = o.user_id
+            WHERE 
+                o.user_id = '$id'
+                AND o.order_status = 6
+                AND pr.product_type IN (4)
+            GROUP BY 
+                o.user_id,
+                c.name) t")->result();
+    }
+
+    public function konversi_point_extravaganza_total_silver($id)
+    {
+        return $this->db->query("SELECT 
+            SUM(
+                CASE 
+                    WHEN pr.product_type IN (1,2,3)
+                        THEN FLOOR((oi.order_qty * oi.order_price) / 10000000)
+                    WHEN pr.product_type = 4
+                        THEN FLOOR((oi.order_qty * oi.order_price) / 100000000)
+                    ELSE 0
+                END
+            ) AS total_silver
+        FROM orders o
+        JOIN order_items oi
+            ON oi.order_id = o.id
+        JOIN products pr
+            ON pr.id = oi.product_id
+        WHERE o.user_id = '$id' AND o.order_status = 6
+        ")->row();
     }
 }

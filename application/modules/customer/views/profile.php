@@ -28,6 +28,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
     </div>
 
+    
+        <div class="table-responsive">
+            <table class="table table-striped" id="tbkonversi_profile" style="background:#ffffff;border-radius:8px;overflow:hidden; text-align: center;">
+                <thead style="background:#1f6fbe;color:#ffffff;">
+                    <tr>
+                        <th>Point Total</th>
+                        <th>Silver</th>
+                        <th>Gold</th>
+                        <th>Platinum</th>
+                    </tr>
+                </thead>
+                <tbody style="color:#0b2a4a;">
+                    <tr>
+                        <td><?= number_format((int)$point_total_silver) ?></td>
+                        <td><?= number_format((int)$point_konv_silver) ?></td>
+                        <td><?= number_format((int)$point_konv_gold) ?></td>
+                        <td><?= number_format((int)$point_konv_platinum) ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     <?php echo form_open_multipart('customer/profile/edit_name', 'class="custom-form"'); ?>
     <div class="input-box">
         <i data-feather="at-sign"></i>

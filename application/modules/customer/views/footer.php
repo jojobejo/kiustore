@@ -1,6 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 $controller = $this->router->fetch_class();
+$is_product_detail = ($this->uri->segment(1) === 'product' && is_numeric($this->uri->segment(2)) && $this->uri->segment(3));
 ?>
 <!-- <div class="footer-wrap shop notif-cart" id="notif-cart">
   <ul class="footer">
@@ -14,7 +15,22 @@ $controller = $this->router->fetch_class();
 <div class="internet-connection-status" id="internetStatus"></div>
 
 <!-- Footer Start -->
-<footer class="footer-wrap" style="background-color: #0c5fdb;">
+<?php if ($is_product_detail) : ?>
+  <style>
+    .footer-wrap.footer-fixed-product {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 3;
+    }
+
+    .main-wrap.product-page {
+      padding-bottom: 90px;
+    }
+  </style>
+<?php endif; ?>
+<footer class="footer-wrap <?= $is_product_detail ? 'footer-fixed-product' : ''; ?>" style="background-color: #0c5fdb;">
   <ul class="footer">
     <li class="footer-item <?= ($this->uri->segment(1) == 'home' ? 'active' : '') ?>">
       <a href="<?= site_url('home') ?>" class="footer-link">

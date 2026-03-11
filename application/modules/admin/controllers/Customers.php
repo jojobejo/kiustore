@@ -172,6 +172,10 @@ class Customers extends CI_Controller
             $customer['flash'] = $this->session->flashdata('customer_flash');
             $customer['orders'] = $this->order->order_by($id);
             $customer['payments'] = $this->payment->payment_by($id);
+            $customer['totpayments'] = $this->payment->total_payment_by_id($id);
+            $customer['extravaganza_summary_abc'] = $this->payment->konversi_point_extravaganza_ABC($id);
+            $customer['extravaganza_summary_fastmoving'] = $this->payment->konversi_point_extravaganza_fastmoving($id);
+            $customer['extravaganza_history'] = $this->payment->riwayat_invoice($id);
 
             $this->load->view('header', $params);
             $this->load->view('customers/view', $customer);
