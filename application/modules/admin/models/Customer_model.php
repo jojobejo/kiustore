@@ -81,10 +81,10 @@ class Customer_model extends CI_Model
         $this->db->where('id', $id)->delete('users');
         $this->db->where('user_id', $id)->delete('orders');
         $this->db->query("
-            DELETE order_item
-            FROM order_item
+            DELETE order_items
+            FROM order_items
             JOIN orders
-                ON orders.id = order_item.order_id
+                ON orders.id = order_items.order_id
             WHERE orders.user_id = '$id'");
         $this->db->query("
             DELETE payments
