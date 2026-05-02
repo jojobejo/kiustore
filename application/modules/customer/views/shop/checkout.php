@@ -59,6 +59,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                                 <input type="radio" name="payment" id="transfer" value="2" checked />
                                                 <label class="form-check-label" for="cod">VA - KARISMA </label>
                                             </div>
+                                            <div class="input-box col-6">
+                                                <input type="radio" name="payment" id="tfbank" value="3" checked />
+                                                <label class="form-check-label" for="cod">Transfer Bank</label>
+                                            </div>
                                             <!-- Net Banking Option End -->
                                         </div>
                                     </div>
@@ -112,6 +116,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                                     <input type="radio" name="payment" id="transfer" value="2" checked />
                                                     <label class="form-check-label" for="transfer">Virtual Account Karisma</label>
                                                 </div>
+                                                <div class="input-box col-6">
+                                                    <input type="radio" name="payment" id="tfbank" value="3" checked />
+                                                    <label class="form-check-label" for="cod">Transfer Bank</label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -148,6 +156,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             </div>
         </form>
+
     <?php else : ?>
         <form action="<?php echo site_url('checkout_submit'); ?>" method="POST">
             <div class="checkout-wrapper-area py-3">
@@ -203,6 +212,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                     <div class="input-box col-6">
                                         <input type="radio" name="payment" id="transfer" value="2" />
                                         <label class="form-check-label" for="cod">Virtual Account Karisma</label>
+                                    </div>
+                                    <div class="input-box col-6">
+                                        <input type="radio" name="payment" id="tfbank" value="3" checked />
+                                        <label class="form-check-label" for="cod">Transfer Bank</label>
                                     </div>
                                     <!-- Net Banking Option End -->
                                 </div>

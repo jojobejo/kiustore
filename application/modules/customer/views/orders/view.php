@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+$banks = (array) json_decode(get_settings('payment_banks'));
 ?>
 
 <main class="main-wrap order-detail mb-xxl">
@@ -121,6 +122,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <span>
                     <?php echo ($data->payment_method == 1) ? 'Kredit' : ''; ?>
                     <?php echo ($data->payment_method == 2) ? 'Virtual Account Karisma' : ''; ?>
+                    <?php echo ($data->payment_method == 3) ? 'Transfer Bank' : ''; ?>
                 </span>
             </li>
 
@@ -301,7 +303,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <?php elseif ($data->order_status == 5) : ?>
                     <?php if ($data->payment_price == NULL) : ?>
                         <div class="alert alert-info m-2 w-100">Pesanan sudah diterima dan menunggu pelunasan</div>
-                        <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success">Konfirmasi Pembayaran</a>
+                        <button type="button" class="btn btn-success payment-proof-trigger" data-toggle="modal" data-target="#paymentProofModal" data-bs-toggle="modal" data-bs-target="#paymentProofModal">Konfirmasi Pembayaran</button>
                     <?php else : ?>
                         <div class="alert alert-info m-2 w-100">Menunggu konfirmasi pembayaran</div>
                     <?php endif; ?>
@@ -321,7 +323,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <?php elseif ($data->order_status == 2) : ?>
                     <?php if ($data->payment_status == 3) : ?>
                         <div class="alert alert-info m-2 w-100">Pembayaran Gagal / Kurang Bayar</div>
-                        <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-success">Konfirmasi Pembayaran</a>
+                        <button type="button" class="btn btn-success payment-proof-trigger" data-toggle="modal" data-target="#paymentProofModal" data-bs-toggle="modal" data-bs-target="#paymentProofModal">Konfirmasi Pembayaran</button>
                     <?php else : ?>
                         <!-- SHOW START PAYMENT -->
                         <?php if ($is_briva) : ?>
@@ -367,11 +369,130 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <?php elseif ($data->order_status == 10) : ?>
                     <div class="alert alert-info m-2 w-100">Verifikasi pembayaran oleh admin</div>
                 <?php endif; ?>
+
+            <?php elseif ($data->payment_method == 3) : ?>
+                <?php if ($data->order_status == 1) : ?>
+                    <div class="alert alert-info m-2 w-100">Pesanan dalam proses sales , Sales Akan melakukan Update Ongkir</div>
+                    <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
+                <?php elseif ($data->order_status == 2) : ?>
+                    <?php if ($data->payment_status == 3) : ?>
+                        <div class="alert alert-info m-2 w-100">Pembayaran Gagal / Kurang Bayar</div>
+                        <button type="button" class="btn btn-success payment-proof-trigger" data-toggle="modal" data-target="#paymentProofModal" data-bs-toggle="modal" data-bs-target="#paymentProofModal">Konfirmasi Pembayaran</button>
+                    <?php else : ?>
+                        <?php
+                        $dataorder = json_decode($data->delivery_data, true);
+                        $duedate = date("ym", strtotime($data->due_date));
+                        ?>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="<?php echo site_url('customer/payments/confirm?order=' . $data->order_id); ?>" class="btn btn-danger w-100" id="transaksi_batal">Batlkan Transaksi</a>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-success w-100" id="transaksi_sukses" data-toggle="modal" data-target="#paymentProofModal" data-bs-toggle="modal" data-bs-target="#paymentProofModal">Konfirmasi Pembayaran</button>
+                            </div>
+                        </div>
+
+                    <?php endif; ?>
+
+                <?php elseif ($data->order_status == 3) : ?>
+                    <?php if ($data->shipping_method == 1) : ?>
+                        <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan</div>
+                    <?php else : ?>
+                        <?php foreach ($resi as $gt) : ?>
+                            <?php if ($gt->resi_sts == '0') : ?>
+                                <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan - Resi Akan diupdate Sales</div>
+                            <?php else : ?>
+                                <div class="alert alert-info m-2 w-100">Pesanan dalam pengemasan - Resi Anda : <?= $gt->no_resi ?></div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                <?php elseif ($data->order_status == 4) : ?>
+                    <div class="alert alert-info m-2 w-100">Pesanan dalam pengiriman</div>
+                    <a href="#" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#terimaModal"><i class="fa fa-thumbs-o-up"></i> Terima Barang</a>
+                <?php elseif ($data->order_status == 6) : ?>
+                    <div class="alert alert-info m-2 w-100">Pesanan selesai</div>
+                <?php elseif ($data->order_status == 7) : ?>
+                    <div class="alert alert-info m-2 w-100">Pesanan dibatalkan</div>
+                <?php elseif ($data->order_status == 10) : ?>
+                    <div class="alert alert-info m-2 w-100">Verifikasi pembayaran oleh admin</div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </section>
     <!-- Payment Method Section End -->
 </main>
+
+<div class="modal fade" id="paymentProofModal" tabindex="-1" aria-labelledby="paymentProofModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentProofModalLabel">Upload Bukti Pembayaran</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <?php echo form_open_multipart('customer/payments/do_confirm'); ?>
+            <div class="modal-body">
+                <input type="hidden" name="order_id" value="<?= $data->order_id ?>">
+                <div class="mb-3">
+                    <label class="form-label">Nama Bank Pengirim</label>
+                    <input type="text" name="bank_name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">No. Rekening Pengirim</label>
+                    <input type="text" name="bank_number" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nama Pengirim</label>
+                    <input type="text" name="name" class="form-control" value="<?= isset($data->name) ? htmlspecialchars($data->name, ENT_QUOTES, 'UTF-8') : '' ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Jumlah Transfer</label>
+                    <input type="text" name="transfer" class="form-control" value="<?= isset($final_price) ? $final_price : 0 ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Transfer ke</label>
+                    <?php if (!empty($banks)) : ?>
+                        <select name="bank" class="form-control" required>
+                            <?php foreach ($banks as $bankKey => $bankData) : ?>
+                                <option value="<?= $bankKey ?>"><?= isset($bankData->bank) ? $bankData->bank : $bankKey ?><?php if (isset($bankData->name)) echo ' a.n ' . $bankData->name; ?><?php if (isset($bankData->number)) echo ' (' . $bankData->number . ')'; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    <?php else : ?>
+                        <input type="text" name="bank" class="form-control" placeholder="Bank tujuan" required>
+                    <?php endif; ?>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Bukti Pembayaran</label>
+                    <input type="file" name="picture" class="form-control" accept=".jpg,.jpeg,.png" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Kirim Bukti</button>
+            </div>
+            <?php echo form_close(); ?>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var modalElement = document.getElementById('paymentProofModal');
+        if (!modalElement) {
+            return;
+        }
+
+        document.querySelectorAll('.payment-proof-trigger').forEach(function(btn) {
+            btn.addEventListener('click', function(event) {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    event.preventDefault();
+                    var modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+                    modalInstance.show();
+                }
+            });
+        });
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

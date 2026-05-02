@@ -551,7 +551,7 @@ class Shop extends CI_Controller
                             }
                         }
                     }
-                } else {
+                } else if ($payment == 2) {
                     $user_id    = get_current_user_id();
                     // untuk metode pembayaran cash order langsung dijadikan 1
                     if (is_member() == '1') {
@@ -725,6 +725,49 @@ class Shop extends CI_Controller
                         $this->product->removechartall($kdfaktur);
                         $this->product->insertgenerate($generatechart);
                     }
+                } else if ($payment == 3) {
+                    $user_id        = get_current_user_id();
+                    $total_price    = $this->session->userdata('total_price');
+                    $order_number   = $this->_create_order_number($quantity, $user_id, $coupon_id);
+
+                    $order = array(
+                        'user_id' => $user_id,
+                        'coupon_id' => $coupon_id,
+                        'order_number' => $order_number,
+                        'kd_faktur' => $kdfaktur,
+                        'order_status' => 2,
+                        'order_date' => $order_date,
+                        'total_price' => $total_price,
+                        'total_items' => count($quantity),
+                        'payment_method' => $payment,
+                        'shipping_method' => $shipping,
+                        'delivery_data' => $delivery_data,
+                        'due_date' => $due_date,
+                    );
+
+                    $order = $this->product->create_order($order);
+                    $n = 0;
+
+                    foreach ($quantity as $id => $data) {
+                        $items[$n]['order_id'] = $order;
+                        $items[$n]['product_id'] = $id;
+                        $items[$n]['order_qty'] = $data['qty'];
+                        $items[$n]['satuan'] = $data['satuan'];
+                        $items[$n]['satuan_text'] = $data['satuan_text'];
+                        $items[$n]['satuan_qty'] = $data['satuan_qty'];
+                        $items[$n]['order_price'] = $data['price'];
+                        $n++;
+                    }
+
+                    $generatechart = array(
+                        'kdchart'   => $kdfaktur
+                    );
+
+                    $now = date('Y-m-d');
+
+                    $this->product->create_order_items($items);
+                    $this->product->removechartall($kdfaktur);
+                    $this->product->insertgenerate($generatechart);
                 }
 
                 $this->cart->destroy();

@@ -113,47 +113,24 @@ class Payments extends CI_Controller
             $config['upload_path'] = './assets/uploads/payments/';
             $config['allowed_types'] = 'jpg|jpeg|png';
             $config['max_size'] = 5096;
+            $config['overwrite'] = FALSE;
+            $config['encrypt_name'] = TRUE;
 
             $this->load->library('upload', $config);
 
-            // if ($this->upload->do_upload('picture')) {
-            //     $data = $this->upload->data();
-            //     $config['image_library'] = 'gd2';
-            //     $config['source_image'] = './assets/uploads/payments/' . $data['file_name'];
-            //     $config['create_thumb'] = FALSE;
-            //     $config['maintain_ratio'] = FALSE;
-            //     $config['quality'] = '50%';
-            //     $config['width'] = 400;
-            //     $config['height'] = 600;
-            //     $new_file_name = $data['file_name'];
-            //     $config['new_image'] = './assets/uploads/payments/' . $new_file_name;
-            //     $this->load->library('image_lib', $config);
-            //     $this->image_lib->resize();
-            //     $file_name = $data['file_name'];
-
-            //     $picture_name = $file_name;
-            // } else {
-            //     show_error($this->upload->display_errors());
-            // }
-
-            $picture_name = "-";
-
-            $data = array(
-                'transfer_to' => $bank,
-                'source' => array(
-                    'bank' => $bank_name,
-                    'name' => $name,
-                    'number' => $bank_number
-                )
-            );
-            $data = json_encode($data);
+            if ($this->upload->do_upload('picture')) {
+                $upload_data = $this->upload->data();
+                $picture_name = $upload_data['file_name'];
+            } else {
+                $picture_name = '-';
+            }
 
             $payment = array(
                 'order_id' => $order_id,
                 'payment_price' => $transfer,
-                'payment_date' => date('Y-m-d H:i:s'),
+                'payment_date' => 0,
                 'picture_name' => $picture_name,
-                'payment_data' => $data
+                'payment_status' => 0
             );
             $this->payment->register_payment($order_id, $payment);
             $this->session->set_flashdata('payment_flash', 'Konfirmasi berhasil dilakukan. Admin akan memverifikasinya dalam waktu 1x24 jam');

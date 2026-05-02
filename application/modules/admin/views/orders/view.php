@@ -103,7 +103,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
               </tr>
               <tr>
                 <td>Status</td>
-                <td><b class="statusField"><?php echo get_order_status($data->order_status, $data->payment_method); ?></b></td>
+                <?php if ($data->payment_method == 5) : ?>
+                  <td><b class="statusField"><?php echo get_order_status($data->order_status, $data->payment_method); ?></b></td>
+                <?php elseif ($data->payment_method == 3) : ?>
+                  <td><span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span></b></td>
+                <?php endif; ?>
               </tr>
               <?php if ($data->payment_method == 5) : ?>
                 <!--    <tr>
