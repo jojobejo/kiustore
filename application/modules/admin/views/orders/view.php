@@ -212,7 +212,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   </td>
                 </tr>
                 <?php if (admin_role() != 'distribusi') { ?>
-
                   <?php if ($data->order_status == '1' || $data->order_status == '9' || $data->order_status == '11') : ?>
                     <tr>
                       <td>Ongkir</td>
@@ -301,6 +300,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <?php if (admin_role() != 'distribusi') { ?>
           <div class="card card-primary" id="#payments">
             <?php if ($data->order_status == '9') : ?>
+            <?php elseif ($data->order_status == '8') : ?>
+              <div class="card-header">
+                <div class="row">
+                  <div class="col-auto">
+                    <h3 class="mb-0">Pembayaran</h3>
+                  </div>
+                </div>
+              </div>
             <?php else : ?>
               <div class="card-header">
                 <div class="row">
@@ -313,7 +320,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             <div class="card-body <?php echo ($data->payment_method == 1) ? 'p-0' : ''; ?>">
               <?php if ($data->payment_method == 1) : ?>
-
               <?php else : ?>
               <?php endif; ?>
               <?php if ($data->payment_method == 2) : ?>
@@ -465,6 +471,44 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <?php endif; ?>
             </div>
 
+            <div class="card-body <?php echo ($data->payment_method == 3) ? 'p-0' : ''; ?>">
+              <?php if ($data->payment_method == 3) : ?>
+                <?php if ($data->payment_price == NULL) : ?>
+                  <div class="alert alert-info m-2">Tidak ada data pembayaran.</div>
+                <?php else : ?>
+                  <div>
+                    <img class="img img-fluid" src="<?php echo base_url('assets/uploads/payments/' . $data->picture_name); ?>">
+                  </div>
+                  <?php if ($payment_flash) : ?>
+                    <br>
+                    <div class="alert alert-info" id="payment_flash"><?php echo $payment_flash; ?></div>
+                  <?php endif; ?>
+
+                  <table class="table align-items-center table-flush table-hover">
+                    <tr>
+                      <td>Transfer</td>
+                      <td><b>Rp <?php echo format_rupiah($data->payment_price); ?></b></td>
+                    </tr>
+                    <tr>
+                      <td>Tanggal</td>
+                      <td><b><?php echo get_formatted_date($data->payment_date); ?></b></td>
+                    </tr>
+                    <tr>
+                      <td>Status</td>
+                      <td><b>
+                          <?php if ($data->payment_status == 1) : ?>
+                            <span class="badge badge-info">Menunggu konfirmasi</span>
+                          <?php elseif ($data->payment_status == 2) : ?>
+                            <span class="badge badge-success">Dikonfirmasi</span>
+                          <?php elseif ($data->payment_status == 3) : ?>
+                            <span class="badge badge-danger">Gagal</span>
+                          <?php endif; ?>
+                        </b></td>
+                    </tr>
+                  <?php endif; ?>
+                <?php endif; ?>
+            </div>
+
             <?php if ($data->payment_price != NULL) : ?>
               <div class="card-footer">
                 <form action="<?php echo site_url('admin/payments/verify'); ?>" method="POST">
@@ -474,19 +518,19 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <input type="hidden" name="order" value="<?php echo $data->id; ?>">
 
                     <!-- FORM VERIFY PAYMENTS  -->
-                    <!-- <div class="col-md-9">
-                        <select class="form-control" name="action">
-                          <?php if ($data->payment_status == 1) : ?>
-                            <option value="1">Konfirmasi Pembayaran</option>
-                            <option value="2">Pembayaran Tidak Ada</option>
-                          <?php else : ?>
-                            <option value="4" readonly>Tidak ada pilihan</option>
-                          <?php endif; ?>
-                        </select>
-                      </div>
-                      <div class="col-md-3 text-right">
-                        <input type="submit" class="btn btn-primary" value="OK">
-                      </div> -->
+                    <div class="col-md-9">
+                      <select class="form-control" name="action">
+                        <?php if ($data->payment_status == 1) : ?>
+                          <option value="1">Konfirmasi Pembayaran</option>
+                          <option value="2">Pembayaran Tidak Ada</option>
+                        <?php else : ?>
+                          <option value="4" readonly>Tidak ada pilihan</option>
+                        <?php endif; ?>
+                      </select>
+                    </div>
+                    <div class="col-md-3 text-right">
+                      <input type="submit" class="btn btn-primary" value="OK">
+                    </div>
 
                   </div>
                 </form>

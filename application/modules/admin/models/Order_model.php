@@ -563,6 +563,7 @@ class Order_model extends CI_Model
                 (o.payment_method = 1 &&  o.order_status = 3)
                 -- OR (o.payment_method = 2 AND o.order_status = 3 AND py.payment_status = 2)
                 OR (o.payment_method = 2 AND o.order_status = 3 )
+                OR (o.payment_method = 3 AND o.order_status = 3 )
             GROUP BY o.id
             ORDER BY o.order_date DESC
         ");
@@ -1209,6 +1210,15 @@ class Order_model extends CI_Model
                     'shipping_cost' => $data['shipping_cost'],
                     'insurance' => $data['insurance'],
                     'order_status' => 3
+                ));
+        } else if ($data['order_status'] == 11) {
+            $this->db->where('id', $data['id'])
+                ->update('orders', array(
+                    'invoice_number' => $data['invoice_number'],
+                    'ttb_number' => $data['ttb_number'],
+                    'shipping_cost' => $data['shipping_cost'],
+                    'insurance' => $data['insurance'],
+                    'order_status' => 2
                 ));
         } else {
             $status = ($data['payment_method'] == 1) ? '3' : '2';

@@ -447,9 +447,7 @@ class Orders extends CI_Controller
                 $data['insurance'] = $this->input->post('insurance');
                 $data['payment_method'] = $this->input->post('payment_method');
                 $data['order_status']   = $this->input->post('order_status');
-
                 $this->order->verify($data);
-
                 redirect('admin/orders/view/' . $data['id']);
                 break;
             case 'update_harga':

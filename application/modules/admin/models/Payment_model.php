@@ -60,6 +60,8 @@ class Payment_model extends CI_Model
             $this->db->where('id', $order_id)->update('orders', array('order_status' => 3));
         } else if ($payment_method == 1) {
             $this->db->where('id', $order_id)->update('orders', array('order_status' => 6));
+        } else if ($payment_method == 3) {
+            $this->db->where('id', $order_id)->update('orders', array('order_status' => 3));
         }
         return $this->db->where('id', $id)->update('payments', array('payment_status' => $status));
     }

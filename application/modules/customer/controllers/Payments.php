@@ -133,7 +133,7 @@ class Payments extends CI_Controller
                 'payment_price' => $transfer,
                 'payment_date' => date('Y-m-d H:i:s'),
                 'picture_name' => $picture_name,
-                'payment_status' => '0',
+                'payment_status' => '1',
                 'payment_data' => json_encode(array(
                     'order_id' => $order_id,
                     'bank_name' => $bank_name,
