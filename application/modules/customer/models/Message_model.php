@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Message_model extends CI_Model {
+class Message_model extends CI_Model
+{
     public $user_id;
 
     public function __construct()
@@ -11,7 +12,7 @@ class Message_model extends CI_Model {
         $this->user_id = get_current_user_id();
     }
 
-    public function send(Array $data)
+    public function send(array $data)
     {
         $this->db->insert('message', $data);
 
@@ -35,13 +36,13 @@ class Message_model extends CI_Model {
     {
         $id = $this->user_id;
 
-        return $this->db->where(array('customer_id'=>$id, 'status'=>2, 'chat_from'=>1))->get('message')->num_rows();
+        return $this->db->where(array('customer_id' => $id, 'status' => 2, 'chat_from' => 1))->get('message')->num_rows();
     }
 
     public function read_all_messages()
     {
         $id = $this->user_id;
 
-        return $this->db->where(array('customer_id'=>$id, 'chat_from'=>1))->update('message', array('status' => 1));
+        return $this->db->where(array('customer_id' => $id, 'chat_from' => 1))->update('message', array('status' => 1));
     }
 }

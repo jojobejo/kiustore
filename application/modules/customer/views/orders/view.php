@@ -372,8 +372,21 @@ $banks = (array) json_decode(get_settings('payment_banks'));
 
             <?php elseif ($data->payment_method == 3) : ?>
                 <?php if ($data->order_status == 1) : ?>
-                    <div class="alert alert-info m-2 w-100">Pesanan dalam proses sales , Sales Akan melakukan Update Ongkir</div>
+
+                    <div class="shipping-method-choose mb-3">
+                        <div class="alert alert-info">Ekspedisi
+                            </br>
+                            &nbsp;- &nbsp; Pelanggan diharapkan untuk menghubungi admin untuk menentukan metode pengiriman dan biaya ongkir. </br>
+                            &nbsp;- &nbsp; Biaya ongkir akan dihitung berdasarkan lokasi pengiriman dan berat total barang yang dipesan. </br>
+                            &nbsp;- &nbsp; Estimasi waktu pengiriman akan diinformasikan setelah pelanggan menghubungi admin dan menentukan metode pengiriman. </br>
+                            &nbsp;- &nbsp; Pelanggan dapat menghubungi admin melalui fitur chat atau kontak yang tersedia di website untuk mendapatkan informasi lebih lanjut tentang metode pengiriman, biaya ongkir, dan estimasi waktu pengiriman. </br>
+                            </br>
+
+                        </div>
+                    </div>
                     <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
+
+
                 <?php elseif ($data->order_status == 2) : ?>
                     <?php if ($data->payment_status == 3) : ?>
                         <div class="alert alert-info m-2 w-100">Pembayaran Gagal / Kurang Bayar</div>
@@ -416,6 +429,29 @@ $banks = (array) json_decode(get_settings('payment_banks'));
                     <div class="alert alert-info m-2 w-100">Pesanan dibatalkan</div>
                 <?php elseif ($data->order_status == 10) : ?>
                     <div class="alert alert-info m-2 w-100">Verifikasi pembayaran oleh admin</div>
+                <?php elseif ($data->order_status == 11) : ?>
+                    <div class="shipping-method-choose mb-3">
+                        <div class="alert alert-info">Ekspedisi
+                            </br>
+                            &nbsp;- &nbsp; Pelanggan diharapkan untuk menghubungi admin untuk menentukan metode pengiriman dan biaya ongkir. </br>
+                            &nbsp;- &nbsp; Biaya ongkir akan dihitung berdasarkan lokasi pengiriman dan berat total barang yang dipesan. </br>
+                            &nbsp;- &nbsp; Estimasi waktu pengiriman akan diinformasikan setelah pelanggan menghubungi admin dan menentukan metode pengiriman. </br>
+                            &nbsp;- &nbsp; Pelanggan dapat menghubungi admin melalui fitur chat atau kontak yang tersedia di website untuk mendapatkan informasi lebih lanjut tentang metode pengiriman, biaya ongkir, dan estimasi waktu pengiriman. </br>
+                            <div class="alert alert-warning mt-3 mb-3">
+                                <strong>Catatan:</strong> Jika pelanggan tidak menghubungi admin untuk menentukan metode pengiriman dan biaya ongkir dalam waktu 1x24 jam maka pesanan akan otomatis dibatalkan oleh sistem.
+                            </div>
+                            <div class="row">
+                                <div class="col-md">
+                                    <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
+                                </div>
+                                <div class="col-md">
+                                    <a href="<?= base_url('message?auto_text=1') ?>" class="btn btn-warning w-100" id="btnChatsales">Chat Dengan Sales Admin</a>
+                                </div>
+                            </div>
+                            </br>
+                        </div>
+                    </div>
+
                 <?php endif; ?>
             <?php endif; ?>
         </div>
@@ -888,6 +924,67 @@ $banks = (array) json_decode(get_settings('payment_banks'));
     </script>
 
 <?php endif; ?>
+
+<?php if ($data->payment_method == 3 && $data->order_status == 1 || $data->payment_method == 3 && $data->order_status == 11) : ?>
+    <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Batalkan Pesanan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Anda yakin ingin membatalkan pesanan? </p>
+                    <input type="text" name="del_va" id="del_va" value="<?= $data->order_id ?>" hidden>
+                    <input type="text" name="del_no" id="del_no" value="<?= $data->number_ordered ?>" hidden>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger cancel-btn">Batalkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('.cancel-btn').click(function(e) {
+            e.preventDefault();
+
+            let delVa = $('#del_va').val();
+
+            $(this).html('<i class="fa fa-spin fa-spinner"></i> Membatalkan...');
+
+            $.ajax({
+                method: 'POST',
+                url: '<?php echo site_url('customer/orders/order_api?action=cancel_order_tf'); ?>',
+                data: {
+                    del_va: delVa
+                },
+                context: this,
+                success: function(res) {
+                    if (res.code == 200) {
+                        console.log("Response dari server:", res);
+                        $(this).html('Batalkan');
+
+                        if (res.success) {
+                            $('.statusField').text('Dibatalkan');
+                            $('.actionRow').html('Order dibatalkan');
+                        } else if (res.error) {
+                            $('.actionRow').html(res.message);
+                        }
+
+                        setTimeout(() => {
+                            $('#cancelModal').modal('hide');
+                            location.reload();
+                        }, 1000);
+                    }
+                }
+            })
+        })
+    </script>
+<?php endif; ?>
+
+
 
 <?php if ($data->order_status == 2) : ?>
     <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

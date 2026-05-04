@@ -43,107 +43,142 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <?php foreach ($kdchart as $kd) : ?>
                                 <input type="text" value="<?= $kd->kdchart ?>" name="kdfaktur" id="kdfaktur" hidden>
                             <?php endforeach; ?>
+
+                            <?php foreach ($is_ongkir as $isongkir) : ?>
+                                <?php if ($isongkir->ongkir == 0) : ?>
+                                    <div class="shipping-method-choose mb-3">
+                                        <div class="alert alert-info">Metode Pembayaran</div>
+                                        <div class="card shipping-method-choose-card">
+                                            <div class="card-body">
+                                                <div class="payment-method-choose">
+                                                    <div class="row">
+                                                        <!-- Net Banking Option Start -->
+                                                        <div class="input-box col-6">
+                                                            <input type="radio" name="payment" id="transfer" value="2" />
+                                                            <label class="form-check-label" for="cod">VA - KARISMA </label>
+                                                        </div>
+                                                        <div class="input-box col-6">
+                                                            <input type="radio" name="payment" id="tfbank" value="3" />
+                                                            <label class="form-check-label" for="cod">TRANSFER BANK</label>
+                                                        </div>
+                                                        <!-- Net Banking Option End -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="shipping-method-choose mb-3">
+                                        <div class="alert alert-info">Ekspedisi
+                                            </br>
+                                            &nbsp;- &nbsp; Pelanggan diharapkan untuk menghubungi admin untuk menentukan metode pengiriman dan biaya ongkir. </br>
+                                            &nbsp;- &nbsp; Biaya ongkir akan dihitung berdasarkan lokasi pengiriman dan berat total barang yang dipesan. </br>
+                                            &nbsp;- &nbsp; Estimasi waktu pengiriman akan diinformasikan setelah pelanggan menghubungi admin dan menentukan metode pengiriman. </br>
+                                            &nbsp;- &nbsp; Pelanggan dapat menghubungi admin melalui fitur chat atau kontak yang tersedia di website untuk mendapatkan informasi lebih lanjut tentang metode pengiriman, biaya ongkir, dan estimasi waktu pengiriman. </br>
+                                            </br>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-3">
+                                                <a href="https://www.jtcargo.id/networkQuery?type=2&senderAddressVal=&receiveAddressVal=&sender=%7B%22areaId%22%3A%22%22,%22cityId%22%3A%22%22,%22provinceId%22%3A%22%22%7D&receive=%7B%22areaId%22%3A%22%22,%22cityId%22%3A%22%22,%22provinceId%22%3A%22%22%7D&weight" class="btn btn-primary btn-sm w-100" target="_blank">J&T Cargo</a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="https://indahonline.com/shipping/rates" class="btn btn-primary btn-sm w-100" target="_blank">Indah Cargo</a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="https://sentralcargo.co.id/ongkir" class="btn btn-primary btn-sm w-100" target="_blank">Sentral Cargo</a>
+                                            </div>
+                                            <div class="col-3">
+                                                <a href="https://barakaexpress.co.id/cek-tarif/" class="btn btn-primary btn-sm w-100" target="_blank">Baraka Express</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <!-- shipping method choose-->
+
+                                    <div class="shipping-method-choose mb-3" hidden>
+                                        <div class="alert alert-info m-2">Metode Pengiriman</div>
+                                        <div class="card shipping-method-choose-card">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="input-box col-6">
+                                                        <input type="text" value="KARISMA" name="jns_shipping" id="jns_shipping" hidden>
+                                                        <input id="karisma" name="shipping" type="radio" value="9" checked>
+                                                        PT. Karisma Indoagro Universal
+                                                        <label for="karisma"></label>
+                                                        <div class="check"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <?php else : ?>
+                                    <?php foreach ($jasa_ongkir as $j) :
+                                        $now = date('Y-m-d');
+                                        $jsongkir = explode(';', $j->jsongkir);
+                                        $expedisis = $j->sjasa;
+                                        $expedisi = $j->sjasa;
+                                        if ($expedisi == "jne") {
+                                            $expedisi = 'JNE';
+                                        } elseif ($expedisi == "pos") {
+                                            $expedisi = 'POS INDONESIA';
+                                        } elseif ($expedisi == "tiki") {
+                                            $expedisi = 'TIKI';
+                                        }
+                                    ?>
+                                        <div hidden>
+                                            <input type="text" value="<?= $expedisis ?>" name="jns_shipping" id="jns_shipping">
+                                            <input type="text" value="<?= $jsongkir['3'] ?> Hari" name="estimasi" id="estimasi">
+                                            <input type="text" value="<?= $jsongkir['4'] ?>" name="ongkirprice" id="ongkirprice">
+                                            <input type="text" value="<?= $j->kd_faktur ?>" name="kdfaktur" id="kdfaktur">
+                                        </div>
+                                        <!-- Payment Method Choose-->
+                                        <div class="shipping-method-choose mb-3">
+                                            <div class="alert alert-info m-2">Metode Pembayaran</div>
+                                            <div class="card shipping-method-choose-card">
+                                                <div class="card-body">
+                                                    <div class="payment-method-choose">
+                                                        <div class="row">
+                                                            <div class="input-box col-6">
+                                                                <input type="radio" name="payment" id="transfer" value="2" checked />
+                                                                <label class="form-check-label" for="transfer">Virtual Account Karisma</label>
+                                                            </div>
+                                                            <div class="input-box col-6">
+                                                                <input type="radio" name="payment" id="tfbank" value="3" checked />
+                                                                <label class="form-check-label" for="cod">Transfer Bank</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- shipping method choose-->
+                                        <div class="shipping-method-choose mb-3">
+                                            <div class="alert alert-info m-2">Metode Pengiriman</div>
+                                            <div class="card shipping-method-choose-card">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="input-box col-6">
+                                                            <input id="expiedisi" name="shipping" type="radio" value="5" checked>
+                                                            <label for="karisma"><?= $expedisi ?> - <?= $jsongkir['1'] ?> (<?= $jsongkir['2'] ?>), Estimasi : <?= $jsongkir['3'] ?> (Rp. <?= number_format($jsongkir['4'], 0) ?>)</label>
+                                                            <div class="check"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+
                         </div>
                     </div>
-                </div>
-                <?php foreach ($is_ongkir as $isongkir) : ?>
-                    <?php if ($isongkir->ongkir == 0) : ?>
-                        <div class="shipping-method-choose mb-3">
-                            <div class="alert alert-info m-2">Metode Pembayaran</div>
-                            <div class="card shipping-method-choose-card">
-                                <div class="card-body">
-                                    <div class="payment-method-choose">
-                                        <div class="row">
-                                            <!-- Net Banking Option Start -->
-                                            <div class="input-box col-6">
-                                                <input type="radio" name="payment" id="transfer" value="2" checked />
-                                                <label class="form-check-label" for="cod">VA - KARISMA </label>
-                                            </div>
-                                            <div class="input-box col-6">
-                                                <input type="radio" name="payment" id="tfbank" value="3" checked />
-                                                <label class="form-check-label" for="cod">Transfer Bank</label>
-                                            </div>
-                                            <!-- Net Banking Option End -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- shipping method choose-->
-                        <div class="shipping-method-choose mb-3">
-                            <div class="alert alert-info m-2">Metode Pengiriman</div>
-                            <div class="card shipping-method-choose-card">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="input-box col-6">
-                                            <input type="text" value="KARISMA" name="jns_shipping" id="jns_shipping" hidden>
-                                            <input id="karisma" name="shipping" type="radio" value="1" checked>
-                                            <label for="karisma">PT. Karisma Indoagro Universal</label>
-                                            <div class="check"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    <?php else : ?>
-                        <?php foreach ($jasa_ongkir as $j) :
-                            $now = date('Y-m-d');
-                            $jsongkir = explode(';', $j->jsongkir);
-                            $expedisis = $j->sjasa;
-                            $expedisi = $j->sjasa;
-                            if ($expedisi == "jne") {
-                                $expedisi = 'JNE';
-                            } elseif ($expedisi == "pos") {
-                                $expedisi = 'POS INDONESIA';
-                            } elseif ($expedisi == "tiki") {
-                                $expedisi = 'TIKI';
-                            }
-                        ?>
-                            <div hidden>
-                                <input type="text" value="<?= $expedisis ?>" name="jns_shipping" id="jns_shipping">
-                                <input type="text" value="<?= $jsongkir['3'] ?> Hari" name="estimasi" id="estimasi">
-                                <input type="text" value="<?= $jsongkir['4'] ?>" name="ongkirprice" id="ongkirprice">
-                                <input type="text" value="<?= $j->kd_faktur ?>" name="kdfaktur" id="kdfaktur">
-                            </div>
-                            <!-- Payment Method Choose-->
-                            <div class="shipping-method-choose mb-3">
-                                <div class="alert alert-info m-2">Metode Pembayaran</div>
-                                <div class="card shipping-method-choose-card">
-                                    <div class="card-body">
-                                        <div class="payment-method-choose">
-                                            <div class="row">
-                                                <div class="input-box col-6">
-                                                    <input type="radio" name="payment" id="transfer" value="2" checked />
-                                                    <label class="form-check-label" for="transfer">Virtual Account Karisma</label>
-                                                </div>
-                                                <div class="input-box col-6">
-                                                    <input type="radio" name="payment" id="tfbank" value="3" checked />
-                                                    <label class="form-check-label" for="cod">Transfer Bank</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- shipping method choose-->
-                            <div class="shipping-method-choose mb-3">
-                                <div class="alert alert-info m-2">Metode Pengiriman</div>
-                                <div class="card shipping-method-choose-card">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="input-box col-6">
-                                                <input id="expiedisi" name="shipping" type="radio" value="5" checked>
-                                                <label for="karisma"><?= $expedisi ?> - <?= $jsongkir['1'] ?> (<?= $jsongkir['2'] ?>), Estimasi : <?= $jsongkir['3'] ?> (Rp. <?= number_format($jsongkir['4'], 0) ?>)</label>
-                                                <div class="check"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                <?php endforeach; ?>
+                </div>
+
 
                 <!-- Cart Amount Area-->
                 <div class="card cart-amount-area mb-10">

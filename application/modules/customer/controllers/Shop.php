@@ -735,7 +735,7 @@ class Shop extends CI_Controller
                         'coupon_id' => $coupon_id,
                         'order_number' => $order_number,
                         'kd_faktur' => $kdfaktur,
-                        'order_status' => 2,
+                        'order_status' => 11,
                         'order_date' => $order_date,
                         'total_price' => $total_price,
                         'total_items' => count($quantity),

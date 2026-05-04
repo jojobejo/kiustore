@@ -470,6 +470,8 @@ if (!function_exists('get_order_status')) {
             return '<span class="badge bg-warning">Dalam Pengajuan Kredit</span>';
         else if ($status == 10)
             return '<span class="badge bg-warning">Payment Verify</span>';
+        else if ($status == 11)
+            return '<span class="badge bg-warning">Tentukan Metode Pengiriman Anda</span>';
         else if ($status == null)
             return '<span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span>';
     }
@@ -498,6 +500,8 @@ if (!function_exists('get_payment_methods')) {
             return '<span class="badge bg-warning">Dalam Pengajuan Kredit</span>';
         else if ($payment == 10)
             return '<span class="badge bg-warning">Payment Verify</span>';
+        else if ($payment == 11)
+            return '<span class="badge bg-warning">On Prosess || Tentukan Metode Pengiriman Anda</span>';
     }
 }
 
@@ -547,6 +551,8 @@ if (!function_exists('get_payment_method')) {
         if ($payment == 1)
             return 'Kredit';
         else if ($payment == 2)
+            return 'Virtual Account';
+        else if ($payment == 3)
             return 'Transfer Bank';
     }
 }

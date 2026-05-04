@@ -88,13 +88,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <td>Metode pembayaran</td>
                 <td><b>
                     <?php echo ($data->payment_method == 1) ? 'Kredit' : ''; ?>
-                    <?php echo ($data->payment_method == 2) ? 'Transfer Bank' : ''; ?>
+                    <?php echo ($data->payment_method == 2) ? 'Virtual Account' : ''; ?>
+                    <?php echo ($data->payment_method == 3) ? 'Transfer Bank' : ''; ?>
                   </b></td>
               </tr>
               <tr>
                 <td>Metode pengiriman</td>
                 <td><b>
                     <?php echo ($data->shipping_method == 1) ? 'PT. Karisma Indoagro Universal' : ''; ?>
+                    <?php echo ($data->shipping_method == 9) ? 'Ekspedisi Luar' : ''; ?>
                   </b></td>
               </tr>
               <tr>
@@ -105,8 +107,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <td>Status</td>
                 <?php if ($data->payment_method == 5) : ?>
                   <td><b class="statusField"><?php echo get_order_status($data->order_status, $data->payment_method); ?></b></td>
-                <?php elseif ($data->payment_method == 3) : ?>
-                  <td><span class="badge bg-warning">Menunggu Konfirmasi Pembayaran</span></b></td>
+                <?php else : ?>
+                  <td><b class="statusField"><?php echo get_order_status($data->order_status, $data->payment_method); ?></b></td>
                 <?php endif; ?>
               </tr>
               <?php if ($data->payment_method == 5) : ?>
@@ -202,30 +204,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <input type="hidden" value="<?php echo $data->id; ?>" name="id">
                     <input type="hidden" value="<?php echo $data->payment_method; ?>" name="payment_method">
                     <input type="hidden" value="<?php echo $data->order_status; ?>" name="order_status">
-                    <?php if ($data->order_status == '1' || $data->order_status == '9') : ?>
+                    <?php if ($data->order_status == '1' || $data->order_status == '9' || $data->order_status == '11') : ?>
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" required>
                     <?php else : ?>
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" readonly>
                     <?php endif; ?>
                   </td>
                 </tr>
-
-                <!--  <tr>
-                          <td>No. TTB</td>
-                          <td>
-                              <input type="text" value="<?php echo $data->ttb_number; ?>" class="form-control form-control-sm" name="ttb_number">
-                          </td>
-                      </tr> -->
                 <?php if (admin_role() != 'distribusi') { ?>
-                  <!--
-                  <tr>
-                    <td>Tgl Jatuh Tempo</td>
-                    <td>
-                      <input type="date" value="<?php echo $data->due_date; ?>" class="form-control form-control-sm" name="due_date">
-                    </td>
-                  </tr> -->
 
-                  <?php if ($data->order_status == '1' || $data->order_status == '9') : ?>
+                  <?php if ($data->order_status == '1' || $data->order_status == '9' || $data->order_status == '11') : ?>
                     <tr>
                       <td>Ongkir</td>
                       <td>
@@ -255,12 +243,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <tr>
                     <td></td>
                     <td>
-                      <?php if ($data->order_status == '1') : ?>
+                      <?php if ($data->order_status == '1' || $data->order_status == '11') : ?>
                         <div class="col-md-3 text-right">
                           <input type="submit" class="btn btn-primary" value="OK">
                         </div>
                       <?php elseif ($data->order_status == '9') : ?>
-
                         <?php if (!empty($kredit)) : ?>
                           <?php
                           $selisih = $kredit->max_credit - $kredit->tagihan;

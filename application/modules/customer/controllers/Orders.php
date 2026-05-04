@@ -27,11 +27,14 @@ class Orders extends CI_Controller
         $orders['cancel'] = 0;
         $orders['all']  = 0;
         // $orders['cancel'] = 0;
+
         foreach ($orders['orders'] as $dt) {
             if (($dt->payment_method == 2 &&  $dt->order_status == 2) || ($dt->payment_method == 1 && $dt->order_status == 2)) {
                 $orders['unpaid']++;
             }
-            if (($dt->payment_method == 2 &&  $dt->order_status == 1) || ($dt->payment_method == 1 && $dt->order_status == 9) || ($dt->payment_method == 2 &&  $dt->order_status == 3) || ($dt->payment_method == 2 &&  $dt->order_status == 8) || ($dt->payment_method == 1 &&  $dt->order_status == 1) || ($dt->payment_method == 1 &&  $dt->order_status == 3)) {
+            if (($dt->payment_method == 2 &&  $dt->order_status == 1) || ($dt->payment_method == 1 && $dt->order_status == 9) || ($dt->payment_method == 2 &&  $dt->order_status == 3) || ($dt->payment_method == 2 &&  $dt->order_status == 8) || ($dt->payment_method == 1 &&  $dt->order_status == 1) || ($dt->payment_method == 1 &&  $dt->order_status == 3)
+                || ($dt->payment_method == 3 &&  $dt->order_status == 11)
+            ) {
                 $orders['process']++;
             }
             if (($dt->payment_method == 2 &&  $dt->order_status == 4) || ($dt->payment_method == 1 &&  $dt->order_status == 4)) {
@@ -294,6 +297,7 @@ class Orders extends CI_Controller
                     $response = array('code' => 200, 'error' => TRUE, 'message' => 'Order tidak dapat diterima. payment method=' . $data->payment_method . ' order status=' . $data->order_status);
                 }
                 break;
+
             case 'cancel_order':
                 $id = $this->input->post('id');
                 $del_va = $this->input->post('del_va');
@@ -302,11 +306,29 @@ class Orders extends CI_Controller
 
                 if (($data->payment_method == 1 && $data->order_status == 1) ||
                     ($data->payment_method == 2 && $data->order_status == 1) ||
-                    ($data->payment_method == 2 && $data->order_status == 2)
+                    ($data->payment_method == 2 && $data->order_status == 2) ||
+                    ($data->payment_method == 3 && $data->order_status == 1)
                 ) {
                     $this->order->cancel_order($id);
                     $this->order->delete_va($del_va);
                     $this->brivaws->deleteVa($del_no, $del_va);
+                    $response = array('code' => 200, 'success' => TRUE, 'message' => 'Order dibatalkan');
+                } else {
+                    $response = array('code' => 200, 'error' => TRUE, 'message' => 'Order tidak dapat dibatalkan. payment method=' . $data->payment_method . ' order status=' . $data->order_status);
+                }
+                break;
+
+            case 'cancel_order_tf':
+
+                $del_va     = $this->input->post('del_va');
+                $data       = $this->order->order_data($del_va);
+
+                if (($data->payment_method == 1 && $data->order_status == 1) ||
+                    ($data->payment_method == 2 && $data->order_status == 1) ||
+                    ($data->payment_method == 2 && $data->order_status == 2) ||
+                    ($data->payment_method == 3 && $data->order_status == 1)
+                ) {
+                    $this->order->cancel_order($del_va);
                     $response = array('code' => 200, 'success' => TRUE, 'message' => 'Order dibatalkan');
                 } else {
                     $response = array('code' => 200, 'error' => TRUE, 'message' => 'Order tidak dapat dibatalkan. payment method=' . $data->payment_method . ' order status=' . $data->order_status);

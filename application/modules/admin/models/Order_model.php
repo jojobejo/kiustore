@@ -428,8 +428,7 @@ class Order_model extends CI_Model
     {
         $id = $this->user_id;
         if (admin_role() == 'admin') {
-            $orders = $this->db->query("
-                SELECT
+            $orders = $this->db->query("SELECT
                     o.id
                     , o.order_number
                     , o.order_date
@@ -468,14 +467,14 @@ class Order_model extends CI_Model
                     OR (o.payment_method = 1 &&  o.order_status = 1)
                     OR (o.payment_method = 1 && o.order_status = 9)
                     OR (o.payment_method = 1 &&  o.order_status = 3)
+                    OR (o.payment_method = 3 &&  o.order_status = 11)
                 GROUP BY o.id
                 ORDER BY o.order_date DESC
             ");
 
             return $orders->result();
         } else {
-            $orders = $this->db->query("
-                SELECT
+            $orders = $this->db->query("SELECT
                     o.id
                     , o.order_number
                     , o.order_date

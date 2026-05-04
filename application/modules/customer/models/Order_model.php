@@ -31,8 +31,7 @@ class Order_model extends CI_Model
         $id = $this->user_id;
 
         if ($filter == 'semua') {
-            $orders = $this->db->query("
-            SELECT
+            $orders = $this->db->query("SELECT
                   o.id,
                   SUM(oi.order_qty * oi.order_price) AS total_belanja,
                   o.order_number,

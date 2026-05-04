@@ -92,7 +92,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
     <div class="tab-pane fade" id="catagories2" role="tabpanel" aria-labelledby="catagories2-tab">
       <?php foreach ($orders as $order) : ?>
-        <?php if (($order->payment_method == 2 &&  $order->order_status == 1) || ($order->payment_method == 1 && $order->order_status == 9) || ($order->payment_method == 2 &&  $order->order_status == 3) || ($order->payment_method == 2 &&  $order->order_status == 8) || ($order->payment_method == 1 &&  $order->order_status == 1) || ($order->payment_method == 1 &&  $order->order_status == 3)) : ?>
+        <?php if (($order->payment_method == 2 &&  $order->order_status == 1) || ($order->payment_method == 1 && $order->order_status == 9) || ($order->payment_method == 2 &&  $order->order_status == 3) || ($order->payment_method == 2 &&  $order->order_status == 8) || ($order->payment_method == 1 &&  $order->order_status == 1) || ($order->payment_method == 1 &&  $order->order_status == 3) || ($order->payment_method == 3 && $order->order_status == 11) ) : ?>
           <div class="order-box">
             <div class="media">
               <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number; ?>" class="content-box">
