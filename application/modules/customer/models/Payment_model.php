@@ -58,6 +58,13 @@ class Payment_model extends CI_Model
         return $this->db->insert_id();
     }
 
+    public function register_payment_api($id, array $data)
+    {
+        $this->db->where('id', $id)->update('orders', array('order_status' => 8));
+        $this->db->insert('briva_api', $data);
+        return $this->db->insert_id();
+    }
+
     public function payment_list()
     {
         $id = $this->user_id;

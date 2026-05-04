@@ -110,6 +110,9 @@ class Payments extends CI_Controller
             $name = $this->input->post('name');
             $bank = $this->input->post('bank');
 
+            $order_number = $this->input->post('number_order');
+            $userid = $this->input->post('user_id');
+
             $config['upload_path'] = './assets/uploads/payments/';
             $config['allowed_types'] = 'jpg|jpeg|png';
             $config['max_size'] = 5096;
@@ -128,11 +131,33 @@ class Payments extends CI_Controller
             $payment = array(
                 'order_id' => $order_id,
                 'payment_price' => $transfer,
-                'payment_date' => 0,
+                'payment_date' => date('Y-m-d H:i:s'),
                 'picture_name' => $picture_name,
-                'payment_status' => 0
+                'payment_status' => '0',
+                'payment_data' => json_encode(array(
+                    'order_id' => $order_id,
+                    'bank_name' => $bank_name,
+                    'bank_number' => $bank_number,
+                    'transfer' => $transfer,
+                    'bank' => $bank,
+                    'name' => $name,
+                    'name_duplicate' => $name
+                ))
             );
+
+            $regist_payment_api = array(
+                'order_number' => $order_number,
+                'user_id' => $userid,
+                'name' => $name,
+                'va_code' => '0',
+                'userno' => '0',
+                'total_price_topay' => $transfer,
+                'status' => '1'
+            );
+
             $this->payment->register_payment($order_id, $payment);
+            $this->payment->register_payment_api($order_id, $regist_payment_api);
+
             $this->session->set_flashdata('payment_flash', 'Konfirmasi berhasil dilakukan. Admin akan memverifikasinya dalam waktu 1x24 jam');
 
             redirect('order_history');

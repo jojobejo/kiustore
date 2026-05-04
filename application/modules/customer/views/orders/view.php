@@ -432,7 +432,11 @@ $banks = (array) json_decode(get_settings('payment_banks'));
             </div>
             <?php echo form_open_multipart('customer/payments/do_confirm'); ?>
             <div class="modal-body">
+
                 <input type="hidden" name="order_id" value="<?= $data->order_id ?>">
+                <input type="hidden" name="number_order" value="<?= $data->number_ordered; ?>">
+                <input type="hidden" name="user_id" value="<?= $data->user_id ?>">
+
                 <div class="mb-3">
                     <label class="form-label">Nama Bank Pengirim</label>
                     <input type="text" name="bank_name" class="form-control" required>
