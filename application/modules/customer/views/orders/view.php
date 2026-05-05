@@ -473,17 +473,17 @@ $banks = (array) json_decode(get_settings('payment_banks'));
                 <input type="hidden" name="number_order" value="<?= $data->number_ordered; ?>">
                 <input type="hidden" name="user_id" value="<?= $data->user_id ?>">
 
-                <div class="mb-3">
+                <div class="mb-3" hidden>
                     <label class="form-label">Nama Bank Pengirim</label>
-                    <input type="text" name="bank_name" class="form-control" required>
+                    <input type="text" name="bank_name" class="form-control" value="<?= $customer->name ?>" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" hidden>
                     <label class="form-label">No. Rekening Pengirim</label>
-                    <input type="text" name="bank_number" class="form-control" required>
+                    <input type="text" name="bank_number" class="form-control" value="0" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3" hidden>
                     <label class="form-label">Nama Pengirim</label>
-                    <input type="text" name="name" class="form-control" value="<?= isset($data->name) ? htmlspecialchars($data->name, ENT_QUOTES, 'UTF-8') : '' ?>" required>
+                    <input type="text" name="name" class="form-control" value="<?= $customer->name ?>" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Jumlah Transfer</label>
@@ -809,7 +809,10 @@ $banks = (array) json_decode(get_settings('payment_banks'));
 </script>
 
 
-<?php if (($data->payment_method == 2 && $data->order_status == 4) || ($data->payment_method == 1 && $data->order_status == 4)) : ?>
+<?php if (($data->payment_method == 2 && $data->order_status == 4) ||
+    ($data->payment_method == 1 && $data->order_status == 4) ||
+    ($data->payment_method == 3 && $data->order_status == 4)
+) : ?>
     <div class="modal fade" id="terimaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

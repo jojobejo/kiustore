@@ -290,7 +290,7 @@ class Orders extends CI_Controller
                 $id = $this->input->post('id');
                 $data = $this->order->order_data($id);
 
-                if (($data->payment_method == 2 && $data->order_status == 4) || ($data->payment_method == 1 && $data->order_status == 4)) {
+                if (($data->payment_method == 2 && $data->order_status == 4) || ($data->payment_method == 1 && $data->order_status == 4) || ($data->payment_method == 3 && $data->order_status == 4)) {
                     $this->order->terima_order($_POST);
                     $response = array('code' => 200, 'success' => TRUE, 'message' => 'Order diterima');
                 } else {

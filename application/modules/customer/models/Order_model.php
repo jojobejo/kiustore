@@ -713,8 +713,7 @@ class Order_model extends CI_Model
 
     public function get_data_customer($id)
     {
-        $customer = $this->db->query("
-        SELECT
+        $customer = $this->db->query("SELECT
             c.user_id as id,
             c.max_credit,
             c.profile_picture,
