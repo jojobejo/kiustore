@@ -80,6 +80,7 @@ $route['cus_edit_customer/(:any)']          = 'customer/profile/cus_editdata/$1'
 $route['edit_profile_cust/(:any)']          = 'customer/profile/cus_edit_profile/$1';
 $route['sv_alamatcus']                      = 'customer/profile/';
 $route['change_alamat_customer_profile']    = 'customer/profile/change_alamat_asal';
+$route['change_password']                   = 'customer/profile/change_password';
 $route['message']                           = 'customer/message';
 $route['send_message']                      = 'customer/message/send';
 $route['count_unread_messages']             = 'customer/message/count_unread';

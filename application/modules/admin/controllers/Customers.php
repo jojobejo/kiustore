@@ -223,6 +223,13 @@ class Customers extends CI_Controller
 
                 $response = array('code' => 204);
                 break;
+            case 'reset_password':
+                $id = $this->input->post('id');
+
+                $this->customer->reset_customer_password($id, '1234');
+
+                $response = array('code' => 200);
+                break;
             case 'edit':
                 $customer['user_id'] = $this->input->post('user_id');
                 $customer['name'] = $this->input->post('names');

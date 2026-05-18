@@ -28,8 +28,6 @@ class Profile extends CI_Controller
 
         // $sisa_after_platinum = $total_silver - ($konv_platinum * 100);
 
-
-
         $params['title']    = $data->name;
         $user['user']       = $data;
         $user['flash']      = $this->session->flashdata('profile');
@@ -275,7 +273,7 @@ class Profile extends CI_Controller
                 $password = password_hash($get_password, PASSWORD_BCRYPT);
             }
 
-            $data->username = $this->input->post('username');
+            $data->email = $this->input->post('username');
             $data->password = $password;
 
             $flash_message = ($this->profile->update_account($data)) ? 'Akun berhasil diperbarui' : 'Terjadi kesalahan';

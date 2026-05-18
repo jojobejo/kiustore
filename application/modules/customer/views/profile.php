@@ -22,6 +22,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <a href="<?= base_url('edit_profile_cust/' . get_user_name_id()) ?>" class="btn btn-md btn-warning mt-2 mb-2 w-100">Edit Profile</a>
                         </span>
                     </div>
+                    <div class="col-auto">
+                        <span class="content-color font-md">
+                            <a href="<?= base_url('change_password') ?>" class="btn btn-md btn-warning mt-2 mb-2 w-100">Ganti Password</a>
+                        </span>
+                    </div>
                 </div>
             </div>
 

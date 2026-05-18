@@ -129,6 +129,31 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </div>
   </div>
 
+  <div class="modal fade" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+    <div class="modal-dialog modal-modal-dialog-centered modal-" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title" id="modal-title-default">Reset Password Pelanggan?</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">Ã—</span>
+          </button>
+        </div>
+        <form action="#" id="resetPasswordCustomer" method="POST">
+
+          <input type="hidden" name="id" value="" class="resetPasswordID">
+
+          <div class="modal-body">
+            <p>Password customer akan diubah ke default <strong>1234</strong>. Lanjutkan?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-warning btn-reset-password">Reset Password</button>
+            <button type="button" class="btn btn-link  ml-auto" data-dismiss="modal">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <link href="<?php echo get_theme_uri('vendor/datatables.net-bs4/css/dataTables.bootstrap4.min.css', 'argon'); ?>" rel="stylesheet">
 
   <script src="<?php echo get_theme_uri('vendor/datatables.net/js/jquery.dataTables.min.js', 'argon'); ?>"></script>
@@ -155,6 +180,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
         $('.deactivateID').val(id);
         $('#deactivateModal').modal('show');
+      });
+
+      $(document).on('click', '.btnKey', function() {
+        var id = $(this).data('id');
+        var btn = $('.btn-reset-password');
+
+        btn.html('Reset Password');
+
+        $('.resetPasswordID').val(id);
+        $('#resetPasswordModal').modal('show');
       });
 
       $(document).on('click', '.btnActivate', function() {
@@ -251,6 +286,34 @@ defined('BASEPATH') or exit('No direct script access allowed');
         })
       });
 
+      $('#resetPasswordCustomer').submit(function(e) {
+        e.preventDefault();
+
+        var id = $('.resetPasswordID').val();
+        var btn = $('.btn-reset-password');
+
+        btn.html('<i class="fa fa-spin fa-spinner"></i> Reset password...');
+
+        $.ajax({
+          method: 'POST',
+          url: '<?php echo site_url('admin/customers/api/reset_password'); ?>',
+          data: {
+            id: id
+          },
+          success: function(res) {
+            if (res.code == 200) {
+              btn.html('<i class="fa fa-check"></i> Password berhasil direset!');
+
+              setTimeout(() => {
+                $('#resetPasswordModal').modal('hide');
+                table.ajax.reload();
+                btn.html('Reset Password');
+              }, 1500);
+            }
+          }
+        })
+      });
+
       var role = '<?= admin_role(); ?>';
       var table = $('#customerList').DataTable({
         "ajax": "<?php echo site_url('admin/customers/api/customers'); ?>",
@@ -315,7 +378,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
               var action = '';
 
               if (row.status == 1) {
-                action = '<div class="text-right"><a href="#" data-id="' + row.id + '" class="btn btn-primary btn-sm btnDeactivate"><i class="fa fa-lock"></i></a> <a href="#" data-id="' + row.id + '" class="btn btn-danger btn-sm btnDelete"><i class="fa fa-trash"></i></a></div>';
+                action = '<div class="text-right"><a href="#" data-id="' + row.id + '" class="btn btn-primary btn-sm btnDeactivate"><i class="fa fa-lock"></i></a><a href="#" data-id="' + row.id + '" class="btn btn-danger btn-sm btnDelete"><i class="fa fa-trash"></i></a><a href="#" data-id="' + row.id + '" class="btn btn-warning btn-sm btnKey"><i class="fa fa-key"></i></a></div>';
               } else {
                 action = '<div class="text-right"><a href="#" data-id="' + row.id + '" class="btn btn-primary btn-sm btnActivate"><i class="fa fa-unlock"></i></a> <a href="#" data-id="' + row.id + '" class="btn btn-danger btn-sm btnDelete"><i class="fa fa-trash"></i></a></div>';
               }

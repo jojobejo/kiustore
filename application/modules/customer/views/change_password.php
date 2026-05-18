@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     </div>
                     <div class="user-info">
                         <h5 class="mb-0"><?php echo get_user_name(); ?></h5>                        
-                        <p class="mb-0 text-dark">@<?php echo $user->username; ?></p>
+                        <p class="mb-0 text-dark">@<?php echo $user->email; ?></p>
                     </div>
                 </div>
             </div>
@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <?php echo form_open('customer/profile/edit_account', array('autocomplete' => 'off')); ?>
                         <div class="mb-3">
                             <div class="title mb-2"><i class="lni lni-user"></i><span>Username</span></div>
-                            <input class="form-control" type="text" id="inputName" name="username" value="<?php echo set_value('username', $user->username); ?>" readonly>
+                            <input class="form-control" type="text" id="inputName" name="username" value="<?php echo set_value('username', $user->email); ?>" readonly>
                         </div>
                         <div class="mb-3">
                             <div class="title mb-2"><i class="lni lni-key"></i><span>Password</span></div>

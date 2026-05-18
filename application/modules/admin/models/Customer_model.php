@@ -104,6 +104,13 @@ class Customer_model extends CI_Model
         $this->db->where('id', $id)->update('users', array('status' => 1));
     }
 
+    public function reset_customer_password($id, $default_password = '1234')
+    {
+        $password = password_hash($default_password, PASSWORD_BCRYPT);
+
+        $this->db->where('id', $id)->update('users', array('password' => $password));
+    }
+
     public function is_customer_exist($id)
     {
         return ($this->db->where('user_id', $id)->get('customers')->num_rows() > 0) ? TRUE : FALSE;
