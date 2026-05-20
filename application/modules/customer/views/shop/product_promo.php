@@ -1,5 +1,19 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
+if (!function_exists('format_customer_price_text')) {
+    function format_customer_price_text($price, $price_2 = null, $price_3 = null, $use_get_price = true)
+    {
+        $formatted_price = $use_get_price ? format_rupiah(get_price($price, $price_2, $price_3)) : format_rupiah($price);
+        $normalized_price = preg_replace('/[^0-9]/', '', (string) $formatted_price);
+
+        if ($normalized_price === '999') {
+            return 'silahkan hubungi admin';
+        }
+
+        return 'Rp ' . $formatted_price;
+    }
+}
 ?>
 <!-- Main Start -->
 <main class="main-wrap index-page mb-xxl">
@@ -26,9 +40,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <div class="content-wrap">
                                 <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>" class="font-sm title-color"><?php echo $product->name; ?> </a>
                                 <?php if ($product->promo == 1) : ?>
-                                    <span class="title-color font-sm">Rp <?php echo format_rupiah(get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3)); ?> <del><small> <?php echo format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?></small></del>
+                                    <span class="title-color font-sm"><?php echo format_customer_price_text($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?> <del><small> <?php echo format_customer_price_text($product->price, $product->price_2, $product->price_3); ?></small></del>
                                     <?php else : ?>
-                                        <span class="title-color font-sm plus-item">Rp <?php echo ($product->promo == 1) ? format_rupiah(get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3))  : format_rupiah(get_price($product->price, $product->price_2, $product->price_3)); ?>
+                                        <span class="title-color font-sm plus-item"><?php echo ($product->promo == 1) ? format_customer_price_text($product->promo_price, $product->promo_price_2, $product->promo_price_3)  : format_customer_price_text($product->price, $product->price_2, $product->price_3); ?>
                                         <?php endif; ?>
 
                                         <!-- <a class="btn btn-success btn-sm add-to-chart add-cart" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->current_discount > 0) ? ($product->price - $product->current_discount) : $product->price; ?>" data-id="<?php echo $product->id; ?>">Beli</a> -->

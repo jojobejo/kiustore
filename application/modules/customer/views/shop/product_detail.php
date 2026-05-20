@@ -1,5 +1,19 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
+if (!function_exists('format_customer_price_text')) {
+  function format_customer_price_text($price, $price_2 = null, $price_3 = null, $use_get_price = true)
+  {
+    $formatted_price = $use_get_price ? get_price($price, $price_2, $price_3) : format_rupiah($price);
+    $normalized_price = preg_replace('/[^0-9]/', '', (string) $formatted_price);
+
+    if ($normalized_price === '999') {
+      return 'silahkan hubungi admin';
+    }
+
+    return 'Rp ' . $formatted_price;
+  }
+}
 ?>
 
 <!-- Main Start -->
@@ -28,9 +42,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
     <div class="price">
       <?php if ($product->promo == 1) : ?>
-        <div class="price"><span>Rp <?php echo get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?></span><del><small>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></small></del></div>
+        <div class="price"><span><?php echo format_customer_price_text($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?></span><del><small><?php echo format_customer_price_text($product->price, $product->price_2, $product->price_3); ?></small></del></div>
       <?php else : ?>
-        <span>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></span>
+        <span><?php echo format_customer_price_text($product->price, $product->price_2, $product->price_3); ?></span>
       <?php endif; ?>
 
     </div>
@@ -96,9 +110,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                 <span class="title-color font-sm plus-item">
                   <?php if ($product->promo == 1) : ?>
-                    <div class="price"><span>Rp <?php echo get_price($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?></span><del><small>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></small></del></div>
+                    <div class="price"><span><?php echo format_customer_price_text($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?></span><del><small><?php echo format_customer_price_text($product->price, $product->price_2, $product->price_3); ?></small></del></div>
                   <?php else : ?>
-                    <span>Rp <?php echo get_price($product->price, $product->price_2, $product->price_3); ?></span>
+                    <span><?php echo format_customer_price_text($product->price, $product->price_2, $product->price_3); ?></span>
                   <?php endif; ?>
                   <!-- <a class="btn btn-success btn-sm" href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">Beli</a> -->
 

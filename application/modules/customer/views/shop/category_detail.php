@@ -1,5 +1,19 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
+if (!function_exists('format_customer_price_text')) {
+  function format_customer_price_text($price, $price_2 = null, $price_3 = null, $use_get_price = true)
+  {
+    $formatted_price = $use_get_price ? get_price($price, $price_2, $price_3) : format_rupiah($price);
+    $normalized_price = preg_replace('/[^0-9]/', '', (string) $formatted_price);
+
+    if ($normalized_price === '999') {
+      return 'silahkan hubungi admin';
+    }
+
+    return 'Rp ' . $formatted_price;
+  }
+}
 ?>
 <!-- Main Start -->
 <main class="main-wrap index-page mb-xxl">
@@ -43,7 +57,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
               </div>
               <div class="content-wrap">
                 <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>" class="font-sm title-color"><?php echo $product->name; ?> </a>
-                <span class="title-color font-sm plus-item">Rp <?php echo format_rupiah($product->price); ?>
+                <span class="title-color font-sm plus-item"><?php echo format_customer_price_text($product->price, null, null, false); ?>
                   <!-- <a class="btn btn-success btn-sm add-to-chart add-cart w-10" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->current_discount > 0) ? ($product->price - $product->current_discount) : $product->price; ?>" data-id="<?php echo $product->id; ?>">Beli</a> -->
                 </span>
               </div>
