@@ -12,7 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <meta name="keywords" content="Fastkart" />
     <meta name="author" content="Fastkart" />
     <link rel="manifest" href="manifest.json" />
-    <title>Fastkart PWA App</title>
+    <title>Karisma Online</title>
     <link rel="icon" href="https://os.youngpreneur.co.id/assets/themes/fastkart/images/favicon.png" type="image/x-icon" />
     <link rel="apple-touch-icon" href="https://os.youngpreneur.co.id/assets/themes/fastkart/images/favicon.png" />
     <meta name="theme-color" content="#0baf9a" />

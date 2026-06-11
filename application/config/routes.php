@@ -62,6 +62,7 @@ $route['dashboard_admin']                   = 'admin/dashboard';
 $route['admin']                             = 'admin/admin';
 
 $route['send_admin_message']                = 'admin/messages/send';
+$route['admin/messages/fetch']              = 'admin/messages/fetch';
 $route['generate_va']                       = 'admin/customers/generate_va';
 
 $route['login']                             = 'auth/login';
@@ -82,6 +83,7 @@ $route['sv_alamatcus']                      = 'customer/profile/';
 $route['change_alamat_customer_profile']    = 'customer/profile/change_alamat_asal';
 $route['change_password']                   = 'customer/profile/change_password';
 $route['message']                           = 'customer/message';
+$route['message/fetch']                     = 'customer/message/fetch';
 $route['send_message']                      = 'customer/message/send';
 $route['count_unread_messages']             = 'customer/message/count_unread';
 $route['home']                              = 'customer/home';

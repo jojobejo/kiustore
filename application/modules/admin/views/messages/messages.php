@@ -36,18 +36,20 @@ defined('BASEPATH') or exit('No direct script access allowed');
               </div>
             </div>
 
-            <?php foreach ($contact_list as $data) { ?>
-              <a href="<?php echo site_url('admin/messages'); ?>?user_id=<?= $data->user_id; ?>" class="list-group-item list-group-item-action border-0">
-                <div class="badge bg-success float-right"> <?= $data->unread; ?></div>
-                <div class="d-flex align-items-start">
-                  <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">
-                  <div class="flex-grow-1 ml-3">
-                    <?= $data->name; ?>
-                    <div class="small"> <?= $data->shop_name; ?></div>
+            <div class="chat-contact-list">
+              <?php foreach ($contact_list as $data) { ?>
+                <a href="<?php echo site_url('admin/messages'); ?>?user_id=<?= $data->user_id; ?>" class="list-group-item list-group-item-action border-0">
+                  <div class="badge bg-success float-right"> <?= $data->unread; ?></div>
+                  <div class="d-flex align-items-start">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" class="rounded-circle mr-1" alt="Vanessa Tucker" width="40" height="40">
+                    <div class="flex-grow-1 ml-3">
+                      <?= html_escape($data->name); ?>
+                      <div class="small"> <?= html_escape($data->shop_name); ?></div>
+                    </div>
                   </div>
-                </div>
-              </a>
-            <?php } ?>
+                </a>
+              <?php } ?>
+            </div>
 
 
 
@@ -74,10 +76,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             <div class="position-relative">
               <div class="chat-messages p-4" id="chat_wrapper">
+                <?php $last_message_id = 0; ?>
                 <?php if (isset($message)) {
                   foreach ($message['message'] as $data) {
+                    $last_message_id = max($last_message_id, (int) $data->id);
                     if ($data->chat_from == 1) { ?>
-                      <div class="chat-message-right pb-4">
+                      <div class="chat-message-right pb-4" data-message-id="<?= (int) $data->id ?>">
                         <div>
                           <img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">
                           <!-- <div class="text-muted small text-nowrap mt-2"><?= date('d-m-Y H:i', strtotime($data->created_at)) ?></div> -->
@@ -85,21 +89,21 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <div class="chat-text">
                           <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
                             <div class="font-weight-bold mb-1">Anda</div>
-                            <?= $data->message ?>
+                            <?= html_escape($data->message) ?>
                           </div>
                           <div class="datetime text-muted small text-nowrap mt-2"><?= date('d-m-Y H:i', strtotime($data->created_at)) ?></div>
                         </div>
                       </div>
                     <?php } else { ?>
-                      <div class="chat-message-left pb-4">
+                      <div class="chat-message-left pb-4" data-message-id="<?= (int) $data->id ?>">
                         <div>
                           <img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="rounded-circle mr-1" alt="Sharon Lessman" width="40" height="40">
 
                         </div>
                         <div class="chat-text">
                           <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3 rel">
-                            <div class="font-weight-bold mb-1"><?= $data->name ?></div>
-                            <?= $data->message ?>
+                            <div class="font-weight-bold mb-1"><?= html_escape($data->name) ?></div>
+                            <?= html_escape($data->message) ?>
                           </div>
                           <div class="datetime text-muted small text-nowrap mt-2 rel"><?= date('d-m-Y H:i', strtotime($data->created_at)) ?></div>
                         </div>
@@ -138,6 +142,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 
 <script>
+  window.adminChatLastMessageId = <?= (int) $last_message_id ?>;
+  window.adminChatCustomerId = <?= (isset($message) ? (int) $message['customer_detail']->user_id : 0); ?>;
+
   $('#chat_wrapper').animate({
     scrollTop: $('#chat_wrapper').get(0).scrollHeight
   }, 1000); //default 1000 = 1s

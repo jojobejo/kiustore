@@ -30,6 +30,15 @@ class Product_model extends CI_Model
         return $this->db->where('id', $id)->get('products')->row()->stock;
     }
 
+    public function get_cart_product($id)
+    {
+        return $this->db
+            ->select('id, product_type, product_unit_1, product_unit_value, product_unit_weight')
+            ->where('id', $id)
+            ->get('products')
+            ->row();
+    }
+
     public function count_tmp_cart($id, $now)
     {
         return $this->db->query("SELECT 

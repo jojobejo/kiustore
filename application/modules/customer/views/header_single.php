@@ -6,17 +6,17 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Fastkart" />
-    <meta name="keywords" content="Fastkart" />
-    <meta name="author" content="Fastkart" />
+    <meta name="description" content="Karisma Online" />
+    <meta name="keywords" content="Karisma Online" />
+    <meta name="author" content="Karisma Online" />
     <link rel="manifest" href="manifest.json" />
-    <title>Fastkart PWA App</title>
+    <title>Karisma Online</title>
     <link rel="icon" href="<?php echo site_url('assets/images/favicon.png'); ?>" type="image/png">
     <link rel="apple-touch-icon" href="<?php echo get_theme_uri('images/favicon.png');?>" />
     <meta name="theme-color" content="#0baf9a" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content="Fastkart" />
+    <meta name="apple-mobile-web-app-title" content="Karisma Online" />
     <meta name="msapplication-TileImage" content="<?php echo get_theme_uri('images/favicon.png');?>" />
     <meta name="msapplication-TileColor" content="#FFFFFF" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />

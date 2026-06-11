@@ -100,6 +100,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   </b></td>
               </tr>
               <tr>
+                <td>Nama Ekspedisi</td>
+                <td><b><?php echo !empty($data->nama_ekspedisi) ? $data->nama_ekspedisi : '-'; ?></b></td>
+              </tr>
+              <tr>
                 <td>Catatan</td>
                 <td><b><?php echo $delivery_data->note; ?></b></td>
               </tr>
@@ -208,6 +212,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" required>
                     <?php else : ?>
                       <input type="text" value="<?php echo $data->invoice_number; ?>" class="form-control form-control-sm" name="invoice_number" readonly>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Ekspedisi</td>
+                  <td>
+                    <?php if ($data->order_status == '1' || $data->order_status == '9' || $data->order_status == '11') : ?>
+                      <input type="text" value="<?php echo $data->nama_ekspedisi; ?>" class="form-control form-control-sm" name="ekspedisi_luar" id="ekspedisi_luar" required>
+                    <?php else : ?>
+                      <input type="text" value="<?php echo $data->nama_ekspedisi; ?>" class="form-control form-control-sm" name="ekspedisi_luar" id="ekspedisi_luar" readonly>
                     <?php endif; ?>
                   </td>
                 </tr>

@@ -1205,6 +1205,7 @@ class Order_model extends CI_Model
             $this->db->where('id', $data['id'])
                 ->update('orders', array(
                     'invoice_number' => $data['invoice_number'],
+                    'nama_ekspedisi' => $data['ekspedisi_luar'],
                     'ttb_number' => $data['ttb_number'],
                     //  'due_date' => $data['due_date'],
                     'shipping_cost' => $data['shipping_cost'],
@@ -1215,6 +1216,7 @@ class Order_model extends CI_Model
             $this->db->where('id', $data['id'])
                 ->update('orders', array(
                     'invoice_number' => $data['invoice_number'],
+                    'nama_ekspedisi' => $data['ekspedisi_luar'],
                     'ttb_number' => $data['ttb_number'],
                     'shipping_cost' => $data['shipping_cost'],
                     'insurance' => $data['insurance'],
@@ -1225,6 +1227,7 @@ class Order_model extends CI_Model
             $this->db->where('id', $data['id'])
                 ->update('orders', array(
                     'invoice_number' => $data['invoice_number'],
+                    'nama_ekspedisi' => $data['ekspedisi_luar'],
                     'ttb_number' => $data['ttb_number'],
                     //  'due_date' => $data['due_date'],
                     'shipping_cost' => $data['shipping_cost'],

@@ -31,21 +31,23 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <!-- Live Chat Wrapper-->
         <div class="live-chat-wrapper" id="chat_wrapper">
           <!-- Agent Message Content-->
+          <?php $last_message_id = 0; ?>
           <?php foreach ($message as $data) {
+            $last_message_id = max($last_message_id, (int) $data->id);
             if ($data->chat_from == 1) { ?>
-              <div class="agent-message-content d-flex align-items-start">
+              <div class="agent-message-content d-flex align-items-start" data-message-id="<?= (int) $data->id ?>">
                 <div class="agent-thumbnail me-2 mt-2"><img src="<?php echo get_user_image(); ?>" alt=""></div>
                 <div class="agent-message-text">
                   <div class="d-block">
-                    <p><?= $data->message ?></p>
+                    <p><?= html_escape($data->message) ?></p>
                   </div><span><?= date('d-m-Y H:i', strtotime($data->created_at)) ?></span>
                 </div>
               </div>
             <?php } else { ?>
-              <div class="user-message-content">
+              <div class="user-message-content" data-message-id="<?= (int) $data->id ?>">
                 <div class="user-message-text">
                   <div class="d-block">
-                    <p><?= $data->message ?></p>
+                    <p><?= html_escape($data->message) ?></p>
                   </div><span><?= date('d-m-Y H:i', strtotime($data->created_at)) ?></span>
                 </div>
               </div>
@@ -75,6 +77,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <!-- Main End -->
 
 <script>
+window.customerChatLastMessageId = <?= (int) $last_message_id ?>;
+
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('auto_text')) {

@@ -101,6 +101,11 @@ $banks = (array) json_decode(get_settings('payment_banks'));
             <?php endforeach; ?>
 
             <li>
+                <span>Nama Ekspedisi</span>
+                <span><?php echo !empty($data->nama_ekspedisi) ? $data->nama_ekspedisi : '-'; ?></span>
+            </li>
+
+            <li>
                 <span>Asuransi</span>
                 <span>Rp <?php echo format_rupiah($data->insurance); ?></span>
             </li>

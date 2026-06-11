@@ -36,6 +36,73 @@ defined('BASEPATH') or exit('No direct script access allowed');
   var base_url = "<?= base_url(); ?>"
 </script>
 <script type="text/javascript">
+  var adminMessageAudioUnlocked = false;
+
+  function requestAdminMessageNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
+  function unlockAdminMessageAudio() {
+    if (adminMessageAudioUnlocked || !$('#myAudio').length) {
+      return;
+    }
+
+    $("#myAudio").prop('muted', true);
+    var playPromise = $("#myAudio").get(0).play();
+
+    if (playPromise && playPromise.then) {
+      playPromise.then(function() {
+        $("#myAudio").get(0).pause();
+        $("#myAudio").get(0).currentTime = 0;
+        $("#myAudio").prop('muted', false);
+        adminMessageAudioUnlocked = true;
+      }).catch(function() {
+        $("#myAudio").prop('muted', false);
+      });
+    } else {
+      $("#myAudio").prop('muted', false);
+      adminMessageAudioUnlocked = true;
+    }
+  }
+
+  function playAdminMessageSound() {
+    if (!$('#myAudio').length) {
+      return;
+    }
+
+    $("#myAudio").prop('muted', false);
+    $("#myAudio").get(0).currentTime = 0;
+    var playPromise = $("#myAudio").get(0).play();
+
+    if (playPromise && playPromise.catch) {
+      playPromise.catch(function() {});
+    }
+  }
+
+  function showAdminMessageNotification(body, targetUrl) {
+    playAdminMessageSound();
+
+    if (!window.Notification) {
+      return;
+    }
+
+    if (Notification.permission === 'granted') {
+      const notify = new Notification('Perhatian - Karisma Online', {
+        body: body || 'Chat Baru',
+        icon: '<?php echo site_url('assets/images/favicon.png'); ?>'
+      });
+
+      notify.onclick = (event) => {
+        event.preventDefault();
+        window.open(targetUrl || '<?php echo site_url('admin/messages'); ?>', '_blank');
+      };
+    } else if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+
   $(document).ready(function() {
     $('#myTable').DataTable();
     selectRowsJs.init();
@@ -44,9 +111,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
     $("#myAudio").get(0).play();
     $(document).scrollTop($(document).height());
 
+    $(document).one('click touchstart keydown', function() {
+      requestAdminMessageNotificationPermission();
+      unlockAdminMessageAudio();
+    });
+
     setInterval(function() {
 
-      <?php if (admin_role() == 'salesman' || admin_role() == 'adminonline') : ?>
+      <?php if (admin_role() == 'admin' || admin_role() == 'salesman' || admin_role() == 'adminonline') : ?>
         var unread_message = $("#unread_message").text();
         $.ajax({
           url: "<?= base_url() ?>admin/messages/get_unread",
@@ -58,46 +130,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
             console.log('new order= ' + data);
             // $("#myAudio").prop('muted', false);
             // $("#myAudio").delay(50).get(0).play();
-            if (unread_message != 0) {
-              if (unread_message != data) {
-                $("#myAudio").prop('muted', false);
-                $("#myAudio").delay(50).get(0).play();
-
-                if (!window.Notification) {
-                  console.log('Browser does not support notifications.')
-                } else {
-                  if (Notification.permission === 'granted') {
-                    const notify = new Notification('Perhatian', {
-                      body: 'Chat Baru',
-                      icon: '<?php echo site_url('assets/images/favicon.png'); ?>'
-                    })
-                    notify.onclick = (event) => {
-                      event.preventDefault();
-                      window.open('https://os.youngpreneur.co.id/admin/messages', '_blank');
-                    }
-                  } else {
-                    Notification.requestPermission()
-                      .then(function(p) {
-                        if (p === 'granted') {
-                          const notify = new Notification('Perhatian!', {
-                            body: 'Chat Baru',
-                            icon: '<?php echo site_url('assets/images/favicon.png'); ?>'
-                          })
-                          notify.onclick = (event) => {
-                            event.preventDefault();
-                            window.open('https://os.youngpreneur.co.id/admin/messages', '_blank');
-                          }
-                        } else {
-                          console.log('User has blocked notifications.')
-                        }
-                      })
-                      .catch(function(err) {
-                        console.error(err)
-                      })
-                  }
-                }
-
-              }
+            if (parseInt(data, 10) > parseInt(unread_message, 10)) {
+              showAdminMessageNotification('Chat Baru', '<?php echo site_url('admin/messages'); ?>');
             }
             $("#unread_message").html(data);
           }
@@ -272,8 +306,81 @@ defined('BASEPATH') or exit('No direct script access allowed');
     }
   });
 
+  function escapeHtml(value) {
+    return $('<div>').text(value || '').html();
+  }
+
+  function scrollAdminChatToBottom() {
+    if ($('#chat_wrapper').length) {
+      $('#chat_wrapper').animate({
+        scrollTop: $('#chat_wrapper').get(0).scrollHeight
+      }, 300);
+    }
+  }
+
+  function renderAdminChatMessage(message, shouldNotify) {
+    var messageId = parseInt(message.id || 0, 10);
+
+    if (messageId > 0 && $('#chat_wrapper [data-message-id="' + messageId + '"]').length) {
+      return;
+    }
+
+    var text = escapeHtml(message.message);
+    var time = escapeHtml(message.created_at_formatted || format_tanggal());
+    var chat = '';
+
+    if (parseInt(message.chat_from, 10) === 1) {
+      chat =
+        '<div class="chat-message-right pb-4" data-message-id="' + messageId + '">' +
+        '<div>' +
+        '<img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="rounded-circle mr-1" alt="Admin" width="40" height="40">' +
+        '</div>' +
+        '<div class="chat-text">' +
+        '<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">' +
+        '<div class="font-weight-bold mb-1">Anda</div>' +
+        text +
+        '</div>' +
+        '<div class="datetime text-muted small text-nowrap mt-2">' + time + '</div>' +
+        '</div>' +
+        '</div>';
+    } else {
+      chat =
+        '<div class="chat-message-left pb-4" data-message-id="' + messageId + '">' +
+        '<div>' +
+        '<img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="rounded-circle mr-1" alt="Customer" width="40" height="40">' +
+        '</div>' +
+        '<div class="chat-text">' +
+        '<div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3 rel">' +
+        '<div class="font-weight-bold mb-1">' + escapeHtml(message.name || 'Customer') + '</div>' +
+        text +
+        '</div>' +
+        '<div class="datetime text-muted small text-nowrap mt-2 rel">' + time + '</div>' +
+        '</div>' +
+        '</div>';
+    }
+
+    $('#chat_wrapper').append(chat);
+
+    if (messageId > (window.adminChatLastMessageId || 0)) {
+      window.adminChatLastMessageId = messageId;
+    }
+
+    scrollAdminChatToBottom();
+
+    if (shouldNotify && parseInt(message.chat_from, 10) === 2) {
+      showAdminMessageNotification(
+        (message.name ? message.name + ': ' : '') + (message.message || 'Chat Baru'),
+        '<?php echo site_url('admin/messages'); ?>?user_id=' + (window.adminChatCustomerId || '')
+      );
+    }
+  }
+
   function send_message() {
-    var message = $("#text_message").val();
+    var message = $.trim($("#text_message").val());
+
+    if (message === '') {
+      return;
+    }
 
     $.ajax({
       url: base_url + 'send_admin_message',
@@ -281,32 +388,50 @@ defined('BASEPATH') or exit('No direct script access allowed');
       dataType: 'json',
       data: $('#message_form').serialize(),
       success: function(data) {
-        console.log('sukses');
-        var chat =
-          '<div class="chat-message-right pb-4">' +
-          '<div>' +
-          '<img src="https://bootdey.com/img/Content/avatar/avatar1.png" class="rounded-circle mr-1" alt="Chris Wood" width="40" height="40">' +
-          '</div>' +
-          '<div class="chat-text">' +
-          '<div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">' +
-          '<div class="font-weight-bold mb-1">Anda</div>' +
-          message +
-          '</div>' +
-          '<div class="datetime text-muted small text-nowrap mt-2">' + format_tanggal() + '</div>' +
-          ' </div>' +
-          '</div>';
-        $('#chat_wrapper').append(chat);
+        if (data.error) {
+          return;
+        }
 
         $("#text_message").val('');
-        $('#chat_wrapper').animate({
-          scrollTop: $('#chat_wrapper').get(0).scrollHeight
-        }, 1000);
+        renderAdminChatMessage(data.data || {
+          id: 0,
+          message: message,
+          chat_from: 1,
+          created_at_formatted: format_tanggal()
+        }, false);
 
       },
       error: function(data) {
         console.log(data + ' errrrr');
       },
     });
+  }
+
+  function fetchAdminMessages() {
+    if (!$('#chat_wrapper').length || !window.adminChatCustomerId) {
+      return;
+    }
+
+    $.ajax({
+      url: base_url + 'admin/messages/fetch',
+      type: 'GET',
+      dataType: 'json',
+      data: {
+        customer_id: window.adminChatCustomerId,
+        last_id: window.adminChatLastMessageId || 0
+      },
+      success: function(res) {
+        if (!res.error && res.data && res.data.length) {
+          $.each(res.data, function(_, message) {
+            renderAdminChatMessage(message, true);
+          });
+        }
+      }
+    });
+  }
+
+  if ($('#chat_wrapper').length && window.adminChatCustomerId) {
+    setInterval(fetchAdminMessages, 3000);
   }
 </script>
 </body>

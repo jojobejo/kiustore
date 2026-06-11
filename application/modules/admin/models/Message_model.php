@@ -13,16 +13,23 @@ class Message_model extends CI_Model
     public function get_contact()
     {
         $id = $this->user_id;
-        // return $this->db->where('salesman_id', $id)->get('customers')->result();
+        $role = admin_role();
 
-        return $this->db->query("
-            SELECT a.*, count(case when b.status = 2 and b.chat_from = 2 then b.message end) as unread
-            FROM customers a
-            LEFT JOIN message b
-                ON b.customer_id = a.user_id
-            WHERE a.salesman_id = '$id'
-            GROUP BY b.customer_id
-        ")->result();
+        $this->db
+            ->select('a.*, COUNT(CASE WHEN b.status = 2 AND b.chat_from = 2 THEN b.id END) as unread', false)
+            ->from('customers a')
+            ->join('message b', 'b.customer_id = a.user_id', 'left');
+
+        if ($role != 'admin') {
+            $this->db->where('a.salesman_id', $id);
+        }
+
+        return $this->db
+            ->group_by('a.user_id')
+            ->order_by('unread', 'DESC')
+            ->order_by('a.name', 'ASC')
+            ->get()
+            ->result();
     }
 
     public function get_message($id)
@@ -42,6 +49,19 @@ class Message_model extends CI_Model
         // return ($this->db->order_by('created_at')->where('customer_id', $id)->get('message')->result());
     }
 
+    public function get_message_after($customer_id, $last_id = 0)
+    {
+        return $this->db
+            ->select('a.*, b.name')
+            ->from('message a')
+            ->join('customers b', 'a.customer_id = b.user_id')
+            ->where('a.customer_id', (int) $customer_id)
+            ->where('a.id >', (int) $last_id)
+            ->order_by('a.id', 'ASC')
+            ->get()
+            ->result();
+    }
+
     public function send(array $data)
     {
         $this->db->insert('message', $data);
@@ -52,10 +72,17 @@ class Message_model extends CI_Model
     public function count_all_unread()
     {
         $id = $this->user_id;
-        $query = $this->db
+        $role = admin_role();
+
+        $this->db
             ->select('1')
-            ->where(array('salesman_id' => $id, 'status' => 2, 'chat_from' => 2))
-            ->get('message');
+            ->where(array('status' => 2, 'chat_from' => 2));
+
+        if ($role != 'admin') {
+            $this->db->where('salesman_id', $id);
+        }
+
+        $query = $this->db->get('message');
 
         return $query->num_rows();
     }
@@ -63,9 +90,17 @@ class Message_model extends CI_Model
     public function count_unread()
     {
         $id = $this->user_id;
-        $query = $this->db
+        $role = admin_role();
+
+        $this->db
             ->select('1')
-            ->where(array('salesman_id' => $id, 'status' => 2, 'chat_from' => 2))
+            ->where(array('status' => 2, 'chat_from' => 2));
+
+        if ($role != 'admin') {
+            $this->db->where('salesman_id', $id);
+        }
+
+        $query = $this->db
             ->group_by('customer_id')
             ->get('message');
 
@@ -75,8 +110,15 @@ class Message_model extends CI_Model
     public function read_message($customer_id)
     {
         $id = $this->user_id;
+        $role = admin_role();
 
-        return $this->db->where(array('salesman_id' => $id, 'customer_id' => $customer_id, 'chat_from' => 2))->update('message', array('status' => 1));
+        $this->db->where(array('customer_id' => $customer_id, 'chat_from' => 2));
+
+        if ($role != 'admin') {
+            $this->db->where('salesman_id', $id);
+        }
+
+        return $this->db->update('message', array('status' => 1));
     }
 
 

@@ -442,6 +442,7 @@ class Orders extends CI_Controller
             case 'verify':
                 $data['id'] = $this->input->post('id');
                 $data['invoice_number'] = $this->input->post('invoice_number');
+                $data['ekspedisi_luar'] = $this->input->post('ekspedisi_luar');
                 $data['ttb_number'] = $this->input->post('ttb_number');
                 $data['shipping_cost'] = $this->input->post('shipping_cost');
                 $data['insurance'] = $this->input->post('insurance');

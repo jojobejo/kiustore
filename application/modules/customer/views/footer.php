@@ -68,6 +68,7 @@ $is_product_detail = ($this->uri->segment(1) === 'product' && is_numeric($this->
 </footer>
 <!-- Footer End -->
 
+<audio id="customer_message_notification_audio" src="<?php echo base_url('assets/audio/order2.mp3'); ?>" preload="auto"></audio>
 
 <!-- Bootstrap Js -->
 <script src="<?php echo get_theme_uri('js/bootstrap.bundle.min.js'); ?>"></script>
@@ -114,6 +115,103 @@ $is_product_detail = ($this->uri->segment(1) === 'product' && is_numeric($this->
 
 <?php if (!empty($_SESSION['__ACTIVE_SESSION_DATA'])) : ?>
   <script>
+    var customerUnreadMessageTotal = null;
+    var customerMessageAudioUnlocked = false;
+
+    function requestCustomerMessageNotificationPermission() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+
+    function unlockCustomerMessageAudio() {
+      if (customerMessageAudioUnlocked) {
+        return;
+      }
+
+      var audio = document.getElementById('customer_message_notification_audio');
+      if (!audio) {
+        return;
+      }
+
+      audio.muted = true;
+      var playPromise = audio.play();
+
+      if (playPromise && playPromise.then) {
+        playPromise.then(function() {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.muted = false;
+          customerMessageAudioUnlocked = true;
+        }).catch(function() {
+          audio.muted = false;
+        });
+      } else {
+        audio.muted = false;
+        customerMessageAudioUnlocked = true;
+      }
+    }
+
+    function playCustomerMessageNotificationSound() {
+      var audio = document.getElementById('customer_message_notification_audio');
+      if (!audio) {
+        return;
+      }
+
+      audio.muted = false;
+      audio.currentTime = 0;
+      var playPromise = audio.play();
+
+      if (playPromise && playPromise.catch) {
+        playPromise.catch(function() {});
+      }
+    }
+
+    function showCustomerUnreadMessageNotification(totalUnread) {
+      playCustomerMessageNotificationSound();
+
+      if (!('Notification' in window)) {
+        return;
+      }
+
+      if (Notification.permission === 'granted') {
+        var notify = new Notification('Pesan Baru - Karisma Online', {
+          body: 'Anda memiliki ' + totalUnread + ' pesan belum dibaca',
+          icon: '<?php echo site_url('assets/images/favicon.png'); ?>'
+        });
+
+        notify.onclick = function(event) {
+          event.preventDefault();
+          window.location.href = '<?php echo site_url('message'); ?>';
+        };
+      } else if (Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+
+    function refreshCustomerUnreadMessages(allowNotify) {
+      $.ajax({
+        method: 'GET',
+        url: '<?php echo site_url('count_unread_messages'); ?>',
+        success: function(res) {
+          var unread = parseInt(res, 10) || 0;
+
+          $('#unread_sum').text(unread);
+
+          if (allowNotify && customerUnreadMessageTotal !== null && unread > customerUnreadMessageTotal) {
+            showCustomerUnreadMessageNotification(unread);
+          }
+
+          customerUnreadMessageTotal = unread;
+        }
+      });
+    }
+
+    $(document).one('click touchstart keydown', function() {
+      requestCustomerMessageNotificationPermission();
+      unlockCustomerMessageAudio();
+    });
+
     //Total Product in Cart
     $.ajax({
       method: 'GET',
@@ -128,17 +226,10 @@ $is_product_detail = ($this->uri->segment(1) === 'product' && is_numeric($this->
     });
 
     //Total Unread Message
-    $.ajax({
-      method: 'GET',
-      url: '<?php echo site_url('count_unread_messages'); ?>',
-      success: function(res) {
-        console.log(res);
-        // var data = res.data;
-
-        // var unread = data.total_item;
-        $('#unread_sum').text(res);
-      }
-    });
+    refreshCustomerUnreadMessages(false);
+    setInterval(function() {
+      refreshCustomerUnreadMessages(true);
+    }, 5000);
   </script>
 <?php endif; ?>
 

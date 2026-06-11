@@ -32,6 +32,18 @@ class Message_model extends CI_Model
         return $data->result();
     }
 
+    public function load_message_after($last_id = 0)
+    {
+        $id = $this->user_id;
+
+        return $this->db
+            ->where('customer_id', $id)
+            ->where('id >', (int) $last_id)
+            ->order_by('id', 'ASC')
+            ->get('message')
+            ->result();
+    }
+
     public function count_unread()
     {
         $id = $this->user_id;

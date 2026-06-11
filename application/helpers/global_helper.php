@@ -708,10 +708,17 @@ if (!function_exists('all_unread_messages')) {
     {
         $CI = init();
         $id = get_current_user_id();
-        $query = $CI->db
+        $role = admin_role();
+
+        $CI->db
             ->select('1')
-            ->where(array('salesman_id' => $id, 'status' => 2, 'chat_from' => 2))
-            ->get('message');
+            ->where(array('status' => 2, 'chat_from' => 2));
+
+        if ($role != 'admin') {
+            $CI->db->where('salesman_id', $id);
+        }
+
+        $query = $CI->db->get('message');
 
         return $query->num_rows();
 
@@ -724,9 +731,17 @@ if (!function_exists('unread_messages')) {
     {
         $CI = init();
         $id = get_current_user_id();
-        $query = $CI->db
+        $role = admin_role();
+
+        $CI->db
             ->select('1')
-            ->where(array('salesman_id' => $id, 'status' => 2, 'chat_from' => 2))
+            ->where(array('status' => 2, 'chat_from' => 2));
+
+        if ($role != 'admin') {
+            $CI->db->where('salesman_id', $id);
+        }
+
+        $query = $CI->db
             ->group_by('customer_id')
             ->get('message');
 

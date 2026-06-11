@@ -304,25 +304,40 @@ class Shop extends CI_Controller
                 }
 
                 $items = [];
-                $items_multi    = [];
-                $total_price_multi[1] = 0;
-                $total_price_multi[2] = 0;
-                $total_price_multi[3] = 0;
+                $items_multi = [];
+                $total_price_multi = [
+                    1 => 0,
+                    2 => 0,
+                    3 => 0,
+                    4 => 0,
+                ];
 
                 foreach ($this->cart->contents() as $item) {
+                    $product_type = $this->_resolve_cart_product_type($item);
+
+                    if ($product_type === null) {
+                        $this->session->set_flashdata('error', 'Data produk di keranjang tidak lengkap. Silakan hapus produk tersebut lalu tambahkan ulang.');
+                        redirect('cart');
+                        return;
+                    }
+
                     $items[$item['id']]['qty'] = $item['qty'];
                     $items[$item['id']]['satuan'] = $item['satuan'];
                     $items[$item['id']]['satuan_text'] = $item['satuan_text'];
                     $items[$item['id']]['satuan_qty'] = $item['satuan_qty'];
                     $items[$item['id']]['price'] = $item['price'];
 
-                    $items_multi[$item['product_type']][$item['id']]['qty'] = $item['qty'];
-                    $items_multi[$item['product_type']][$item['id']]['satuan'] = $item['satuan'];
-                    $items_multi[$item['product_type']][$item['id']]['satuan_text'] = $item['satuan_text'];
-                    $items_multi[$item['product_type']][$item['id']]['satuan_qty'] = $item['satuan_qty'];
-                    $items_multi[$item['product_type']][$item['id']]['price'] = $item['price'];
-                    // $total_price_multi[$item['product_type']] +=  $item['price'];
-                    $total_price_multi[$item['product_type']] += ($item['price'] * $item['qty']);
+                    $items_multi[$product_type][$item['id']]['qty'] = $item['qty'];
+                    $items_multi[$product_type][$item['id']]['satuan'] = $item['satuan'];
+                    $items_multi[$product_type][$item['id']]['satuan_text'] = $item['satuan_text'];
+                    $items_multi[$product_type][$item['id']]['satuan_qty'] = $item['satuan_qty'];
+                    $items_multi[$product_type][$item['id']]['price'] = $item['price'];
+
+                    if (!isset($total_price_multi[$product_type])) {
+                        $total_price_multi[$product_type] = 0;
+                    }
+
+                    $total_price_multi[$product_type] += ($item['price'] * $item['qty']);
                 }
 
                 $akseslv        = is_members();
@@ -788,6 +803,24 @@ class Shop extends CI_Controller
     }
 
 
+    private function _resolve_cart_product_type($item)
+    {
+        if (!empty($item['product_type'])) {
+            return (int) $item['product_type'];
+        }
+
+        if (empty($item['id'])) {
+            return null;
+        }
+
+        $product = $this->product->get_cart_product($item['id']);
+        if (!empty($product) && !empty($product->product_type)) {
+            return (int) $product->product_type;
+        }
+
+        return null;
+    }
+
     public function cart_api()
     {
         $action     = $this->input->get('action');
@@ -807,6 +840,23 @@ class Shop extends CI_Controller
                 $product_type = $this->input->post('product_type');
                 $product_weight = $this->input->post('product_weight');
                 $now    = date('Y-m-d');
+                $product = $this->product->get_cart_product($id);
+
+                if (empty($product)) {
+                    $response = array('code' => 202, 'message' => 'Produk tidak ditemukan.');
+                    break;
+                }
+
+                $product_type = !empty($product_type) ? $product_type : $product->product_type;
+                $satuan = !empty($satuan) ? $satuan : 1;
+                $satuan_text = !empty($satuan_text) ? $satuan_text : $product->product_unit_1;
+                $satuan_qty = !empty($satuan_qty) ? $satuan_qty : $product->product_unit_value;
+                $product_weight = !empty($product_weight) ? $product_weight : $product->product_unit_weight;
+
+                if (empty($product_type)) {
+                    $response = array('code' => 202, 'message' => 'Tipe produk belum diatur. Hubungi admin.');
+                    break;
+                }
 
                 if ($satuan == 1) {
                     $price      = $this->input->post('price');
