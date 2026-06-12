@@ -155,11 +155,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                       <td><?php echo $item->order_qty; ?> <?php echo $item->satuan_text; ?></td>
                       <td>
                         <input type="hidden" value="<?php echo $item->id; ?>" name="id[]">
-                        <input type="hidden" value="<?php echo $item->order_qty; ?>" name="qty[]">
-                        <?php if ($data->order_status == 9) : ?>
-                          <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]">
-                        <?php elseif ($data->order_status == 1) : ?>
-                          <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]">
+                        <?php if (in_array((int) $data->order_status, array(1, 9, 11), true)) : ?>
+                          <input type="number" min="0" step="0.01" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]" required>
                         <?php else : ?>
                           <input type="text" value="<?= floatval($item->order_price); ?>" class="form-control form-control-sm" name="order_price[]" readonly>
                         <?php endif; ?>
@@ -170,9 +167,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <tr>
                     <td colspan="4">
                       <div class="col-md-3 text-right">
-                        <?php if ($data->order_status == 1) : ?>
-                          <input type="submit" class="btn btn-primary" value="Update Harga">
-                        <?php elseif ($data->order_status == 9) : ?>
+                        <?php if (in_array((int) $data->order_status, array(1, 9, 11), true)) : ?>
                           <input type="submit" class="btn btn-primary" value="Update Harga">
                         <?php endif; ?>
 

@@ -452,24 +452,58 @@ class Orders extends CI_Controller
                 redirect('admin/orders/view/' . $data['id']);
                 break;
             case 'update_harga':
-                $id = $this->input->post('id');
-                $order_id = $this->input->post('order_id');
-                $order_price = $this->input->post('order_price');
-                $qty = $this->input->post('qty');
-                $data = array();
-                $total_price = 0;
-                for ($x = 0; $x < sizeof($id); $x++) {
+                $order_id = (int) $this->input->post('order_id');
+                $ids = $this->input->post('id');
+                $prices = $this->input->post('order_price');
+                $order = $this->order->order_data($order_id);
 
-                    $total_price += $order_price[$x] * $qty[$x];
-                    $data[] = array(
-                        'id' => $id[$x],
-                        'order_price' => $order_price[$x]
+                if (!$order || !in_array((int) $order->order_status, array(1, 9, 11), true)) {
+                    $this->session->set_flashdata('order_flash', 'Harga tidak dapat diperbarui pada status pesanan ini.');
+                    redirect('admin/orders/view/' . $order_id);
+                }
+
+                $items = $this->order->order_items($order_id);
+                $items_by_id = array();
+                foreach ($items as $item) {
+                    $items_by_id[(int) $item->id] = $item;
+                }
+
+                if (empty($items_by_id) || !is_array($ids) || !is_array($prices) || count($ids) !== count($prices) || count($ids) !== count($items_by_id)) {
+                    $this->session->set_flashdata('order_flash', 'Data harga tidak valid.');
+                    redirect('admin/orders/view/' . $order_id);
+                }
+
+                $updates = array();
+                $total_price = 0;
+                $processed_ids = array();
+
+                foreach ($ids as $index => $id) {
+                    $item_id = (int) $id;
+                    $price = $prices[$index];
+
+                    if (!isset($items_by_id[$item_id]) || isset($processed_ids[$item_id]) || !is_numeric($price) || (float) $price < 0) {
+                        $this->session->set_flashdata('order_flash', 'Data harga tidak valid.');
+                        redirect('admin/orders/view/' . $order_id);
+                    }
+
+                    $price = (float) $price;
+                    $processed_ids[$item_id] = true;
+                    $total_price += $price * (float) $items_by_id[$item_id]->order_qty;
+                    $updates[] = array(
+                        'id' => $item_id,
+                        'order_price' => $price
                     );
                 }
-                // print_r($data);
-                // exit;
-                $this->order->update_harga($data);
+
+                $this->db->trans_start();
+                $this->order->update_harga($updates);
                 $this->order->update_total_harga($order_id, $total_price);
+                $this->db->trans_complete();
+
+                $message = $this->db->trans_status()
+                    ? 'Harga satuan berhasil diperbarui.'
+                    : 'Harga satuan gagal diperbarui.';
+                $this->session->set_flashdata('order_flash', $message);
 
                 redirect('admin/orders/view/' . $order_id);
                 break;
