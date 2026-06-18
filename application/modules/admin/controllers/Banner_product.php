@@ -78,6 +78,7 @@ class Banner_product extends CI_Controller {
         $params['title'] = 'Tambah Banner Produk Baru';
 
         $product['flash'] = $this->session->flashdata('add_new_product_flash');
+        $product['error'] = $this->session->flashdata('add_new_product_error');
         $product['products'] = $this->product->get_list_products();
 
         $this->load->view('header', $params);
@@ -88,36 +89,88 @@ class Banner_product extends CI_Controller {
     public function add_banner_product()
     {
         $product_id = $this->input->post('product_id');
-        // $date = date('Y-m-d H:i:s');
+
+        if (empty($product_id) || ! is_numeric($product_id) || ! $this->product->is_product_exist($product_id))
+        {
+            $this->session->set_flashdata('add_new_product_error', 'Pilih produk yang valid untuk banner.');
+            redirect('admin/banner_product/add_new_banner_product');
+        }
 
         $config['upload_path'] = './assets/uploads/banner_product/';
         $config['allowed_types'] = 'jpg|png|jpeg';
         $config['max_size'] = 2048;
+        $config['encrypt_name'] = TRUE;
+
+        if ( ! is_dir($config['upload_path']))
+        {
+            mkdir($config['upload_path'], 0755, TRUE);
+        }
+
+        if ( ! is_dir($config['upload_path']) || ! is_writable($config['upload_path']))
+        {
+            $this->session->set_flashdata('add_new_product_error', 'Folder upload banner tidak dapat ditulis.');
+            redirect('admin/banner_product/add_new_banner_product');
+        }
 
         $this->load->library('upload', $config);
 
-        if ( isset($_FILES['picture']) && @$_FILES['picture']['error'] == '0')
+        if ( ! isset($_FILES['picture']) || $_FILES['picture']['error'] != UPLOAD_ERR_OK)
         {
-            if ( ! $this->upload->do_upload('picture'))
-            {
-                $error = array('error' => $this->upload->display_errors());
-
-                show_error($error);
-            }
-            else
-            {
-                $upload_data = $this->upload->data();
-                $file_name = $upload_data['file_name'];
-            }
+            $this->session->set_flashdata('add_new_product_error', $this->_upload_error_message(isset($_FILES['picture']['error']) ? $_FILES['picture']['error'] : NULL));
+            redirect('admin/banner_product/add_new_banner_product');
         }
+
+        if ( ! $this->upload->do_upload('picture'))
+        {
+            $this->session->set_flashdata('add_new_product_error', strip_tags($this->upload->display_errors()));
+            redirect('admin/banner_product/add_new_banner_product');
+        }
+
+        $upload_data = $this->upload->data();
+        $file_name = $upload_data['file_name'];
 
         $product['product_id'] = $product_id;
         $product['banner_image'] = $file_name;
 
-        $this->product->add_new_banner_product($product);
+        if ( ! $this->product->add_new_banner_product($product))
+        {
+            $file = $config['upload_path'] . $file_name;
+
+            if (file_exists($file) && is_readable($file))
+            {
+                unlink($file);
+            }
+
+            $this->session->set_flashdata('add_new_product_error', 'Banner gagal disimpan ke database.');
+            redirect('admin/banner_product/add_new_banner_product');
+        }
+
         $this->session->set_flashdata('add_new_product_flash', 'Banner produk baru berhasil ditambahkan!');
 
         redirect('admin/banner_product/add_new_banner_product');
+    }
+
+    private function _upload_error_message($error_code)
+    {
+        switch ($error_code)
+        {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'Ukuran gambar terlalu besar. Maksimal 2MB.';
+            case UPLOAD_ERR_PARTIAL:
+                return 'Upload gambar tidak lengkap. Silahkan coba lagi.';
+            case UPLOAD_ERR_NO_FILE:
+            case NULL:
+                return 'Pilih gambar banner terlebih dahulu.';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return 'Folder sementara upload tidak tersedia di server.';
+            case UPLOAD_ERR_CANT_WRITE:
+                return 'Server gagal menulis file upload.';
+            case UPLOAD_ERR_EXTENSION:
+                return 'Upload dihentikan oleh konfigurasi server.';
+            default:
+                return 'Upload gambar gagal. Silahkan coba lagi.';
+        }
     }
 
     public function delete($id) 

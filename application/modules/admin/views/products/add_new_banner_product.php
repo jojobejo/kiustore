@@ -38,26 +38,31 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   <?php echo $flash; ?>
                 </span>
                 <?php endif; ?>
+                <?php if ($error) : ?>
+                <div class="alert alert-danger mt-3 mb-0">
+                  <?php echo $error; ?>
+                </div>
+                <?php endif; ?>
               </div>
 
               <div class="card-body">
                 <div class="row">
                   <div class="col-md-12">
                     <div class="form-group">
-                      <label class="form-control-label" for="pakcage">Produk:</label>
+                      <label class="form-control-label" for="package">Produk:</label>
                       <select name="product_id" class="form-control" id="package">
-                        <option>Pilih Produk</option>
-                        <?php if ( count($products) > 0) : ?>
+                        <option value="">Pilih Produk</option>
+                        <?php if (count($products) > 0) : ?>
                           <?php foreach ($products as $product) : ?>
-                            <option value="<?php echo $product->id; ?>"<?php echo set_select('product_id', $product->id); ?>>› <?php echo $product->name; ?></option>
+                            <option value="<?php echo $product->id; ?>"<?php echo set_select('product_id', $product->id); ?>><?php echo $product->name; ?></option>
                           <?php endforeach; ?>
                         <?php endif; ?>
                       </select>
                       <?php echo form_error('product_id'); ?>
-                  </div>
+                    </div>
                   </div>
                 </div>
-                
+
                 <div class="form-group">
                   <label class="form-control-label" for="pic">Foto:</label>
                   <input type="file" name="picture" class="form-control" id="pic">
@@ -65,15 +70,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </div>
 
                 <div class="card-footer text-right">
-                    <input type="submit" value="Tambah Produk Baru" class="btn btn-primary">
+                  <input type="submit" value="Tambah Banner Produk" class="btn btn-primary">
                 </div>
-
               </div>
-
             </div>
-
           </div>
-
         </div>
       </div>
 

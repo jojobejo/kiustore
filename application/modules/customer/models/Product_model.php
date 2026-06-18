@@ -272,10 +272,20 @@ class Product_model extends CI_Model
     public function get_all_banner()
     {
         $data = $this->db->query("
-            SELECT b.*, a.banner_image
+            SELECT
+                a.id AS banner_id,
+                a.product_id,
+                a.banner_image,
+                a.created_at,
+                b.id,
+                b.sku,
+                b.name
             FROM banner_product a
-            JOIN products b
+            LEFT JOIN products b
                 ON b.id = a.product_id
+            WHERE a.banner_image IS NOT NULL
+                AND a.banner_image != ''
+            ORDER BY a.id DESC
         ")->result();
         return $data;
     }
