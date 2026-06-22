@@ -4,7 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 if (!function_exists('format_customer_price_text')) {
   function format_customer_price_text($price, $price_2 = null, $price_3 = null, $use_get_price = true)
   {
-    $formatted_price = $use_get_price ? get_price($price, $price_2, $price_3) : format_rupiah($price);
+    $formatted_price = $use_get_price ? format_rupiah(get_price($price, $price_2, $price_3)) : format_rupiah($price);
     $normalized_price = preg_replace('/[^0-9]/', '', (string) $formatted_price);
 
     if ($normalized_price === '999') {

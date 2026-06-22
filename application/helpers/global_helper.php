@@ -764,12 +764,14 @@ if (!function_exists('get_price')) {
 
 
         if ($level == 1) {
-            return format_rupiah($price1);
+            return $price1;
         } elseif ($level == 2) {
-            return format_rupiah($price2);
+            return $price2;
         } elseif ($level == 3) {
-            return format_rupiah($price3);
+            return $price3;
         }
+
+        return $price1;
     }
 }
 

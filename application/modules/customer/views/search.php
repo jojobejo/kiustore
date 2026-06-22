@@ -22,7 +22,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         if (!function_exists('format_search_price_text')) {
             function format_search_price_text($price, $price_2, $price_3)
             {
-                $formatted_price = get_price($price, $price_2, $price_3);
+                $formatted_price = format_rupiah(get_price($price, $price_2, $price_3));
                 $normalized_price = preg_replace('/[^0-9]/', '', (string) $formatted_price);
 
                 if ($normalized_price === '999') {

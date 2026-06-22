@@ -10,9 +10,21 @@ class Product_model extends CI_Model
         $this->user_id = get_current_user_id();
     }
 
-    public function get_all_products()
+    public function count_all_products()
     {
-        return $this->db->like('level_product', level_user())->get('v_products')->result();
+        return $this->db->like('level_product', level_user())
+            ->count_all_results('v_products');
+    }
+
+    public function get_all_products($limit = null, $offset = 0)
+    {
+        $this->db->like('level_product', level_user());
+
+        if ($limit !== null) {
+            $this->db->limit($limit, $offset);
+        }
+
+        return $this->db->get('v_products')->result();
     }
 
     public function search_products($like)
@@ -169,9 +181,21 @@ class Product_model extends CI_Model
         return $this->db->get('product_category')->result();
     }
 
-    public function get_products_in_category($id)
+    public function count_products_in_category($id)
     {
         return $this->db->where('category_id', $id)
+            ->count_all_results('products');
+    }
+
+    public function get_products_in_category($id, $limit = null, $offset = 0)
+    {
+        $this->db->where('category_id', $id);
+
+        if ($limit !== null) {
+            $this->db->limit($limit, $offset);
+        }
+
+        return $this->db
             ->get('products')->result();
     }
 
