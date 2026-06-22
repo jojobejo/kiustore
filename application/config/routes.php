@@ -60,6 +60,7 @@ $route['error/app']                         = 'errors/app';
 
 $route['dashboard_admin']                   = 'admin/dashboard';
 $route['admin']                             = 'admin/admin';
+$route['admin/categories']                  = 'admin/products/category';
 
 $route['send_admin_message']                = 'admin/messages/send';
 $route['admin/messages/fetch']              = 'admin/messages/fetch';

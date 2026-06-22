@@ -94,18 +94,18 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </li>
             <?php if (admin_role() == 'admin' || admin_role() == 'adminonline') : ?>
               <li class="nav-item">
-                <a class="nav-link <?= ($this->uri->segment(3) == 'category' ? 'active' : '') ?>" href="<?php echo site_url('admin/payments/briva_payment'); ?>">
+                <a class="nav-link <?= ($this->uri->segment(2) == 'categories' || ($this->uri->segment(2) == 'products' && $this->uri->segment(3) == 'category') ? 'active' : '') ?>" href="<?php echo site_url('admin/categories'); ?>">
                   <i class="ni ni-bullet-list-67 text-info"></i>
                   <span class="nav-link-text">Kategori Produk</span>
                 </a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" hidden>
                 <a class="nav-link <?= ($this->uri->segment(2) == 'payments' ? 'active' : '') ?>" href="<?php echo site_url('admin/brivaws'); ?>">
                   <i class="ni ni-bullet-list-67 text-info"></i>
                   <span class="nav-link-text">BRIVA API</span>
                 </a>
               </li>
-              <li class="nav-item">
+              <li class="nav-item" hidden>
                 <a class="nav-link" <?= ($this->uri->segment(2) == 'ongkir' ? 'active' : '') ?> href="<?php echo site_url('admin/ongkir'); ?>">
                   <i class="ni ni-bullet-list-67 text-info"></i>
                   <span class="nav-link-text">Data Ongkir</span>
