@@ -42,26 +42,31 @@ if (!function_exists('session_data')) {
         $read_session_in_cookie = get_cookie('__ACTIVE_SESSION_DATA');
         $read_session_in_session = $CI->session->userdata('__ACTIVE_SESSION_DATA');
 
-        if ($read_session_in_cookie) {
-            $read_data = $CI->encryption->decrypt($read_session_in_cookie);
-            $read_data = json_decode($read_data);
-
-            return $read_data;
-        } else if ($read_session_in_session) {
-            $read_data = $CI->encryption->decrypt($read_session_in_session);
-            $read_data = json_decode($read_data);
-
-            return $read_data;
-        } else {
-            $default_session = new stdClass();
-
-            $default_session->is_login = false;
-            $default_session->user_id = 0;
-            $default_session->login_at = 0;
-            $default_session->remember_me = false;
-
-            return $default_session;
+        $encrypted_session = NULL;
+        if (is_string($read_session_in_cookie) && $read_session_in_cookie !== '') {
+            $encrypted_session = $read_session_in_cookie;
+        } elseif (is_string($read_session_in_session) && $read_session_in_session !== '') {
+            $encrypted_session = $read_session_in_session;
         }
+
+        if ($encrypted_session !== NULL) {
+            $read_data = $CI->encryption->decrypt($encrypted_session);
+            if (is_string($read_data)) {
+                $read_data = json_decode($read_data);
+                if (is_object($read_data)) {
+                    return $read_data;
+                }
+            }
+        }
+
+        $default_session = new stdClass();
+
+        $default_session->is_login = false;
+        $default_session->user_id = 0;
+        $default_session->login_at = 0;
+        $default_session->remember_me = false;
+
+        return $default_session;
     }
 }
 

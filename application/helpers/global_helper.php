@@ -6,8 +6,8 @@ function check_agreement()
     $ci = &get_instance();
     $ci->load->database();
 
-    $controller = strtolower($ci->router->class);
-    $method     = strtolower($ci->router->method);
+    $controller = strtolower((string) $ci->router->class);
+    $method     = strtolower((string) $ci->router->method);
 
     $allowed = [
         'terms/policy_privacy',
@@ -55,7 +55,7 @@ if (!function_exists('get_settings')) {
             ->where('key', $key)
             ->get('settings')
             ->row();
-        return $row->content;
+        return $row ? $row->content : NULL;
     }
 }
 
@@ -319,7 +319,14 @@ if (!function_exists('get_store_logo')) {
 if (!function_exists('get_formatted_date')) {
     function get_formatted_date($source_date)
     {
+        if (!is_string($source_date) || trim($source_date) === '') {
+            return '-';
+        }
+
         $d = strtotime($source_date);
+        if ($d === false) {
+            return '-';
+        }
 
         $year = date('Y', $d);
         $month = date('n', $d);
@@ -385,11 +392,13 @@ if (!function_exists('create_product_sku')) {
 if (!function_exists('create_acronym')) {
     function create_acronym($words)
     {
-        $words = explode(' ', $words);
+        $words = preg_split('/\s+/', trim((string) $words));
         $acronym = '';
 
         foreach ($words as $word) {
-            $acronym .= $word[0];
+            if ($word !== '') {
+                $acronym .= $word[0];
+            }
         }
 
         $acronym = strtoupper($acronym);

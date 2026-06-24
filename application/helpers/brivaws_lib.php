@@ -6,6 +6,9 @@ class brivaws_lib
     private $client_id;
     private $url;
     private $privateKey;
+    private $secret_key;
+    private $partnerServiceId;
+    private $expartnerid;
 
     public function __construct()
     {
@@ -15,7 +18,7 @@ class brivaws_lib
 
         date_default_timezone_set("Asia/Jakarta");
 
-        $this->load->model(array(
+        $this->CI->load->model(array(
             'order_model' => 'order',
             'payment_model' => 'payment'
         ));
@@ -38,7 +41,7 @@ class brivaws_lib
     public function createVa($customerNo, $custname, $tot_price, $trid)
     {
         $patch = '/snap/v1.0/transfer-va/create-va';
-        $fullUrl = $this->CI->url . $patch;
+        $fullUrl = $this->url . $patch;
         $method = 'POST';
         $timestamp  = gmdate('Y-m-d\TH:i:s.000\Z');
         $token = $this->getToken();
@@ -85,13 +88,11 @@ class brivaws_lib
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-        $token = json_decode($response, true);
-
         $this->echoPre('-- create token --');
         $this->echoPre($response);
 
         // Cek response valid JSON
-        $token = json_decode($response, true);
+        $token = is_string($response) ? json_decode($response, true) : NULL;
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             log_message('error', "getToken() gagal decode JSON. Response mentah: " . $response);

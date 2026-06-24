@@ -256,9 +256,13 @@
         echo '</pre>';
     }
 
+    /*
+     * Legacy class-method experiment retained for reference only. This file is
+     * a standalone BRIVA test script, so a method declaration is invalid here
+     * and prevents PHP from parsing the whole application tree.
+     *
     public function getToken()
-    
-{
+    {
     $endpoint = '/snap/v1.0/access-token/b2b';
     $fullUrl = $this->url . $endpoint;
     $timestamp = gmdate("Y-m-d\TH:i:s\Z");
@@ -303,5 +307,6 @@
         ];
     }
 }
+    */
 
 ?>

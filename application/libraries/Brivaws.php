@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Brivaws
 {
+    private $CI;
     private $client_id;
     private $url;
     private $privateKey;

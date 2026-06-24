@@ -50,6 +50,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		EllisLab Dev Team
  * @link		https://codeigniter.com/user_guide/database/
  */
+/**
+ * CodeIgniter 3 maps configuration arrays directly to the driver object.
+ * This retains that legacy behaviour without PHP 8.2 dynamic-property notices.
+ */
+#[\AllowDynamicProperties]
 abstract class CI_DB_driver {
 
 	/**
@@ -205,6 +210,13 @@ abstract class CI_DB_driver {
 	 * @var	bool
 	 */
 	public $save_queries		= TRUE;
+
+	/**
+	 * Fallback database connection configurations.
+	 *
+	 * @var array
+	 */
+	public $failover		= array();
 
 	/**
 	 * Queries list

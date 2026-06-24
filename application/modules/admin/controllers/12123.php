@@ -59,6 +59,11 @@
 // echo "Access Token: " . $accessToken;
 
 
+/*
+ * Incomplete BRIVA experiment retained as documentation. It is not a
+ * CodeIgniter controller class, so declaring a public method at file scope is
+ * invalid PHP and blocks deployment linting.
+ *
 public function create_va()
 {
     // Panggil fungsi get_token()
@@ -136,4 +141,5 @@ public function create_va()
         ], JSON_PRETTY_PRINT);
     }
 }
+*/
 

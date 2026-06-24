@@ -120,7 +120,7 @@ class CI_Encrypt {
 				return $this->encryption_key;
 			}
 
-			$key = config_item('encryption_key');
+			$key = (string) config_item('encryption_key');
 
 			if ( ! self::strlen($key))
 			{

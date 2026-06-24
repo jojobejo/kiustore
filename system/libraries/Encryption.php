@@ -164,7 +164,7 @@ class CI_Encryption {
 		isset(self::$func_overload) OR self::$func_overload = (extension_loaded('mbstring') && ini_get('mbstring.func_overload'));
 		$this->initialize($params);
 
-		if ( ! isset($this->_key) && self::strlen($key = config_item('encryption_key')) > 0)
+		if ( ! isset($this->_key) && self::strlen($key = (string) config_item('encryption_key')) > 0)
 		{
 			$this->_key = $key;
 		}
@@ -909,6 +909,10 @@ class CI_Encryption {
 	 */
 	protected static function strlen($str)
 	{
+		// PHP 8.1+ deprecates passing NULL to strlen(). A failed or expired
+		// encrypted payload is handled by the caller as an invalid value.
+		$str = (string) $str;
+
 		return (self::$func_overload)
 			? mb_strlen($str, '8bit')
 			: strlen($str);

@@ -30,7 +30,7 @@ if (!function_exists('get_token')) {
         $response = curl_exec($ch);
         curl_close($ch);
 
-        $data = json_decode($response, true);
+        $data = is_string($response) ? json_decode($response, true) : array();
 
         return $data['access_token'] ?? null;
     }
@@ -62,7 +62,7 @@ if (!function_exists('curl_request')) {
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         curl_close($ch);
-        return json_decode($response, true);
+        return is_string($response) ? json_decode($response, true) : array();
     }
 
     if (!function_exists('symmetricSignature')) {
