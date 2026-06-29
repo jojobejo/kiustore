@@ -54,6 +54,28 @@ $route['default_controller']                = 'customer/home';
 $route['404_override']                      = 'errors/not_found';
 $route['translate_uri_dashes']              = FALSE;
 
+// Mobile API v1
+$route['api/v1']                            = 'api/mobile/index';
+$route['api/v1/auth/register']              = 'api/mobile/register';
+$route['api/v1/auth/login']                 = 'api/mobile/login';
+$route['api/v1/auth/logout']                = 'api/mobile/logout';
+$route['api/v1/profile']                    = 'api/mobile/profile';
+$route['api/v1/banners']                    = 'api/mobile/banners';
+$route['api/v1/categories']                 = 'api/mobile/categories';
+$route['api/v1/products']                   = 'api/mobile/products';
+$route['api/v1/products/(:num)']            = 'api/mobile/product/$1';
+$route['api/v1/cart']                       = 'api/mobile/cart';
+$route['api/v1/cart/(:num)']                = 'api/mobile/cart_item/$1';
+$route['api/v1/shipping/provinces']         = 'api/mobile/shipping_provinces';
+$route['api/v1/shipping/cities']            = 'api/mobile/shipping_cities';
+$route['api/v1/shipping/districts']         = 'api/mobile/shipping_districts';
+$route['api/v1/shipping/quotes']            = 'api/mobile/shipping_quotes';
+$route['api/v1/orders']                     = 'api/mobile/orders';
+$route['api/v1/orders/checkout']            = 'api/mobile/checkout';
+$route['api/v1/orders/(:num)']              = 'api/mobile/order/$1';
+$route['api/v1/orders/(:num)/cancel']       = 'api/mobile/cancel_order/$1';
+$route['api/v1/messages']                   = 'api/mobile/messages';
+
 $route['error/no-internet']                 = 'errors/no_internet';
 $route['error/timeout']                     = 'errors/timeout';
 $route['error/app']                         = 'errors/app';
