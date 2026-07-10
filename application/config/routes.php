@@ -56,6 +56,7 @@ $route['translate_uri_dashes']              = FALSE;
 
 // Mobile API v1
 $route['api/v1']                            = 'api/mobile/index';
+$route['api/v1/status']                     = 'api/mobile/index';
 $route['api/v1/auth/register']              = 'api/mobile/register';
 $route['api/v1/auth/login']                 = 'api/mobile/login';
 $route['api/v1/auth/logout']                = 'api/mobile/logout';
@@ -70,8 +71,12 @@ $route['api/v1/shipping/provinces']         = 'api/mobile/shipping_provinces';
 $route['api/v1/shipping/cities']            = 'api/mobile/shipping_cities';
 $route['api/v1/shipping/districts']         = 'api/mobile/shipping_districts';
 $route['api/v1/shipping/quotes']            = 'api/mobile/shipping_quotes';
+$route['api/v1/payment-methods']            = 'api/mobile/payment_methods';
+$route['api/v1/payments/banks']             = 'api/mobile/payment_banks';
 $route['api/v1/orders']                     = 'api/mobile/orders';
 $route['api/v1/orders/checkout']            = 'api/mobile/checkout';
+$route['api/v1/orders/(:num)/payment-method'] = 'api/mobile/select_payment_method/$1';
+$route['api/v1/orders/(:num)/payments/bank-transfer'] = 'api/mobile/confirm_bank_transfer/$1';
 $route['api/v1/orders/(:num)']              = 'api/mobile/order/$1';
 $route['api/v1/orders/(:num)/cancel']       = 'api/mobile/cancel_order/$1';
 $route['api/v1/messages']                   = 'api/mobile/messages';

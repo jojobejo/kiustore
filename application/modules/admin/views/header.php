@@ -99,6 +99,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <span class="nav-link-text">Kategori Produk</span>
                 </a>
               </li>
+              <?php if (admin_role() == 'admin' || admin_role() == 'salesman' || admin_role() == 'adminonline' || admin_role() == 'keuangan') : ?>
+                <li class="nav-item">
+                  <a class="nav-link <?= ($this->uri->segment(2) == 'products' && $this->uri->segment(3) == '' ? 'active' : '') ?>" href="<?php echo site_url('admin/products'); ?>">
+                    <i class="fa fa-cubes text-danger"></i>
+                    <span class="nav-link-text">Produk</span>
+                  </a>
+                </li>
+              <?php endif; ?>
               <li class="nav-item" hidden>
                 <a class="nav-link <?= ($this->uri->segment(2) == 'payments' ? 'active' : '') ?>" href="<?php echo site_url('admin/brivaws'); ?>">
                   <i class="ni ni-bullet-list-67 text-info"></i>
@@ -115,14 +123,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <a class="nav-link <?= ($this->uri->segment(2) == 'banner_product' ? 'active' : '') ?>" href="<?php echo site_url('admin/banner_product'); ?>">
                   <i class="fa fa-image text-success"></i>
                   <span class="nav-link-text">Banner Produk</span>
-                </a>
-              </li>
-            <?php endif; ?>
-            <?php if (admin_role() == 'admin' || admin_role() == 'salesman' || admin_role() == 'adminonline' || admin_role() == 'keuangan') : ?>
-              <li class="nav-item">
-                <a class="nav-link <?= ($this->uri->segment(2) == 'products' && $this->uri->segment(3) == '' ? 'active' : '') ?>" href="<?php echo site_url('admin/products'); ?>">
-                  <i class="fa fa-cubes text-danger"></i>
-                  <span class="nav-link-text">Produk</span>
                 </a>
               </li>
             <?php endif; ?>

@@ -274,7 +274,9 @@ class Mobile_api_model extends CI_Model
 
     private function apply_product_filters($level, $filters)
     {
-        $this->db->from('v_products v')->where('v.is_available', 1);
+        $this->db->from('v_products v')
+            ->where('v.is_available', 1)
+            ->where('v.stock >', 0);
         $this->db->like('v.level_product', (string) $level);
 
         if (!empty($filters['search'])) {
@@ -414,6 +416,18 @@ class Mobile_api_model extends CI_Model
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ));
+    }
+
+    public function active_transaction_order($user_id)
+    {
+        $row = $this->db
+            ->where('user_id', (int) $user_id)
+            ->where_not_in('order_status', array(5, 6, 7))
+            ->order_by('order_date', 'DESC')
+            ->get('orders')
+            ->row_array();
+
+        return $row ? $this->format_order($row) : null;
     }
 
     public function cart_item($id, $user_id)
@@ -602,12 +616,47 @@ class Mobile_api_model extends CI_Model
         );
     }
 
-    public function checkout($user_id, $level, $data)
+    public function payment_methods()
     {
-        if ((int) $data['payment_method'] !== 2) {
-            return array('success' => FALSE, 'status' => 422, 'message' => 'API v1 baru mendukung payment_method 2.');
+        return array(
+            array(
+                'id' => 2,
+                'name' => 'Virtual Account Karisma',
+                'detail' => 'Pembayaran melalui virtual account',
+                'icon' => 'building.columns.fill'
+            ),
+            array(
+                'id' => 3,
+                'name' => 'Transfer Bank',
+                'detail' => 'Transfer manual ke rekening Karisma',
+                'icon' => 'banknote.fill'
+            )
+        );
+    }
+
+    public function payment_banks()
+    {
+        $banks = json_decode(get_settings('payment_banks'), TRUE);
+        $result = array();
+
+        foreach ((array) $banks as $code => $bank) {
+            if (!is_array($bank)) {
+                continue;
+            }
+
+            $result[] = array(
+                'id' => (string) $code,
+                'bank' => isset($bank['bank']) ? $bank['bank'] : '',
+                'number' => isset($bank['number']) ? $bank['number'] : '',
+                'name' => isset($bank['name']) ? $bank['name'] : ''
+            );
         }
 
+        return $result;
+    }
+
+    public function checkout($user_id, $level, $data)
+    {
         $quote = $this->db
             ->where(array(
                 'id' => (int) $data['shipping_quote_id'],
@@ -664,11 +713,11 @@ class Mobile_api_model extends CI_Model
             'order_number' => $order_number,
             'kd_faktur' => 'MOB-' . $order_number,
             'invoice_number' => '',
-            'order_status' => 2,
+            'order_status' => 1,
             'order_date' => date('Y-m-d H:i:s'),
             'total_price' => $cart['summary']['subtotal'],
             'total_items' => count($cart['items']),
-            'payment_method' => 2,
+            'payment_method' => null,
             'shipping_method' => 5,
             'delivery_data' => json_encode(array(
                 'customer' => array(
@@ -725,8 +774,131 @@ class Mobile_api_model extends CI_Model
         return array(
             'success' => TRUE,
             'status' => 201,
-            'data' => $this->order($order_id, $user_id)
+            'data' => $this->order_summary($order_id, $user_id)
         );
+    }
+
+    public function confirm_bank_transfer($order_id, $user_id, $data)
+    {
+        $order = $this->db
+            ->where(array('id' => (int) $order_id, 'user_id' => (int) $user_id))
+            ->get('orders')
+            ->row_array();
+
+        if (!$order) {
+            return array('success' => FALSE, 'status' => 404, 'message' => 'Pesanan tidak ditemukan.');
+        }
+
+        if ((int) $order['payment_method'] !== 3) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Pesanan ini bukan pembayaran transfer bank.');
+        }
+
+        if (!in_array((int) $order['order_status'], array(2, 8), TRUE)) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Status pesanan tidak dapat menerima konfirmasi pembayaran.');
+        }
+
+        $banks = array();
+        foreach ($this->payment_banks() as $bank) {
+            $banks[$bank['id']] = $bank;
+        }
+
+        if (!isset($banks[$data['transfer_to']])) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Bank tujuan transfer tidak valid.');
+        }
+
+        $amount = (float) $data['transfer_amount'];
+        if ($amount <= 0) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Jumlah transfer tidak valid.');
+        }
+
+        $payment_data = array(
+            'order_id' => (int) $order_id,
+            'bank_name' => $data['source_bank'],
+            'bank_number' => $data['source_account_number'],
+            'transfer' => $amount,
+            'bank' => $data['transfer_to'],
+            'transfer_to' => $data['transfer_to'],
+            'name' => $data['source_account_name'],
+            'name_duplicate' => $data['source_account_name'],
+            'source' => array(
+                'bank' => $data['source_bank'],
+                'number' => $data['source_account_number'],
+                'name' => $data['source_account_name']
+            )
+        );
+
+        $payment = array(
+            'order_id' => (int) $order_id,
+            'payment_price' => $amount,
+            'payment_date' => date('Y-m-d H:i:s'),
+            'picture_name' => $data['picture_name'] !== '' ? $data['picture_name'] : '-',
+            'payment_status' => '1',
+            'payment_data' => json_encode($payment_data)
+        );
+
+        $this->db->trans_begin();
+        $this->db->where('id', (int) $order_id)->update('orders', array('order_status' => 8));
+        $this->db->insert('payments', $payment);
+        $payment_id = (int) $this->db->insert_id();
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return array('success' => FALSE, 'status' => 500, 'message' => 'Konfirmasi pembayaran gagal disimpan.');
+        }
+
+        $this->db->trans_commit();
+
+        $payment['id'] = $payment_id;
+        $payment['payment_price'] = (float) $payment['payment_price'];
+        $payment['payment_status'] = (int) $payment['payment_status'];
+        $payment['picture_url'] = $payment['picture_name'] !== '-'
+            ? base_url('assets/uploads/payments/' . $payment['picture_name'])
+            : null;
+        $payment['payment_data'] = $payment_data;
+
+        return array('success' => TRUE, 'status' => 201, 'message' => 'Konfirmasi pembayaran berhasil dikirim.', 'data' => $payment);
+    }
+
+    public function select_payment_method($order_id, $user_id, $payment_method)
+    {
+        $payment_method = (int) $payment_method;
+        if (!in_array($payment_method, array(2, 3), TRUE)) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Metode pembayaran tidak didukung. Gunakan payment_method 2 atau 3.');
+        }
+
+        $order = $this->db
+            ->where(array('id' => (int) $order_id, 'user_id' => (int) $user_id))
+            ->get('orders')
+            ->row_array();
+
+        if (!$order) {
+            return array('success' => FALSE, 'status' => 404, 'message' => 'Pesanan tidak ditemukan.');
+        }
+
+        if ((int) $order['order_status'] !== 2) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Metode pembayaran baru dapat dipilih setelah pesanan dikonfirmasi admin.');
+        }
+
+        $this->db
+            ->where(array('id' => (int) $order_id, 'user_id' => (int) $user_id))
+            ->update('orders', array('payment_method' => $payment_method));
+
+        return array(
+            'success' => TRUE,
+            'status' => 200,
+            'message' => 'Metode pembayaran berhasil dipilih.',
+            'data' => $this->order_summary($order_id, $user_id)
+        );
+    }
+
+    public function order_summary($id, $user_id)
+    {
+        $row = $this->db
+            ->where(array('id' => (int) $id, 'user_id' => (int) $user_id))
+            ->get('orders')
+            ->row_array();
+
+        return $row ? $this->format_order($row) : null;
     }
 
     public function orders($user_id, $page, $per_page)
@@ -772,15 +944,28 @@ class Mobile_api_model extends CI_Model
         foreach ($items as &$item) {
             $item['id'] = (int) $item['id'];
             $item['product_id'] = (int) $item['product_id'];
+            $item['product_name'] = isset($item['name']) && $item['name'] !== '' ? $item['name'] : 'Produk';
             $item['quantity'] = (int) $item['order_qty'];
-            $item['price'] = (float) $item['order_price'];
-            $item['subtotal'] = $item['quantity'] * $item['price'];
+            $item['unit_name'] = isset($item['satuan_text']) && $item['satuan_text'] !== '' ? $item['satuan_text'] : 'pcs';
+            $item['unit_price'] = (float) $item['order_price'];
+            $item['subtotal'] = $item['quantity'] * $item['unit_price'];
             $item['image_url'] = base_url('assets/uploads/products/' . ($item['picture_name'] ? $item['picture_name'] : 'default.jpg'));
-            unset($item['order_qty'], $item['order_price'], $item['picture_name']);
+            unset($item['order_qty'], $item['order_price'], $item['picture_name'], $item['name'], $item['satuan_text']);
         }
 
-        $order['items'] = $items;
-        return $order;
+        $delivery_data = is_array($order['delivery_data']) ? $order['delivery_data'] : array();
+        $customer = isset($delivery_data['customer']) && is_array($delivery_data['customer'])
+            ? $delivery_data['customer']
+            : array();
+
+        return array(
+            'order' => $order,
+            'items' => $items,
+            'shipping_address' => isset($customer['address']) ? $customer['address'] : '',
+            'shipping_service' => isset($order['jenis_pengiriman']) ? $order['jenis_pengiriman'] : '',
+            'shipping_cost' => isset($order['shipping_cost']) ? (float) $order['shipping_cost'] : 0,
+            'insurance' => isset($order['insurance']) ? (float) $order['insurance'] : 0
+        );
     }
 
     public function cancel_order($id, $user_id)
@@ -853,18 +1038,21 @@ class Mobile_api_model extends CI_Model
             5 => 'Selesai',
             6 => 'Selesai',
             7 => 'Dibatalkan',
-            8 => 'Diproses',
-            9 => 'Menunggu persetujuan'
+            8 => 'Dalam proses verifikasi pembayaran',
+            9 => 'Menunggu persetujuan',
+            10 => 'Payment Verify',
+            11 => 'Tentukan metode pengiriman'
         );
 
         $row['id'] = (int) $row['id'];
         $row['order_status'] = $status;
+        $row['status_id'] = $status;
         $row['status_label'] = isset($labels[$status]) ? $labels[$status] : 'Status ' . $status;
         $row['total_price'] = (float) $row['total_price'];
         $row['shipping_cost'] = (float) $row['shipping_cost'];
         $row['insurance'] = (float) $row['insurance'];
         $row['total_items'] = (int) $row['total_items'];
-        $row['payment_method'] = (int) $row['payment_method'];
+        $row['payment_method'] = $row['payment_method'] === null ? null : (int) $row['payment_method'];
         $row['grand_total'] = $row['total_price'] + $row['shipping_cost'] + $row['insurance'];
         $row['delivery_data'] = json_decode($row['delivery_data'], TRUE);
 

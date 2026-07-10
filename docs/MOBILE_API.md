@@ -270,6 +270,24 @@ Catatan:
 
 ### Order
 
+Aturan transaksi aktif:
+
+- User tidak dapat menambahkan item ke keranjang jika masih memiliki transaksi berjalan.
+- Transaksi dianggap berjalan selama `order_status` bukan `5`, `6`, atau `7`.
+- API `POST /api/v1/cart` akan mengembalikan `409 Conflict` dengan arahan agar user melanjutkan transaksi dari menu Riwayat, atau membatalkan/menyelesaikan transaksi tersebut.
+
+Metode pembayaran:
+
+```http
+GET /api/v1/payment-methods
+```
+
+Rekening tujuan transfer bank:
+
+```http
+GET /api/v1/payments/banks
+```
+
 List order:
 
 ```http
@@ -292,8 +310,19 @@ POST /api/v1/orders/checkout
 {
   "shipping_quote_id": 10,
   "shipping_service": "REG",
-  "payment_method": 2,
   "note": "Hubungi sebelum kirim"
+}
+```
+
+Pilih metode pembayaran setelah admin mengonfirmasi pesanan:
+
+```http
+POST /api/v1/orders/123/payment-method
+```
+
+```json
+{
+  "payment_method": 3
 }
 ```
 
@@ -305,10 +334,39 @@ POST /api/v1/orders/123/cancel
 
 Catatan penting checkout:
 
-- Versi awal ini baru mendukung `payment_method = 2`.
-- Tujuannya supaya flow mobile aman dulu dan tidak berbenturan dengan logika kredit web yang lebih kompleks.
+- Order mobile baru dibuat dengan `order_status = 1` (`Menunggu diproses`) dan `payment_method = null`.
+- Admin mengonfirmasi pesanan dari modul order web. Setelah status menjadi `2` (`Menunggu pembayaran`), aplikasi menampilkan invoice dan membuka pemilihan metode pembayaran.
+- Endpoint pemilihan metode pembayaran mendukung `payment_method = 2` untuk Virtual Account dan `payment_method = 3` untuk Transfer Bank.
+- Jika user memilih Transfer Bank, upload bukti transfer melalui endpoint konfirmasi pembayaran. Endpoint ini membuat `payments.payment_status = 1` dan mengubah `orders.order_status = 8` (`Dalam proses verifikasi pembayaran`).
+- Metode kredit (`payment_method = 1`) belum didukung di mobile karena masih bergantung pada approval dan limit kredit web.
 - Harga order item dan stok selalu diverifikasi ulang dari database.
 - `total_price` disimpan sebagai subtotal barang, sedangkan `grand_total` pada response sudah memasukkan ongkir dan insurance.
+
+Konfirmasi pembayaran transfer bank:
+
+```http
+POST /api/v1/orders/123/payments/bank-transfer
+```
+
+Payload JSON:
+
+```json
+{
+  "source_bank": "BCA",
+  "source_account_number": "1234567890",
+  "source_account_name": "Budi",
+  "transfer_amount": 91500,
+  "transfer_to": "bank-bca",
+  "picture_mime": "image/jpeg",
+  "picture_base64": "BASE64_IMAGE"
+}
+```
+
+Catatan:
+
+- `transfer_to` memakai `id` dari endpoint `/api/v1/payments/banks`.
+- Bukti pembayaran juga dapat dikirim sebagai multipart field `picture` (`jpg`, `jpeg`, atau `png`, maksimal 5MB).
+- Setelah konfirmasi berhasil, order masuk status `8` / menunggu konfirmasi pembayaran admin.
 
 ### Chat
 
@@ -348,6 +406,6 @@ File diubah:
 
 - API key ongkir masih tersimpan di file config project. Untuk production lebih baik dipindah ke environment yang aman.
 - Belum ada refresh token.
-- Belum ada upload foto profil atau upload bukti pembayaran.
+- Belum ada upload foto profil.
 - Belum ada endpoint BRIVA otomatis di flow checkout mobile ini.
 - Jika nanti Anda ingin, tahap berikutnya paling masuk akal adalah menambahkan `payment confirmation`, `wishlist`, dan `push notification ready payload`.

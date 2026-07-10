@@ -238,6 +238,15 @@ class Mobile extends CI_Controller
         $quantity = (int) $this->value('quantity');
         $unit_type = (int) $this->value('unit_type', 1);
 
+        $active_order = $this->mobile_api->active_transaction_order($this->user->id);
+        if ($active_order) {
+            return $this->error(
+                'Masih ada transaksi berjalan. Lanjutkan dari menu Riwayat, atau batalkan/selesaikan transaksi tersebut sebelum menambahkan item baru.',
+                409,
+                array('active_order' => $active_order)
+            );
+        }
+
         if ($quantity < 1 || !in_array($unit_type, array(1, 2), TRUE)) {
             return $this->error('Quantity atau unit_type tidak valid.', 422);
         }
@@ -348,6 +357,24 @@ class Mobile extends CI_Controller
         return $this->shipping_response($result, 201);
     }
 
+    public function payment_methods()
+    {
+        if (!$this->require_method('GET')) {
+            return;
+        }
+
+        return $this->respond($this->mobile_api->payment_methods());
+    }
+
+    public function payment_banks()
+    {
+        if (!$this->require_method('GET')) {
+            return;
+        }
+
+        return $this->respond($this->mobile_api->payment_banks());
+    }
+
     public function orders()
     {
         if (!$this->require_method('GET') || !$this->authenticate()) {
@@ -393,7 +420,6 @@ class Mobile extends CI_Controller
         $result = $this->mobile_api->checkout($this->user->id, $this->user->level, array(
             'shipping_quote_id' => (int) $this->value('shipping_quote_id'),
             'shipping_service' => trim((string) $this->value('shipping_service')),
-            'payment_method' => (int) $this->value('payment_method', 2),
             'note' => trim((string) $this->value('note', ''))
         ));
 
@@ -415,6 +441,60 @@ class Mobile extends CI_Controller
         }
 
         return $this->respond($this->mobile_api->order((int) $id, $this->user->id), 200, 'Pesanan dibatalkan.');
+    }
+
+    public function confirm_bank_transfer($id)
+    {
+        if (!$this->require_method('POST') || !$this->authenticate()) {
+            return;
+        }
+
+        if (!$this->require_fields(array('source_bank', 'source_account_number', 'source_account_name', 'transfer_amount', 'transfer_to'))) {
+            return;
+        }
+
+        $picture_name = $this->payment_picture_name();
+        if ($picture_name === FALSE) {
+            return;
+        }
+
+        $result = $this->mobile_api->confirm_bank_transfer((int) $id, $this->user->id, array(
+            'source_bank' => trim((string) $this->value('source_bank')),
+            'source_account_number' => trim((string) $this->value('source_account_number')),
+            'source_account_name' => trim((string) $this->value('source_account_name')),
+            'transfer_amount' => (float) $this->value('transfer_amount'),
+            'transfer_to' => trim((string) $this->value('transfer_to')),
+            'picture_name' => $picture_name
+        ));
+
+        if (!$result['success']) {
+            return $this->error($result['message'], $result['status']);
+        }
+
+        return $this->respond($result['data'], $result['status'], $result['message']);
+    }
+
+    public function select_payment_method($id)
+    {
+        if (!$this->require_method('POST') || !$this->authenticate()) {
+            return;
+        }
+
+        if (!$this->require_fields(array('payment_method'))) {
+            return;
+        }
+
+        $result = $this->mobile_api->select_payment_method(
+            (int) $id,
+            $this->user->id,
+            (int) $this->value('payment_method')
+        );
+
+        if (!$result['success']) {
+            return $this->error($result['message'], $result['status']);
+        }
+
+        return $this->respond($result['data'], $result['status'], $result['message']);
     }
 
     public function messages()
@@ -552,6 +632,79 @@ class Mobile extends CI_Controller
         }
 
         return $this->respond($result['data'], $status);
+    }
+
+    private function payment_picture_name()
+    {
+        if (!empty($_FILES['picture']['name'])) {
+            $config['upload_path'] = './assets/uploads/payments/';
+            $config['allowed_types'] = 'jpg|jpeg|png';
+            $config['max_size'] = 5096;
+            $config['overwrite'] = FALSE;
+            $config['encrypt_name'] = TRUE;
+
+            $this->load->library('upload', $config);
+            if (!$this->upload->do_upload('picture')) {
+                $this->error(strip_tags($this->upload->display_errors('', '')), 422);
+                return FALSE;
+            }
+
+            $upload_data = $this->upload->data();
+            return $upload_data['file_name'];
+        }
+
+        $base64 = trim((string) $this->value('picture_base64', ''));
+        if ($base64 === '') {
+            return '';
+        }
+
+        $mime = strtolower(trim((string) $this->value('picture_mime', '')));
+        if (preg_match('/^data:(image\/(png|jpe?g));base64,(.+)$/i', $base64, $matches)) {
+            $mime = strtolower($matches[1]);
+            $base64 = $matches[3];
+        }
+
+        $extensions = array(
+            'image/jpeg' => 'jpg',
+            'image/jpg' => 'jpg',
+            'image/png' => 'png'
+        );
+
+        if (!isset($extensions[$mime])) {
+            $this->error('Format bukti pembayaran harus jpg, jpeg, atau png.', 422);
+            return FALSE;
+        }
+
+        $binary = base64_decode($base64, TRUE);
+        if ($binary === FALSE) {
+            $this->error('Bukti pembayaran base64 tidak valid.', 422);
+            return FALSE;
+        }
+
+        if (strlen($binary) > 5096 * 1024) {
+            $this->error('Ukuran bukti pembayaran maksimal 5MB.', 422);
+            return FALSE;
+        }
+
+        $file_name = bin2hex(random_bytes(16)) . '.' . $extensions[$mime];
+        $upload_dir = FCPATH . 'assets/uploads/payments/';
+        if (!is_dir($upload_dir) && !@mkdir($upload_dir, 0775, TRUE)) {
+            $this->error('Folder bukti pembayaran belum siap.', 500);
+            return FALSE;
+        }
+
+        if (!is_writable($upload_dir)) {
+            $this->error('Folder bukti pembayaran tidak dapat ditulis.', 500);
+            return FALSE;
+        }
+
+        $path = $upload_dir . $file_name;
+        if (@file_put_contents($path, $binary) === FALSE) {
+            $this->error('Bukti pembayaran gagal disimpan.', 500);
+            return FALSE;
+        }
+
+        return $file_name;
     }
 
     private function method_not_allowed($allowed)
