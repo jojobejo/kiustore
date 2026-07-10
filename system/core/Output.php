@@ -459,7 +459,10 @@ class CI_Output {
 		if ($this->parse_exec_vars === TRUE)
 		{
 			$memory	= round(memory_get_usage() / 1024 / 1024, 2).'MB';
-			$output = str_replace(array('{elapsed_time}', '{memory_usage}'), array($elapsed, $memory), $output);
+			// Controllers may send output directly (for example with echo), leaving
+			// CodeIgniter's internal output buffer as NULL. PHP 8.1+ no longer
+			// accepts NULL as the subject of str_replace().
+			$output = str_replace(array('{elapsed_time}', '{memory_usage}'), array($elapsed, $memory), (string) $output);
 		}
 
 		// --------------------------------------------------------------------

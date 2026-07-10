@@ -88,7 +88,7 @@ class Product_model extends CI_Model {
             , (p.stock - (p.product_unit_value * (p.stock / p.product_unit_value))) AS result2
             , pc.name as category_name
             FROM products p
-            JOIN product_category pc
+            LEFT JOIN product_category pc
                 ON pc.id = p.category_id
             WHERE p.id = '$id'
         ")->row();

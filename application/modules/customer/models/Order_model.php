@@ -537,7 +537,14 @@ class Order_model extends CI_Model
     public function is_va_exist($id)
     {
         $user_id = $this->user_id;
-        return ($this->db->where(array('order_number' => $id, 'user_id' => $user_id))->get('briva_api')->num_rows() > 0) ? TRUE : FALSE;
+        // Hanya VA aktif yang boleh menyembunyikan tombol "Lakukan Pembayaran".
+        // Riwayat VA dengan status selesai/kedaluwarsa tetap tersimpan di briva_api,
+        // namun tidak dapat dipakai kembali untuk pembayaran.
+        return ($this->db->where(array(
+            'order_number' => $id,
+            'user_id'      => $user_id,
+            'status'       => 1
+        ))->get('briva_api')->num_rows() > 0) ? TRUE : FALSE;
     }
 
     public function get_latest_active_va($user_id)

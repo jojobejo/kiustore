@@ -366,8 +366,12 @@ class Products extends CI_Controller
     {
         if ($this->product->is_product_exist($id)) {
             $data = $this->product->product_data($id);
+            if (!$data) {
+                show_404();
+                return;
+            }
 
-            $params['title'] = $data->name . ' | SKU ' . $data->sku;
+            $params['title'] = ($data->name ?? 'Produk') . ' | SKU ' . ($data->sku ?? '-');
 
             $product['product'] = $data;
             $product['flash'] = $this->session->flashdata('product_flash');
