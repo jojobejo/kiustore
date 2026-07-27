@@ -1,0 +1,306 @@
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+class Profile extends CI_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
+
+        verify_session('customer');
+
+        $this->load->model(array(
+            'profile_model' => 'profile',
+            'rajaongkir_model' => 'ongkirapi'
+        ));
+
+        $this->load->library('form_validation');
+    }
+
+    public function index()
+    {
+        $data           = $this->profile->get_profile();
+        $point          = $this->profile->get_total_silver_points();
+        $total_silver   = (int)($point->total_silver ?? 0);
+        $konv_silver    = (int)($point->total_silver ?? 0);
+        $konv_gold      = (int)floor($konv_silver / 50);
+        $konv_platinum  = (int)floor($konv_silver / 50) / 2;
+
+        // $sisa_after_platinum = $total_silver - ($konv_platinum * 100);
+
+        $params['title']    = $data->name;
+        $user['user']       = $data;
+        $user['flash']      = $this->session->flashdata('profile');
+        $user['point_total_silver'] = $total_silver;
+        $user['point_konv_silver'] = $konv_silver;
+        $user['point_konv_gold'] = $konv_gold;
+        $user['point_konv_platinum'] = $konv_platinum;
+
+        $this->load->view('header', $params);
+        $this->load->view('profile', $user);
+        $this->load->view('footer');
+    }
+
+    public function toggle_readonly()
+    {
+        $readonly = $this->input->post('readonly');
+        echo json_encode(["status" => "success", "readonly" => $readonly]);
+    }
+
+    public function inputlocation()
+    {
+        $location = $this->input->post('location');
+        echo json_encode(["status" => "success", "location" => $location]);
+    }
+
+    public function get_provinces()
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://pro.rajaongkir.com/api/province",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => array(
+                "content-type: application/x-www-form-urlencoded",
+                "key: " . $this->api_key,
+            ),
+        ));
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        if ($response) {
+            $data = json_decode($response, true);
+            $provinces = [];
+            if (isset($data['rajaongkir']['results'])) {
+                foreach ($data['rajaongkir']['results'] as $prov) {
+                    $provinces[] = [
+                        "id" => $prov['province_id'],
+                        "text" => $prov['province']
+                    ];
+                }
+            }
+            echo json_encode($provinces);
+        } else {
+            echo json_encode([]);
+        }
+    }
+
+    public function cus_editdata($action)
+    {
+        $id = $action;
+        // 1 = verifikasi alamat
+        // 2 = edit profile 
+        // 3 = save alamat - customer  
+
+        switch ($id) {
+            case '1':
+                $data = $this->profile->get_profile();
+
+                $params['title']    = $data->name;
+                $user['user']       = $data;
+                $user['action']     = $id;
+                $user['flash']      = $this->session->flashdata('profile');
+
+                $this->load->view('header', $params);
+                $this->load->view('profile_edit', $user);
+                $this->load->view('footer');
+                break;
+            case '2':
+                $reset_id = [
+                    'province_id'       => '0',
+                    'kota_id'           => '0',
+                    'subdistrict_id'    => '0'
+                ];
+                $this->profile->update($reset_id);
+                redirect('cus_edit_customer/1');
+                break;
+            case '3':
+
+                $pro_id     = $this->input->post('pro_id');
+                $kab_id     = $this->input->post('kab_id');
+                $kec_id     = $this->input->post('kec_id');
+                $pro_name   = $this->input->post('pro_name');
+                $kab_name   = $this->input->post('kab_name');
+                $kec_name   = $this->input->post('kec_name');
+
+                $data = array(
+                    'province_id'    => $pro_id,
+                    'kota_id'        => $kab_id,
+                    'subdistrict_id' => $kec_id,
+                    'alamat_kirim'   => $pro_name . ',' . $kab_name . ',' . $kec_name
+                );
+
+                $update = $this->profile->update($data);
+
+                if ($update) {
+                    echo json_encode(['status' => 'success', 'message' => 'Alamat berhasil diperbarui!']);
+                } else {
+                    echo json_encode(['status' => 'error', 'message' => 'Gagal memperbarui alamat!']);
+                }
+
+                break;
+        }
+    }
+
+    public function change_alamat_asal()
+    {
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://rajaongkir.komerce.id/api/v1/destination/province",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "content-type: application/x-www-form-urlencoded",
+                "key:" . $this->api_key,
+            ),
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            $user['kota'] = array('error' => true);
+        } else {
+            // DATA AWAL
+            $data = $this->profile->get_profile();
+            $params['title'] = $data->name;
+            // JSON-RAJA-ONGKIR
+            $user['kota'] = json_decode($response);
+        }
+
+        $this->load->view('header', $params);
+        $this->load->view('profile_alamat', $user);
+        $this->load->view('footer');
+    }
+
+    public function change_password()
+    {
+        $data = $this->profile->get_profile();
+
+        $params['title'] = $data->name;
+        $user['user'] = $data;
+        $user['flash'] = $this->session->flashdata('profile');
+
+        $this->load->view('header', $params);
+        $this->load->view('change_password', $user);
+        $this->load->view('footer');
+    }
+
+    public function cus_edit_profile()
+    {
+        $data = $this->profile->get_profile();
+
+        $params['title']    = $data->name;
+        $user['user']       = $data;
+        $user['flash']      = $this->session->flashdata('profile');
+
+        $this->load->view('header', $params);
+        $this->load->view('change_profile_customer', $user);
+        $this->load->view('footer');
+    }
+
+    public function edit_name()
+    {
+        $this->form_validation->set_rules('name', 'Nama lengkap', 'required|max_length[32]|min_length[4]');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->index();
+        } else {
+            $data = new stdClass();
+
+            $data->name = $this->input->post('name');
+            $data->phone_number = $this->input->post('phone_number');
+            $data->address = $this->input->post('address');
+            $data->shop_name = $this->input->post('shop_name');
+            $data->shop_address = $this->input->post('shop_address');
+
+            $profile = $this->profile->get_profile();
+            $old_profile = $profile->profile_picture;
+
+            if (isset($_FILES) && @$_FILES['file']['error'] == '0') {
+                $config['upload_path'] = './assets/uploads/users/';
+                $config['allowed_types'] = 'jpg|png';
+                $config['max_size'] = 2048;
+
+                $this->load->library('upload', $config);
+
+                if ($this->upload->do_upload('file')) {
+                    if ($old_profile) {
+                        unlink('./assets/uploads/users/' . $old_profile);
+                    }
+
+                    $file_data = $this->upload->data();
+                    $data->profile_picture = $file_data['file_name'];
+                } else {
+                    $errors = $this->upload->display_errors();
+                    $errors .= '<p>';
+                    $errors .= anchor('profile', '&laquo; Kembali');
+                    $errors .= '</p>';
+
+                    show_error($errors);
+                }
+            }
+
+            $flash_message = ($this->profile->update($data)) ? 'Profil berhasil diperbarui!' : 'Terjadi kesalahan';
+
+            $this->session->set_flashdata('profile', $flash_message);
+            redirect('customer/profile');
+        }
+    }
+
+    public function edit_account()
+    {
+        $this->form_validation->set_rules('username', 'Username', 'required|max_length[16]|min_length[4]');
+        $this->form_validation->set_rules('password', 'Password', 'min_length[4]');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->index();
+        } else {
+            $data = new stdClass();
+            $profile = $this->profile->get_profile();
+
+            $get_password = $this->input->post('password');
+
+            if (empty($get_password)) {
+                $password = $profile->password;
+            } else {
+                $password = password_hash($get_password, PASSWORD_BCRYPT);
+            }
+
+            $data->email = $this->input->post('username');
+            $data->password = $password;
+
+            $flash_message = ($this->profile->update_account($data)) ? 'Akun berhasil diperbarui' : 'Terjadi kesalahan';
+
+            $this->session->set_flashdata('profile', $flash_message);
+
+            redirect('customer/profile/change_password');
+        }
+    }
+
+    public function edit_email()
+    {
+        $this->form_validation->set_rules('email', 'Email', 'required|valid_email|max_length[32]|min_length[10]');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->index();
+        } else {
+            $data = new stdClass();
+
+            $data->email = $this->input->post('email');
+
+            $flash_message = ($this->profile->update_account($data)) ? 'Email berhasil diperbarui' : 'Terjadi kesalahan';
+
+            $this->session->set_flashdata('profile', $flash_message);
+            $this->session->set_flashdata('show_tab', 'email');
+
+            redirect('customer/profile');
+        }
+    }
+}
