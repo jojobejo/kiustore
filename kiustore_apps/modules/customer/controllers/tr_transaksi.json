@@ -1,0 +1,91 @@
+{
+    "responseCode": "2003500",
+    "responseMessage": "Successful",
+    "virtualAccountData": [
+        {
+            "partnerServiceId": "   91118",
+            "customerNo": "8123009960",
+            "virtualAccountNo": "   911188123009960",
+            "virtualAccountName": "Annelia Kartika ",
+            "trxId": "2523888883670041351",
+            "totalAmount": {
+                "value": "100.00",
+                "currency": "IDR"
+            },
+            "trxDateTime": "2025-08-26T12:48:21+07:00",
+            "additionalInfo": {
+                "channel": "NBMB",
+                "sourceAccountVa": "2101300300300",
+                "tellerId": "8888367"
+            }
+        },
+        {
+            "partnerServiceId": "   91118",
+            "customerNo": "8123009969",
+            "virtualAccountNo": "   911188123009969",
+            "virtualAccountName": "Arin            ",
+            "trxId": "2523888885278061801",
+            "totalAmount": {
+                "value": "100.00",
+                "currency": "IDR"
+            },
+            "trxDateTime": "2025-08-26T13:10:03+07:00",
+            "additionalInfo": {
+                "channel": "NBMB",
+                "sourceAccountVa": "2101300300300",
+                "tellerId": "8888527"
+            }
+        },
+        {
+            "partnerServiceId": "   91118",
+            "customerNo": "8123009969",
+            "virtualAccountNo": "   911188123009969",
+            "virtualAccountName": "Arin            ",
+            "trxId": "2523888883678061795",
+            "totalAmount": {
+                "value": "100.00",
+                "currency": "IDR"
+            },
+            "trxDateTime": "2025-08-26T13:10:35+07:00",
+            "additionalInfo": {
+                "channel": "NBMB",
+                "sourceAccountVa": "2101300300300",
+                "tellerId": "8888367"
+            }
+        },
+        {
+            "partnerServiceId": "   91118",
+            "customerNo": "8123009969",
+            "virtualAccountNo": "   911188123009969",
+            "virtualAccountName": "Arin            ",
+            "trxId": "2523888885868061798",
+            "totalAmount": {
+                "value": "100.00",
+                "currency": "IDR"
+            },
+            "trxDateTime": "2025-08-26T13:12:00+07:00",
+            "additionalInfo": {
+                "channel": "NBMB",
+                "sourceAccountVa": "2101300300300",
+                "tellerId": "8888586"
+            }
+        },
+         {
+            "partnerServiceId": "   91118",
+            "customerNo": "8123000001",
+            "virtualAccountNo": "   911188123000001",
+            "virtualAccountName": "Wahyu Ari",
+            "trxId": "2523988886870146653",
+            "totalAmount": {
+                "value": "10000.00",
+                "currency": "IDR"
+            },
+            "trxDateTime": "2025-08-27T12:59:38+07:00",
+            "additionalInfo": {
+                "channel": "BFVA",
+                "sourceAccountVa": "2101300300300",
+                "tellerId": "8888687"
+            }
+        }
+    ]
+}
