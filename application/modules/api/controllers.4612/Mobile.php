@@ -123,19 +123,6 @@ class Mobile extends CI_Controller
         return $this->respond(null, 200, 'Logout berhasil.');
     }
 
-    public function account()
-    {
-        if (!$this->require_method('DELETE') || !$this->authenticate()) {
-            return;
-        }
-
-        if (!$this->mobile_api->delete_account($this->user->id)) {
-            return $this->error('Akun gagal dihapus. Silakan coba lagi.', 500);
-        }
-
-        return $this->respond(array('deleted' => TRUE), 200, 'Akun berhasil dihapus.');
-    }
-
     public function profile()
     {
         if (!$this->authenticate()) {
