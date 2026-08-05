@@ -61,7 +61,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
                 <div class="form-group">
                   <label class="form-control-label" for="name">Password:</label>
-                  <input type="password" name="password" value="<?php echo set_value('password', $users->password); ?>" class="form-control" id="password">
+                  <input type="password" name="password" value="" placeholder="Kosongkan jika tidak ingin mengubah password" class="form-control" id="password">
                   <?php echo form_error('password'); ?>
                 </div>
 
@@ -76,6 +76,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       <option value="distribusi" <?=$users->role == 'distribusi' ? 'selected': '' ?> >distribusi</option>
               			</select>
               	</div>
+
+                <div class="form-group mb-0">
+                  <label class="form-control-label d-block">Akun Internal</label>
+                  <label class="custom-toggle">
+                    <input type="checkbox" name="is_internal" value="1" <?php echo set_checkbox('is_internal', '1', (int) $users->is_internal === 1); ?>>
+                    <span class="custom-toggle-slider rounded-circle"></span>
+                  </label>
+                  <small class="d-block text-muted mt-2">Akun internal dipakai untuk aktivitas internal/test dan dikecualikan dari ringkasan serta laporan bisnis yang sudah disesuaikan.</small>
+                </div>
 
               <!--  <div class="form-group">
               		<label class="form-control-label" for="status">Status</label>

@@ -7,9 +7,27 @@ class Report_model extends CI_Model {
         parent::__construct();
     }
 
+    private function has_internal_column()
+    {
+        return $this->db->field_exists('is_internal', 'users');
+    }
+
+    private function external_user_where($alias = 'u')
+    {
+        if (!$this->has_internal_column()) {
+            return '1=1';
+        }
+
+        return "COALESCE({$alias}.is_internal, 0) = 0";
+    }
+
     public function count_all_orders()
     {
-        return $this->db->get('orders')->num_rows();
+        return $this->db
+            ->from('orders o')
+            ->join('users u', 'u.id = o.user_id')
+            ->where($this->external_user_where('u'), null, false)
+            ->count_all_results();
     }
 
     public function tabel($bulan, $tahun)
@@ -37,9 +55,11 @@ class Report_model extends CI_Model {
           LEFT JOIN product_category ca ON ca.id = p.category_id
           LEFT JOIN coupons c ON c.id = o.coupon_id
           JOIN customers cu  ON cu.user_id = o.user_id
+          JOIN users u ON u.id = o.user_id
           WHERE
           month(o.finish_date) = '" . $bulan . "' and year(o.finish_date) = '" . $tahun . "'
           AND o.order_status != 7
+          AND " . $this->external_user_where('u') . "
           ORDER BY o.order_date DESC
         ";
 
@@ -55,6 +75,9 @@ class Report_model extends CI_Model {
                 ON c.id = o.coupon_id
             JOIN customers cu
                 ON cu.user_id = o.user_id
+            JOIN users u
+                ON u.id = o.user_id
+            WHERE " . $this->external_user_where('u') . "
             ORDER BY o.order_date DESC
             LIMIT 5
         ");
@@ -124,8 +147,11 @@ class Report_model extends CI_Model {
     {
         $overview = $this->db->query("
             SELECT MONTH(order_date) month, COUNT(order_date) sale
-            FROM orders
-            WHERE order_date >= NOW() - INTERVAL 1 YEAR
+            FROM orders o
+            JOIN users u
+                ON u.id = o.user_id
+            WHERE o.order_date >= NOW() - INTERVAL 1 YEAR
+            AND " . $this->external_user_where('u') . "
             GROUP BY MONTH(order_date)");
 
         return $overview->result();
@@ -135,7 +161,10 @@ class Report_model extends CI_Model {
     {
         $data = $this->db->query("
             SELECT  MONTH(order_date) AS month, SUM(total_price) AS income
-            FROM orders
+            FROM orders o
+            JOIN users u
+                ON u.id = o.user_id
+            WHERE " . $this->external_user_where('u') . "
             GROUP BY MONTH(order_date)");
 
         return $data->result();

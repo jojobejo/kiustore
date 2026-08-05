@@ -659,7 +659,10 @@ if (!function_exists('get_total_order')) {
             FROM orders a
             JOIN customers b
                 ON a.user_id = b.user_id
+            JOIN users u
+                ON u.id = a.user_id
             WHERE b.salesman_id = '$id' AND a.order_status = 1
+            AND " . ($CI->db->field_exists('is_internal', 'users') ? "COALESCE(u.is_internal, 0) = 0" : "1=1") . "
         ")->num_rows();
     }
 }
@@ -690,7 +693,10 @@ if (!function_exists('get_unconfirmed_payment')) {
                 ON a.user_id = b.user_id
             JOIN payments c
                 ON a.id = c.order_id
+            JOIN users u
+                ON u.id = a.user_id
             WHERE b.salesman_id = '$id' AND c.payment_status = 1
+            AND " . ($CI->db->field_exists('is_internal', 'users') ? "COALESCE(u.is_internal, 0) = 0" : "1=1") . "
         ")->num_rows();
     }
 }
@@ -699,7 +705,16 @@ if (!function_exists('get_total_packing')) {
     function get_total_packing()
     {
         $CI = init();
-        return $CI->db->where('order_status', 3)->get('orders')->num_rows();
+        $CI->db
+            ->from('orders a')
+            ->join('users u', 'u.id = a.user_id')
+            ->where('a.order_status', 3);
+
+        if ($CI->db->field_exists('is_internal', 'users')) {
+            $CI->db->where('COALESCE(u.is_internal, 0) = 0', null, false);
+        }
+
+        return $CI->db->count_all_results();
     }
 }
 
