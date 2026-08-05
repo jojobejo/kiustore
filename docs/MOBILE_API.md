@@ -24,6 +24,7 @@ Tabel yang ditambahkan:
 - `mobile_api_tokens`
 - `mobile_cart_items`
 - `mobile_shipping_quotes`
+- `mobile_account_deletions`
 
 Contoh eksekusi migrasi:
 
@@ -126,6 +127,36 @@ Payload:
 ```http
 POST /api/v1/auth/logout
 ```
+
+### Hapus Akun
+
+```http
+DELETE /api/v1/account
+```
+
+Endpoint ini wajib memakai Bearer token. Flow ini dibuat untuk memenuhi Apple Guideline 5.1.1(v), yaitu app yang mendukung pembuatan akun juga harus menyediakan penghapusan akun dari dalam app.
+
+Response berhasil:
+
+```json
+{
+  "success": true,
+  "message": "Akun berhasil dihapus.",
+  "data": {
+    "deleted": true
+  }
+}
+```
+
+Efek database:
+
+- Semua token user di `mobile_api_tokens` di-revoke.
+- Cart user di `mobile_cart_items` dihapus.
+- Quote ongkir sementara di `mobile_shipping_quotes` dihapus.
+- Data profil di `customers` dianonimkan dan dilepas dari `user_id`.
+- Histori `orders` dan `reviews` dilepas dari `user_id` agar transaksi non-PII tetap bisa disimpan untuk kebutuhan operasional/pembukuan.
+- Row `users` dianonimkan, email diganti ke email lokal `deleted-*`, password diganti random hash, dan status dinonaktifkan.
+- Audit non-PII disimpan ke `mobile_account_deletions` menggunakan `email_hash`.
 
 ### Profil
 
@@ -395,7 +426,9 @@ File baru:
 - `application/modules/api/controllers/Mobile.php`
 - `application/modules/api/models/Mobile_api_model.php`
 - `db/migrations/20260629_mobile_api.sql`
+- `db/migrations/20260728_mobile_account_deletion.sql`
 - `docs/MOBILE_API.md`
+- `docs/APP_REVIEW_RESOLUTION_20260728.md`
 
 File diubah:
 

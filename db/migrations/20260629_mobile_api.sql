@@ -45,5 +45,16 @@ CREATE TABLE IF NOT EXISTS `mobile_shipping_quotes` (
   KEY `idx_mobile_quote_expiry` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS `mobile_account_deletions` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `email_hash` CHAR(64) NOT NULL,
+  `deleted_at` DATETIME NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_mobile_account_deletion_user` (`user_id`),
+  KEY `idx_mobile_account_deletion_deleted_at` (`deleted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Foreign key tidak dipaksakan agar aman pada dump lama project
 -- yang memiliki perbedaan engine dan struktur historis.

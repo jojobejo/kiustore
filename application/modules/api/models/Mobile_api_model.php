@@ -127,6 +127,43 @@ class Mobile_api_model extends CI_Model
             ->update('mobile_api_tokens', array('revoked_at' => date('Y-m-d H:i:s')));
     }
 
+    public function delete_account($user_id)
+    {
+        $user_id = (int) $user_id;
+        if ($user_id <= 0) {
+            return FALSE;
+        }
+
+        $user = $this->db
+            ->where(array('id' => $user_id, 'role' => 'customer'))
+            ->get('users')
+            ->row_array();
+
+        if (!$user) {
+            return FALSE;
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $deleted_email = 'deleted-user-' . $user_id . '-' . time() . '@deleted.kiustore.local';
+
+        $this->db->trans_begin();
+
+        $this->insert_account_deletion_audit($user, $now);
+        $this->revoke_all_user_tokens($user_id, $now);
+        $this->delete_mobile_session_data($user_id);
+        $this->anonymize_customer_profile($user_id);
+        $this->detach_user_history($user_id);
+        $this->anonymize_user_account($user_id, $deleted_email, $now);
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            return FALSE;
+        }
+
+        $this->db->trans_commit();
+        return TRUE;
+    }
+
     public function profile($user_id)
     {
         $fields = array(
@@ -1066,5 +1103,103 @@ class Mobile_api_model extends CI_Model
         } while ($this->db->where('order_number', $number)->count_all_results('orders') > 0);
 
         return $number;
+    }
+
+    private function insert_account_deletion_audit(array $user, $deleted_at)
+    {
+        if (!$this->db->table_exists('mobile_account_deletions')) {
+            return;
+        }
+
+        $this->db->insert('mobile_account_deletions', array(
+            'user_id' => (int) $user['id'],
+            'email_hash' => hash('sha256', strtolower((string) $user['email'])),
+            'deleted_at' => $deleted_at,
+            'created_at' => $deleted_at
+        ));
+    }
+
+    private function revoke_all_user_tokens($user_id, $revoked_at)
+    {
+        if (!$this->db->table_exists('mobile_api_tokens')) {
+            return;
+        }
+
+        $this->db
+            ->where('user_id', (int) $user_id)
+            ->where('revoked_at IS NULL', null, FALSE)
+            ->update('mobile_api_tokens', array('revoked_at' => $revoked_at));
+    }
+
+    private function delete_mobile_session_data($user_id)
+    {
+        foreach (array('mobile_cart_items', 'mobile_shipping_quotes') as $table) {
+            if ($this->db->table_exists($table)) {
+                $this->db->where('user_id', (int) $user_id)->delete($table);
+            }
+        }
+    }
+
+    private function anonymize_customer_profile($user_id)
+    {
+        if (!$this->db->table_exists('customers')) {
+            return;
+        }
+
+        $data = array();
+        $this->set_existing_field($data, 'customers', 'nik', '');
+        $this->set_existing_field($data, 'customers', 'npwp', '');
+        $this->set_existing_field($data, 'customers', 'name', 'Deleted User');
+        $this->set_existing_field($data, 'customers', 'phone_number', null);
+        $this->set_existing_field($data, 'customers', 'address', '');
+        $this->set_existing_field($data, 'customers', 'shop_name', '');
+        $this->set_existing_field($data, 'customers', 'shop_address', null);
+        $this->set_existing_field($data, 'customers', 'alamat_kirim', '');
+        $this->set_existing_field($data, 'customers', 'profile_picture', null);
+        $this->set_existing_field($data, 'customers', 'kode_customer', '');
+
+        if ($this->db->field_exists('user_id', 'customers')) {
+            $data['user_id'] = null;
+        }
+
+        if (!empty($data)) {
+            $this->db->where('user_id', (int) $user_id)->update('customers', $data);
+        }
+    }
+
+    private function detach_user_history($user_id)
+    {
+        foreach (array('orders', 'reviews') as $table) {
+            if ($this->db->table_exists($table) && $this->db->field_exists('user_id', $table)) {
+                $this->db->where('user_id', (int) $user_id)->update($table, array('user_id' => null));
+            }
+        }
+
+        if ($this->db->table_exists('message') && $this->db->field_exists('customer_id', 'message')) {
+            $this->db->where('customer_id', (int) $user_id)->update('message', array('customer_id' => 0));
+        }
+    }
+
+    private function anonymize_user_account($user_id, $deleted_email, $deleted_at)
+    {
+        $data = array(
+            'email' => $deleted_email,
+            'password' => password_hash(bin2hex(random_bytes(24)), PASSWORD_BCRYPT)
+        );
+
+        $this->set_existing_field($data, 'users', 'name', 'Deleted User');
+        $this->set_existing_field($data, 'users', 'profile_picture', null);
+        $this->set_existing_field($data, 'users', 'status', 0);
+        $this->set_existing_field($data, 'users', 'email_verified_at', null);
+        $this->set_existing_field($data, 'users', 'register_date', $deleted_at);
+
+        $this->db->where('id', (int) $user_id)->update('users', $data);
+    }
+
+    private function set_existing_field(array &$data, $table, $field, $value)
+    {
+        if ($this->db->field_exists($field, $table)) {
+            $data[$field] = $value;
+        }
     }
 }
