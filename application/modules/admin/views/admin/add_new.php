@@ -97,6 +97,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     </select>
                     <?php echo form_error('role'); ?>
                   </div>
+                  <div class="form-group mb-0">
+                    <label class="form-control-label d-block">Akun Internal</label>
+                    <label class="custom-toggle">
+                      <input type="checkbox" name="is_internal" value="1" <?php echo set_checkbox('is_internal', '1'); ?>>
+                      <span class="custom-toggle-slider rounded-circle"></span>
+                    </label>
+                    <small class="d-block text-muted mt-2">Tandai jika akun ini dipakai untuk aktivitas internal/test dan tidak boleh ikut perhitungan data bisnis.</small>
+                  </div>
 
                 </div>
             </div>

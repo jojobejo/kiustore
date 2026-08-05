@@ -9,6 +9,20 @@ class Payment_model extends CI_Model
         $this->user_id = get_current_user_id();
     }
 
+    private function has_internal_column()
+    {
+        return $this->db->field_exists('is_internal', 'users');
+    }
+
+    private function external_user_where($alias = 'u')
+    {
+        if (!$this->has_internal_column()) {
+            return '1=1';
+        }
+
+        return "COALESCE({$alias}.is_internal, 0) = 0";
+    }
+
     public function count_all_payments()
     {
         return $this->db->get('payments')->num_rows();
@@ -16,7 +30,16 @@ class Payment_model extends CI_Model
 
     public function sum_success_payment()
     {
-        return $this->db->select('SUM(total_price) as total_payment')->where('order_status', 4)->or_where('order_status', 3)->get('orders')->row()->total_payment;
+        $row = $this->db
+            ->select('SUM(o.total_price) as total_payment')
+            ->from('orders o')
+            ->join('users u', 'u.id = o.user_id')
+            ->where_in('o.order_status', array(3, 4))
+            ->where($this->external_user_where('u'), null, false)
+            ->get()
+            ->row();
+
+        return $row ? $row->total_payment : 0;
     }
 
     public function payment_overview()
@@ -28,7 +51,10 @@ class Payment_model extends CI_Model
 	            ON o.id = p.order_id
             JOIN customers c
 	            ON c.user_id = o.user_id
+            JOIN users u
+                ON u.id = o.user_id
             WHERE p.payment_status = '1'
+            AND " . $this->external_user_where('u') . "
             LIMIT 5")->result();
 
         return $data;

@@ -9,14 +9,39 @@ class Customer_model extends CI_Model
         $this->user_id = get_current_user_id();
     }
 
+    private function has_internal_column()
+    {
+        return $this->db->field_exists('is_internal', 'users');
+    }
+
+    private function external_user_where($alias = 'u')
+    {
+        if (!$this->has_internal_column()) {
+            return '1=1';
+        }
+
+        return "COALESCE({$alias}.is_internal, 0) = 0";
+    }
+
     public function count_all_customers()
     {
-        return $this->db->get('customers')->num_rows();
+        return $this->db
+            ->from('customers c')
+            ->join('users u', 'u.id = c.user_id')
+            ->where($this->external_user_where('u'), null, false)
+            ->count_all_results();
     }
 
     public function latest_customers()
     {
-        return $this->db->order_by('id', 'DESC')->get('customers')->result();
+        return $this->db
+            ->select('c.*')
+            ->from('customers c')
+            ->join('users u', 'u.id = c.user_id')
+            ->where($this->external_user_where('u'), null, false)
+            ->order_by('c.id', 'DESC')
+            ->get()
+            ->result();
     }
 
     public function get_all_sales()
@@ -31,10 +56,12 @@ class Customer_model extends CI_Model
     public function get_all_customers()
     {
         $id = $this->user_id;
+        $internalSelect = $this->has_internal_column() ? 'COALESCE(u.is_internal, 0)' : '0';
+
         if (admin_role() == 'admin' || admin_role() == 'keuangan') {
 
             $customers = $this->db->query("
-                SELECT c.user_id as id, c.profile_picture, c.name, u.email, c.phone_number, c.address, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level
+                SELECT c.user_id as id, c.profile_picture, c.name, u.email, c.phone_number, c.address, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level, {$internalSelect} AS is_internal
                 FROM customers c
                 JOIN users u
                     ON u.id = c.user_id
@@ -46,7 +73,7 @@ class Customer_model extends CI_Model
             return $customers->result();
         } else {
             $customers = $this->db->query("
-            SELECT c.user_id as id, c.profile_picture, c.name, u.email, c.phone_number, c.address, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level
+            SELECT c.user_id as id, c.profile_picture, c.name, u.email, c.phone_number, c.address, IFNULL(s.name, '-') AS sales_name, u.status, u.register_date, c.shop_name, c.level, {$internalSelect} AS is_internal
             FROM customers c
             JOIN users u
                 ON u.id = c.user_id

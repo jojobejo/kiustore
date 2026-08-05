@@ -26,6 +26,32 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <h3 class="mb-0">Users</h3>
             </div>
 
+            <div class="card-body border-bottom">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group mb-md-0">
+                    <label class="form-control-label" for="filterRole">Filter Role</label>
+                    <select id="filterRole" class="form-control form-control-sm">
+                      <option value="">Semua Role</option>
+                      <?php foreach (($roles ?? array()) as $role) : ?>
+                        <option value="<?php echo html_escape($role->role); ?>"><?php echo html_escape($role->role); ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group mb-md-0">
+                    <label class="form-control-label" for="filterInternal">Filter Akun</label>
+                    <select id="filterInternal" class="form-control form-control-sm">
+                      <option value="">Semua Akun</option>
+                      <option value="1">Internal</option>
+                      <option value="0">Non Internal</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table align-items-center table-flush" id="adminList" style="width: 100%">
@@ -35,6 +61,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <th scope="col">Nama</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Role</th>
+                                <th scope="col">Akun</th>
                                 <th scope="col">Tanggal Terdaftar</th>
                                 <th scope="col">Status</th>
                                 <th scope="col"></th>
@@ -131,6 +158,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 <script>
 $(document).ready(function() {
+    function escapeHtml(value) {
+      if (value === null || value === undefined) {
+        return '';
+      }
+
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     $(document).on('click', '.btnDelete', function() {
       var id  = $(this).data('id');
       var btn = $('.btn-delete');
@@ -159,6 +199,38 @@ $(document).ready(function() {
 
       $('.activateID').val(id);
       $('#activateModal').modal('show');
+    });
+
+    $(document).on('click', '.btnInternal', function(e) {
+      e.preventDefault();
+
+      var btn = $(this);
+      var id = btn.data('id');
+      var nextStatus = btn.data('next');
+      var oldHtml = btn.html();
+
+      btn.html('<i class="fa fa-spin fa-spinner"></i>');
+
+      $.ajax({
+        method: 'POST',
+        url: '<?php echo site_url('admin/admin/api/toggle_internal'); ?>',
+        data: {
+          id: id,
+          is_internal: nextStatus
+        },
+        success: function(res) {
+          if (res.code == 200) {
+            table.ajax.reload(null, false);
+          } else {
+            btn.html(oldHtml);
+            alert('Gagal memperbarui status akun internal. Pastikan migrasi database sudah dijalankan.');
+          }
+        },
+        error: function() {
+          btn.html(oldHtml);
+          alert('Gagal memperbarui status akun internal.');
+        }
+      });
     });
 
     $('#deleteUser').submit(function(e) {
@@ -246,18 +318,34 @@ $(document).ready(function() {
     });
 
     var table = $('#adminList').DataTable({
-      "ajax" : "<?php echo site_url('admin/admin/api/users'); ?>",
+      "ajax" : {
+        "url": "<?php echo site_url('admin/admin/api/users'); ?>",
+        "data": function (d) {
+          d.role = $('#filterRole').val();
+          d.is_internal = $('#filterInternal').val();
+        }
+      },
       "columns" : [
         {"data": "id"},
         {"data": function (data, type, row) {
-            var url = window.location.href.split('?')[0].replace('#', '');
-            url = url + '/edit/'+ data.id;
+            var baseUrl = '<?php echo site_url(); ?>';
+            var url = data.role == 'customer' ? baseUrl + 'admin/customers/view/' + data.id : baseUrl + 'admin/admin/edit/' + data.id;
+            var name = escapeHtml(data.display_name || data.name || '-');
+            var shopName = data.shop_name ? '<br><small class="text-muted">' + escapeHtml(data.shop_name) + '</small>' : '';
 
-            return '<a href="'+ url +'">'+ data.name +'</a>';
+            return '<a href="'+ url +'">'+ name +'</a>' + shopName;
         }
         },
         {"data": "email"},
         {"data": "role"},
+        {"data": function (data, type, row) {
+            if (data.is_internal == 1) {
+              return '<span class="badge badge-warning">Internal</span>';
+            }
+
+            return '<span class="badge badge-light">Non Internal</span>';
+          }
+        },
         {"data": function (data, type, row) {
             return data.register_date;
           }
@@ -276,11 +364,20 @@ $(document).ready(function() {
             var url = window.location.href.split('?')[0].replace('#', '');
             url = url + '/edit/'+ row.id;
             var action = '';
+            var internalNext = row.is_internal == 1 ? 0 : 1;
+            var internalTitle = row.is_internal == 1 ? 'Tandai non internal' : 'Tandai internal';
+            var internalIcon = row.is_internal == 1 ? 'fa-user-check' : 'fa-user-shield';
+            var internalButton = '<a href="#" title="'+internalTitle+'" data-id="'+row.id+'" data-next="'+internalNext+'" class="btn btn-warning btn-sm btnInternal"><i class="fa '+internalIcon+'"></i></a> ';
+            var customerUrl = '<?php echo site_url('admin/customers/view/'); ?>' + row.id;
+
+            if (row.role == 'customer') {
+              return '<div class="text-right">'+internalButton+'<a href="'+customerUrl+'" title="Lihat profil customer" class="btn btn-info btn-sm"><i class="fa fa-eye"></i></a></div>';
+            }
 
             if(row.status == 1){
-              action = '<div class="text-right"><a href="#" data-id="'+row.id+'" class="btn btn-primary btn-sm btnDeactivate"><i class="fa fa-lock"></i></a> <a href="#" data-id="'+row.id+'" class="btn btn-danger btn-sm btnDelete"><i class="fa fa-trash"></i></a></div>' ;
+              action = '<div class="text-right">'+internalButton+'<a href="#" data-id="'+row.id+'" class="btn btn-primary btn-sm btnDeactivate"><i class="fa fa-lock"></i></a> <a href="#" data-id="'+row.id+'" class="btn btn-danger btn-sm btnDelete"><i class="fa fa-trash"></i></a></div>' ;
             } else {
-              action = '<div class="text-right"><a href="#" data-id="'+row.id+'" class="btn btn-primary btn-sm btnActivate"><i class="fa fa-unlock"></i></a> <a href="#" data-id="'+row.id+'" class="btn btn-danger btn-sm btnDelete"><i class="fa fa-trash"></i></a></div>' ;
+              action = '<div class="text-right">'+internalButton+'<a href="#" data-id="'+row.id+'" class="btn btn-primary btn-sm btnActivate"><i class="fa fa-unlock"></i></a> <a href="#" data-id="'+row.id+'" class="btn btn-danger btn-sm btnDelete"><i class="fa fa-trash"></i></a></div>' ;
             }
             return action;
           }
@@ -300,6 +397,10 @@ $(document).ready(function() {
           "previous":   "&lsaquo;"
         },
       }
+    });
+
+    $('#filterRole, #filterInternal').on('change', function() {
+      table.ajax.reload();
     });
 });
 </script>

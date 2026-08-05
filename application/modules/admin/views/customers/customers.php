@@ -41,6 +41,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <th scope="col">Alamat</th>
                   <th scope="col">Level</th>
                   <th scope="col">Sales</th>
+                  <th scope="col">Akun</th>
                   <th scope="col">Status</th>
                   <th scope="col">Tanggal Terdaftar</th>
                   <th scope="col"></th>
@@ -353,6 +354,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
           {
             "data": function(data, type, row) {
               return data.sales_name;
+            }
+          },
+          {
+            "data": function(data, type, row) {
+              if (data.is_internal == 1) {
+                return '<span class="badge badge-warning">Internal</span>';
+              }
+
+              return '<span class="badge badge-light">Non Internal</span>';
             }
           },
           {

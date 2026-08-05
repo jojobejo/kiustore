@@ -18,6 +18,10 @@ class Admin extends CI_Controller
             'admin_model' => 'users'
         ));
         $this->load->library('form_validation');
+
+        if (admin_role() != 'admin') {
+            show_error('Anda tidak memiliki akses untuk mengelola akun internal.', 403, 'Akses ditolak');
+        }
     }
 
     public $api_key = "197f7e1329685d3ed9d1468c54efc9dd";
@@ -25,9 +29,10 @@ class Admin extends CI_Controller
     public function index()
     {
         $params['title'] = 'Admin';
+        $data['roles'] = $this->users->get_role_options();
 
         $this->load->view('header', $params);
-        $this->load->view('admin/admin');
+        $this->load->view('admin/admin', $data);
         $this->load->view('footer');
     }
 
@@ -60,6 +65,7 @@ class Admin extends CI_Controller
             $email = $this->input->post('email');
             $role = $this->input->post('role');
             $status = $this->input->post('status');
+            $is_internal = $this->input->post('is_internal') ? 1 : 0;
 
             $password = password_hash($password, PASSWORD_BCRYPT);
 
@@ -69,7 +75,8 @@ class Admin extends CI_Controller
                 'email' => $email,
                 'role' => $role,
                 'register_date' => date('Y-m-d H:i:s'),
-                'status' => $status
+                'status' => $status,
+                'is_internal' => $is_internal
             );
 
             $this->users->register_user($data);
@@ -135,6 +142,7 @@ class Admin extends CI_Controller
             $email = $this->input->post('email');
             $password = $this->input->post('password');
             $role = $this->input->post('role');
+            $is_internal = $this->input->post('is_internal') ? 1 : 0;
 
             $config['upload_path'] = './assets/uploads/users/';
             $config['allowed_types'] = 'jpg|png|jpeg';
@@ -162,13 +170,15 @@ class Admin extends CI_Controller
                 $file_name = ($this->users->is_users_have_image($id)) ? $current_picture : NULL;
             }
 
-            $password = password_hash($password, PASSWORD_BCRYPT);
-
             $users['name'] = $name;
             $users['email'] = $email;
-            $users['password'] = $password;
             $users['role'] = $role;
+            $users['is_internal'] = $is_internal;
             //  $users['status'] = $status;
+
+            if ($password !== '') {
+                $users['password'] = password_hash($password, PASSWORD_BCRYPT);
+            }
 
             $this->users->edit_users($id, $users);
             $this->session->set_flashdata('edit_users_flash', 'User berhasil diperbarui!');
@@ -181,7 +191,12 @@ class Admin extends CI_Controller
     {
         switch ($action) {
             case 'users':
-                $users = $this->users->get_all_users();
+                $filters = array(
+                    'role' => $this->input->get('role', true),
+                    'is_internal' => $this->input->get('is_internal', true)
+                );
+
+                $users = $this->users->get_all_users($filters);
 
                 //  $n = 0;
                 //  foreach ($users as $user)
@@ -194,6 +209,17 @@ class Admin extends CI_Controller
                 $users['data'] = $users;
 
                 $response = $users;
+                break;
+            case 'toggle_internal':
+                $id = $this->input->post('id');
+                $is_internal = $this->input->post('is_internal') ? 1 : 0;
+
+                $updated = $this->users->update_internal_status($id, $is_internal);
+
+                $response = array(
+                    'code' => $updated ? 200 : 422,
+                    'is_internal' => $is_internal
+                );
                 break;
             case 'delete':
                 $id = $this->input->post('id');
