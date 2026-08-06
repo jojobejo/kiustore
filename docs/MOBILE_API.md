@@ -399,6 +399,87 @@ Catatan:
 - Bukti pembayaran juga dapat dikirim sebagai multipart field `picture` (`jpg`, `jpeg`, atau `png`, maksimal 5MB).
 - Setelah konfirmasi berhasil, order masuk status `8` / menunggu konfirmasi pembayaran admin.
 
+Generate payment BRIVA:
+
+```http
+POST /api/v1/orders/123/payments/briva
+```
+
+Catatan:
+
+- Hanya untuk order milik user login dengan `order_status = 2` dan `payment_method = 2`.
+- Endpoint memanggil library `Brivaws` sesuai flow web `customer/orders/update_briva_status`.
+- Jika BRIVA sudah ada di BRI, API menjalankan `updateVa` dan sukses pada `responseCode = 2002800`.
+- Jika BRIVA belum ada di BRI, API menerima `responseCode = 4042812`, lalu menjalankan `createVa`.
+- Data VA disimpan ke tabel `briva_api` dengan `va_code = 91118 + 8 digit terakhir nomor telepon customer`, `total_price_topay`, dan `exp_date` 15 menit dari waktu generate.
+- Response mengembalikan `va_code` serta `expires_at`/`exp_date` agar aplikasi mobile dapat langsung menampilkan kode VA dan expired payment.
+- Jika VA aktif untuk order tersebut sudah tersedia, endpoint mengembalikan data yang ada agar tombol generate aman ditekan ulang.
+
+Response berhasil:
+
+```json
+{
+  "success": true,
+  "message": "Payment VA Telah terbuat",
+  "data": {
+    "id": 15,
+    "order_number": "MOB2608050101906",
+    "kd_faktur": "MOB2608050101906",
+    "name": "Budi",
+    "va_code": "9111812345678",
+    "userno": "12345678",
+    "total_price_topay": 106500,
+    "exp_date": "2026-08-05T17:47:35+07:00",
+    "expires_at": "2026-08-05T17:47:35+07:00",
+    "expired_payment": "2026-08-05T17:47:35+07:00",
+    "status": 1
+  }
+}
+```
+
+Response gagal yang umum:
+
+- `401 Unauthorized`: token login tidak dikirim atau tidak valid.
+- `404 Not Found`: order tidak ditemukan untuk user login.
+- `422 Unprocessable Entity`: order belum `order_status = 2`, bukan `payment_method = 2`, atau nomor customer BRIVA tidak valid.
+- `502 Bad Gateway`: response dari BRIVA gagal saat `updateVa` atau `createVa`.
+
+Cek status payment BRIVA:
+
+```http
+GET /api/v1/orders/123/payments/briva/status
+```
+
+Endpoint ini dipakai aplikasi mobile untuk auto-update halaman invoice setelah user melakukan pembayaran VA.
+
+Behavior:
+
+- Hanya untuk order milik user login dengan `payment_method = 2`.
+- Membaca data VA dari tabel `briva_api`.
+- Memanggil `Brivaws::inquiryStatusVa` dan `Brivaws::inquiryVa`.
+- Jika `paidStatus = Y`, API menjalankan `updateStatusVa`, mengubah `briva_api.status = 2`, dan mengubah `orders.order_status = 10`.
+- Jika VA sudah expired dan `paidStatus != Y`, API menjalankan `updateStatusVa`, mengubah `briva_api.status = 3`, dan mengubah `orders.order_status = 7`.
+- Response selalu menyertakan `order_detail` terbaru agar aplikasi mobile bisa langsung mengganti tampilan tanpa menunggu refresh manual.
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Pembayaran BRIVA berhasil diterima.",
+  "data": {
+    "paid_status": "Y",
+    "is_paid": true,
+    "is_expired": false,
+    "expired_date": "2026-08-05T17:47:35+07:00",
+    "status_text": "Pembayaran BRIVA berhasil diterima.",
+    "va_data": {},
+    "briva_payment": {},
+    "order_detail": {}
+  }
+}
+```
+
 ### Chat
 
 Ambil pesan:
@@ -440,5 +521,4 @@ File diubah:
 - API key ongkir masih tersimpan di file config project. Untuk production lebih baik dipindah ke environment yang aman.
 - Belum ada refresh token.
 - Belum ada upload foto profil.
-- Belum ada endpoint BRIVA otomatis di flow checkout mobile ini.
 - Jika nanti Anda ingin, tahap berikutnya paling masuk akal adalah menambahkan `payment confirmation`, `wishlist`, dan `push notification ready payload`.

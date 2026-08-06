@@ -348,7 +348,7 @@ class Mobile_api_model extends CI_Model
             'sku' => $row['sku'],
             'name' => $row['name'],
             'description' => $row['description'],
-            'image_url' => base_url('assets/uploads/products/' . ($row['picture_name'] ? $row['picture_name'] : 'default.jpg')),
+            'image_url' => $this->product_image_url(isset($row['picture_name']) ? $row['picture_name'] : null),
             'stock' => (int) $row['stock'],
             'is_available' => (bool) $row['is_available'],
             'product_type' => (int) $row['product_type'],
@@ -372,6 +372,16 @@ class Mobile_api_model extends CI_Model
                 )
             )
         );
+    }
+
+    private function product_image_url($picture_name)
+    {
+        $file_name = $picture_name ? $picture_name : 'default.jpg';
+        $path = 'assets/uploads/products/' . $file_name;
+        $version = @filemtime(FCPATH . $path);
+        $url = base_url($path);
+
+        return $version ? $url . '?v=' . $version : $url;
     }
 
     private function fallback_banners()
@@ -928,6 +938,229 @@ class Mobile_api_model extends CI_Model
         );
     }
 
+    public function generate_briva_payment($order_id, $user_id, $brivaws)
+    {
+        $order = $this->db
+            ->select('o.*, c.name AS customer_name, c.phone_number, c.va_code AS customer_va_code')
+            ->from('orders o')
+            ->join('customers c', 'c.user_id = o.user_id', 'left')
+            ->where(array('o.id' => (int) $order_id, 'o.user_id' => (int) $user_id))
+            ->get()
+            ->row_array();
+
+        if (!$order) {
+            return array('success' => FALSE, 'status' => 404, 'message' => 'Pesanan tidak ditemukan.');
+        }
+
+        if ((int) $order['order_status'] !== 2) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'BRIVA baru dapat dibuat saat invoice menunggu pembayaran.');
+        }
+
+        if ((int) $order['payment_method'] !== 2) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'BRIVA hanya tersedia untuk metode pembayaran Virtual Account.');
+        }
+
+        $existing = $this->briva_payment_by_order_number($order['order_number']);
+        if ($existing && strtotime((string) $existing['exp_date']) > time()) {
+            return array(
+                'success' => TRUE,
+                'status' => 200,
+                'message' => 'Payment BRIVA sudah tersedia.',
+                'data' => $this->format_briva_payment($existing)
+            );
+        }
+
+        $customer_no = $this->briva_customer_no($order);
+        if ($customer_no === '') {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Nomor customer untuk BRIVA belum valid.');
+        }
+
+        $va_name = $this->briva_customer_name($order);
+        $trxid = $order['order_number'];
+        $total_to_pay = (float) $order['total_price'] + (float) $order['shipping_cost'] + (float) $order['insurance'];
+        $total_to_pay_formatted = number_format($total_to_pay, 2, '.', '');
+        $expires_at = date('c', strtotime('+15 minutes'));
+
+        $api_response = $this->decode_briva_response(
+            $brivaws->updateVa(
+                $customer_no,
+                $va_name,
+                $trxid,
+                $total_to_pay_formatted
+            )
+        );
+
+        $response_code = $this->briva_response_code($api_response);
+        $success_message = 'Payment Telah terbuat';
+
+        if ($response_code === '4042812') {
+            $create_response = $this->decode_briva_response(
+                $brivaws->createVa(
+                    $customer_no,
+                    $va_name,
+                    $total_to_pay_formatted,
+                    $trxid
+                )
+            );
+
+            if (!$this->is_successful_briva_response($create_response)) {
+                return array(
+                    'success' => FALSE,
+                    'status' => 502,
+                    'message' => 'Gagal create VA ke BRIVA.',
+                    'errors' => array(
+                        'briva_update' => $api_response,
+                        'briva_create' => $create_response
+                    )
+                );
+            }
+
+            $api_response = $create_response;
+            $success_message = 'Payment VA Telah terbuat';
+        } elseif ($response_code !== '2002800') {
+            return array(
+                'success' => FALSE,
+                'status' => 502,
+                'message' => 'Gagal update ke BRIVA.',
+                'errors' => array('briva' => $api_response)
+            );
+        }
+
+        if (!$this->is_successful_briva_response($api_response)) {
+            return array(
+                'success' => FALSE,
+                'status' => 502,
+                'message' => 'Gagal generate payment BRIVA.',
+                'errors' => array('briva' => $api_response)
+            );
+        }
+
+        $data = array(
+            'order_number' => $trxid,
+            'kd_faktur' => $order['kd_faktur'],
+            'user_id' => (int) $user_id,
+            'name' => $va_name,
+            'va_code' => '91118' . $customer_no,
+            'userno' => $customer_no,
+            'total_price_topay' => $total_to_pay_formatted,
+            'exp_date' => $expires_at,
+            'status' => '1'
+        );
+
+        $this->save_briva_payment($trxid, $data);
+        $saved = $this->briva_payment_by_order_number($trxid);
+
+        return array(
+            'success' => TRUE,
+            'status' => 201,
+            'message' => $success_message,
+            'data' => $this->format_briva_payment($saved ? $saved : $data)
+        );
+    }
+
+    public function briva_payment_status($order_id, $user_id, $brivaws)
+    {
+        $order = $this->db
+            ->where(array('id' => (int) $order_id, 'user_id' => (int) $user_id))
+            ->get('orders')
+            ->row_array();
+
+        if (!$order) {
+            return array('success' => FALSE, 'status' => 404, 'message' => 'Pesanan tidak ditemukan.');
+        }
+
+        if ((int) $order['payment_method'] !== 2) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Pesanan ini bukan pembayaran Virtual Account.');
+        }
+
+        $briva = $this->briva_payment_by_order_number($order['order_number']);
+        if (!$briva) {
+            return array('success' => FALSE, 'status' => 404, 'message' => 'Payment BRIVA belum tersedia.');
+        }
+
+        if (in_array((int) $order['order_status'], array(3, 10), TRUE)) {
+            return array(
+                'success' => TRUE,
+                'status' => 200,
+                'message' => 'Order sudah dibayar.',
+                'data' => $this->format_briva_status_response($order, $user_id, $briva, 'Y', FALSE, 'Order sudah dibayar.')
+            );
+        }
+
+        if ((int) $order['order_status'] === 7) {
+            return array(
+                'success' => TRUE,
+                'status' => 200,
+                'message' => 'Order dibatalkan.',
+                'data' => $this->format_briva_status_response($order, $user_id, $briva, 'N', TRUE, 'Order dibatalkan.')
+            );
+        }
+
+        $status_response = $this->decode_briva_response(
+            $brivaws->inquiryStatusVa($briva['userno'], $briva['order_number'])
+        );
+        $va_response = $this->decode_briva_response(
+            $brivaws->inquiryVa($briva['userno'], $briva['order_number'])
+        );
+
+        if ($this->briva_response_code($status_response) === '') {
+            return array(
+                'success' => FALSE,
+                'status' => 502,
+                'message' => 'Response status BRIVA tidak valid.',
+                'errors' => array('briva_status' => $status_response)
+            );
+        }
+
+        $paid_status = isset($status_response['additionalInfo']['paidStatus'])
+            ? (string) $status_response['additionalInfo']['paidStatus']
+            : 'N';
+        $expired_date = isset($va_response['virtualAccountData']['expiredDate'])
+            ? (string) $va_response['virtualAccountData']['expiredDate']
+            : (isset($briva['exp_date']) ? (string) $briva['exp_date'] : '');
+        $is_expired = $expired_date !== '' && strtotime($expired_date) !== FALSE && strtotime($expired_date) <= time();
+        $status_text = isset($status_response['responseMessage'])
+            ? (string) $status_response['responseMessage']
+            : 'Menunggu pembayaran';
+
+        if ($paid_status === 'Y') {
+            $brivaws->updateStatusVa($briva['userno'], $briva['order_number']);
+            $this->db->where('order_number', $order['order_number'])->update('briva_api', array('status' => 2));
+            $this->db->where('order_number', $order['order_number'])->update('orders', array('order_status' => 10));
+            $status_text = 'Pembayaran BRIVA berhasil diterima.';
+            $is_expired = FALSE;
+        } elseif ($is_expired) {
+            $brivaws->updateStatusVa($briva['userno'], $briva['order_number']);
+            $this->db->where('order_number', $order['order_number'])->update('briva_api', array('status' => 3));
+            $this->db->where('order_number', $order['order_number'])->update('orders', array('order_status' => 7));
+            $status_text = 'VA expired & transaksi dibatalkan';
+        }
+
+        $briva = $this->briva_payment_by_order_number($order['order_number']);
+        $order = $this->db
+            ->where(array('id' => (int) $order_id, 'user_id' => (int) $user_id))
+            ->get('orders')
+            ->row_array();
+
+        $data = $this->format_briva_status_response(
+            $order,
+            $user_id,
+            $briva,
+            $paid_status,
+            $is_expired,
+            $status_text,
+            $expired_date,
+            isset($va_response['virtualAccountData']) ? $va_response['virtualAccountData'] : null
+        );
+
+        return array(
+            'success' => TRUE,
+            'status' => 200,
+            'message' => $status_text,
+            'data' => $data
+        );
+    }
+
     public function order_summary($id, $user_id)
     {
         $row = $this->db
@@ -986,7 +1219,7 @@ class Mobile_api_model extends CI_Model
             $item['unit_name'] = isset($item['satuan_text']) && $item['satuan_text'] !== '' ? $item['satuan_text'] : 'pcs';
             $item['unit_price'] = (float) $item['order_price'];
             $item['subtotal'] = $item['quantity'] * $item['unit_price'];
-            $item['image_url'] = base_url('assets/uploads/products/' . ($item['picture_name'] ? $item['picture_name'] : 'default.jpg'));
+            $item['image_url'] = $this->product_image_url(isset($item['picture_name']) ? $item['picture_name'] : null);
             unset($item['order_qty'], $item['order_price'], $item['picture_name'], $item['name'], $item['satuan_text']);
         }
 
@@ -999,9 +1232,12 @@ class Mobile_api_model extends CI_Model
             'order' => $order,
             'items' => $items,
             'shipping_address' => isset($customer['address']) ? $customer['address'] : '',
-            'shipping_service' => isset($order['jenis_pengiriman']) ? $order['jenis_pengiriman'] : '',
+            'shipping_service' => $this->order_shipping_service($order),
             'shipping_cost' => isset($order['shipping_cost']) ? (float) $order['shipping_cost'] : 0,
-            'insurance' => isset($order['insurance']) ? (float) $order['insurance'] : 0
+            'insurance' => isset($order['insurance']) ? (float) $order['insurance'] : 0,
+            'briva_payment' => $this->format_briva_payment(
+                $this->briva_payment_by_order_number($order['order_number'])
+            )
         );
     }
 
@@ -1019,6 +1255,47 @@ class Mobile_api_model extends CI_Model
         return $this->db
             ->where(array('id' => (int) $id, 'user_id' => (int) $user_id))
             ->update('orders', array('order_status' => 7));
+    }
+
+    public function complete_order($id, $user_id, $data)
+    {
+        $rating = (int) $data['rating'];
+        if ($rating < 1 || $rating > 5) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Rating pelayanan sales wajib diisi.');
+        }
+
+        $order = $this->db
+            ->where(array('id' => (int) $id, 'user_id' => (int) $user_id))
+            ->get('orders')
+            ->row();
+
+        if (!$order) {
+            return array('success' => FALSE, 'status' => 404, 'message' => 'Pesanan tidak ditemukan.');
+        }
+
+        if ((int) $order->order_status !== 4) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Pesanan belum dalam status dikirim.');
+        }
+
+        $updated = $this->db
+            ->where(array('id' => (int) $id, 'user_id' => (int) $user_id))
+            ->update('orders', array(
+                'order_status' => 5,
+                'finish_date' => date('Y-m-d H:i:s'),
+                'rating' => $rating,
+                'rating_desc' => isset($data['rating_description']) ? $data['rating_description'] : ''
+            ));
+
+        if (!$updated) {
+            return array('success' => FALSE, 'status' => 500, 'message' => 'Pesanan gagal diselesaikan.');
+        }
+
+        return array(
+            'success' => TRUE,
+            'status' => 200,
+            'message' => 'Pesanan selesai. Terima kasih atas rating pelayanan sales.',
+            'data' => $this->order((int) $id, (int) $user_id)
+        );
     }
 
     public function messages($user_id, $last_id)
@@ -1064,18 +1341,147 @@ class Mobile_api_model extends CI_Model
         return $data;
     }
 
+    private function briva_payment_by_order_number($order_number)
+    {
+        return $this->db
+            ->where('order_number', (string) $order_number)
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get('briva_api')
+            ->row_array();
+    }
+
+    private function save_briva_payment($order_number, $data)
+    {
+        if ($this->briva_payment_by_order_number($order_number)) {
+            return $this->db
+                ->where('order_number', (string) $order_number)
+                ->update('briva_api', $data);
+        }
+
+        return $this->db->insert('briva_api', $data);
+    }
+
+    private function briva_customer_no($order)
+    {
+        $digits = preg_replace('/\D+/', '', isset($order['phone_number']) ? (string) $order['phone_number'] : '');
+        if (strlen($digits) >= 8) {
+            return substr($digits, -8);
+        }
+
+        $va_code = preg_replace('/\D+/', '', isset($order['customer_va_code']) ? (string) $order['customer_va_code'] : '');
+        if (strlen($va_code) > 5) {
+            return substr($va_code, -8);
+        }
+
+        return '';
+    }
+
+    private function briva_customer_name($order)
+    {
+        $delivery_data = json_decode(isset($order['delivery_data']) ? $order['delivery_data'] : '', TRUE);
+        if (isset($delivery_data['customer']['name']) && trim((string) $delivery_data['customer']['name']) !== '') {
+            return trim((string) $delivery_data['customer']['name']);
+        }
+
+        if (isset($order['customer_name']) && trim((string) $order['customer_name']) !== '') {
+            return trim((string) $order['customer_name']);
+        }
+
+        return 'Karisma Customer';
+    }
+
+    private function decode_briva_response($response)
+    {
+        if (is_array($response)) {
+            return $response;
+        }
+
+        $decoded = json_decode((string) $response, TRUE);
+        return is_array($decoded) ? $decoded : array('raw' => $response);
+    }
+
+    private function briva_response_code($response)
+    {
+        if (!is_array($response)) {
+            return '';
+        }
+
+        return isset($response['responseCode']) ? (string) $response['responseCode'] : '';
+    }
+
+    private function is_successful_briva_response($response)
+    {
+        $code = $this->briva_response_code($response);
+        return strpos($code, '200') === 0;
+    }
+
+    private function format_briva_payment($row)
+    {
+        if (!$row) {
+            return null;
+        }
+
+        $expires_at = isset($row['exp_date']) ? (string) $row['exp_date'] : '';
+
+        return array(
+            'id' => isset($row['id']) ? (int) $row['id'] : null,
+            'order_number' => isset($row['order_number']) ? (string) $row['order_number'] : '',
+            'kd_faktur' => isset($row['kd_faktur']) ? (string) $row['kd_faktur'] : '',
+            'name' => isset($row['name']) ? (string) $row['name'] : '',
+            'va_code' => isset($row['va_code']) ? (string) $row['va_code'] : '',
+            'userno' => isset($row['userno']) ? (string) $row['userno'] : '',
+            'total_price_topay' => isset($row['total_price_topay']) ? (float) $row['total_price_topay'] : 0,
+            'exp_date' => $expires_at,
+            'expires_at' => $expires_at,
+            'expired_payment' => $expires_at,
+            'status' => isset($row['status']) ? (int) $row['status'] : 0
+        );
+    }
+
+    private function format_briva_status_response($order, $user_id, $briva, $paid_status, $is_expired, $status_text, $expired_date = '', $va_data = null)
+    {
+        if ($expired_date === '' && $briva && isset($briva['exp_date'])) {
+            $expired_date = (string) $briva['exp_date'];
+        }
+
+        return array(
+            'paid_status' => (string) $paid_status,
+            'is_paid' => $paid_status === 'Y',
+            'is_expired' => (bool) $is_expired,
+            'expired_date' => (string) $expired_date,
+            'status_text' => (string) $status_text,
+            'va_data' => $va_data,
+            'briva_payment' => $this->format_briva_payment($briva),
+            'order_detail' => $order ? $this->order((int) $order['id'], (int) $user_id) : null
+        );
+    }
+
+    private function order_shipping_service($order)
+    {
+        if (isset($order['nama_ekspedisi']) && trim((string) $order['nama_ekspedisi']) !== '') {
+            return trim((string) $order['nama_ekspedisi']);
+        }
+
+        if (isset($order['jenis_pengiriman']) && trim((string) $order['jenis_pengiriman']) !== '') {
+            return trim((string) $order['jenis_pengiriman']);
+        }
+
+        return '';
+    }
+
     private function format_order($row)
     {
         $status = (int) $row['order_status'];
         $labels = array(
             1 => 'Menunggu diproses',
             2 => 'Menunggu pembayaran',
-            3 => 'Dibayar',
+            3 => 'Dikemas',
             4 => 'Dikirim',
             5 => 'Selesai',
             6 => 'Selesai',
             7 => 'Dibatalkan',
-            8 => 'Dalam proses verifikasi pembayaran',
+            8 => 'Sedang ditinjau oleh admin',
             9 => 'Menunggu persetujuan',
             10 => 'Payment Verify',
             11 => 'Tentukan metode pengiriman'

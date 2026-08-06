@@ -456,6 +456,28 @@ class Mobile extends CI_Controller
         return $this->respond($this->mobile_api->order((int) $id, $this->user->id), 200, 'Pesanan dibatalkan.');
     }
 
+    public function complete_order($id)
+    {
+        if (!$this->require_method('POST') || !$this->authenticate()) {
+            return;
+        }
+
+        if (!$this->require_fields(array('rating'))) {
+            return;
+        }
+
+        $result = $this->mobile_api->complete_order((int) $id, $this->user->id, array(
+            'rating' => (int) $this->value('rating'),
+            'rating_description' => trim((string) $this->value('rating_description', ''))
+        ));
+
+        if (!$result['success']) {
+            return $this->error($result['message'], $result['status']);
+        }
+
+        return $this->respond($result['data'], $result['status'], $result['message']);
+    }
+
     public function confirm_bank_transfer($id)
     {
         if (!$this->require_method('POST') || !$this->authenticate()) {
@@ -482,6 +504,56 @@ class Mobile extends CI_Controller
 
         if (!$result['success']) {
             return $this->error($result['message'], $result['status']);
+        }
+
+        return $this->respond($result['data'], $result['status'], $result['message']);
+    }
+
+    public function generate_briva_payment($id)
+    {
+        if (!$this->require_method('POST') || !$this->authenticate()) {
+            return;
+        }
+
+        try {
+            $this->load->library('Brivaws');
+            $result = $this->mobile_api->generate_briva_payment(
+                (int) $id,
+                $this->user->id,
+                $this->brivaws
+            );
+        } catch (Exception $e) {
+            log_message('error', 'Generate BRIVA mobile gagal: ' . $e->getMessage());
+            return $this->error('Koneksi BRIVA belum siap. Silakan coba lagi.', 500);
+        }
+
+        if (!$result['success']) {
+            return $this->error($result['message'], $result['status'], isset($result['errors']) ? $result['errors'] : null);
+        }
+
+        return $this->respond($result['data'], $result['status'], $result['message']);
+    }
+
+    public function briva_payment_status($id)
+    {
+        if (!$this->require_method('GET') || !$this->authenticate()) {
+            return;
+        }
+
+        try {
+            $this->load->library('Brivaws');
+            $result = $this->mobile_api->briva_payment_status(
+                (int) $id,
+                $this->user->id,
+                $this->brivaws
+            );
+        } catch (Exception $e) {
+            log_message('error', 'Cek status BRIVA mobile gagal: ' . $e->getMessage());
+            return $this->error('Koneksi BRIVA belum siap. Silakan coba lagi.', 500);
+        }
+
+        if (!$result['success']) {
+            return $this->error($result['message'], $result['status'], isset($result['errors']) ? $result['errors'] : null);
         }
 
         return $this->respond($result['data'], $result['status'], $result['message']);
