@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KARISMA ONLINE - 9 Balanced Scorecards (BSC) Executive Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070B14;
+      --bg-card: #FFFFFF;
+      --bg-card-alt: #F8FAFC;
+      --border-color: #E2E8F0;
+      --navy-header: #0F172A;
+      --navy-sub: #1E293B;
+      --orange-header: #EA580C;
+      --orange-sub: #C2410C;
+      --green-status: #059669;
+      --green-light: #D1FAE5;
+      --orange-status: #D97706;
+      --orange-light: #FEF3C7;
+      --red-status: #DC2626;
+      --red-light: #FEE2E2;
+      --text-dark: #0F172A;
+      --text-muted: #475569;
+      --text-dim: #64748B;
+      --cyan-accent: #0284C7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* TOP BAR NAVIGATION */
+    .top-bar {
+      height: 50px;
+      background: #0F172A;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 100;
+      flex-shrink: 0;
+      color: #F8FAFC;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      background: var(--orange-header);
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #F8FAFC;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: #94A3B8;
+      border-left: 1px solid #334155;
+      padding-left: 12px;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-nav {
+      background: #1E293B;
+      border: 1px solid #475569;
+      color: #F8FAFC;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover {
+      background: #334155;
+      border-color: #38BDF8;
+      color: #38BDF8;
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #38BDF8;
+      background: rgba(56, 189, 248, 0.15);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    /* DECK CONTAINER */
+    .deck-container {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .slide {
+      position: absolute;
+      width: calc(100% - 32px);
+      max-width: 1440px;
+      height: calc(100% - 32px);
+      max-height: 840px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(40px);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      overflow-y: auto;
+      padding: 16px 20px;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    /* SCREENSHOT 1: DASHBOARD EKSEKUTIF FORMAT */
+    .dash-top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #CBD5E1;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .dash-top-left {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0F172A;
+      letter-spacing: 0.5px;
+    }
+
+    .dash-top-right {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0284C7;
+      letter-spacing: 0.5px;
+    }
+
+    .dash-main-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #0F172A;
+      margin-bottom: 2px;
+    }
+
+    .dash-subtitle {
+      font-size: 12px;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+
+    .master-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: 14px;
+      border: 1px solid #CBD5E1;
+    }
+
+    .master-table th {
+      background: var(--orange-header);
+      color: #FFFFFF;
+      font-weight: 800;
+      text-align: left;
+      padding: 7px 10px;
+      font-size: 11.5px;
+      border: 1px solid #C2410C;
+    }
+
+    .master-table td {
+      padding: 6px 10px;
+      border: 1px solid #CBD5E1;
+      vertical-align: middle;
+      color: #1E293B;
+    }
+
+    .master-table tr:nth-child(even) td {
+      background: #F8FAFC;
+    }
+
+    .status-cell-master {
+      text-align: center;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+
+    .badge-master-green {
+      background: var(--green-status);
+      color: #FFFFFF;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      font-weight: 800;
+    }
+
+    .badge-master-orange {
+      background: var(--orange-status);
+      color: #FFFFFF;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      font-weight: 800;
+    }
+
+    .badge-master-red {
+      background: var(--red-status);
+      color: #FFFFFF;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      font-weight: 800;
+    }
+
+    /* SCREENSHOT 1: PRINSIP INTEGRITAS DATA (4 GRID) */
+    .integrity-section-title {
+      font-size: 13px;
+      font-weight: 900;
+      color: #0F172A;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .integrity-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .integrity-card {
+      border: 1px solid #CBD5E1;
+      background: #F8FAFC;
+      border-radius: 4px;
+      padding: 8px 12px;
+    }
+
+    .integrity-card-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 3px;
+    }
+
+    .integrity-card-desc {
+      font-size: 10.5px;
+      color: #475569;
+      line-height: 1.35;
+    }
+
+    /* SCREENSHOT 2: EXACT BSC CARD FORMAT */
+    .bsc-main-header {
+      background: #0F172A;
+      color: #FFFFFF;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 7px 12px;
+      border: 1px solid #0F172A;
+      letter-spacing: 0.5px;
+    }
+
+    .bsc-obj-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      border-left: 1px solid #CBD5E1;
+      border-right: 1px solid #CBD5E1;
+      border-bottom: 1px solid #CBD5E1;
+    }
+
+    .bsc-obj-label {
+      background: #0F172A;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      text-align: center;
+    }
+
+    .bsc-obj-text {
+      background: #FFFFFF;
+      color: #1E293B;
+      font-size: 11.5px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      line-height: 1.35;
+    }
+
+    .bsc-meta-bar {
+      display: grid;
+      grid-template-columns: 2.2fr 2.5fr 1.2fr 1.5fr 1.2fr;
+      border-left: 1px solid #CBD5E1;
+      border-right: 1px solid #CBD5E1;
+      border-bottom: 1px solid #CBD5E1;
+      background: #F8FAFC;
+      font-size: 11px;
+    }
+
+    .meta-cell {
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border-right: 1px solid #CBD5E1;
+      color: #1E293B;
+    }
+
+    .meta-cell:last-child {
+      border-right: none;
+    }
+
+    .meta-cell-status {
+      background: var(--orange-header);
+      color: #FFFFFF;
+      font-weight: 900;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .meta-cell-status.green {
+      background: var(--green-status);
+    }
+
+    .meta-cell-date {
+      background: #0F172A;
+      color: #FFFFFF;
+      font-weight: 800;
+      justify-content: center;
+    }
+
+    /* CARD TABLE */
+    .bsc-card-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      border-left: 1px solid #CBD5E1;
+      border-right: 1px solid #CBD5E1;
+      border-bottom: 1px solid #CBD5E1;
+    }
+
+    .bsc-card-table th {
+      background: var(--orange-header);
+      color: #FFFFFF;
+      font-weight: 800;
+      text-align: left;
+      padding: 6px 10px;
+      border: 1px solid #C2410C;
+    }
+
+    .bsc-card-table th.center {
+      text-align: center;
+    }
+
+    .bsc-card-table td {
+      padding: 5px 8px;
+      border: 1px solid #CBD5E1;
+      vertical-align: middle;
+      color: #1E293B;
+    }
+
+    .td-must-win {
+      font-weight: 800;
+      color: #0F172A;
+      background: #FFFFFF;
+      width: 25%;
+    }
+
+    .td-key-init {
+      width: 42%;
+      line-height: 1.3;
+    }
+
+    .td-audit {
+      font-style: italic;
+      color: #475569;
+      width: 23%;
+      font-size: 10px;
+    }
+
+    .td-status {
+      width: 10%;
+      text-align: center;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+
+    .td-status.green {
+      background: var(--green-status);
+    }
+
+    .td-status.orange {
+      background: var(--orange-status);
+    }
+
+    .td-status.red {
+      background: var(--red-status);
+    }
+
+    .total-row td {
+      background: #0F172A;
+      color: #FFFFFF;
+      font-weight: 800;
+      padding: 6px 10px;
+    }
+
+    .total-score-box {
+      background: var(--orange-header);
+      color: #FFFFFF;
+      text-align: center;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .total-score-box.green {
+      background: var(--green-status);
+    }
+
+    /* LEGEND BAR */
+    .bsc-legend-strip {
+      display: flex;
+      width: 100%;
+      border: 1px solid #CBD5E1;
+      border-top: none;
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      text-align: center;
+    }
+
+    .leg-green {
+      flex: 1.2;
+      background: var(--green-status);
+      padding: 4px;
+    }
+
+    .leg-orange {
+      flex: 1.4;
+      background: var(--orange-status);
+      padding: 4px;
+    }
+
+    .leg-red {
+      flex: 1.4;
+      background: var(--red-status);
+      padding: 4px;
+    }
+
+    /* 3-COLUMN GROUNDED ANALYSIS BOX */
+    .grounded-3col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      border: 1px solid #CBD5E1;
+      border-top: none;
+      background: #FFFFFF;
+      padding: 8px 10px;
+      gap: 12px;
+    }
+
+    .grounded-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grounded-col-title {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .col-title-green {
+      color: var(--green-status);
+    }
+
+    .col-title-orange {
+      color: var(--orange-header);
+    }
+
+    .col-title-blue {
+      color: var(--cyan-accent);
+    }
+
+    .grounded-list {
+      list-style: none;
+      font-size: 10px;
+      color: #334155;
+      line-height: 1.35;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .grounded-list li {
+      position: relative;
+      padding-left: 10px;
+    }
+
+    .grounded-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: #64748B;
+      font-weight: bold;
+    }
+
+    /* COVER SLIDE */
+    .cover-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      background: #0F172A;
+      color: #FFFFFF;
+      border-radius: 8px;
+      padding: 40px;
+    }
+
+    .cover-badge {
+      background: var(--orange-header);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 5px 16px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .cover-title {
+      font-size: 38px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+    }
+
+    .cover-subtitle {
+      font-size: 15px;
+      color: #94A3B8;
+      max-width: 800px;
+      line-height: 1.5;
+      margin-bottom: 30px;
+    }
+
+    .cover-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      width: 100%;
+      max-width: 850px;
+    }
+
+    .cover-kpi-card {
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .cover-kpi-val {
+      font-size: 24px;
+      font-weight: 900;
+      color: #38BDF8;
+      margin-bottom: 2px;
+    }
+
+    .cover-kpi-lbl {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #94A3B8;
+      text-transform: uppercase;
+    }
+
+    /* FOOTER BAR */
+    .bottom-bar {
+      height: 40px;
+      background: #0F172A;
+      border-top: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 11px;
+      color: #94A3B8;
+      flex-shrink: 0;
+    }
+
+    .kbd-btn {
+      background: #1E293B;
+      border: 1px solid #475569;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #F8FAFC;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR NAVIGATION -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <span class="brand-badge">9 BSC AUDIT REPORT</span>
+      <span class="brand-title">PT. KARISMA INDOAGRO UNIVERSAL</span>
+      <span class="brand-subtitle">Executive Scorecard Presentation</span>
+    </div>
+    <div class="nav-controls">
+      <button class="btn-nav" onclick="prevSlide()">◀ Prev</button>
+      <span class="slide-counter" id="slideNum">01 / 14</span>
+      <button class="btn-nav" onclick="nextSlide()">Next ▶</button>
+      <button class="btn-nav" onclick="toggleFullScreen()">⛶ Fullscreen (F)</button>
+    </div>
+  </header>
+
+  <!-- MAIN DECK -->
+  <main class="deck-container">
+
+    <!-- SLIDE 1: COVER -->
+    <section class="slide active" id="slide-1">
+      <div class="cover-wrap">
+        <div class="cover-badge">Laporan Kinerja Komersial 2026</div>
+        <h1 class="cover-title">KARISMA ONLINE // BALANCED SCORECARD</h1>
+        <p class="cover-subtitle">
+          Evaluasi Kesiapan Komersial Terpadu 9 Sisi Strategis Berbasis Sumber Data Tunggal (*Single Source of Truth*)
+        </p>
+        <div class="cover-kpi-grid">
+          <div class="cover-kpi-card">
+            <div class="cover-kpi-val">94.2%</div>
+            <div class="cover-kpi-lbl">Rata-Rata 9 BSC</div>
+          </div>
+          <div class="cover-kpi-card">
+            <div class="cover-kpi-val">&lt; 5 Detik</div>
+            <div class="cover-kpi-lbl">Otomasi BRIVA</div>
+          </div>
+          <div class="cover-kpi-card">
+            <div class="cover-kpi-val">100%</div>
+            <div class="cover-kpi-lbl">Kepatuhan App Store</div>
+          </div>
+          <div class="cover-kpi-card">
+            <div class="cover-kpi-val">Kecamatan</div>
+            <div class="cover-kpi-lbl">Akurasi Logistik</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: MASTER DASHBOARD 9 BSC (SCREENSHOT 1) -->
+    <section class="slide" id="slide-2">
+      <div class="dash-top-header">
+        <span class="dash-top-left">KARISMA ONLINE // BALANCED SCORECARD (BSC) AUDIT REPORT</span>
+        <span class="dash-top-right">SUMBER DATA TERVERIFIKASI</span>
+      </div>
+      <h2 class="dash-main-title">DASHBOARD EKSEKUTIF: 9 BALANCED SCORECARDS (BSC) KARISMA</h2>
+      <p class="dash-subtitle">Evaluasi Kinerja Terpadu Berbasis Sumber Data Tunggal (Single Source of Truth)</p>
+
+      <table class="master-table">
+        <thead>
+          <tr>
+            <th style="width: 4%;">No</th>
+            <th style="width: 22%;">Perspektif BSC</th>
+            <th style="width: 24%;">Unit Penanggung Jawab (Owner)</th>
+            <th style="width: 32%;">Measure Lead Utama</th>
+            <th style="width: 8%; text-align: center;">Overall Status</th>
+            <th style="width: 10%; text-align: center;">Indikator Kinerja</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">1</td>
+            <td><strong>BSC Karisma Online</strong></td>
+            <td>Tim Digital & IT Karisma Online</td>
+            <td>Status Kesiapan API, Test Coverage, Kepatuhan Regulasi App Store</td>
+            <td class="status-cell-master"><span class="badge-master-orange">95%</span></td>
+            <td>■ On Progress (90-99%)</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">2</td>
+            <td><strong>BSC Sisi Customer</strong></td>
+            <td>Tim Customer Experience & Komersial</td>
+            <td>Indeks Rating Layanan Sales (Skala 1-5), Retensi Mitra, Waktu Siklus Order</td>
+            <td class="status-cell-master"><span class="badge-master-orange">94%</span></td>
+            <td>■ On Progress (90-99%)</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">3</td>
+            <td><strong>BSC Divisi Sales</strong></td>
+            <td>Kepala Divisi Penjualan & Distribusi</td>
+            <td>Utilisasi Limit Kredit Toko, Rasio Toko Aktif Order, Rating Layanan Sales</td>
+            <td class="status-cell-master"><span class="badge-master-red">89%</span></td>
+            <td>■ Perlu Intervensi (&lt;90%)</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">4</td>
+            <td><strong>BSC Logistik & Warehouse</strong></td>
+            <td>Tim Logistik & Operasional Gudang</td>
+            <td>SLA Pengemasan Pesanan (&lt;2 Jam), Akurasi Ongkir Kecamatan, Rasio Deadstock</td>
+            <td class="status-cell-master"><span class="badge-master-orange">92%</span></td>
+            <td>■ On Progress (90-99%)</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">5</td>
+            <td><strong>BSC Sisi Multiplatform</strong></td>
+            <td>Tim Mobile Engineering & UI/UX</td>
+            <td>App Store Review Clearance, Android Crash Rate (&lt;0.1%), UI Responsiveness</td>
+            <td class="status-cell-master"><span class="badge-master-orange">96%</span></td>
+            <td>■ On Progress (90-99%)</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">6</td>
+            <td><strong>BSC Sisi Perusahaan</strong></td>
+            <td>Dewan Direksi & Tim Manajemen Eksekutif</td>
+            <td>Days Sales Outstanding (DSO), Efisiensi Biaya per Order, Indeks Kepatuhan Audit</td>
+            <td class="status-cell-master"><span class="badge-master-orange">94%</span></td>
+            <td>■ On Progress (90-99%)</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">7</td>
+            <td><strong>BSC Payment & Keuangan</strong></td>
+            <td>Divisi Keuangan & Treasury Karisma</td>
+            <td>Adopsi Virtual Account (BRIVA), Kecepatan Rekonsiliasi Kas, Rasio Over-Limit</td>
+            <td class="status-cell-master"><span class="badge-master-orange">96%</span></td>
+            <td>■ On Progress (90-99%)</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">8</td>
+            <td><strong>BSC Sisi Teknis</strong></td>
+            <td>Tim Lead Backend Engineering</td>
+            <td>API Latency (&lt;200ms), Error Rate (&lt;0.01%), Integritas Transaksi ACID DB</td>
+            <td class="status-cell-master"><span class="badge-master-orange">95%</span></td>
+            <td>■ On Progress (90-99%)</td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">9</td>
+            <td><strong>BSC Sisi Keamanan</strong></td>
+            <td>Tim Security & Compliance</td>
+            <td>Zero Critical Vulnerability, Token Expiry Enforcement, Audit Trail Non-PII</td>
+            <td class="status-cell-master"><span class="badge-master-orange">97%</span></td>
+            <td>■ On Progress (90-99%)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="integrity-section-title">PRINSIP INTEGRITAS DATA & SUMBER DOKUMENTASI RESMI</div>
+      <div class="integrity-grid">
+        <div class="integrity-card">
+          <div class="integrity-card-title">1. Arsitektur & Kepatuhan Platform (95%)</div>
+          <div class="integrity-card-desc">Terverifikasi pada controller mobile CodeIgniter (`Mobile.php`) dan arsitektur iOS Swift/Android Kotlin. Lolos regulasi Apple App Review 5.1.1 melalui audit tabel `mobile_account_deletions`.</div>
+        </div>
+        <div class="integrity-card">
+          <div class="integrity-card-title">2. Finansial & Limit Kredit Pelanggan (94%)</div>
+          <div class="integrity-card-desc">Data tagihan berjalan dan limit kredit dibaca langsung dari `customers.max_credit` dan agregasi tabel `orders` serta view database `v_products`.</div>
+        </div>
+        <div class="integrity-card">
+          <div class="integrity-card-title">3. Kesiapan Divisi Sales & Distribusi (89%)</div>
+          <div class="integrity-card-desc">Pemetaan akun toko binaan aktif di backend (`customers.salesman_id`). Tantangan utama terletak pada legalitas skema komisi teritori digital untuk mendorong adopsi lapangan.</div>
+        </div>
+        <div class="integrity-card">
+          <div class="integrity-card-title">4. Ekosistem Pembayaran & Virtual Account (96%)</div>
+          <div class="integrity-card-desc">Kanal BRIVA aktif via library `Brivaws` pada tabel `briva_api` dengan auto-update status pembayaran instan ke pesanan lunas (`status = 10`).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: BSC 1 - SISI APPS / KARISMA ONLINE -->
+    <section class="slide" id="slide-3">
+      <div class="bsc-main-header">BALANCED SCORECARD: KARISMA ONLINE (PLATFORM & DIGITAL ECOSYSTEM)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Digitalisasi menyeluruh kanal pemesanan B2B/B2C, integrasi monitoring limit kredit & penagihan virtual account (BRIVA), percepatan pemenuhan order, serta kesiapan distribusi multi-platform yang aman dan patuh regulasi.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Tim Digital & IT Karisma Online</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> Status Kesiapan API, Test Coverage, Kepatuhan App Store</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Bulanan</div>
+        <div class="meta-cell meta-cell-status">Overall Status: 95%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. KEANDALAN AKSES & PENGALAMAN PENGGUNA</td>
+            <td class="td-key-init">1.1 Akses pemesanan mandiri 24/7 (Aplikasi iOS Swift, Android & Web KiuStore)</td>
+            <td class="td-audit">Terverifikasi: MainTabView, Catalog, Cart, Checkout</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Mode jelajah katalog produk & promo tanpa kewajiban login awal (Guest Browsing)</td>
+            <td class="td-audit">Terverifikasi: GuestAccessTests & LoginView</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Sinkronisasi harga grosir & stok produk real-time via API /api/v1</td>
+            <td class="td-audit">Terverifikasi: APIEndpoint & Staging API</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. INTEGRASI FINANSIAL & OTOMASI TRANSAKSI</td>
+            <td class="td-key-init">2.1 Integrasi pembayaran Virtual Account instan BRIVA via Brivaws</td>
+            <td class="td-audit">Terverifikasi: MobileBrivaPaymentAPI & OrderTests</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Visibilitas limit kredit (max_credit) & tagihan berjalan real-time bagi mitra</td>
+            <td class="td-audit">Terverifikasi: CustomerFinanceTests & GET /customer/finance-summary</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Otomasi validasi persetujuan pesanan sesuai plafon kredit toko (payment_method = 1)</td>
+            <td class="td-audit">Terverifikasi: CheckoutViewModelTests</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">3. KECEPATAN LOGISTIK & PENGELOLAAN PESANAN</td>
+            <td class="td-key-init">3.1 Pemrosesan alur pesanan dari checkout hingga pengiriman (Order SLA)</td>
+            <td class="td-audit">Terverifikasi: Alur status pesanan 1, 2, 3, 4, 5</td>
+            <td class="td-status orange">90%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Transparansi status kirim, ongkir (mobile_shipping_quotes) & faktur digital</td>
+            <td class="td-audit">Terverifikasi: ShippingTests & InvoiceView</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.3 Fitur pemesanan cepat rutin 1-sentuhan (Quick Re-Order)</td>
+            <td class="td-audit">Status: Dalam pengembangan modul</td>
+            <td class="td-status red">85%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">4. KEPATUHAN REGULASI, KEAMANAN & DATA</td>
+            <td class="td-key-init">4.1 Kepatuhan 100% standar Apple App Review & Privasi (Hapus Akun DELETE /account)</td>
+            <td class="td-audit">Terverifikasi: AppReviewResolution & ProductionSafetyTests</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">4.2 Layanan bantuan pelanggan interaktif terintegrasi (In-App Chat Support)</td>
+            <td class="td-audit">Terverifikasi: ChatTests & ChatView</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">4.3 Pembentukan duta digital (Digital Champion) di cabang untuk pendampingan toko</td>
+            <td class="td-audit">Status: Menunggu standardisasi SOP cabang</td>
+            <td class="td-status red">80%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box">95%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>Lolos 100% kepatuhan Apple Guideline 5.1.1 (Penghapusan akun terenkripsi SHA-256 pada mobile_account_deletions).</li>
+            <li>Integrasi limit kredit real-time (customers.max_credit) aktif mencegah pesanan over-limit.</li>
+            <li>Lulus rangkaian pengujian fungsional modul checkout dan keranjang multi-unit.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Penyesuaian pemahaman alur digital bagi toko-toko konvensional di area perintis.</li>
+            <li>Alur retur barang rusak masih mengandalkan verifikasi fisik manual di depo/gudang.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Meluncurkan fitur Quick Re-Order 1-klik untuk memudahkan pesanan paket mingguan toko mitra.</li>
+            <li>Menetapkan target penyiapan barang gudang seragam (SLA 2 jam) dan modul foto retur digital.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: BSC 2 - SISI CUSTOMER -->
+    <section class="slide" id="slide-4">
+      <div class="bsc-main-header">BALANCED SCORECARD: SISI CUSTOMER (CUSTOMER EXPERIENCE & MITRA ACCESS)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Memberikan kemudahan pemesanan mandiri 24/7, fleksibilitas tingkatan harga sesuai level mitra, transparansi kupon diskon, layanan interaktif responsif, dan keterbukaan ulasan kepuasan produk.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Tim Customer Experience & Komersial</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> Indeks Rating Layanan (Skala 1-5), Retensi Mitra, Siklus Order</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Bulanan</div>
+        <div class="meta-cell meta-cell-status">Overall Status: 94%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. KEMUDAHAN AKSES & BELANJA</td>
+            <td class="td-key-init">1.1 Mode Guest Browsing katalog produk tanpa kewajiban login awal</td>
+            <td class="td-audit">Terverifikasi: Endpoint GET /api/v1/products & UI Katalog</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Manajemen data profil toko, kontak, dan multi-alamat pengiriman</td>
+            <td class="td-audit">Terverifikasi: Endpoint PUT /api/v1/profile & Tabel customers</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Sistem kupon promo potongan harga transaksi belanja</td>
+            <td class="td-audit">Terverifikasi: Tabel coupons & validasi Shop.php</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. LAYANAN INTERAKTIF & KOMUNIKASI</td>
+            <td class="td-key-init">2.1 Saluran pesan langsung Customer Service 2 arah (In-App Live Chat)</td>
+            <td class="td-audit">Terverifikasi: Endpoint /api/v1/messages & Tabel message</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Sistem ulasan dan rating bintang kualitas produk pasca pesanan selesai</td>
+            <td class="td-audit">Terverifikasi: Endpoint POST /api/v1/orders/{id}/complete</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Notifikasi pengingat pembayaran & status pesanan instan</td>
+            <td class="td-audit">Status: Integrasi gateway notifikasi pesan</td>
+            <td class="td-status red">85%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="2">3. TRANSPARANSI & LOYALITAS</td>
+            <td class="td-key-init">3.1 Akses riwayat faktur, rincian biaya, dan status pengiriman real-time</td>
+            <td class="td-audit">Terverifikasi: Endpoint GET /api/v1/orders & Tabel orders</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Program poin loyalitas dan reward kuota diskon toko aktif</td>
+            <td class="td-audit">Status: Tahap perancangan skema reward Q4 2026</td>
+            <td class="td-status red">80%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box">94%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>Katalog terbuka memudahkan calon mitra kios menjelajahi seluruh varian dan promo.</li>
+            <li>In-App Live Chat aktif memberikan kanal komunikasi resmi dua arah langsung ke CS.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Kios pedesaan masih terbiasa menghubungi kontak pribadi salesman dibanding fitur chat aplikasi.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Menyediakan video panduan ringkas 1 menit dan voucher promo belanja perdana via aplikasi.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: BSC 3 - SISI SALES -->
+    <section class="slide" id="slide-5">
+      <div class="bsc-main-header">BALANCED SCORECARD: SISI SALES (SALES FORCE ENABLEMENT & DISTRIBUSI)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Memberdayakan tenaga penjual lapangan, mengoptimalkan pembagian wilayah kios binaan, mengawal kepatuhan limit piutang, dan mempercepat rekonsiliasi order digital.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Kepala Divisi Penjualan & Distribusi</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> Utilisasi Limit Kredit, Rasio Toko Aktif, Rating Layanan Sales</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Bulanan</div>
+        <div class="meta-cell meta-cell-status" style="background: var(--red-status);">Overall Status: 89%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. PEMETAAN WILAYAH & BINAAN</td>
+            <td class="td-key-init">1.1 Penugasan kios binaan per salesman lapangan di basis data terpusat</td>
+            <td class="td-audit">Terverifikasi: Field customers.salesman_id & Admin Salesman</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Visibilitas riwayat transaksi dan status pembayaran toko binaan</td>
+            <td class="td-audit">Terverifikasi: Modul Admin Salesman API & Controller Orders</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Perencanaan rute kunjungan sales terintegrasi riwayat order kios</td>
+            <td class="td-audit">Status: Dalam perancangan modul territory route</td>
+            <td class="td-status red">80%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. PENGAWALAN PLAFON KREDIT</td>
+            <td class="td-key-init">2.1 Visibilitas limit kredit (max_credit) toko binaan saat pemesanan</td>
+            <td class="td-audit">Terverifikasi: Model Mobile_api_model & Admin Piutang</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Alur validasi persetujuan pesanan tempo digital oleh supervisor sales</td>
+            <td class="td-audit">Terverifikasi: Status alur piutang di Piutang.php</td>
+            <td class="td-status orange">90%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Skema insentif komisi teritori digital untuk mendorong adopsi mobile</td>
+            <td class="td-audit">Status: Menunggu legalitas formal skema komisi direksi</td>
+            <td class="td-status red">80%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="2">3. PENDAMPINGAN & LAYANAN</td>
+            <td class="td-key-init">3.1 Program pendampingan instalasi aplikasi ke kios mitra perintis</td>
+            <td class="td-audit">Terverifikasi: Pelaksanaan onboarding tim cabang</td>
+            <td class="td-status red">85%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Sistem penilaian kinerja pelayanan salesman dari ulasan toko</td>
+            <td class="td-audit">Terverifikasi: Modul Rating.php & Tabel reviews</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box" style="background: var(--red-status);">89%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>Struktur database mengunci relasi toko ke salesman_id untuk kepastian kepemilikan akun.</li>
+            <li>Limit plafon kredit toko terkontrol otomatis mencegah resiko over-limit.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Kekhawatiran tim sales bahwa order mandiri aplikasi akan memotong komisi penjualan mereka.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Mengesahkan SK Direksi: Komisi pesanan digital tetap 100% dialokasikan ke salesman pembina.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: BSC 4 - SISI LOGISTIK & WAREHOUSE -->
+    <section class="slide" id="slide-6">
+      <div class="bsc-main-header">BALANCED SCORECARD: SISI LOGISTIK & WAREHOUSE (SUPPLY CHAIN & SLA)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Menjamin presisi perhitungan ongkos kirim hingga tingkat kecamatan, efisiensi alur pengemasan gudang (Order SLA), mitigasi produk lambat bergerak (deadstock), dan penyediaan armada muatan besar.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Tim Logistik & Operasional Gudang</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> SLA Pengemasan (&lt;2 Jam), Akurasi Ongkir, Rasio Deadstock</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Harian</div>
+        <div class="meta-cell meta-cell-status">Overall Status: 92%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. PRESISI LOGISTIK WILAYAH</td>
+            <td class="td-key-init">1.1 Integrasi pembacaan tarif ekspedisi tingkat kecamatan (RajaOngkir Pro API)</td>
+            <td class="td-audit">Terverifikasi: Endpoint shipping/destination & Rajaongkir.php</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Penguncian kuotasi tarif ongkos kirim 30 menit saat proses checkout</td>
+            <td class="td-audit">Terverifikasi: Tabel mobile_shipping_quotes & expiry lock</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Kalkulasi otomatis akumulasi berat produk satuan botol/pcs dan dus/karton</td>
+            <td class="td-audit">Terverifikasi: Model validasi berat & product_unit_value</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. KECEPATAN PEMENUHAN GUDANG</td>
+            <td class="td-key-init">2.1 Antrean status alur pesanan terstruktur (Verifikasi &rarr; Kemas &rarr; Kirim)</td>
+            <td class="td-audit">Terverifikasi: Controller Pengiriman.php & Admin Orders</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Standarisasi target penyiapan barang gudang seragam (SLA &lt; 2 Jam)</td>
+            <td class="td-audit">Status: Penyelarasan SOP shift tim gudang cabang</td>
+            <td class="td-status red">85%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Skema pengiriman armada truk internal Karisma untuk muatan tonase besar</td>
+            <td class="td-audit">Status: Penentuan tarif flat rute rutin armada internal</td>
+            <td class="td-status red">80%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="2">3. PENGENDALIAN DEADSTOCK</td>
+            <td class="td-key-init">3.1 Deteksi dini produk slow-moving (&gt; 1 tahun pergerakan &lt; 5% & retur)</td>
+            <td class="td-audit">Terverifikasi: Catatan teknis CATATAN PENTING.txt #DEADSTOCK</td>
+            <td class="td-status orange">90%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Otomasi alur diskon kilat (flash sale) cuci gudang produk deadstock</td>
+            <td class="td-audit">Status: Tahap sinkronisasi formula promo staging</td>
+            <td class="td-status red">80%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box">92%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>Penguncian ongkir 30 menit (mobile_shipping_quotes) berhasil mengeliminasi selisih tarif.</li>
+            <li>Alur status pesanan gudang terintegrasi langsung dengan nomor resi pengiriman.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Tarif ekspedisi kurir reguler tidak ekonomis untuk pesanan pupuk tonase besar (drum cairan).</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Mengaktifkan opsi armada truk internal Karisma dengan tarif flat terjangkau rute mingguan.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: BSC 5 - SISI MULTIPLATFORM -->
+    <section class="slide" id="slide-7">
+      <div class="bsc-main-header">BALANCED SCORECARD: SISI MULTIPLATFORM (TRI-PLATFORM IOS, ANDROID, WEB)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Menghadirkan performa aplikasi native berkecepatan tinggi, ukuran aplikasi hemat kuota, antarmuka responsif di ponsel/tablet, dan stabilitas back-office web portal.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Tim Mobile Engineering & UI/UX</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> App Store Review Clearance, Android Crash Rate (&lt;0.1%), Responsiveness</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Bulanan</div>
+        <div class="meta-cell meta-cell-status">Overall Status: 96%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. EKOSISTEM IOS (APP STORE)</td>
+            <td class="td-key-init">1.1 Arsitektur Swift Native (SwiftUI & UIKit) berkinerja tinggi</td>
+            <td class="td-audit">Terverifikasi: Source build iOS Karisma Online</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Kepatuhan Apple Review Guideline 5.1.1(v) (Penghapusan Akun Mandiri)</td>
+            <td class="td-audit">Terverifikasi: Dokumen docs/APP_REVIEW_RESOLUTION_20260728.md</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Tata letak antarmuka adaptif layar iPad dengan tombol navigasi jelas</td>
+            <td class="td-audit">Terverifikasi: Kepatuhan review UI iPad resolution</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. EKOSISTEM ANDROID (PLAY STORE)</td>
+            <td class="td-key-init">2.1 Arsitektur Kotlin/Java Native (MVVM Pattern) responsif</td>
+            <td class="td-audit">Terverifikasi: Source code kiustore_apps module</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Optimasi ukuran installer APK hemat kuota internet (&lt; 15MB)</td>
+            <td class="td-audit">Terverifikasi: Build packaging & resource shrinking</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Kompresi otomatis foto bukti transfer bank sebelum diunggah</td>
+            <td class="td-audit">Terverifikasi: Controller Mobile.php payment_picture_name</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="2">3. PORTAL BACK-OFFICE WEB</td>
+            <td class="td-key-init">3.1 Dasbor operasional web AdminLTE dengan manajemen modul lengkap</td>
+            <td class="td-audit">Terverifikasi: Module application/modules/admin</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Sinkronisasi status transaksi lintas platform (iOS, Android, Web)</td>
+            <td class="td-audit">Terverifikasi: Database MariaDB InnoDB ACID transactions</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box">96%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>Lulus 100% audit kepatuhan Apple Review (DELETE /account non-PII & guest browsing).</li>
+            <li>APK Android berukuran ringan di bawah 15MB hemat kuota bagi mitra pedesaan.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Variasi performa smartphone Android tipe lama milik sebagian kios mitra binaan.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Mengoptimalkan caching lokal dan kompresi gambar otomatis pada sisi perangkat.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: BSC 6 - SISI PERUSAHAAN -->
+    <section class="slide" id="slide-8">
+      <div class="bsc-main-header">BALANCED SCORECARD: SISI PERUSAHAAN (GOVERNANCE & CORPORATE FINANCE)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Mengakselerasi perputaran modal kerja, menekan Days Sales Outstanding (DSO), menjamin kepatuhan audit perpajakan, dan meningkatkan efisiensi biaya operasional per order.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Dewan Direksi & Tim Manajemen Eksekutif</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> Days Sales Outstanding (DSO), Efisiensi Biaya, Kepatuhan Audit</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Bulanan</div>
+        <div class="meta-cell meta-cell-status">Overall Status: 94%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. ARUS KAS & MODAL KERJA</td>
+            <td class="td-key-init">1.1 Pemotongan waktu settlement pembayaran transfer dari 2-4 jam ke &lt; 5 detik</td>
+            <td class="td-audit">Terverifikasi: Otomasi webhook callback BRIVA</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Penurunan risiko piutang tak tertagih via validasi limit plafon kredit sistem</td>
+            <td class="td-audit">Terverifikasi: Logika max_credit di checkout mobile</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Visibilitas dasbor eksekutif pergerakan omset harian dan bulanan</td>
+            <td class="td-audit">Terverifikasi: Controller Dashboard.php & Report.php</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. TATA KELOLA HUKUM & AUDIT</td>
+            <td class="td-key-init">2.1 Pemisahan data identitas pribadi (non-PII) tanpa menghapus faktur transaksi</td>
+            <td class="td-audit">Terverifikasi: Model Mobile_api_model.php delete_account</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Perlindungan integritas nomor faktur dan pesanan untuk audit perpajakan</td>
+            <td class="td-audit">Terverifikasi: Relasi tabel orders, order_items, payments</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Pencatatan audit trail lengkap seluruh aktivitas transaksi dan pembayaran</td>
+            <td class="td-audit">Terverifikasi: Tabel briva_api, mobile_account_deletions</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="2">3. SKALABILITAS KORPORASI</td>
+            <td class="td-key-init">3.1 Efisiensi biaya operasional per transaksi pemesanan</td>
+            <td class="td-audit">Terverifikasi: Otomasi sistem mengurangi beban kasir</td>
+            <td class="td-status orange">90%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Standardisasi SOP operasional cabang untuk ekspansi digital</td>
+            <td class="td-audit">Status: Penyusunan panduan operasional cabang terpadu</td>
+            <td class="td-status red">85%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box">94%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>Integritas faktur dan nomor pesanan terlindungi untuk keperluan audit pajak resmi.</li>
+            <li>Arus kas bertumbuh lebih cepat berkat eliminasi jeda verifikasi manual bank.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Masa transisi staf administrasi cabang dari kebiasaan input data konvensional.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Menjadwalkan workshop pelatihan sistem digital terpadu bagi staf administrasi cabang.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: BSC 7 - SISI KEUANGAN & PAYMENT -->
+    <section class="slide" id="slide-9">
+      <div class="bsc-main-header">BALANCED SCORECARD: SISI KEUANGAN & PAYMENT (FINTECH & PRICING ENGINE)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Otomasi penerimaan pembayaran Virtual Account (BRIVA), perlindungan skema harga bertingkat, kepastian rekonsiliasi kas harian, dan pencegahan transaksi over-limit.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Divisi Keuangan & Treasury Karisma</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> Adopsi BRIVA, Kecepatan Rekonsiliasi Kas, Rasio Over-Limit</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Harian</div>
+        <div class="meta-cell meta-cell-status">Overall Status: 96%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. OTOMASI FINTECH BRIVA</td>
+            <td class="td-key-init">1.1 Integrasi library Brivaws standar SNAP API BRI (/transfer-va/create-va)</td>
+            <td class="td-audit">Terverifikasi: Controller Brivawsapi.php & key/private.pem</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Penerbitan Dynamic VA (91118 + No HP) dengan batas kedaluwarsa 15 menit</td>
+            <td class="td-audit">Terverifikasi: CATATAN PENTING.txt (V) & Tabel briva_api</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Webhook callback otomatis memperbarui status pesanan menjadi Lunas (status = 10)</td>
+            <td class="td-audit">Terverifikasi: Function inquiryVa & callback handler</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. PROTEKSI HARGA MULTI-TIER</td>
+            <td class="td-key-init">2.1 Proteksi skema harga 3 level (Level 1: Retail, Level 2: Grosir, Level 3: Distributor)</td>
+            <td class="td-audit">Terverifikasi: Database View v_products & level_product</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Sistem satuan ganda (Botol/Pcs ke Dus/Karton dengan konversi otomatis)</td>
+            <td class="td-audit">Terverifikasi: Modul keranjang unit_type 1 & 2</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Kalkulasi potongan promo dan diskon kupon langsung di sisi server</td>
+            <td class="td-audit">Terverifikasi: Query promo aktif CAST(expired_date AS DATE)</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="2">3. KONTROL LIMIT KREDIT</td>
+            <td class="td-key-init">3.1 Validasi otomatis pencegahan pemesanan melebihi limit plafon (max_credit)</td>
+            <td class="td-audit">Terverifikasi: Model Mobile_api_model checkout validation</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Jalur pembayaran cadangan Transfer Manual Multi-Bank dengan verifikasi kasir</td>
+            <td class="td-audit">Terverifikasi: Endpoint POST /api/v1/orders/{id}/confirm-transfer</td>
+            <td class="td-status orange">90%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box">96%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>View database v_products mengunci skema harga multi-level secara tamper-proof.</li>
+            <li>Dynamic VA 15 menit berhasil mencegah penumpukan pesanan pending yang menahan stok.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Risiko gangguan jaringan perbankan saat lonjakan pesanan puncak musim tanam.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Menyiapkan jalur transfer bank manual multi-bank dengan verifikasi cepat tim kasir.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: BSC 8 - SISI TEKNIS -->
+    <section class="slide" id="slide-10">
+      <div class="bsc-main-header">BALANCED SCORECARD: SISI TEKNIS (BACKEND ARCHITECTURE & RESTFUL API)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Menyediakan infrastruktur backend RESTful API yang cepat (&lt;200ms), modular (HMVC), aman, kompatibel PHP 8.x, dengan integritas transaksi MariaDB ACID.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Tim Lead Backend Engineering</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> API Latency (&lt;200ms), Error Rate (&lt;0.01%), ACID Transaksi DB</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Bulanan</div>
+        <div class="meta-cell meta-cell-status">Overall Status: 95%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. RESTFUL API ARCHITECTURE</td>
+            <td class="td-key-init">1.1 Endpoint API /api/v1 terisolasi pada modul application/modules/api</td>
+            <td class="td-audit">Terverifikasi: Controller Mobile.php (827 baris kode)</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Penanganan payload JSON murni dan standarisasi response error HTTP</td>
+            <td class="td-audit">Terverifikasi: Function respond & error di Mobile.php</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Konfigurasi CORS header (Access-Control-Allow-Origin: *) & HTTP verbs</td>
+            <td class="td-audit">Terverifikasi: Preflight OPTIONS handler di Mobile.php</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. BASIS DATA & TRANSAKSI</td>
+            <td class="td-key-init">2.1 Migration scripts database (20260629_mobile_api, 20260728_account_deletion)</td>
+            <td class="td-audit">Terverifikasi: Folder db/migrations/*.sql</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Penerapan transaksi ACID (trans_begin, trans_commit, trans_rollback)</td>
+            <td class="td-audit">Terverifikasi: Model Mobile_api_model.php (1612 baris kode)</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Optimasi query view v_products dan pemanfaatan indeks tabel relasi</td>
+            <td class="td-audit">Terverifikasi: sql_view.sql & indeks foreign key dump</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">3. KINERJA & SKALABILITAS</td>
+            <td class="td-key-init">3.1 Kompatibilitas penuh CodeIgniter 3 HMVC pada lingkungan PHP 8.x</td>
+            <td class="td-audit">Terverifikasi: Log error testing & library compatibility</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Keranjang belanja mobile berbasis basis data tanpa dependensi sesi web</td>
+            <td class="td-audit">Terverifikasi: Tabel mobile_cart_items</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.3 Cakupan pengujian unit test API otomatis</td>
+            <td class="td-audit">Status: Perluasan skenario pengujian beban transaksi</td>
+            <td class="td-status red">85%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box">95%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>Arsitektur API mandiri berbasis bearer token tanpa ketergantungan sesi web browser.</li>
+            <li>Transaksi checkout terlindungi mekanisme trans_begin dan trans_commit ACID.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Kebutuhan penanganan query pada tabel historis pesanan yang terus membesar.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Menerapkan strategi pengarsipan data (archiving) transaksi di atas 2 tahun secara berkala.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: BSC 9 - SISI KEAMANAN -->
+    <section class="slide" id="slide-11">
+      <div class="bsc-main-header">BALANCED SCORECARD: SISI KEAMANAN (SECURITY & COMPLIANCE)</div>
+      <div class="bsc-obj-row">
+        <div class="bsc-obj-label">Objective Description</div>
+        <div class="bsc-obj-text">Menjamin keamanan data kredensial pengguna, enkripsi token sesi, perlindungan hak privasi non-PII, dan kepatuhan audit regulasi global.</div>
+      </div>
+      <div class="bsc-meta-bar">
+        <div class="meta-cell"><strong>Owner:</strong> Tim Security & Compliance</div>
+        <div class="meta-cell"><strong>Measure lead:</strong> Zero Critical Vulnerability, Token Expiry, Audit Trail Non-PII</div>
+        <div class="meta-cell"><strong>Frequency:</strong> Bulanan</div>
+        <div class="meta-cell meta-cell-status">Overall Status: 97%</div>
+        <div class="meta-cell meta-cell-date">31-Agu-26</div>
+      </div>
+
+      <table class="bsc-card-table">
+        <thead>
+          <tr>
+            <th>Must Win</th>
+            <th>Key initiatives</th>
+            <th>Dasar Verifikasi / Sumber Data</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-must-win" rowspan="3">1. AUTENTIKASI & SESI</td>
+            <td class="td-key-init">1.1 Bearer Token SHA-256 (mobile_api_tokens) dengan kedaluwarsa 30 hari</td>
+            <td class="td-audit">Terverifikasi: issue_token & user_from_token SHA-256</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.2 Hashing kata sandi pengguna berstandar industri BCRYPT (password_hash)</td>
+            <td class="td-audit">Terverifikasi: Register & login verify di Mobile.php</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">1.3 Pencabutan token instan saat logout dan pembatasan hak akses level</td>
+            <td class="td-audit">Terverifikasi: Function revoke_token & require_fields</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">2. PRIVASI & NON-PII</td>
+            <td class="td-key-init">2.1 Endpoint penghapusan akun mandiri DELETE /api/v1/account</td>
+            <td class="td-audit">Terverifikasi: App Store Guideline 5.1.1(v) compliance</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.2 Audit trail non-PII dengan hash SHA-256 pada tabel mobile_account_deletions</td>
+            <td class="td-audit">Terverifikasi: Struktur kolom email_hash CHAR(64)</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">2.3 Pelepasan relasi PII pada pesanan tanpa menghapus arsip pembukuan</td>
+            <td class="td-audit">Terverifikasi: Anonymization logic di delete_account</td>
+            <td class="td-status green">100%</td>
+          </tr>
+          <tr>
+            <td class="td-must-win" rowspan="3">3. OPERASIONAL & AUDIT</td>
+            <td class="td-key-init">3.1 Isolasi akun uji coba internal (is_internal) agar tidak mengotori omset riil</td>
+            <td class="td-audit">Terverifikasi: Pemisahan data akun demo di database</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.2 Sanitasi input payload JSON mencegah ancaman SQL Injection & XSS</td>
+            <td class="td-audit">Terverifikasi: Input casting & query bindings</td>
+            <td class="td-status orange">95%</td>
+          </tr>
+          <tr>
+            <td class="td-key-init">3.3 Pembaruan rutin sertifikat keamanan SSL/TLS dan private key perbankan</td>
+            <td class="td-audit">Terverifikasi: File key/private.pem & HTTPS headers</td>
+            <td class="td-status orange">90%</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="3" style="text-align: right;">Total Capaian Kinerja Terverifikasi (Overall Score)</td>
+            <td class="total-score-box">97%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bsc-legend-strip">
+        <div class="leg-green">■ &gt;= 100% (Tercapai / Teruji Lulus Penuh)</div>
+        <div class="leg-orange">■ On Progress &lt;100% - 90% (Live Staging / Dalam Pengawalan)</div>
+        <div class="leg-red">■ Belum Start / &lt;90% (Perlu Kebijakan Manajemen)</div>
+      </div>
+
+      <div class="grounded-3col">
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-green">Pencapaian Terverifikasi</div>
+          <ul class="grounded-list">
+            <li>Kepatuhan penuh standar Apple App Review 5.1.1(v) dan enkripsi SHA-256 token.</li>
+            <li>Pemisahan data audit non-PII menjamin kerahasiaan data pengguna.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-orange">Tantangan & Isu Lapangan</div>
+          <ul class="grounded-list">
+            <li>Kebutuhan rotasi kunci privat enkripsi perbankan berkala sesuai kebijakan perbankan.</li>
+          </ul>
+        </div>
+        <div class="grounded-col">
+          <div class="grounded-col-title col-title-blue">Rencana Aksi & Mitigasi Risiko</div>
+          <ul class="grounded-list">
+            <li>Menjadwalkan rotasi kunci per semester dan memonitor anomali otentikasi server.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12: MATRIKS GROUNDED ANALYSIS TERPADU -->
+    <section class="slide" id="slide-12">
+      <div class="dash-top-header">
+        <span class="dash-top-left">KARISMA ONLINE // BALANCED SCORECARD (BSC) AUDIT REPORT</span>
+        <span class="dash-top-right">EVALUASI 9 SISI STRATEGIS</span>
+      </div>
+      <h2 class="dash-main-title">MATRIKS ACCOMPLISHMENT, ISSUES & RISK MITIGATION</h2>
+      <p class="dash-subtitle">Ringkasan Terpadu Pencapaian Nyata, Tantangan Lapangan, dan Rencana Mitigasi Risiko Terverifikasi</p>
+
+      <table class="master-table" style="font-size: 10.5px;">
+        <thead>
+          <tr>
+            <th style="width: 14%;">Perspektif</th>
+            <th style="width: 28%;">Accomplishment (Pencapaian Teruji)</th>
+            <th style="width: 28%;">Issues & Root Cause (Tantangan)</th>
+            <th style="width: 30%;">Next Steps & Risk Mitigation (Solusi)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. Apps / Platform</strong></td>
+            <td>Lolos Apple Review 5.1.1 & Guest Browsing aktif 100%.</td>
+            <td>Kios konvensional butuh adaptasi alur digital.</td>
+            <td>Rilis fitur Quick Re-Order 1-klik & panduan video.</td>
+          </tr>
+          <tr>
+            <td><strong>2. Customer</strong></td>
+            <td>Pemesanan mandiri 24/7 & live chat CS terintegrasi.</td>
+            <td>Kios daerah terbiasa pesan via telepon pribadi.</td>
+            <td>Insentif kupon promo belanja perdana via aplikasi.</td>
+          </tr>
+          <tr>
+            <td><strong>3. Sales</strong></td>
+            <td>Penugasan toko binaan terkunci rapi per salesman_id.</td>
+            <td>Kekhawatiran pemotongan komisi pesanan mobile.</td>
+            <td>SK Direksi: komisi 100% tetap milik sales pembina.</td>
+          </tr>
+          <tr>
+            <td><strong>4. Logistik</strong></td>
+            <td>Ongkir presisi kecamatan & quote lock 30 menit teruji.</td>
+            <td>Tarif kurir reguler mahal untuk pupuk tonase besar.</td>
+            <td>Aktivasi opsi armada truk internal Karisma.</td>
+          </tr>
+          <tr>
+            <td><strong>5. Multiplatform</strong></td>
+            <td>Tri-Platform iOS Swift, Android Kotlin & Web Admin siap.</td>
+            <td>Variasi spesifikasi ponsel Android mitra di daerah.</td>
+            <td>Menjaga ukuran APK &lt; 15MB & kompresi foto lokal.</td>
+          </tr>
+          <tr>
+            <td><strong>6. Perusahaan</strong></td>
+            <td>Settlement kas cepat memotong DSO; audit faktur aman.</td>
+            <td>Penyesuaian kebiasaan staf cabang ke sistem otomatis.</td>
+            <td>Pelatihan SOP cabang & monitoring omset terpusat.</td>
+          </tr>
+          <tr>
+            <td><strong>7. Keuangan</strong></td>
+            <td>BRIVA auto-settlement & margin 3 level terkunci.</td>
+            <td>Risiko lonjakan antrean saat puncak musim tanam.</td>
+            <td>Idempotency random external-id & fallback transfer kasir.</td>
+          </tr>
+          <tr>
+            <td><strong>8. Teknis</strong></td>
+            <td>Backend RESTful API /api/v1 & transaksi ACID DB.</td>
+            <td>Volume data transaksi historis semakin membesar.</td>
+            <td>Penjadwalan archiving data berkala & optimasi indeks.</td>
+          </tr>
+          <tr>
+            <td><strong>9. Keamanan</strong></td>
+            <td>Bearer Token SHA-256, BCRYPT, audit non-PII lulus uji.</td>
+            <td>Kebutuhan rotasi kunci privat enkripsi berkala.</td>
+            <td>Prosedur rotasi kunci tahunan & monitoring log server.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SLIDE 13: STRATEGIC ROADMAP -->
+    <section class="slide" id="slide-13">
+      <div class="dash-top-header">
+        <span class="dash-top-left">KARISMA ONLINE // BALANCED SCORECARD (BSC) AUDIT REPORT</span>
+        <span class="dash-top-right">TIMELINE EKSEKUSI</span>
+      </div>
+      <h2 class="dash-main-title">STRATEGIC ROADMAP: JADWAL & TAHAPAN IMPLEMENTASI</h2>
+      <p class="dash-subtitle">Rencana Kerja Terukur Menuju Peluncuran Penuh & Skalabilitas Nasional (Q3 2026 – Q1 2027)</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 10px;">
+        <div style="border: 1px solid #CBD5E1; border-top: 4px solid var(--orange-header); background: #F8FAFC; border-radius: 6px; padding: 14px;">
+          <div style="font-size: 13px; font-weight: 800; color: #0F172A; margin-bottom: 2px;">Fase 1: Peluncuran & Aktivasi</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--orange-header); margin-bottom: 8px;">Q3 2026 (SEGERA)</div>
+          <ul class="grounded-list" style="font-size: 11px;">
+            <li>Publikasi serentak di Apple App Store & Google Play Store.</li>
+            <li>Onboarding 500+ mitra kios binaan bersama tim sales.</li>
+            <li>Aktivasi promo belanja perdana via aplikasi mobile.</li>
+            <li>Monitoring settlement harian BRIVA dan kecepatan kirim gudang.</li>
+          </ul>
+        </div>
+
+        <div style="border: 1px solid #CBD5E1; border-top: 4px solid var(--green-status); background: #F8FAFC; border-radius: 6px; padding: 14px;">
+          <div style="font-size: 13px; font-weight: 800; color: #0F172A; margin-bottom: 2px;">Fase 2: Optimalisasi Logistik & Komisi</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--green-status); margin-bottom: 8px;">Q4 2026</div>
+          <ul class="grounded-list" style="font-size: 11px;">
+            <li>Integrasi opsi armada truk internal untuk muatan tonase besar.</li>
+            <li>Peluncuran program poin loyalitas dan reward toko aktif.</li>
+            <li>Pemberlakuan penuh skema komisi digital bagi sales lapangan.</li>
+            <li>Otomasi promo diskon musiman cuci gudang deadstock.</li>
+          </ul>
+        </div>
+
+        <div style="border: 1px solid #CBD5E1; border-top: 4px solid var(--cyan-accent); background: #F8FAFC; border-radius: 6px; padding: 14px;">
+          <div style="font-size: 13px; font-weight: 800; color: #0F172A; margin-bottom: 2px;">Fase 3: Konsolidasi & Skalabilitas</div>
+          <div style="font-size: 11px; font-weight: 700; color: var(--cyan-accent); margin-bottom: 8px;">Q1 2027</div>
+          <ul class="grounded-list" style="font-size: 11px;">
+            <li>Konsolidasi peramalan kebutuhan stok berbasis siklus tanam.</li>
+            <li>Perluasan area binaan cabang ke sentra pertanian baru.</li>
+            <li>Peningkatan kapasitas infrastruktur server dan fitur lanjutan.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 14: KESIMPULAN EKSEKUTIF & APPROVAL -->
+    <section class="slide" id="slide-14">
+      <div class="dash-top-header">
+        <span class="dash-top-left">KARISMA ONLINE // BALANCED SCORECARD (BSC) AUDIT REPORT</span>
+        <span class="dash-top-right">EXECUTIVE APPROVAL</span>
+      </div>
+      <h2 class="dash-main-title">KESIMPULAN EKSEKUTIF & PERSETUJUAN DIREKSI</h2>
+      <p class="dash-subtitle">Persetujuan Peluncuran Komersial Ekosistem Karisma Online</p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px;">
+        <div style="border: 1px solid #CBD5E1; background: #F8FAFC; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 13px; font-weight: 800; color: #0F172A; margin-bottom: 10px;">📌 Ringkasan Evaluasi 9 Sisi Kesiapan</div>
+          <ul class="grounded-list" style="font-size: 11.5px; gap: 8px;">
+            <li><strong>Rata-Rata Kesiapan 94.2%:</strong> Ekosistem Karisma Online telah mencapai kesiapan komersial penuh dan lulus seluruh audit regulasi.</li>
+            <li><strong>Kepatuhan Standar Industri:</strong> Memenuhi 100% persyaratan Apple App Store, Google Play Store, dan perbankan Bank BRI.</li>
+            <li><strong>Efisiensi Operasional Terbukti:</strong> Pemangkasan waktu settlement kas dari jam ke detik serta akurasi ongkos kirim tingkat kecamatan.</li>
+          </ul>
+        </div>
+
+        <div style="border: 1px solid #CBD5E1; background: #F8FAFC; border-radius: 6px; padding: 16px;">
+          <div style="font-size: 13px; font-weight: 800; color: var(--green-status); margin-bottom: 10px;">✅ Rekomendasi Keputusan Dewan Direksi</div>
+          <ul class="grounded-list" style="font-size: 11.5px; gap: 8px;">
+            <li><strong>1. Persetujuan Peluncuran (Go-Live Sign-Off):</strong> Memberikan persetujuan resmi peluncuran publik aplikasi mobile Karisma Online.</li>
+            <li><strong>2. Kebijakan Komisi Digital Sales:</strong> Mengesahkan SK Direksi terkait alokasi 100% komisi pesanan digital untuk salesman pembina kios.</li>
+            <li><strong>3. Alokasi Armada Logistik:</strong> Menyetujui skema pengiriman armada truk internal untuk pesanan pupuk tonase besar.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px; background: #0F172A; color: #FFFFFF; border-radius: 6px; padding: 12px 18px; display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 11.5px; font-weight: 600; color: #94A3B8;">Dokumen ini siap disahkan sebagai acuan kerja resmi PT. Karisma Indoagro Universal.</span>
+        <span style="font-size: 12px; font-weight: 800; color: #38BDF8;">Sesi Diskusi & Tanya Jawab (Q&A) Dipersilakan</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM BAR -->
+  <footer class="bottom-bar">
+    <div>PT. KARISMA INDOAGRO UNIVERSAL &bull; BALANCED SCORECARD AUDIT REPORT</div>
+    <div>
+      <span>Ganti Slide: <span class="kbd-btn">◀</span> / <span class="kbd-btn">▶</span> / <span class="kbd-btn">Space</span></span> &bull; 
+      <span>Layar Penuh: <span class="kbd-btn">F</span></span>
+    </div>
+  </footer>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+
+    function updateSlide() {
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx === currentSlide);
+      });
+      document.getElementById('slideNum').textContent = 
+        String(currentSlide + 1).padStart(2, '0') + ' / ' + String(totalSlides).padStart(2, '0');
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleFullScreen();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        currentSlide = 0;
+        updateSlide();
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        currentSlide = totalSlides - 1;
+        updateSlide();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>

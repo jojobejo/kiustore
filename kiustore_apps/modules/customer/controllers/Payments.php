@@ -128,21 +128,29 @@ class Payments extends CI_Controller
                 $picture_name = '-';
             }
 
+            $payment_data = array(
+                'order_id' => $order_id,
+                'bank_name' => $bank_name,
+                'bank_number' => $bank_number,
+                'transfer' => $transfer,
+                'bank' => $bank,
+                'transfer_to' => $bank,
+                'name' => $name,
+                'name_duplicate' => $name,
+                'source' => array(
+                    'bank' => $bank_name,
+                    'name' => $name,
+                    'number' => $bank_number
+                )
+            );
+
             $payment = array(
                 'order_id' => $order_id,
                 'payment_price' => $transfer,
                 'payment_date' => date('Y-m-d H:i:s'),
                 'picture_name' => $picture_name,
                 'payment_status' => '1',
-                'payment_data' => json_encode(array(
-                    'order_id' => $order_id,
-                    'bank_name' => $bank_name,
-                    'bank_number' => $bank_number,
-                    'transfer' => $transfer,
-                    'bank' => $bank,
-                    'name' => $name,
-                    'name_duplicate' => $name
-                ))
+                'payment_data' => json_encode($payment_data)
             );
 
             $regist_payment_api = array(

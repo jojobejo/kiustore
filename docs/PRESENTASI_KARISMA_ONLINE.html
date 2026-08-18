@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karisma Online - Strategic Launching & Development Presentation Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070B14;
+      --bg-card: rgba(15, 23, 42, 0.85);
+      --bg-card-hover: rgba(30, 41, 59, 0.95);
+      --border-glow: rgba(16, 185, 129, 0.35);
+      --border-cyan: rgba(6, 182, 212, 0.35);
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      
+      --accent-green: #10B981;
+      --accent-green-glow: rgba(16, 185, 129, 0.5);
+      --accent-cyan: #06B6D4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.5);
+      --accent-blue: #3B82F6;
+      --accent-purple: #8B5CF6;
+      --accent-amber: #F59E0B;
+      --accent-rose: #F43F5E;
+      
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* Ambient Background FX */
+    .ambient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.25;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent-green) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+    }
+
+    .orb-2 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, var(--accent-cyan) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+      animation-delay: -6s;
+    }
+
+    .orb-3 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.15;
+      animation-delay: -12s;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(40px, -30px) scale(1.1); }
+      100% { transform: translate(-30px, 40px) scale(0.95); }
+    }
+
+    /* Top Navigation / Header */
+    header {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 32px;
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(16px);
+      background: rgba(7, 11, 20, 0.85);
+      flex-shrink: 0;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 900;
+      color: #041E15;
+      font-size: 1.25rem;
+      box-shadow: 0 0 20px var(--accent-green-glow);
+    }
+
+    .logo-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #FFFFFF, #94A3B8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-sub {
+      font-size: 0.75rem;
+      color: var(--accent-green);
+      font-family: var(--font-mono);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid var(--border-glow);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+
+    .status-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    .btn-icon {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* Deck Main Stage */
+    main.deck-stage {
+      position: relative;
+      z-index: 10;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 48px;
+      overflow: hidden;
+    }
+
+    /* Floating Arrow Navigation Overlays */
+    .floating-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 72px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 30;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .floating-arrow:hover:not(.disabled) {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(6, 182, 212, 0.3));
+      border-color: var(--border-glow);
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: 0 0 20px var(--accent-green-glow);
+    }
+
+    .floating-arrow.disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .floating-prev { left: 16px; }
+    .floating-next { right: 16px; }
+
+    .slide {
+      position: absolute;
+      width: 100%;
+      max-width: 1320px;
+      height: 100%;
+      max-height: calc(100vh - 160px);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 36px 48px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), 0 0 1px rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transform: translateY(24px) scale(0.98);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 16px;
+    }
+
+    .slide-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      line-height: 1.2;
+    }
+
+    .slide-number-indicator {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .slide-number-indicator span {
+      color: var(--accent-green);
+      font-weight: 700;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(6, 182, 212, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-badge {
+      display: inline-flex;
+      align-self: flex-start;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-purple {
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--accent-purple);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #FFFFFF;
+    }
+
+    .card-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .feature-list li::before {
+      content: '✓';
+      color: var(--accent-green);
+      font-weight: bold;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+
+    /* Hero Slide 1 */
+    .hero-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      height: 100%;
+      gap: 20px;
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 3.8rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #FFFFFF 30%, #67E8F9 70%, #34D399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      max-width: 950px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.35rem;
+      color: var(--text-muted);
+      max-width: 780px;
+      line-height: 1.6;
+    }
+
+    .hero-pills {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: var(--font-display);
+      backdrop-filter: blur(8px);
+    }
+
+    /* Table Styles */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    table.data-table th {
+      background: rgba(30, 41, 59, 0.8);
+      color: var(--text-main);
+      font-family: var(--font-display);
+      font-weight: 700;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    table.data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      vertical-align: middle;
+    }
+
+    table.data-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+    }
+
+    /* Bottom Control Bar / Footer */
+    footer {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 32px;
+      background: rgba(7, 11, 20, 0.85);
+      border-top: 1px solid var(--border-subtle);
+      backdrop-filter: blur(16px);
+      flex-shrink: 0;
+    }
+
+    .progress-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      max-width: 400px;
+    }
+
+    .progress-bar-bg {
+      height: 6px;
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+      border-radius: 9999px;
+      width: 8.33%;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: #FFF;
+      padding: 8px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+      color: #041E15;
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 0 15px var(--accent-green-glow);
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    /* Speaker Notes Modal Overlay */
+    .speaker-modal {
+      position: fixed;
+      bottom: 80px;
+      right: 32px;
+      width: 440px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--accent-cyan);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px var(--accent-cyan-glow);
+      backdrop-filter: blur(20px);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      animation: slideUp 0.3s ease;
+    }
+
+    .speaker-modal.active {
+      display: flex;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .speaker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+
+    .speaker-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--accent-cyan);
+    }
+
+    .speaker-close {
+      cursor: pointer;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+    }
+
+    .speaker-content {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      line-height: 1.5;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    /* Keyboard Help Hint */
+    .key-hint {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glowing Background FX -->
+  <div class="ambient-bg">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-badge">K</div>
+      <div>
+        <div class="logo-title">KARISMA ONLINE</div>
+        <div class="logo-sub">PT. Karisma Indoagro Universal</div>
+      </div>
+    </div>
+    <div class="header-controls">
+      <div class="status-badge">
+        <div class="status-pulse"></div>
+        <span>PRODUCTION READY (96.5%)</span>
+      </div>
+      <button class="btn-icon" id="btnNotes" title="Toggle Speaker Notes (N)">
+        🎙️ <span>Notes (N)</span>
+      </button>
+      <button class="btn-icon" id="btnFullscreen" title="Toggle Fullscreen (F)">
+        ⛶ <span>Fullscreen (F)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Deck Main Stage -->
+  <main class="deck-stage">
+
+    <!-- Floating Arrow Overlays -->
+    <div class="floating-arrow floating-prev disabled" id="floatPrev">‹</div>
+    <div class="floating-arrow floating-next" id="floatNext">›</div>
+
+    <!-- ==================== SLIDE 1: COVER ==================== -->
+    <section class="slide active" data-slide="1">
+      <div class="hero-container">
+        <div class="card-badge badge-green">Official Executive Launching Presentation</div>
+        <h1 class="hero-title">KARISMA ONLINE</h1>
+        <p class="hero-subtitle">Smart Digital Ecosystem for Agrochemical & Farm Commerce: Akselerasi Distribusi Multi-Platform (iOS, Android & Web Enterprise).</p>
+        <div class="hero-pills">
+          <div class="hero-pill">🍎 Swift Native iOS</div>
+          <div class="hero-pill">🤖 Kotlin Native Android</div>
+          <div class="hero-pill">⚡ CodeIgniter 3 RESTful API</div>
+          <div class="hero-pill">🏦 BRI BRIVA SNAP API</div>
+          <div class="hero-pill">🚚 RajaOngkir Pro Sub-District</div>
+        </div>
+        <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-dim); font-family: var(--font-mono);">
+          Presenter: Engineering & Product Development Team | PT. Karisma Indoagro Universal | Agustus 2026
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 2: EXECUTIVE SUMMARY ==================== -->
+    <section class="slide" data-slide="2">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Executive Summary</div>
+          <h2 class="slide-title">Latar Belakang & Transformasi Rantai Pasok Agro</h2>
+        </div>
+        <div class="slide-number-indicator"><span>02</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-badge badge-amber">Tantangan Konvensional</div>
+            <div class="card-title">Bottleneck Pemesanan</div>
+            <ul class="feature-list">
+              <li>Order manual via chat/telepon rentan salah varian obat tanaman.</li>
+              <li>Barang <em>slow-moving</em> tertahan tanpa peringatan dini kedaluwarsa.</li>
+              <li>Verifikasi bukti transfer manual memakan waktu 2-4 jam per transaksi.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-green">Solusi Karisma Online</div>
+            <div class="card-title">Ekosistem Omnichannel</div>
+            <ul class="feature-list">
+              <li>Self-service catalog 24/7 di smartphone petani dan kios mitra.</li>
+              <li>Integrasi Bank BRI BRIVA SNAP untuk verifikasi otomatis &lt; 5 detik.</li>
+              <li>Logistik presisi RajaOngkir Pro hingga tingkat kecamatan.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-cyan">Dampak & Indikator</div>
+            <div class="card-title">Key Performance Baseline</div>
+            <ul class="feature-list">
+              <li><strong>3 Platform:</strong> iOS Native, Android Native, Web Admin ERP.</li>
+              <li><strong>13+ Kategori:</strong> Fungisida, Herbisida, Insektisida, Benih, Pupuk Cair.</li>
+              <li><strong>3 Tier Harga:</strong> Retail, Grosir Mitra Kios, Distributor Resmi.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 3: BSC DASHBOARD ==================== -->
+    <section class="slide" data-slide="3">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Strategic Alignment</div>
+          <h2 class="slide-title">Balanced Scorecard (BSC) Master Dashboard</h2>
+        </div>
+        <div class="slide-number-indicator"><span>03</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-badge badge-green">1. Financial Perspective (98.0%)</div>
+            <div class="card-title">Optimalisasi Arus Kas & Finansial</div>
+            <ul class="feature-list">
+              <li>🟢 BRIVA SNAP 15-Min VA Auto-Settlement (100% Lulus Uji)</li>
+              <li>🟢 Enkripsi Kalkulasi Margin Multi-Tier Server-Side (100%)</li>
+              <li>🟡 Akselerasi Perputaran Kas & DSO (92% Baseline Produksi)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-green">2. Customer & Market (100%)</div>
+            <div class="card-title">Akses Pasar & Kepatuhan Regulasi</div>
+            <ul class="feature-list">
+              <li>🟢 Apple App Store Guideline 5.1.1(v) Resolution (100%)</li>
+              <li>🟢 Guest Browsing Flow & In-App CS Live Chat (100%)</li>
+              <li>🟢 Google Play Store Native APK Ready (100%)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-amber">3. Internal Process (94.0%)</div>
+            <div class="card-title">Efisiensi Rantai Pasok & Logistik</div>
+            <ul class="feature-list">
+              <li>🟢 RajaOngkir Pro Sub-District & 30-Min Quote Lock (100%)</li>
+              <li>🟢 Dual-Unit (Botol vs Karton) Multiplier Stok (100%)</li>
+              <li>🟡 Deadstock Engine (92%) | 🔴 Kredit Mobile (78% Sync)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-green">4. Learning & Growth (95.0%)</div>
+            <div class="card-title">Kapabilitas Teknologi & Keamanan</div>
+            <ul class="feature-list">
+              <li>🟢 Tri-Platform Architecture (Swift, Kotlin, CI3 HMVC) (100%)</li>
+              <li>🟢 Keamanan Bearer Token SHA-256 & BCRYPT Hashing (100%)</li>
+              <li>🟢 Salesman Territory Mapping & Internal Segregation (95%)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 4: TECH STACK ==================== -->
+    <section class="slide" data-slide="4">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">System Architecture</div>
+          <h2 class="slide-title">Arsitektur Tri-Platform & Tech Stack</h2>
+        </div>
+        <div class="slide-number-indicator"><span>04</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">🍎</div>
+            <div class="card-badge badge-cyan">iOS Client</div>
+            <div class="card-title">Swift Native</div>
+            <ul class="feature-list">
+              <li>SwiftUI & UIKit Modern Flow.</li>
+              <li>Kepatuhan Apple HIG & Keychain Security.</li>
+              <li>UI Adaptif iPad dengan Back Navigation.</li>
+              <li>Guest Browsing & Account Deletion Compliant.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-icon">🤖</div>
+            <div class="card-badge badge-green">Android Client</div>
+            <div class="card-title">Kotlin & Java Native</div>
+            <ul class="feature-list">
+              <li>Arsitektur MVVM & Material Design 3.</li>
+              <li>Data-Light APK (&lt; 15MB) hemat kuota di desa.</li>
+              <li>Kompresi client-side foto bukti transfer.</li>
+              <li>Google Play Store Policy Certified.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-icon">⚡</div>
+            <div class="card-badge badge-purple">Backend Engine</div>
+            <div class="card-title">CodeIgniter 3 HMVC</div>
+            <ul class="feature-list">
+              <li>PHP 8.3 Ready, High Throughput.</li>
+              <li>Endpoint v1 di <code>modules/api</code>.</li>
+              <li>Bearer Token SHA-256 (30-day lifecycle).</li>
+              <li>MariaDB InnoDB dengan Transaksi ACID Terisolasi.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 5: FINANCIAL ==================== -->
+    <section class="slide" data-slide="5">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Financial Perspective</div>
+          <h2 class="slide-title">Fintech Integration & Multi-Tier Pricing</h2>
+        </div>
+        <div class="slide-number-indicator"><span>05</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-badge badge-green">Automated Settlement</div>
+            <div class="card-title">Bank BRI BRIVA SNAP VA</div>
+            <ul class="feature-list">
+              <li>Library <code>Brivaws</code> langsung ke endpoint SNAP API BRI.</li>
+              <li>Dynamic VA: Prefix 91118 + No. Telepon Pelanggan.</li>
+              <li>Batas waktu bayar 15 menit untuk mengamankan stok berputar.</li>
+              <li>Auto-inquiry webhook: pesanan otomatis lunas tanpa upload bukti bayar.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-cyan">Margin Protection</div>
+            <div class="card-title">Multi-Tier Pricing & Dual-Unit</div>
+            <ul class="feature-list">
+              <li>Enkripsi 3 Level Harga server-side (<code>v_products</code>):
+                <br>&nbsp;&nbsp;• Level 1: Retail / Petani Mandiri
+                <br>&nbsp;&nbsp;• Level 2: Grosir Kios Mitra
+                <br>&nbsp;&nbsp;• Level 3: Distributor Resmi
+              </li>
+              <li>Dual-Unit: Bebas pilih Botol atau Karton dengan konversi gramasi otomatis.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 6: CUSTOMER & COMPLIANCE ==================== -->
+    <section class="slide" data-slide="6">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Customer Perspective</div>
+          <h2 class="slide-title">Apple Review Resolution & User Experience</h2>
+        </div>
+        <div class="slide-number-indicator"><span>06</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-badge badge-green">Apple Guideline 5.1.1(v)</div>
+            <div class="card-title">In-App Account Deletion</div>
+            <ul class="feature-list">
+              <li>Endpoint <code>DELETE /api/v1/account</code> mandiri.</li>
+              <li>Non-PII Policy: Email di-hash SHA-256, token dicabut seketika.</li>
+              <li>Riwayat faktur tetap tersimpan aman untuk audit akuntansi legal.</li>
+              <li>Tersedia di <code>Profil &gt; Pengaturan &gt; Hapus Akun</code>.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-cyan">Omnichannel UX</div>
+            <div class="card-title">Seamless Browsing & Live Support</div>
+            <ul class="feature-list">
+              <li>Fitur <em>Lihat Produk Tanpa Login</em> (Guest Browsing).</li>
+              <li>Login hanya diwajibkan saat checkout & kelola profil.</li>
+              <li>In-App Live Chat Customer Service (<code>/api/v1/messages</code>).</li>
+              <li>Database-Backed Cart: Keranjang tidak hilang saat ganti gawai.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 7: LOGISTICS & PROCESS ==================== -->
+    <section class="slide" data-slide="7">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Internal Process</div>
+          <h2 class="slide-title">Precision Logistics & Deadstock Engine</h2>
+        </div>
+        <div class="slide-number-indicator"><span>07</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-badge badge-green">Sub-District Precision</div>
+            <div class="card-title">RajaOngkir Pro & 30-Min Quote Lock</div>
+            <ul class="feature-list">
+              <li>Kalkulasi ongkir presisi hingga tingkat <strong>Kecamatan (Sub-District ID)</strong>.</li>
+              <li>Dynamic Cart Weight: Total berat gramasi botol & karton dihitung otomatis.</li>
+              <li>30-Minute Quote Lock (<code>mobile_shipping_quotes</code>) mencegah selisih tarif.</li>
+              <li>Opsi kurir: JNE, J&T, SiCepat, dan Armada Truk Internal KIU.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-amber">Inventory Optimization</div>
+            <div class="card-title">Deadstock Management Engine</div>
+            <ul class="feature-list">
+              <li>Deteksi otomatis obat tanaman slow-moving (&gt; 1 tahun pergerakan &lt; 5%).</li>
+              <li>Pemicu promo diskon kilat otomatis sebelum masa kedaluwarsa.</li>
+              <li>Alur retur terstruktur ke prinsipal untuk menjaga likuiditas gudang.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 8: LEARNING & SECURITY ==================== -->
+    <section class="slide" data-slide="8">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Learning & Growth</div>
+          <h2 class="slide-title">Sales Force Enablement & Enterprise Security</h2>
+        </div>
+        <div class="slide-number-indicator"><span>08</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-badge badge-cyan">Field Enablement</div>
+            <div class="card-title">Salesman & Territory Management</div>
+            <ul class="feature-list">
+              <li>Pemetaan akun Kios Binaan per Salesman Lapangan.</li>
+              <li>Monitoring produktivitas pesanan dan omset per wilayah secara visual.</li>
+              <li>Transparansi pencapaian target KPI dan insentif salesman.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-green">Enterprise Security</div>
+            <div class="card-title">Data Protection & Anti-Distorsi</div>
+            <ul class="feature-list">
+              <li>Bearer Token SHA-256 unik per perangkat (masa aktif 30 hari).</li>
+              <li>Password Hashing BCRYPT standar perbankan.</li>
+              <li>ACID Concurrency Lock (<code>trans_begin</code> & <code>trans_commit</code>).</li>
+              <li>Flagging <code>is_internal</code>: Isolasi akun demo agar omset riil tidak bias.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 9: 3-PILAR MATRIX ==================== -->
+    <section class="slide" data-slide="9">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Problem Solving</div>
+          <h2 class="slide-title">3-Pilar Grounded Analysis & Risk Mitigation</h2>
+        </div>
+        <div class="slide-number-indicator"><span>09</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-badge badge-green">1. Accomplishment</div>
+            <div class="card-title">Pencapaian Nyata</div>
+            <ul class="feature-list">
+              <li>Apple Review 5.1.1(v) & Play Store Certified (🟢 100%).</li>
+              <li>BRIVA SNAP settlement otomatis (🟢 100%).</li>
+              <li>Logistik kecamatan & 30-min quote lock aktif (🟢 100%).</li>
+              <li>Proteksi Multi-Tier margin tamper-proof (🟢 100%).</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-amber">2. Issues & Root Cause</div>
+            <div class="card-title">Tantangan Lapangan</div>
+            <ul class="feature-list">
+              <li>Kios konvensional terbiasa beli tempo tanpa verifikasi limit formal.</li>
+              <li>Ongkir ekspedisi reguler mahal untuk pupuk berbobot tonase besar.</li>
+              <li>Koneksi seluler pelosok saat verifikasi Virtual Account.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-cyan">3. Next Steps & Owner</div>
+            <div class="card-title">Mitigasi Solutif</div>
+            <ul class="feature-list">
+              <li>Integrasi Armada Truk Internal $\rightarrow$ <strong>Logistik</strong>.</li>
+              <li>Scoring limit kredit bertahap $\rightarrow$ <strong>Finance & IT</strong>.</li>
+              <li>Fallback Transfer Manual Multi-Bank $\rightarrow$ <strong>Operasional</strong>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 10: BACK OFFICE ==================== -->
+    <section class="slide" data-slide="10">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Executive Control</div>
+          <h2 class="slide-title">Enterprise Back-Office & Audit Governance</h2>
+        </div>
+        <div class="slide-number-indicator"><span>10</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-badge badge-cyan">Operations Center</div>
+            <div class="card-title">Web Enterprise Modules</div>
+            <ul class="feature-list">
+              <li>Sales Dashboard: Grafik omset harian, bulanan & rasio konversi.</li>
+              <li>Order Queue: Alur antrean pesanan (Verifikasi $\rightarrow$ Packing $\rightarrow$ Kirim).</li>
+              <li>Piutang & Credit Limit: Kontrol ketat plafon tempo kios binaan.</li>
+              <li>Cetak invoice resmi standar akuntansi (PDF/Excel).</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-green">Audit Trail</div>
+            <div class="card-title">Integritas Data & Kepatuhan</div>
+            <ul class="feature-list">
+              <li>Pemisahan transaksi non-PII untuk audit pajak perusahaan.</li>
+              <li>Tabel audit <code>mobile_account_deletions</code> untuk privasi data.</li>
+              <li>Pencatatan log pembayaran detail di <code>briva_api</code> dan <code>payments</code>.</li>
+              <li>Role-Based Access: Admin, Finance, Gudang, dan Salesman.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 11: ROADMAP ==================== -->
+    <section class="slide" data-slide="11">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Future Horizon</div>
+          <h2 class="slide-title">Roadmap Strategis & Inovasi Teknologi</h2>
+        </div>
+        <div class="slide-number-indicator"><span>11</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-badge badge-green">Fase 1: Launch Ready</div>
+            <div class="card-title">Q3 2026 (Current)</div>
+            <ul class="feature-list">
+              <li>Rilis Publik iOS App Store & Google Play Store.</li>
+              <li>Aktivasi BRIVA SNAP & Transfer Multi-Bank.</li>
+              <li>Onboarding 500+ Kios Mitra Binaan.</li>
+              <li>Pelatihan Salesman Lapangan.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-cyan">Fase 2: Loyalty & Scale</div>
+            <div class="card-title">Q4 2026</div>
+            <ul class="feature-list">
+              <li>Program Kios Rewards & Loyalty Points.</li>
+              <li>Push Notification Firebase (Flash Sale & Musim Tanam).</li>
+              <li>Opsi Pengiriman Armada Truk Internal.</li>
+              <li>Otomasi Limit Kredit Mobile.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-amber">Fase 3: Smart AI</div>
+            <div class="card-title">2027 Horizon</div>
+            <ul class="feature-list">
+              <li>AI Crop Disease Diagnosis (Foto hama daun $\rightarrow$ Rekomendasi).</li>
+              <li>Peringatan otomatis cuaca & hama per wilayah.</li>
+              <li>Integrasi ERP Akuntansi Enterprise Terpusat.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SLIDE 12: CONCLUSION ==================== -->
+    <section class="slide" data-slide="12">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Executive Decision</div>
+          <h2 class="slide-title">Kesimpulan Eksekutif & Persetujuan Go-Live</h2>
+        </div>
+        <div class="slide-number-indicator"><span>12</span> / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-badge badge-green">Status Kesiapan</div>
+            <div class="card-title">100% Launch Ready</div>
+            <p class="card-text">
+              Ekosistem digital Karisma Online telah menyelesaikan seluruh pengujian fungsional, integrasi BRIVA SNAP, logistik RajaOngkir Pro, regulasi Apple Review 5.1.1(v), dan isolasi akun internal.
+            </p>
+            <div style="margin-top: 10px; font-size: 1.1rem; color: var(--accent-green); font-weight: 700;">
+              Overall Readiness Score: 96.5% (Lulus Audit Eksekutif)
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-badge badge-cyan">Action Required</div>
+            <div class="card-title">Langkah Segera (Action Items)</div>
+            <ul class="feature-list">
+              <li><strong>Executive Go-Live Sign-Off:</strong> Peluncuran serentak di App Store & Google Play.</li>
+              <li><strong>Sosialisasi Mitra:</strong> Edukasi Kios Mitra & Sales Lapangan.</li>
+              <li><strong>Promo Launching:</strong> Aktivasi diskon transaksi perdana via mobile.</li>
+              <li><strong>Sesi Tanya Jawab (Q&A):</strong> Diskusi terbuka dewan direksi.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Navigation -->
+  <footer>
+    <div class="progress-wrapper">
+      <div class="progress-bar-bg">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim);" id="slideCounter">1 / 12</span>
+    </div>
+
+    <div style="font-size: 0.8rem; color: var(--text-dim);">
+      Gunakan <span class="key-hint">◀</span> <span class="key-hint">▶</span> atau <span class="key-hint">Space</span> untuk navigasi
+    </div>
+
+    <div class="nav-buttons">
+      <button class="btn-nav" id="btnPrev" disabled>‹ Sebelumnya</button>
+      <button class="btn-nav" id="btnNext">Berikutnya ›</button>
+    </div>
+  </footer>
+
+  <!-- Speaker Notes Modal -->
+  <div class="speaker-modal" id="speakerModal">
+    <div class="speaker-header">
+      <div class="speaker-title">🎙️ Naskah Presenter (Speaker Notes)</div>
+      <div class="speaker-close" id="closeNotes">✕</div>
+    </div>
+    <div class="speaker-content" id="speakerContent">
+      Selamat pagi/siang Bapak/Ibu Dewan Direksi dan Manajemen. Hari ini kami mempersembahkan presentasi hasil pengembangan Karisma Online yang kini telah mencapai 96.5% Launch Ready.
+    </div>
+  </div>
+
+  <script>
+    const speakerNotes = {
+      1: "Selamat pagi/siang kepada Bapak/Ibu Dewan Direksi, Tim Manajemen, dan Rekan-Rekan Sekalian. Hari ini merupakan tonggak sejarah penting bagi PT. Karisma Indoagro Universal. Kami dengan bangga mempersembahkan ekosistem digital KARISMA ONLINE yang telah mencapai status 96.5% Launch Ready.",
+      2: "Industri agrokimia memiliki dinamika spesifik: ketepatan musim tanam, variasi harga antar level pelanggan, serta berat barang. Karisma Online memotong seluruh birokrasi pemesanan konvensional dan mengotomasi alur data secara omnichannel.",
+      3: "Dashboard Balanced Scorecard ini menunjukkan tingkat kesiapan implementasi keseluruhan sebesar 96.5%. Perspektif Finansial dan Pelanggan telah mencapai tingkat kepatuhan 100% lulus audit teknis.",
+      4: "Dari sisi teknologi, kami memilih pendekatan Tri-Platform Native (Swift di iOS dan Kotlin di Android) untuk memberikan performa kecepatan terbaik, responsivitas di jaringan pelosok, serta integrasi hardware kamera yang stabil.",
+      5: "Fitur komersial kami dirancang sangat spesifik: Multi-Tier Pricing menjamin margin yang adil antar kios, Dual-Unit memudahkan pembelian eceran atau kartonan, dan BRIVA SNAP API memberikan kepastian settlement otomatis dalam 15 menit.",
+      6: "Aplikasi iOS Karisma Online telah memenuhi seluruh kualifikasi ketat Apple App Store Review (Guideline 5.1.1(v)) dengan menghadirkan flow Hapus Akun Mandiri yang aman dengan data non-PII serta fitur Guest Browsing tanpa login.",
+      7: "Sistem logistik kami membaca tarif ekspedisi hingga tingkat kecamatan (Sub-District ID), mengkalkulasi berat botol/karton otomatis, dan mengunci kuota ongkir selama 30 menit agar proses checkout terbebas dari selisih tarif.",
+      8: "Keamanan data pelanggan adalah prioritas tertinggi. Kami menerapkan tokenisasi Bearer SHA-256 30 hari, BCRYPT, serta isolasi akun internal (is_internal) agar data uji coba tidak mengotori omset riil perusahaan.",
+      9: "Analisis 3-Pilar ini merangkum pencapaian nyata, tantangan adaptasi kios tradisional, serta langkah mitigasi seperti armada truk internal dan scoring limit kredit dengan penanggung jawab unit masing-masing.",
+      10: "Bagi tim kantor pusat, Web Enterprise Back-Office menyediakan monitoring grafik omset real-time, antrean packing gudang, serta pemantauan limit piutang salesman secara transparan.",
+      11: "Roadmap inovasi jangka panjang kami mencakup program loyalitas kios pada Q4 2026 dan fitur AI Smart Crop Disease Diagnosis pada 2027 untuk mendeteksi penyakit tanaman langsung dari kamera smartphone petani.",
+      12: "Ekosistem Karisma Online kini siap diluncurkan secara komersial dan membawa PT. Karisma Indoagro Universal menuju era kejayaan baru. Kami mohon persetujuan dewan direksi untuk peluncuran resmi. Waktu dan tempat kami persilakan untuk sesi tanya jawab."
+    };
+
+    let currentSlide = 1;
+    const totalSlides = 12;
+
+    const slides = document.querySelectorAll('.slide');
+    const btnPrev = document.getElementById('btnPrev');
+    const btnNext = document.getElementById('btnNext');
+    const floatPrev = document.getElementById('floatPrev');
+    const floatNext = document.getElementById('floatNext');
+    const progressFill = document.getElementById('progressFill');
+    const slideCounter = document.getElementById('slideCounter');
+    const speakerModal = document.getElementById('speakerModal');
+    const speakerContent = document.getElementById('speakerContent');
+    const btnNotes = document.getElementById('btnNotes');
+    const closeNotes = document.getElementById('closeNotes');
+    const btnFullscreen = document.getElementById('btnFullscreen');
+
+    function updateSlide(newSlide) {
+      if (newSlide < 1 || newSlide > totalSlides) return;
+      
+      slides.forEach(s => s.classList.remove('active'));
+      currentSlide = newSlide;
+      
+      const targetSlide = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+      if (targetSlide) targetSlide.classList.add('active');
+      
+      // Update progress
+      const progressPercent = (currentSlide / totalSlides) * 100;
+      progressFill.style.width = `${progressPercent}%`;
+      slideCounter.textContent = `${currentSlide} / ${totalSlides}`;
+      
+      // Update buttons
+      btnPrev.disabled = (currentSlide === 1);
+      btnNext.disabled = (currentSlide === totalSlides);
+      
+      if (currentSlide === 1) {
+        floatPrev.classList.add('disabled');
+      } else {
+        floatPrev.classList.remove('disabled');
+      }
+      
+      if (currentSlide === totalSlides) {
+        floatNext.classList.add('disabled');
+      } else {
+        floatNext.classList.remove('disabled');
+      }
+      
+      // Update speaker note
+      speakerContent.textContent = speakerNotes[currentSlide] || "Tidak ada catatan untuk slide ini.";
+    }
+
+    btnPrev.addEventListener('click', () => updateSlide(currentSlide - 1));
+    btnNext.addEventListener('click', () => updateSlide(currentSlide + 1));
+    floatPrev.addEventListener('click', () => updateSlide(currentSlide - 1));
+    floatNext.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+    btnNotes.addEventListener('click', () => {
+      speakerModal.classList.toggle('active');
+    });
+
+    closeNotes.addEventListener('click', () => {
+      speakerModal.classList.remove('active');
+    });
+
+    btnFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        e.preventDefault();
+        updateSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        updateSlide(currentSlide - 1);
+      } else if (e.key.toLowerCase() === 'n') {
+        speakerModal.classList.toggle('active');
+      } else if (e.key.toLowerCase() === 'f') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(err => {});
+        } else {
+          document.exitFullscreen();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

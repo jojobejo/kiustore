@@ -189,13 +189,14 @@ class Mobile_api_model extends CI_Model
             return null;
         }
 
-        $profile['id'] = (int) $profile['id'];
-        $profile['status'] = (int) $profile['status'];
-        $profile['province_id'] = (int) $profile['province_id'];
-        $profile['kota_id'] = (int) $profile['kota_id'];
-        $profile['subdistrict_id'] = (int) $profile['subdistrict_id'];
-        $profile['level'] = (int) $profile['level'];
-        $profile['max_credit'] = (int) $profile['max_credit'];
+        foreach (array('id', 'status', 'province_id', 'kota_id', 'subdistrict_id', 'level', 'max_credit', 'salesman_id') as $field) {
+            $profile[$field] = isset($profile[$field]) ? (int) $profile[$field] : 0;
+        }
+
+        foreach (array('email', 'name', 'phone_number', 'address', 'shop_name', 'shop_address', 'nik', 'npwp', 'alamat_kirim', 'kode_customer') as $field) {
+            $profile[$field] = isset($profile[$field]) ? (string) $profile[$field] : '';
+        }
+
         $profile['profile_picture_url'] = $profile['profile_picture']
             ? base_url('assets/uploads/users/' . $profile['profile_picture'])
             : null;

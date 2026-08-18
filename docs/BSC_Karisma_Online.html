@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Karisma Online - Balanced Scorecard (BSC) & Audit Eviden Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #070B14;
+      --bg-card: rgba(15, 23, 42, 0.85);
+      --bg-card-hover: rgba(30, 41, 59, 0.95);
+      --border-glow: rgba(16, 185, 129, 0.35);
+      --border-cyan: rgba(6, 182, 212, 0.35);
+      --border-subtle: rgba(255, 255, 255, 0.1);
+      
+      --accent-green: #10B981;
+      --accent-cyan: #06B6D4;
+      --accent-blue: #38BDF8;
+      --accent-gold: #F59E0B;
+      --accent-rose: #EF4444;
+      
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    .ambient-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      background: 
+        radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(245, 158, 11, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 60%);
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      backdrop-filter: blur(12px);
+      background: rgba(7, 11, 20, 0.7);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: #070B14;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text-main);
+    }
+
+    .brand-title span {
+      color: var(--accent-gold);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .slide-indicator {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      background: rgba(6, 182, 212, 0.1);
+      padding: 0.35rem 0.8rem;
+      border-radius: 20px;
+      border: 1px solid var(--border-cyan);
+    }
+
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover {
+      background: rgba(6, 182, 212, 0.2);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    main {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 2.5rem;
+      perspective: 1000px;
+    }
+
+    .slide {
+      position: absolute;
+      width: calc(100% - 5rem);
+      max-width: 1400px;
+      height: calc(100% - 3rem);
+      max-height: 820px;
+      display: none;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 2.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .slide-header {
+      margin-bottom: 1.2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .slide-category {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-cyan);
+      margin-bottom: 0.3rem;
+    }
+
+    .slide-title {
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .slide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+
+    .badge-yellow { background: rgba(245, 158, 11, 0.15); color: var(--accent-gold); border: 1px solid var(--accent-gold); }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .badge-red { background: rgba(239, 68, 68, 0.15); color: var(--accent-rose); border: 1px solid var(--accent-rose); }
+
+    .scorecard-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin-top: 0.4rem;
+    }
+
+    .scorecard-table th, .scorecard-table td {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 0.55rem 0.75rem;
+      vertical-align: middle;
+    }
+
+    .scorecard-table th {
+      background: var(--accent-gold);
+      color: #000000;
+      font-weight: 800;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-weight: 700;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .st-green { background: #00B050; color: #FFFFFF; }
+    .st-yellow { background: #FFFF00; color: #000000; }
+    .st-red { background: #FF0000; color: #FFFFFF; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      flex: 1;
+    }
+
+    .detail-card {
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .card-title-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 0.5rem;
+    }
+
+    .card-title-box h3 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .pillar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .pillar-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pillar-label.cyan { color: var(--accent-cyan); }
+    .pillar-label.gold { color: var(--accent-gold); }
+    .pillar-label.blue { color: var(--accent-blue); }
+    .pillar-label.green { color: var(--accent-green); }
+
+    .pillar-body {
+      font-size: 0.8rem;
+      line-height: 1.35;
+      color: var(--text-muted);
+    }
+
+    .eviden-box {
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid var(--border-cyan);
+      border-radius: 8px;
+      padding: 0.5rem 0.8rem;
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+      line-height: 1.4;
+    }
+
+    footer {
+      position: relative;
+      z-index: 10;
+      padding: 0.8rem 2.5rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      background: rgba(7, 11, 20, 0.7);
+    }
+
+    .keyboard-hints {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .key-badge {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-bg"></div>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">K</div>
+      <div class="brand-title">KARISMA <span>ONLINE</span> // BSC & AUDIT EVIDEN</div>
+    </div>
+    <div class="nav-controls">
+      <div class="slide-indicator" id="slideIndicator">Slide 1 / 7</div>
+      <button class="btn-nav" onclick="prevSlide()" title="Slide Sebelumnya (◀)">&#9664;</button>
+      <button class="btn-nav" onclick="nextSlide()" title="Slide Berikutnya (▶)">&#9654;</button>
+      <button class="btn-nav" onclick="toggleFullscreen()" title="Fullscreen (F)">&#x26F6;</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- SLIDE 1: COVER -->
+    <div class="slide active" id="slide-1">
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 1.4rem;">
+        <div class="slide-category" style="font-size: 0.9rem;">EXECUTIVE BALANCED SCORECARD REPORT // LEAD WITH DATA</div>
+        <h1 style="font-family: var(--font-display); font-size: 3.2rem; font-weight: 900; line-height: 1.1; color: var(--text-main);">
+          KARISMA <span style="color: var(--accent-gold);">ONLINE</span>
+        </h1>
+        <p style="max-width: 850px; font-size: 1.05rem; color: var(--text-muted); line-height: 1.6;">
+          Evaluasi Kinerja Terpadu 7 Must Wins dengan Bukti Eviden (Audit Trail): Multi-Platform, Transaksi Customer, Payment Gateway, UAT 3 Kios, Bebas Bug 30 Hari, Dokumentasi & SOP Transaksi.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; width: 100%; max-width: 1050px; margin-top: 1.2rem;">
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border-cyan);">
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-gold); font-family: var(--font-mono);">89.1%</div>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 0.3rem;">Overall Status</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim);">Kategori On Progress</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border-cyan);">
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-cyan); font-family: var(--font-mono);">7 Wins</div>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 0.3rem;">Must Win Initiatives</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim);">28 Sub-Inisiatif + Eviden</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border-cyan);">
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-green); font-family: var(--font-mono);">0 Bug</div>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 0.3rem;">Target Critical D+30</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim);">Pasca-Live Stabilitas</div>
+          </div>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border-cyan);">
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-blue); font-family: var(--font-mono);">Min. 3</div>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 0.3rem;">Kios Verifikasi UAT</div>
+            <div style="font-size: 0.75rem; color: var(--text-dim);">Gate Review Go-Live</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: SCORECARD MASTER TABLE -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">SCORECARD OVERVIEW & SINGLE SOURCE OF TRUTH</div>
+          <div class="slide-title">Karisma Online Strategic Scorecard & Eviden</div>
+        </div>
+        <div class="slide-badge badge-yellow">Overall: 89% (On Progress)</div>
+      </div>
+
+      <table class="scorecard-table">
+        <thead>
+          <tr>
+            <th style="width: 40px;">No</th>
+            <th style="width: 230px;">Must Win</th>
+            <th>Key Initiatives & Bukti Eviden (Single Source of Truth)</th>
+            <th style="width: 90px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">1</td>
+            <td style="font-weight: bold;">MULTI PLATFORM</td>
+            <td>Validasi fungsi Android, Web & iOS. <i>Eviden: Kontrak API `docs/MOBILE_API.md`, Controller `Mobile.php`, Migrasi `20260629_mobile_api.sql`</i>.</td>
+            <td style="text-align: center;"><span class="status-pill st-yellow">92%</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">2</td>
+            <td style="font-weight: bold;">CUSTOMER BISA TRANSAKSI STABIL</td>
+            <td>Validasi alur Order → Bayar → Konfirmasi. <i>Eviden: `Mobile.php::checkout()`, DB `orders` & `order_items`, Log `curl_response_log.txt`</i>.</td>
+            <td style="text-align: center;"><span class="status-pill st-yellow">91%</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">3</td>
+            <td style="font-weight: bold;">INTEGRASI PAYMENT GATEWAY STABIL</td>
+            <td>Validasi pembayaran real-time. <i>Eviden: Controller `briva_list_function.php`, `signature_log.txt`, Webhook callback BRIVA</i>.</td>
+            <td style="text-align: center;"><span class="status-pill st-yellow">93%</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">4</td>
+            <td style="font-weight: bold;">UAT DENGAN MINIMAL 3 KIOS</td>
+            <td>Eksekusi uji di 3 kios pilot. <i>Eviden: Dokumen Skenario `SKENARIO-UAT-KIU-2026`, Berita Acara UAT, UAT Bug Sheet</i>.</td>
+            <td style="text-align: center;"><span class="status-pill st-red">85%</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">5</td>
+            <td style="font-weight: bold;">TIDAK ADA BUG CRITICAL 30 HARI LIVE</td>
+            <td>Stabilitas D+30 pasca-live. <i>Eviden: System Log `application/logs/`, Kalender Rilis Go-Live, On-Call 24/7 Matrix</i>.</td>
+            <td style="text-align: center;"><span class="status-pill st-red">85%</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">6</td>
+            <td style="font-weight: bold;">DOKUMENTASI</td>
+            <td>Standarisasi deliverable. <i>Eviden: Master Checklist Dokumen `docs/`, User Manual Mobile/Kasir, API Doc `MOBILE_API.md`</i>.</td>
+            <td style="text-align: center;"><span class="status-pill st-yellow">90%</span></td>
+          </tr>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">7</td>
+            <td style="font-weight: bold;">SOP TRANSAKSI KIOS</td>
+            <td>SOP operasional kasir riil. <i>Eviden: Dokumen `SOP/IT-KIU/2026/001`, Flowchart Kasir Kios, Berita Acara Training</i>.</td>
+            <td style="text-align: center;"><span class="status-pill st-red">88%</span></td>
+          </tr>
+          <tr style="background: rgba(245, 158, 11, 0.1);">
+            <td colspan="3" style="text-align: right; font-weight: bold; font-family: var(--font-display);">Total Rata-Rata Kesiapan:</td>
+            <td style="text-align: center;"><span class="status-pill st-yellow" style="font-size: 0.9rem;">89%</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 0.8rem; font-size: 0.8rem; color: var(--text-dim); display: flex; gap: 2rem;">
+        <div><span class="status-pill st-green" style="padding: 2px 6px;">■</span> &gt;/= 100% (Tercapai / Stabil)</div>
+        <div><span class="status-pill st-yellow" style="padding: 2px 6px;">■</span> 90% - 99% (On Progress)</div>
+        <div><span class="status-pill st-red" style="padding: 2px 6px;">■</span> &lt; 90% (Belum Start / Perlu Intervensi)</div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: MUST WIN 1 & 2 -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">ANALISIS 3-PILAR & AUDIT TRAIL</div>
+          <div class="slide-title">Must Win 1 & 2: Platform & Transaksi Customer</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="detail-card">
+          <div class="card-title-box">
+            <h3>1. Multi Platform</h3>
+            <span class="status-pill st-yellow">92%</span>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label cyan">Accomplishment</div>
+            <div class="pillar-body">• Pengembangan mendukung Android, Web & iOS.<br>• Fitur utama menjadi fokus validasi agar transaksi konsisten.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label gold">Issue & Root Cause</div>
+            <div class="pillar-body">• Belum ada data aktual persentase penyelesaian per platform.<br>• Perlu memastikan kesesuaian fungsi utama sebelum stabil.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label blue">Next Step & Mitigation</div>
+            <div class="pillar-body">• Finalisasi validasi fungsi utama & penyelesaian gap fitur.<br>• Checklist paritas fungsi Android vs Web vs iOS.</div>
+          </div>
+          <div class="eviden-box">
+            <b>Bukti Eviden:</b> Kontrak API `docs/MOBILE_API.md`, Migration `20260629_mobile_api.sql`, Controller `Mobile.php`, Resolusi Apple `APP_REVIEW_RESOLUTION_20260728.md`.
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-title-box">
+            <h3>2. Customer Transaksi Stabil</h3>
+            <span class="status-pill st-yellow">91%</span>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label cyan">Accomplishment</div>
+            <div class="pillar-body">• Alur transaksi customer menjadi fokus utama pengembangan.<br>• Validasi end-to-end dari order sampai transaksi selesai.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label gold">Issue & Root Cause</div>
+            <div class="pillar-body">• Stabilitas harus dibuktikan lewat UAT nyata lapangan.<br>• Potensi issue muncul pada integrasi antar-tahap transaksi.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label blue">Next Step & Mitigation</div>
+            <div class="pillar-body">• Validasi alur Order → Pembayaran → Konfirmasi.<br>• Skenario transaksi end-to-end & continuous monitoring.</div>
+          </div>
+          <div class="eviden-box">
+            <b>Bukti Eviden:</b> Alur `Mobile.php::checkout()`, DB Schema `orders` & `order_items`, Log transaksi `curl_response_log.txt`, ACID Transaction di `Mobile_api_model.php`.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: MUST WIN 3 & 4 -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">ANALISIS 3-PILAR & AUDIT TRAIL</div>
+          <div class="slide-title">Must Win 3 & 4: Payment Gateway & UAT 3 Kios</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="detail-card">
+          <div class="card-title-box">
+            <h3>3. Integrasi Payment Gateway</h3>
+            <span class="status-pill st-yellow">93%</span>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label cyan">Accomplishment</div>
+            <div class="pillar-body">• Payment Gateway terintegrasi dalam alur transaksi.<br>• Validasi keandalan pembayaran & akurasi status real-time.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label gold">Issue & Root Cause</div>
+            <div class="pillar-body">• Dependensi terhadap sistem eksternal mitra penyedia.<br>• Gangguan jaringan / respons gateway memengaruhi transaksi.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label blue">Next Step & Mitigation</div>
+            <div class="pillar-body">• Validasi metode pembayaran (VA, QRIS) & callback sync.<br>• SOP penanganan transaksi abnormal & eskalasi cepat (SLA).</div>
+          </div>
+          <div class="eviden-box">
+            <b>Bukti Eviden:</b> Controller `briva_list_function.php`, `signature_log.txt`, `token_response_log.txt`, Webhook callback BRIVA API.
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-title-box">
+            <h3>4. UAT Minimal 3 Kios</h3>
+            <span class="status-pill st-red">85%</span>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label cyan">Accomplishment</div>
+            <div class="pillar-body">• Target UAT ditetapkan minimal 3 kios untuk validasi riil operasional.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label gold">Issue & Root Cause</div>
+            <div class="pillar-body">• Data aktual hasil UAT dan rekap temuan belum terekam penuh sebagai data selesai.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label blue">Next Step & Mitigation</div>
+            <div class="pillar-body">• Eksekusi UAT di 3 kios pilot (Pusat, Mitra Tani, Berkah Tani).<br>• Skenario seragam, bukti formal & klasifikasi bug.</div>
+          </div>
+          <div class="eviden-box">
+            <b>Bukti Eviden:</b> Dokumen `SKENARIO-UAT-KIU-2026`, Berita Acara UAT 3 Kios Pilot, UAT Bug Sheet bertandatangan penanggung jawab.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: MUST WIN 5 DEEP DIVE -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">TARGET STABILITAS & AUDIT D+30</div>
+          <div class="slide-title">Must Win 5: Bebas Bug Critical 30 Hari Pasca-Live</div>
+        </div>
+        <div class="slide-badge badge-red">Status: 85% (Fase Persiapan)</div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 0.8rem;">
+        <div class="detail-card">
+          <div class="pillar-section">
+            <div class="pillar-label cyan">Accomplishment (Pencapaian Nyata)</div>
+            <div class="pillar-body">• Target stabilitas pasca-live ditetapkan dengan KPI: 0 critical bug selama 30 hari kalender setelah live.</div>
+          </div>
+          <div class="pillar-section" style="margin-top: 0.4rem;">
+            <div class="pillar-label gold">Issue & Root Cause (Tantangan)</div>
+            <div class="pillar-body">• Target baru dapat dinilai setelah masa monitoring 30 hari berjalan penuh.<br>• Belum ada rekam histori bug pada masa produksi.</div>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="pillar-section">
+            <div class="pillar-label blue">Next Step (Langkah Solutif)</div>
+            <div class="pillar-body">• Menetapkan tanggal mulai resmi (T0) monitoring live.<br>• Monitoring stabilitas sistem harian selama 30 hari.<br>• Klasifikasi dan pencatatan setiap temuan bug.</div>
+          </div>
+          <div class="pillar-section" style="margin-top: 0.4rem;">
+            <div class="pillar-label green">Risk Mitigation & Eviden</div>
+            <div class="pillar-body">• Prioritaskan bug critical transaksi, jalur darurat 24/7.<br>• <i>Eviden: System Log `application/logs/`, Template Incident D+30</i>.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background: rgba(6, 182, 212, 0.1); border: 1px solid var(--border-cyan); border-radius: 12px; padding: 0.7rem 1.2rem; font-size: 0.82rem; color: var(--accent-cyan); font-weight: 600;">
+        MATRIKS SLA BUG PASCA-LIVE: Critical Bug (Respon &lt;15 mnt, Fix &lt;4 jam) | Major Bug (Respon &lt;1 jam, Fix &lt;24 jam) | Minor Bug (Rilis Mingguan)
+      </div>
+    </div>
+
+    <!-- SLIDE 6: MUST WIN 6 & 7 -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">OPERATIONAL READINESS & AUDIT TRAIL</div>
+          <div class="slide-title">Must Win 6 & 7: Dokumentasi & SOP Kios</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="detail-card">
+          <div class="card-title-box">
+            <h3>6. Dokumentasi</h3>
+            <span class="status-pill st-yellow">90%</span>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label cyan">Accomplishment</div>
+            <div class="pillar-body">• Dokumentasi ditetapkan sebagai deliverable utama proyek, bukan pekerjaan tambahan.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label gold">Issue & Root Cause</div>
+            <div class="pillar-body">• Rekapitulasi jenis dokumen dan status finalisasi belum dipetakan terpusat.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label blue">Next Step & Mitigation</div>
+            <div class="pillar-body">• Finalisasi User Manual & Kasir, dokumentasi alur & kontrak API.<br>• Master checklist & status Draft → Review → Final.</div>
+          </div>
+          <div class="eviden-box">
+            <b>Bukti Eviden:</b> Dokumen `docs/MOBILE_API.md`, `docs/APP_REVIEW_RESOLUTION_20260728.md`, SQL Migrations di `db/migrations/`.
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="card-title-box">
+            <h3>7. SOP Transaksi Kios</h3>
+            <span class="status-pill st-red">88%</span>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label cyan">Accomplishment</div>
+            <div class="pillar-body">• SOP transaksi kios ditetapkan sebagai Must Win strategis peluncuran Karisma Online.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label gold">Issue & Root Cause</div>
+            <div class="pillar-body">• Status pengesahan SOP belum lengkap.<br>• Risiko tidak aplikatif bila dibuat tanpa mengacu proses riil.</div>
+          </div>
+          <div class="pillar-section">
+            <div class="pillar-label blue">Next Step & Mitigation</div>
+            <div class="pillar-body">• Susun SOP mengacu alur riil sistem & validasi temuan UAT.<br>• Review manajemen & sosialisasi resmi ke seluruh kios.</div>
+          </div>
+          <div class="eviden-box">
+            <b>Bukti Eviden:</b> Dokumen Resmi `SOP/IT-KIU/2026/001`, Flowchart Kasir Kios, Berita Acara Sosialisasi Training Kasir.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: STRATEGIC RECOMMENDATIONS -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <div>
+          <div class="slide-category">EXECUTIVE ROADMAP & ACTIONABLE PROTOCOLS</div>
+          <div class="slide-title">Rekomendasi Strategis & Tindakan Prioritas</div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 0.75rem 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; color: var(--accent-gold);">1. Multi-Platform Feature Parity Matrix</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">Menetapkan checklist keselarasan fitur antara Android dan Web sebelum UAT dimulai.</div>
+          </div>
+          <div style="text-align: right; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">PIC: Tim Mobile & QA</div>
+        </div>
+
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 0.75rem 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; color: var(--accent-gold);">2. Gate Review Berita Acara UAT 3 Kios</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">Syarat mutlak Go-Live: 100% tes transaksi berhasil dan zero bug critical pada 3 kios.</div>
+          </div>
+          <div style="text-align: right; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">PIC: QA & Operasional Kios</div>
+        </div>
+
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 0.75rem 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; color: var(--accent-gold);">3. Matriks SLA Bug & War Room D+30</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">Siaga 24/7 respon <15 menit dan fix <4 jam untuk critical bug transaksi pasca-live.</div>
+          </div>
+          <div style="text-align: right; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">PIC: IT Support & Backend</div>
+        </div>
+
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 0.75rem 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; color: var(--accent-gold);">4. Idempotency & Auto-Retry Payment Webhook</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">Mencegah pemrosesan pembayaran ganda saat terjadi network timeout atau callback berulang.</div>
+          </div>
+          <div style="text-align: right; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">PIC: Backend Lead & Keuangan</div>
+        </div>
+
+        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 0.75rem 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 700; color: var(--accent-gold);">5. Troubleshooting Flowchart Kasir pada SOP</div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem;">Panduan penanganan kendala cepat kasir saat koneksi lambat atau status QRIS pending.</div>
+          </div>
+          <div style="text-align: right; font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">PIC: Tim Operasional & Training</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div>Dokumen Rahasia & Audit-Ready • PT. Karisma Indoagro Universal</div>
+    <div class="keyboard-hints">
+      <span>Gunakan <span class="key-badge">◀</span> <span class="key-badge">▶</span> atau <span class="key-badge">Space</span></span>
+      <span>Layar Penuh: <span class="key-badge">F</span></span>
+    </div>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 7;
+
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      const active = document.getElementById(`slide-${n}`);
+      if (active) active.classList.add('active');
+      document.getElementById('slideIndicator').textContent = `Slide ${n} / ${totalSlides}`;
+      currentSlide = n;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) showSlide(currentSlide - 1);
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key >= '1' && e.key <= '7') {
+        showSlide(parseInt(e.key));
+      }
+    });
+  </script>
+</body>
+</html>

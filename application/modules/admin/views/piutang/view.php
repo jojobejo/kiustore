@@ -77,20 +77,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <td>Transfer ke</td>
                         <td><div style="white-space: initial;"><b>
                             <?php
-                                $bank_data = json_decode($payment->payment_data);
-                                $bank_data  = (Array) $bank_data;
-                                $transfer_to = $bank_data['transfer_to'];
-
-                                $transfer_to = $banks[$transfer_to];
-                                $transfer_from = $bank_data['source'];
+                                $transfer_info = parse_payment_transfer_info($payment->payment_data, $banks);
+                                echo $transfer_info['transfer_to'];
                             ?>
-                            <?php echo $transfer_to->bank; ?> a.n <?php echo $transfer_to->name; ?> (<?php echo $transfer_to->number; ?>)
                         </b></div></td>
                     </tr>
                     <tr>
                         <td>Transfer dari</td>
                         <td><div style="white-space: initial;">
-                            <b><?php echo $transfer_from->bank; ?> a.n <?php echo $transfer_from->name; ?> (<?php echo $transfer_from->number; ?>)</b>
+                            <b><?php echo $transfer_info['transfer_from']; ?></b>
                         </div></td>
                     </tr> -->
                 </table>

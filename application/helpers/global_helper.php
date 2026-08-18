@@ -824,3 +824,100 @@ if (!function_exists('level_user')) {
         return $level;
     }
 }
+
+if (!function_exists('parse_payment_transfer_info')) {
+    function parse_payment_transfer_info($payment_data_raw, $banks = null)
+    {
+        if (empty($banks)) {
+            $banks = json_decode(get_settings('payment_banks'), true);
+        }
+        if (is_object($banks)) {
+            $banks = (array) $banks;
+        }
+
+        $bank_data = [];
+        if (is_string($payment_data_raw)) {
+            $decoded = json_decode($payment_data_raw, true);
+            if (is_array($decoded)) {
+                $bank_data = $decoded;
+            }
+        } elseif (is_array($payment_data_raw)) {
+            $bank_data = $payment_data_raw;
+        } elseif (is_object($payment_data_raw)) {
+            $bank_data = (array) $payment_data_raw;
+        }
+
+        // 1. Resolve Target Bank (Transfer Ke)
+        $target_key = '';
+        if (!empty($bank_data['transfer_to']) && is_string($bank_data['transfer_to'])) {
+            $target_key = $bank_data['transfer_to'];
+        } elseif (!empty($bank_data['bank']) && is_string($bank_data['bank'])) {
+            $target_key = $bank_data['bank'];
+        }
+
+        $transfer_to_text = '-';
+        if ($target_key !== '') {
+            if (is_array($banks) && isset($banks[$target_key])) {
+                $tb = $banks[$target_key];
+                $b_name = is_object($tb) ? ($tb->bank ?? '') : (is_array($tb) ? ($tb['bank'] ?? '') : '');
+                $b_acc  = is_object($tb) ? ($tb->name ?? '') : (is_array($tb) ? ($tb['name'] ?? '') : '');
+                $b_num  = is_object($tb) ? ($tb->number ?? '') : (is_array($tb) ? ($tb['number'] ?? '') : '');
+
+                $parts = [];
+                if ($b_name !== '') $parts[] = $b_name;
+                if ($b_acc !== '') $parts[] = 'a.n ' . $b_acc;
+                if ($b_num !== '') $parts[] = '(' . $b_num . ')';
+                $transfer_to_text = !empty($parts) ? implode(' ', $parts) : $target_key;
+            } else {
+                $transfer_to_text = $target_key;
+            }
+        }
+
+        // 2. Resolve Source Bank (Transfer Dari)
+        $src_bank = '';
+        $src_name = '';
+        $src_num  = '';
+
+        if (!empty($bank_data['source'])) {
+            $source = $bank_data['source'];
+            if (is_object($source)) {
+                $src_bank = $source->bank ?? '';
+                $src_name = $source->name ?? '';
+                $src_num  = $source->number ?? '';
+            } elseif (is_array($source)) {
+                $src_bank = $source['bank'] ?? '';
+                $src_name = $source['name'] ?? '';
+                $src_num  = $source['number'] ?? '';
+            }
+        }
+
+        if ($src_bank === '' && !empty($bank_data['bank_name']) && is_string($bank_data['bank_name'])) {
+            $src_bank = $bank_data['bank_name'];
+        }
+        if ($src_name === '' && !empty($bank_data['name']) && is_string($bank_data['name'])) {
+            $src_name = $bank_data['name'];
+        }
+        if ($src_num === '' && !empty($bank_data['bank_number']) && is_scalar($bank_data['bank_number'])) {
+            $src_num = (string) $bank_data['bank_number'];
+        }
+
+        $src_parts = [];
+        if ($src_bank !== '') $src_parts[] = $src_bank;
+        if ($src_name !== '') $src_parts[] = 'a.n ' . $src_name;
+        if ($src_num !== '') $src_parts[] = '(' . $src_num . ')';
+
+        $transfer_from_text = '-';
+        if (!empty($src_parts)) {
+            $transfer_from_text = implode(' ', $src_parts);
+        } elseif (!empty($bank_data['invoice'])) {
+            $transfer_from_text = 'VA / Invoice: ' . $bank_data['invoice'];
+        }
+
+        return [
+            'transfer_to'   => $transfer_to_text,
+            'transfer_from' => $transfer_from_text,
+            'data'          => $bank_data
+        ];
+    }
+}
+

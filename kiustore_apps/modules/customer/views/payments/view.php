@@ -29,21 +29,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <div class="title d-flex align-items-center"><span>Jumlah Transfer</span></div>
                         <div class="data-content">Rp <?php echo format_rupiah($data->payment_price); ?></div>
                     </div>
+                    <?php
+                        $transfer_info = parse_payment_transfer_info($data->payment_data, $banks);
+                    ?>
                     <div class="single-profile-data d-flex align-items-center justify-content-between">
-                        <div class="title d-flex align-items-center"><span>Trasfer dari</span></div>
-                        <div class="data-content"><b><?php echo $payment->source->bank; ?> a.n <?php echo $payment->source->name; ?> (<?php echo $payment->source->number; ?>) </div>
+                        <div class="title d-flex align-items-center"><span>Transfer dari</span></div>
+                        <div class="data-content"><b><?php echo $transfer_info['transfer_from']; ?></b></div>
                     </div>
                     <div class="single-profile-data d-flex align-items-center justify-content-between">
                         <div class="title d-flex align-items-center"><span>Transfer ke</span></div>
                         <div class="data-content">
-                        <b>
-                            <?php
-                                $transfer_to = $payment->transfer_to;
-                                $transfer_to = $banks[$transfer_to];
-                                
-                            ?>
-                            <?php echo $transfer_to->bank; ?> a.n <?php echo $transfer_to->name; ?> (<?php echo $transfer_to->number; ?>)
-                        </b>
+                            <b><?php echo $transfer_info['transfer_to']; ?></b>
                         </div>
                     </div>
                     <div class="single-profile-data d-flex align-items-center justify-content-between">
