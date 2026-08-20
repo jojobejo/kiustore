@@ -186,6 +186,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             }
 
             $("#pesan").val('');
+            if (window.resizeCustomerMessageTextarea) {
+              window.resizeCustomerMessageTextarea();
+            }
             renderCustomerChatMessage(data.data || {
               id: 0,
               message: message,
@@ -227,5 +230,4 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </script>
 </body>
 </html>
-
 

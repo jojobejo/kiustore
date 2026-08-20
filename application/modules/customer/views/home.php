@@ -34,7 +34,7 @@ if (!function_exists('format_customer_price_text')) {
       <span aria-hidden="true">×</span>
     </button> -->
 
-    <div class="search-box mb-4">
+    <div class="search-box mb-4" data-tour="search">
       <i class="iconly-Search icli search"></i>
       <input class="form-control" type="search" value="<?php echo (isset($query) ? $query : ''); ?>" name="search_query" placeholder="Cari disini..." required />
     </div>
@@ -119,56 +119,56 @@ if (!function_exists('format_customer_price_text')) {
       </div> -->
 
       <div class="col-3">
-        <div class="menu-wrap">
+        <div class="menu-wrap" data-tour="menu-category">
           <div class="bg-shape"></div>
           <a href="<?= site_url('category') ?>"> <img class="menu-img img-fluid" src="<?php echo site_url('assets/icon/kategori.png'); ?>" alt="kategori" /> </a>
           <span class="font-white">Kategori</span>
         </div>
       </div>
       <div class="col-3">
-        <div class="menu-wrap">
+        <div class="menu-wrap" data-tour="menu-products">
           <div class="bg-shape"></div>
           <a href="<?= site_url('all_products') ?>"> <img class="menu-img img-fluid" src="<?php echo site_url('assets/icon/produk.png'); ?>" alt="produk" /> </a>
           <span class="font-white">Produk</span>
         </div>
       </div>
       <div class="col-3">
-        <div class="menu-wrap">
+        <div class="menu-wrap" data-tour="menu-promo">
           <div class="bg-shape"></div>
           <a href="<?= site_url('promo') ?>"> <img class="menu-img img-fluid" src="<?php echo site_url('assets/icon/diskon.png'); ?>" alt="diskon" /> </a>
           <span class="font-white">Promo</span>
         </div>
       </div>
       <div class="col-3">
-        <div class="menu-wrap">
+        <div class="menu-wrap" data-tour="menu-cart">
           <div class="bg-shape"></div>
           <a href="<?= site_url('cart') ?>"> <img class="menu-img img-fluid" src="<?php echo site_url('assets/icon/keranjang.png'); ?>" alt="cart" /> </a>
           <span class="font-white">cart</span>
         </div>
       </div>
       <div class="col-3">
-        <div class="menu-wrap">
+        <div class="menu-wrap" data-tour="menu-invoice">
           <div class="bg-shape"></div>
           <a href="<?= site_url('invoice') ?>"> <img class="menu-img img-fluid" src="<?php echo site_url('assets/icon/kredit.png'); ?>" alt="kredit" /> </a>
           <span class="font-white">Tagihan</span>
         </div>
       </div>
       <div class="col-3">
-        <div class="menu-wrap">
+        <div class="menu-wrap" data-tour="menu-history">
           <div class="bg-shape"></div>
           <a href="<?= site_url('order_history') ?>"> <img class="menu-img img-fluid" src="<?php echo site_url('assets/icon/histori.png'); ?>" alt="histori" /> </a>
           <span class="font-white">Riwayat</span>
         </div>
       </div>
       <div class="col-3">
-        <div class="menu-wrap">
+        <div class="menu-wrap" data-tour="menu-chat">
           <div class="bg-shape"></div>
           <a href="<?= site_url('message') ?>"> <img class="menu-img img-fluid" src="<?php echo site_url('assets/icon/pesan.png'); ?>" alt="chat" /> </a>
           <span class="font-white">Chat</span>
         </div>
       </div>
       <div class="col-3">
-        <div class="menu-wrap">
+        <div class="menu-wrap" data-tour="menu-setting">
           <div class="bg-shape"></div>
           <a href="<?= site_url('profile') ?>"> <img class="menu-img img-fluid" src="<?php echo site_url('assets/icon/user-setting.png'); ?>" alt="setting" /> </a>
           <span class="font-white">Setting</span>
@@ -417,3 +417,371 @@ if (!function_exists('format_customer_price_text')) {
 
 </main>
 <!-- Main End -->
+
+<?php if (!empty($start_customer_tutorial)) : ?>
+  <style>
+    body.kiu-tour-running {
+      overflow: hidden;
+    }
+
+    .kiu-tour-overlay {
+      animation: kiuTourFadeIn 0.22s ease forwards;
+      background: transparent;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      position: fixed;
+      z-index: 10000;
+    }
+
+    .kiu-tour-spotlight {
+      animation: kiuTourPulse 1.4s ease-in-out infinite;
+      border: 3px solid #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.58), 0 0 22px rgba(65, 120, 255, 0.9);
+      pointer-events: none;
+      position: fixed;
+      transition: all 0.28s ease;
+      z-index: 10002;
+    }
+
+    .kiu-tour-card {
+      animation: kiuTourPop 0.25s ease forwards;
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+      left: 50%;
+      max-width: calc(100vw - 36px);
+      opacity: 0;
+      padding: 20px;
+      position: fixed;
+      transform: translate(-50%, 16px);
+      transition: top 0.28s ease;
+      width: 550px;
+      z-index: 10003;
+    }
+
+    .kiu-tour-head {
+      align-items: center;
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .kiu-tour-title {
+      color: #111827;
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.25;
+      margin: 0;
+    }
+
+    .kiu-tour-count {
+      color: #8b8f99;
+      flex: 0 0 auto;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .kiu-tour-desc {
+      color: #7a7f8b;
+      font-size: 17px;
+      line-height: 1.45;
+      margin: 0 0 18px;
+    }
+
+    .kiu-tour-actions {
+      align-items: center;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .kiu-tour-skip {
+      background: transparent;
+      border: 0;
+      color: #8b8f99;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 10px 12px;
+    }
+
+    .kiu-tour-next {
+      align-items: center;
+      background: #3468df;
+      border: 0;
+      border-radius: 14px;
+      color: #ffffff;
+      display: inline-flex;
+      font-size: 16px;
+      font-weight: 800;
+      gap: 10px;
+      padding: 12px 18px;
+    }
+
+    .kiu-tour-next i {
+      font-size: 14px;
+    }
+
+    @keyframes kiuTourFadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes kiuTourPop {
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+
+    @keyframes kiuTourPulse {
+      0%,
+      100% {
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.58), 0 0 20px rgba(65, 120, 255, 0.75);
+      }
+
+      50% {
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.58), 0 0 34px rgba(65, 120, 255, 1);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .kiu-tour-card {
+        border-radius: 18px;
+        padding: 18px;
+        width: calc(100vw - 48px);
+      }
+
+      .kiu-tour-title {
+        font-size: 17px;
+      }
+
+      .kiu-tour-desc {
+        font-size: 15px;
+      }
+    }
+  </style>
+
+  <div class="kiu-tour-overlay" id="kiuTourOverlay"></div>
+  <div class="kiu-tour-spotlight" id="kiuTourSpotlight"></div>
+  <div class="kiu-tour-card" id="kiuTourCard" role="dialog" aria-live="polite" aria-label="Tutorial Customer">
+    <div class="kiu-tour-head">
+      <h2 class="kiu-tour-title" id="kiuTourTitle"></h2>
+      <span class="kiu-tour-count" id="kiuTourCount"></span>
+    </div>
+    <p class="kiu-tour-desc" id="kiuTourDesc"></p>
+    <div class="kiu-tour-actions">
+      <button class="kiu-tour-skip" type="button" id="kiuTourSkip">Skip</button>
+      <button class="kiu-tour-next" type="button" id="kiuTourNext">Lanjut <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      var steps = [{
+          target: '[data-tour="search"]',
+          title: 'Cari Produk',
+          desc: 'Gunakan kolom pencarian untuk menemukan produk berdasarkan nama atau SKU dengan lebih cepat.'
+        },
+        {
+          target: '[data-tour="menu-category"]',
+          title: 'Kategori',
+          desc: 'Gunakan Kategori untuk melihat produk berdasarkan jenis kebutuhan pertanian.'
+        },
+        {
+          target: '[data-tour="menu-products"]',
+          title: 'Produk',
+          desc: 'Buka Produk untuk melihat daftar barang yang tersedia dan memilih item yang dibutuhkan.'
+        },
+        {
+          target: '[data-tour="menu-promo"]',
+          title: 'Promo',
+          desc: 'Pantau Promo untuk melihat produk dengan penawaran khusus yang sedang aktif.'
+        },
+        {
+          target: '[data-tour="menu-cart"]',
+          title: 'Cart',
+          desc: 'Cart menyimpan produk yang sudah dipilih sebelum Anda melanjutkan checkout.'
+        },
+        {
+          target: '[data-tour="menu-invoice"]',
+          title: 'Tagihan',
+          desc: 'Gunakan Tagihan untuk mengecek informasi invoice dan kewajiban pembayaran customer.'
+        },
+        {
+          target: '[data-tour="menu-history"]',
+          title: 'Riwayat',
+          desc: 'Riwayat membantu Anda memantau pesanan yang sudah pernah dibuat.'
+        },
+        {
+          target: '[data-tour="menu-chat"]',
+          title: 'Chat',
+          desc: 'Gunakan Chat untuk bertanya atau berkoordinasi dengan tim Karisma.'
+        },
+        {
+          target: '[data-tour="menu-setting"]',
+          title: 'Setting',
+          desc: 'Setting membawa Anda ke halaman Profile untuk mengatur data akun, alamat, dan password.'
+        },
+        {
+          target: '[data-tour="footer-home"]',
+          title: 'Beranda',
+          desc: 'Navigasi Beranda mengembalikan Anda ke halaman utama aplikasi.'
+        },
+        {
+          target: '[data-tour="footer-category"]',
+          title: 'Kategori Footer',
+          desc: 'Akses cepat ke halaman kategori juga tersedia di navigasi bawah.'
+        },
+        {
+          target: '[data-tour="footer-cart"]',
+          title: 'Keranjang',
+          desc: 'Keranjang di navigasi bawah memudahkan pengecekan pesanan kapan saja.'
+        },
+        {
+          target: '[data-tour="footer-history"]',
+          title: 'Riwayat Order',
+          desc: 'Gunakan Riwayat untuk membuka daftar order dari navigasi bawah.'
+        },
+        {
+          target: '[data-tour="footer-chat"]',
+          title: 'Chat Customer',
+          desc: 'Chat di navigasi bawah menjadi jalur cepat untuk komunikasi bantuan.'
+        },
+        {
+          target: '[data-tour="profile-avatar"]',
+          title: 'Profile Customer',
+          desc: 'Tekan avatar untuk membuka Profile, mengubah data customer, melihat tutorial, atau membuka guide book.'
+        }
+      ];
+
+      var current = 0;
+      var overlay = document.getElementById('kiuTourOverlay');
+      var spotlight = document.getElementById('kiuTourSpotlight');
+      var card = document.getElementById('kiuTourCard');
+      var title = document.getElementById('kiuTourTitle');
+      var desc = document.getElementById('kiuTourDesc');
+      var count = document.getElementById('kiuTourCount');
+      var next = document.getElementById('kiuTourNext');
+      var skip = document.getElementById('kiuTourSkip');
+
+      function getVisibleElement(selector) {
+        var nodes = document.querySelectorAll(selector);
+        for (var i = 0; i < nodes.length; i++) {
+          var rect = nodes[i].getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            return nodes[i];
+          }
+        }
+
+        return null;
+      }
+
+      function placeCard(rect) {
+        var gap = 18;
+        var cardHeight = card.offsetHeight || 210;
+        var top = rect.bottom + gap;
+
+        if (top + cardHeight > window.innerHeight - 18) {
+          top = rect.top - cardHeight - gap;
+        }
+
+        if (top < 18) {
+          top = Math.max(18, (window.innerHeight - cardHeight) / 2);
+        }
+
+        card.style.top = top + 'px';
+      }
+
+      function showStep(index) {
+        current = Math.max(0, Math.min(index, steps.length - 1));
+
+        var step = steps[current];
+        var target = getVisibleElement(step.target);
+
+        if (!target) {
+          if (current < steps.length - 1) {
+            showStep(current + 1);
+          } else {
+            closeTour();
+          }
+          return;
+        }
+
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center'
+        });
+
+        window.setTimeout(function() {
+          var rect = target.getBoundingClientRect();
+          var padding = 8;
+
+          title.textContent = step.title;
+          desc.textContent = step.desc;
+          count.textContent = (current + 1) + ' dari ' + steps.length;
+          next.innerHTML = current === steps.length - 1 ? 'Selesai' : 'Lanjut <i class="fas fa-arrow-right"></i>';
+
+          spotlight.style.left = Math.max(8, rect.left - padding) + 'px';
+          spotlight.style.top = Math.max(8, rect.top - padding) + 'px';
+          spotlight.style.width = Math.min(window.innerWidth - 16, rect.width + padding * 2) + 'px';
+          spotlight.style.height = Math.min(window.innerHeight - 16, rect.height + padding * 2) + 'px';
+          spotlight.style.borderRadius = Math.min(26, Math.max(14, rect.height / 4)) + 'px';
+          placeCard(rect);
+        }, 280);
+      }
+
+      function closeTour() {
+        document.body.classList.remove('kiu-tour-running');
+
+        [overlay, spotlight, card].forEach(function(element) {
+          if (element) {
+            element.remove();
+          }
+        });
+
+        if (window.history.replaceState) {
+          window.history.replaceState(null, '', '<?= site_url('home') ?>');
+        }
+      }
+
+      function lockTutorialClicks(event) {
+        if (!card || card.contains(event.target)) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      document.body.classList.add('kiu-tour-running');
+      document.addEventListener('click', lockTutorialClicks, true);
+
+      next.addEventListener('click', function() {
+        if (current >= steps.length - 1) {
+          closeTour();
+          document.removeEventListener('click', lockTutorialClicks, true);
+          return;
+        }
+
+        showStep(current + 1);
+      });
+
+      skip.addEventListener('click', function() {
+        closeTour();
+        document.removeEventListener('click', lockTutorialClicks, true);
+      });
+
+      window.addEventListener('resize', function() {
+        showStep(current);
+      });
+
+      window.setTimeout(function() {
+        showStep(0);
+      }, 450);
+    })();
+  </script>
+<?php endif; ?>

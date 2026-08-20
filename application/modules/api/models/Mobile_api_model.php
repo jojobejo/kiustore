@@ -1006,6 +1006,10 @@ class Mobile_api_model extends CI_Model
             return array('success' => FALSE, 'status' => 422, 'message' => 'BRIVA hanya tersedia untuk metode pembayaran Virtual Account.');
         }
 
+        if (is_briva_payment_local()) {
+            return $this->generate_local_briva_payment($order, $user_id);
+        }
+
         $existing = $this->briva_payment_by_order_number($order['order_number']);
         if ($existing && strtotime((string) $existing['exp_date']) > time()) {
             return array(
@@ -1140,6 +1144,10 @@ class Mobile_api_model extends CI_Model
                 'message' => 'Order dibatalkan.',
                 'data' => $this->format_briva_status_response($order, $user_id, $briva, 'N', TRUE, 'Order dibatalkan.')
             );
+        }
+
+        if (is_briva_payment_local()) {
+            return $this->local_briva_payment_status($order, $user_id, $briva);
         }
 
         $status_response = $this->decode_briva_response(
@@ -1406,6 +1414,115 @@ class Mobile_api_model extends CI_Model
         }
 
         return $this->db->insert('briva_api', $data);
+    }
+
+    private function generate_local_briva_payment($order, $user_id)
+    {
+        $existing = $this->briva_payment_by_order_number($order['order_number']);
+
+        if ($existing) {
+            $this->db
+                ->where('order_number', $order['order_number'])
+                ->update('briva_api', array('status' => 2));
+            $this->db
+                ->where('order_number', $order['order_number'])
+                ->update('orders', array('order_status' => 10));
+
+            $saved = $this->briva_payment_by_order_number($order['order_number']);
+            $data = $this->format_briva_payment($saved ? $saved : $existing);
+            $data['payment_mode'] = 'local';
+
+            return array(
+                'success' => TRUE,
+                'status' => 200,
+                'message' => 'Payment BRIVA lokal sudah tersedia dan disimulasikan lunas.',
+                'data' => $data
+            );
+        }
+
+        $customer_no = $this->briva_customer_no($order);
+        if ($customer_no === '') {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Nomor customer untuk BRIVA lokal belum valid.');
+        }
+
+        $total_to_pay = (float) $order['total_price'] + (float) $order['shipping_cost'] + (float) $order['insurance'];
+        $data = array(
+            'order_number' => $order['order_number'],
+            'kd_faktur' => $order['kd_faktur'],
+            'user_id' => (int) $user_id,
+            'name' => $this->briva_customer_name($order),
+            'va_code' => '91118' . $customer_no,
+            'userno' => $customer_no,
+            'total_price_topay' => number_format($total_to_pay, 2, '.', ''),
+            'exp_date' => date('c', strtotime('+1 day')),
+            'status' => '2'
+        );
+
+        $this->db->trans_start();
+        $this->save_briva_payment($order['order_number'], $data);
+        $this->db
+            ->where('order_number', $order['order_number'])
+            ->update('orders', array('order_status' => 10));
+        $this->db->trans_complete();
+
+        if (!$this->db->trans_status()) {
+            return array('success' => FALSE, 'status' => 500, 'message' => 'Payment BRIVA lokal gagal disimpan.');
+        }
+
+        $saved = $this->briva_payment_by_order_number($order['order_number']);
+        $response_data = $this->format_briva_payment($saved ? $saved : $data);
+        $response_data['payment_mode'] = 'local';
+
+        return array(
+            'success' => TRUE,
+            'status' => 201,
+            'message' => 'Payment BRIVA lokal berhasil dibuat tanpa koneksi API BRI production.',
+            'data' => $response_data
+        );
+    }
+
+    private function local_briva_payment_status($order, $user_id, $briva)
+    {
+        if ((int) $briva['status'] !== 2 || (int) $order['order_status'] !== 10) {
+            $this->db
+                ->where('order_number', $order['order_number'])
+                ->update('briva_api', array('status' => 2));
+            $this->db
+                ->where('order_number', $order['order_number'])
+                ->update('orders', array('order_status' => 10));
+
+            $briva = $this->briva_payment_by_order_number($order['order_number']);
+            $order = $this->db
+                ->where(array('id' => (int) $order['id'], 'user_id' => (int) $user_id))
+                ->get('orders')
+                ->row_array();
+        }
+
+        $data = $this->format_briva_status_response(
+            $order,
+            $user_id,
+            $briva,
+            'Y',
+            FALSE,
+            'Pembayaran BRIVA lokal berhasil diterima.',
+            isset($briva['exp_date']) ? (string) $briva['exp_date'] : '',
+            array(
+                'paymentMode' => 'local',
+                'virtualAccountNo' => isset($briva['va_code']) ? (string) $briva['va_code'] : '',
+                'totalAmount' => array(
+                    'value' => isset($briva['total_price_topay']) ? (string) $briva['total_price_topay'] : '0.00',
+                    'currency' => 'IDR'
+                )
+            )
+        );
+        $data['payment_mode'] = 'local';
+
+        return array(
+            'success' => TRUE,
+            'status' => 200,
+            'message' => 'Pembayaran BRIVA lokal berhasil diterima.',
+            'data' => $data
+        );
     }
 
     private function briva_customer_no($order)

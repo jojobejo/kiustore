@@ -8,7 +8,9 @@ class Orders extends CI_Controller
         parent::__construct();
 
         verify_session('admin');
-        $this->load->library('Brivaws');
+        if (!is_briva_payment_local()) {
+            $this->load->library('Brivaws');
+        }
         $this->load->model(array(
             'order_model' => 'order'
         ));
@@ -87,6 +89,34 @@ class Orders extends CI_Controller
             ]);
             return;
         }
+
+        if (is_briva_payment_local()) {
+            if ((int) $order->order_status === 7) {
+                echo json_encode([
+                    'debug_raw' => [
+                        'paymentMode' => 'local',
+                        'responseCode' => '409LOCAL',
+                        'responseMessage' => 'Order dibatalkan; local payment tidak diproses.',
+                        'additionalInfo' => ['paidStatus' => 'N']
+                    ]
+                ]);
+                return;
+            }
+
+            $this->db->where('order_number', $invoice)->update('briva_api', ['status' => 2]);
+            $this->db->where('order_number', $invoice)->update('orders', ['order_status' => 10]);
+
+            echo json_encode([
+                'debug_raw' => [
+                    'paymentMode' => 'local',
+                    'responseCode' => '200LOCAL',
+                    'responseMessage' => 'Local development payment accepted',
+                    'additionalInfo' => ['paidStatus' => 'Y']
+                ]
+            ]);
+            return;
+        }
+
         $result = $this->brivaws->inquiryStatusVa($cusno, $invoice);
         if (is_string($result)) {
             $result = json_decode($result);

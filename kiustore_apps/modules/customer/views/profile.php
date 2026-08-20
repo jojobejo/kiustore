@@ -1,6 +1,28 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 ?>
+<style>
+    .profile-action-row {
+        flex-wrap: nowrap;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: thin;
+    }
+
+    .profile-action-row > [class*="col"] {
+        flex: 0 0 auto;
+    }
+
+    .profile-action-row .btn {
+        min-width: 122px;
+        white-space: nowrap;
+    }
+
+    .profile-action-row .btn-guide-book {
+        min-width: 178px;
+    }
+</style>
 <!-- Main Start -->
 <main class="main-wrap setting-page mb-xxl">
     <div class="user-panel">
@@ -11,7 +33,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             <div class="media-body">
                 <h2 class="title-color"><?php echo get_user_name(); ?></h2>
-                <div class="row">
+                <div class="row profile-action-row">
                     <div class="col-auto">
                         <span class="content-color font-md">
                             <a href="<?= base_url('cus_edit_customer/2') ?>" class="btn btn-md btn-warning mt-2 mb-2 w-100">Reset Data Alamat</a>
@@ -20,6 +42,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <div class="col-auto">
                         <span class="content-color font-md">
                             <a href="<?= base_url('edit_profile_cust/' . get_user_name_id()) ?>" class="btn btn-md btn-warning mt-2 mb-2 w-100">Edit Profile</a>
+                        </span>
+                    </div>
+                    <div class="col-auto">
+                        <span class="content-color font-md">
+                            <a href="<?= base_url('profile/tutorial') ?>" class="btn btn-md btn-info mt-2 mb-2 w-100">Tutorial</a>
+                        </span>
+                    </div>
+                    <div class="col-auto">
+                        <span class="content-color font-md">
+                            <a href="<?= base_url('profile/guide-book-customer') ?>" class="btn btn-md btn-primary mt-2 mb-2 w-100 btn-guide-book">Guide Book Customer</a>
                         </span>
                     </div>
                     <div class="col-auto">

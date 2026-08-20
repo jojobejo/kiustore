@@ -90,6 +90,8 @@ $route['error/timeout']                     = 'errors/timeout';
 $route['error/app']                         = 'errors/app';
 
 $route['dashboard_admin']                   = 'admin/dashboard';
+$route['admin/briva-switch']                = 'admin/briva_switch';
+$route['admin/briva-switch/update']         = 'admin/briva_switch/update';
 $route['admin']                             = 'admin/admin';
 $route['admin/categories']                  = 'admin/products/category';
 
@@ -109,6 +111,8 @@ $route['cartongkir']                        = 'customer/addons/addoncart/cart';
 
 $route['customer']                          = 'customer/customer';
 $route['profile']                           = 'customer/profile';
+$route['profile/tutorial']                  = 'customer/profile/tutorial';
+$route['profile/guide-book-customer']       = 'customer/profile/guide_book_customer';
 $route['cus_edit_customer/(:any)']          = 'customer/profile/cus_editdata/$1';
 $route['edit_profile_cust/(:any)']          = 'customer/profile/cus_edit_profile/$1';
 $route['sv_alamatcus']                      = 'customer/profile/';

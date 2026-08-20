@@ -41,6 +41,23 @@ class Profile extends CI_Controller
         $this->load->view('footer');
     }
 
+    public function tutorial()
+    {
+        redirect('home?start_tutorial=1');
+    }
+
+    public function guide_book_customer()
+    {
+        $data = $this->profile->get_profile();
+
+        $params['title'] = 'Guide Book Customer';
+        $user['user'] = $data;
+
+        $this->load->view('header', $params);
+        $this->load->view('profile_guide_book', $user);
+        $this->load->view('footer');
+    }
+
     public function toggle_readonly()
     {
         $readonly = $this->input->post('readonly');

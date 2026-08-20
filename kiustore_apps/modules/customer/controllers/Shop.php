@@ -9,7 +9,9 @@ class Shop extends CI_Controller
         parent::__construct();
         verify_session('customer');
         $this->load->library('cart');
-        $this->load->library('Brivaws');
+        if (!is_briva_payment_local()) {
+            $this->load->library('Brivaws');
+        }
         $this->load->model(array(
             'product_model' => 'product',
             'customer_model' => 'customer',

@@ -33,32 +33,32 @@ $is_product_detail = ($this->uri->segment(1) === 'product' && is_numeric($this->
 <footer class="footer-wrap <?= $is_product_detail ? 'footer-fixed-product' : ''; ?>" style="background-color: #0c5fdb;">
   <ul class="footer">
     <li class="footer-item <?= ($this->uri->segment(1) == 'home' ? 'active' : '') ?>">
-      <a href="<?= site_url('home') ?>" class="footer-link">
+      <a href="<?= site_url('home') ?>" class="footer-link" data-tour="footer-home">
         <i class="iconly-Home icli"></i>
         <span>Beranda</span>
       </a>
     </li>
     <li class="footer-item <?= ($this->uri->segment(1) == 'category' ? 'active' : '') ?>">
-      <a href="<?= site_url('category') ?>" class="footer-link">
+      <a href="<?= site_url('category') ?>" class="footer-link" data-tour="footer-category">
         <i class="iconly-Category icli"></i>
         <span>Kategori</span>
       </a>
     </li>
     <li class="footer-item <?= ($this->uri->segment(1) == 'cart' ? 'active' : '') ?>">
-      <a href="<?= site_url('cart') ?>" class="footer-link">
+      <a href="<?= site_url('cart') ?>" class="footer-link" data-tour="footer-cart">
         <i class="iconly-Bag-2 icli"></i>
         <span>Keranjang</span>
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart_sum">0 </span>
       </a>
     </li>
     <li class="footer-item <?= ($this->uri->segment(1) == 'order_history' ? 'active' : '') ?>">
-      <a href="<?= site_url('order_history') ?>" class="footer-link">
+      <a href="<?= site_url('order_history') ?>" class="footer-link" data-tour="footer-history">
         <i class="iconly-Paper icli"></i>
         <span class="offer">Riwayat</span>
       </a>
     </li>
     <li class="footer-item <?= ($this->uri->segment(1) == 'message' ? 'active' : '') ?>">
-      <a href="<?= site_url('message') ?>" class="footer-link">
+      <a href="<?= site_url('message') ?>" class="footer-link" data-tour="footer-chat">
         <i class="iconly-Chat icli"></i>
         <span>Chat</span>
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="unread_sum">0 </span>

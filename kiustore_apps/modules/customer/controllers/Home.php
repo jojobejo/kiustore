@@ -31,6 +31,7 @@ class Home extends CI_Controller
         $products['last_order']     = $this->product->last_order();
         $products['invoice']        = $this->payment->invoice();
         $products['tagihan']        = $this->payment->tagihan();
+        $products['start_customer_tutorial'] = $this->input->get('start_tutorial') === '1';
 
         $this->load->view('header', $products);
         $this->load->view('home', $products);

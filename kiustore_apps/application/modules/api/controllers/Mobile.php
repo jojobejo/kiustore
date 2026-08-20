@@ -521,11 +521,13 @@ class Mobile extends CI_Controller
         }
 
         try {
-            $this->load->library('Brivaws');
+            if (!is_briva_payment_local()) {
+                $this->load->library('Brivaws');
+            }
             $result = $this->mobile_api->generate_briva_payment(
                 (int) $id,
                 $this->user->id,
-                $this->brivaws
+                is_briva_payment_local() ? null : $this->brivaws
             );
         } catch (Exception $e) {
             log_message('error', 'Generate BRIVA mobile gagal: ' . $e->getMessage());
@@ -546,11 +548,13 @@ class Mobile extends CI_Controller
         }
 
         try {
-            $this->load->library('Brivaws');
+            if (!is_briva_payment_local()) {
+                $this->load->library('Brivaws');
+            }
             $result = $this->mobile_api->briva_payment_status(
                 (int) $id,
                 $this->user->id,
-                $this->brivaws
+                is_briva_payment_local() ? null : $this->brivaws
             );
         } catch (Exception $e) {
             log_message('error', 'Cek status BRIVA mobile gagal: ' . $e->getMessage());

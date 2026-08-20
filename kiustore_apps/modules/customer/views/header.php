@@ -75,7 +75,7 @@
       <a href="<?= site_url('home') ?>"> <img class="logo logo-w" src="<?php echo get_theme_uri('images/logo/logo-w.png'); ?>" alt="logo" /></a>
       <a href="<?= site_url('home') ?>"> <img class="logo" src="<?php echo get_theme_uri('images/logo/logo.png'); ?>" alt="logo" /></a>
     </div>
-    <div class="avatar-wrap">
+    <div class="avatar-wrap" data-tour="profile-avatar">
       <a href="<?= site_url('profile') ?>"> <img class="avatar" src="<?php echo get_user_image(); ?>" alt="avatar" /></a>
     </div>
   </header>

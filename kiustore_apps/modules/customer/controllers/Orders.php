@@ -8,7 +8,9 @@ class Orders extends CI_Controller
         parent::__construct();
 
         verify_session('customer');
-        $this->load->library('Brivaws');
+        if (!is_briva_payment_local()) {
+            $this->load->library('Brivaws');
+        }
         $this->load->model(array(
             'order_model' => 'order'
         ));
@@ -127,6 +129,29 @@ class Orders extends CI_Controller
             }
         }
 
+        if (is_briva_payment_local()) {
+            if ($order && (int) $order->order_status !== 10) {
+                $this->db->where('order_number', $order_number)->update('orders', ['order_status' => 10]);
+            }
+
+            $this->db->where('order_number', $order_number)->update('briva_api', ['status' => 2]);
+
+            echo json_encode([
+                'status'       => 'Pembayaran BRIVA lokal berhasil diterima.',
+                'paidStatus'   => 'Y',
+                'expiredDate'  => $brivas->exp_date,
+                'vaData'       => [
+                    'paymentMode' => 'local',
+                    'virtualAccountNo' => $brivas->va_code,
+                    'totalAmount' => [
+                        'value' => $brivas->total_price_topay,
+                        'currency' => 'IDR'
+                    ]
+                ]
+            ]);
+            return;
+        }
+
         $result     = $this->brivaws->inquiryStatusVa($brivas->userno, $brivas->order_number);
         $resultexp  = $this->brivaws->inquiryVa($brivas->userno, $brivas->order_number);
 
@@ -222,6 +247,29 @@ class Orders extends CI_Controller
                     'status'            => '1'
                 ];
 
+                if (is_briva_payment_local()) {
+                    $datava['status'] = '2';
+                    $datava['exp_date'] = date('c', strtotime('+1 day'));
+
+                    $this->save_local_briva_payment($trxid, $datava);
+                    $this->db->where('id', $id)->update('orders', ['order_status' => 10]);
+
+                    $response = [
+                        'code'    => 200,
+                        'success' => TRUE,
+                        'message' => 'Payment BRIVA lokal berhasil dibuat tanpa koneksi API BRI production.',
+                        'api'     => [
+                            'paymentMode' => 'local',
+                            'responseCode' => '200LOCAL',
+                            'responseMessage' => 'Local development payment accepted'
+                        ]
+                    ];
+
+                    return $this->output
+                        ->set_content_type('application/json')
+                        ->set_output(json_encode($response));
+                }
+
                 $apiResponse = $this->brivaws->updateVa($nocust, $va_name, $trxid, $va_to_pay);
                 $apiResponse = json_decode($apiResponse, true);
 
@@ -276,6 +324,16 @@ class Orders extends CI_Controller
 
     public function test_status_va()
     {
+        if (is_briva_payment_local()) {
+            $data['response'] = json_encode([
+                'paymentMode' => 'local',
+                'responseCode' => '200LOCAL',
+                'responseMessage' => 'BRIVA local development mode aktif'
+            ]);
+            $this->load->view('shop/test', $data);
+            return;
+        }
+
         $response = $this->brivaws->inquiryVa("64054799", "WKB25825185860");
         $data['response'] = $response;
         $this->load->view('shop/test', $data);
@@ -311,7 +369,9 @@ class Orders extends CI_Controller
                 ) {
                     $this->order->cancel_order($id);
                     $this->order->delete_va($del_va);
-                    $this->brivaws->deleteVa($del_no, $del_va);
+                    if (!is_briva_payment_local()) {
+                        $this->brivaws->deleteVa($del_no, $del_va);
+                    }
                     $response = array('code' => 200, 'success' => TRUE, 'message' => 'Order dibatalkan');
                 } else {
                     $response = array('code' => 200, 'error' => TRUE, 'message' => 'Order tidak dapat dibatalkan. payment method=' . $data->payment_method . ' order status=' . $data->order_status);
@@ -359,9 +419,19 @@ class Orders extends CI_Controller
                 );
 
                 if ($data->payment_method == 1 && $data->order_status == 2) {
-                    $this->order->input_va($datava);
-                    $this->brivaws->createVa($va_no, $va_name, $va_to_pay, $trxid);
-                    $response = array('code' => 200, 'success' => TRUE, 'message' => 'Payment Telah terbuat');
+                    if (is_briva_payment_local()) {
+                        $datava['status'] = '2';
+                        $datava['exp_date'] = date('c', strtotime('+1 day'));
+
+                        $this->save_local_briva_payment($trxid, $datava);
+                        $this->db->where('id', $id)->update('orders', ['order_status' => 10]);
+
+                        $response = array('code' => 200, 'success' => TRUE, 'message' => 'Payment BRIVA lokal telah terbuat');
+                    } else {
+                        $this->order->input_va($datava);
+                        $this->brivaws->createVa($va_no, $va_name, $va_to_pay, $trxid);
+                        $response = array('code' => 200, 'success' => TRUE, 'message' => 'Payment Telah terbuat');
+                    }
                 } else {
                     $response = array('code' => 200, 'error' => TRUE, 'message' => 'Payment tidak dapat di generate');
                 }
@@ -383,5 +453,21 @@ class Orders extends CI_Controller
         $response = json_encode($response);
         $this->output->set_content_type('application/json')
             ->set_output($response);
+    }
+
+    private function save_local_briva_payment($order_number, array $data)
+    {
+        $exists = $this->db
+            ->where('order_number', (string) $order_number)
+            ->get('briva_api')
+            ->num_rows() > 0;
+
+        if ($exists) {
+            return $this->db
+                ->where('order_number', (string) $order_number)
+                ->update('briva_api', $data);
+        }
+
+        return $this->db->insert('briva_api', $data);
     }
 }

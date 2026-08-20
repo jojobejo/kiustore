@@ -69,6 +69,58 @@ if (!function_exists('update_settings')) {
     }
 }
 
+if (!function_exists('upsert_settings')) {
+    function upsert_settings($key, $new_content)
+    {
+        $CI = init();
+
+        $exists = $CI->db
+            ->where('key', $key)
+            ->get('settings')
+            ->num_rows() > 0;
+
+        if ($exists) {
+            return $CI->db
+                ->where('key', $key)
+                ->update('settings', array('content' => $new_content));
+        }
+
+        return $CI->db->insert('settings', array(
+            'key' => $key,
+            'content' => $new_content
+        ));
+    }
+}
+
+if (!function_exists('get_settings_default')) {
+    function get_settings_default($key, $default = '')
+    {
+        $CI = &get_instance();
+        $row = $CI->db
+            ->select('content')
+            ->where('key', $key)
+            ->get('settings')
+            ->row();
+
+        return $row ? $row->content : $default;
+    }
+}
+
+if (!function_exists('briva_payment_mode')) {
+    function briva_payment_mode()
+    {
+        $mode = strtolower(trim((string) get_settings_default('briva_payment_mode', 'production')));
+        return in_array($mode, array('local', 'production'), TRUE) ? $mode : 'production';
+    }
+}
+
+if (!function_exists('is_briva_payment_local')) {
+    function is_briva_payment_local()
+    {
+        return briva_payment_mode() === 'local';
+    }
+}
+
 if (!function_exists('get_store_name')) {
     function get_store_name()
     {
@@ -920,4 +972,3 @@ if (!function_exists('parse_payment_transfer_info')) {
         ];
     }
 }
-

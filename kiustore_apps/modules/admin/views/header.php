@@ -92,6 +92,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <span class="nav-link-text">Dashboard</span>
               </a>
             </li>
+            <?php if (admin_role() == 'admin') : ?>
+              <li class="nav-item">
+                <a class="nav-link <?= ($this->uri->segment(2) == 'briva-switch' ? 'active' : '') ?>" href="<?php echo site_url('admin/briva-switch'); ?>">
+                  <i class="fa fa-toggle-on text-success"></i>
+                  <span class="nav-link-text">BRIVA SWITCH</span>
+                </a>
+              </li>
+            <?php endif; ?>
             <?php if (admin_role() == 'admin' || admin_role() == 'adminonline') : ?>
               <li class="nav-item">
                 <a class="nav-link <?= ($this->uri->segment(2) == 'categories' || ($this->uri->segment(2) == 'products' && $this->uri->segment(3) == 'category') ? 'active' : '') ?>" href="<?php echo site_url('admin/categories'); ?>">
