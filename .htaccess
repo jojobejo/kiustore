@@ -1,8 +1,9 @@
 ### Rewrite Rules Added by CyberPanel Rewrite Rule Generator
 
 RewriteEngine On
+RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1|10\.0\.2\.2)(:[0-9]+)?$ [NC]
 RewriteCond %{HTTPS}  !=on
-RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R,L]
 
 ### End CyberPanel Generated Rules.
 

@@ -2,25 +2,102 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 <style>
-    .profile-action-row {
-        flex-wrap: nowrap;
+    .profile-action-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 56px);
         gap: 8px;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        scrollbar-width: thin;
+        width: max-content;
+        max-width: 100%;
+        margin: 12px 0 0;
     }
 
-    .profile-action-row > [class*="col"] {
+    .profile-action-btn {
+        position: relative;
+        width: 56px;
+        min-height: 58px;
+        margin: 0 !important;
+        padding: 7px 5px 6px;
+        border: 1px solid rgba(11, 175, 154, 0.22);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 8px 18px rgba(11, 175, 154, 0.12);
+        color: #0baf9a !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        overflow: hidden;
+        text-decoration: none !important;
+        transition: transform 180ms ease, box-shadow 180ms ease, color 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .profile-action-btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(11, 175, 154, 0.12), rgba(31, 111, 190, 0.06));
+        pointer-events: none;
+    }
+
+    .profile-action-btn:hover,
+    .profile-action-btn:focus {
+        color: #ffffff !important;
+        border-color: rgba(11, 175, 154, 0.62);
+        background: linear-gradient(135deg, #0baf9a, #1f6fbe);
+        transform: translateY(-2px);
+        box-shadow: 0 14px 24px rgba(11, 175, 154, 0.2);
+    }
+
+    .profile-action-icon {
+        position: relative;
+        z-index: 1;
+        width: 22px;
+        height: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         flex: 0 0 auto;
     }
 
-    .profile-action-row .btn {
-        min-width: 122px;
+    .profile-action-icon svg,
+    .profile-action-icon i {
+        width: 19px;
+        height: 19px;
+        font-size: 19px;
+        color: currentColor;
+    }
+
+    .profile-action-text {
+        position: relative;
+        z-index: 1;
+        max-width: 100%;
+        color: currentColor;
+        display: block;
+        font-size: 9.5px;
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: 0;
+        text-align: center;
         white-space: nowrap;
     }
 
-    .profile-action-row .btn-guide-book {
-        min-width: 178px;
+    @media (max-width: 360px) {
+        .profile-action-grid {
+            grid-template-columns: repeat(5, 50px);
+            gap: 6px;
+        }
+
+        .profile-action-btn {
+            width: 50px;
+            min-height: 56px;
+            padding-left: 3px;
+            padding-right: 3px;
+        }
+
+        .profile-action-text {
+            font-size: 9px;
+        }
     }
 </style>
 <!-- Main Start -->
@@ -33,32 +110,27 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
             <div class="media-body">
                 <h2 class="title-color"><?php echo get_user_name(); ?></h2>
-                <div class="row profile-action-row">
-                    <div class="col-auto">
-                        <span class="content-color font-md">
-                            <a href="<?= base_url('cus_edit_customer/2') ?>" class="btn btn-md btn-warning mt-2 mb-2 w-100">Reset Data Alamat</a>
-                        </span>
-                    </div>
-                    <div class="col-auto">
-                        <span class="content-color font-md">
-                            <a href="<?= base_url('edit_profile_cust/' . get_user_name_id()) ?>" class="btn btn-md btn-warning mt-2 mb-2 w-100">Edit Profile</a>
-                        </span>
-                    </div>
-                    <div class="col-auto">
-                        <span class="content-color font-md">
-                            <a href="<?= base_url('profile/tutorial') ?>" class="btn btn-md btn-info mt-2 mb-2 w-100">Tutorial</a>
-                        </span>
-                    </div>
-                    <div class="col-auto">
-                        <span class="content-color font-md">
-                            <a href="<?= base_url('profile/guide-book-customer') ?>" class="btn btn-md btn-primary mt-2 mb-2 w-100 btn-guide-book">Guide Book Customer</a>
-                        </span>
-                    </div>
-                    <div class="col-auto">
-                        <span class="content-color font-md">
-                            <a href="<?= base_url('change_password') ?>" class="btn btn-md btn-warning mt-2 mb-2 w-100">Ganti Password</a>
-                        </span>
-                    </div>
+                <div class="profile-action-grid">
+                    <a href="<?= base_url('cus_edit_customer/2') ?>" class="profile-action-btn" aria-label="Reset Data Alamat" title="Reset Data Alamat">
+                        <span class="profile-action-icon"><i data-feather="map-pin"></i></span>
+                        <span class="profile-action-text">Alamat</span>
+                    </a>
+                    <a href="<?= base_url('edit_profile_cust/' . get_user_name_id()) ?>" class="profile-action-btn" aria-label="Edit Profile" title="Edit Profile">
+                        <span class="profile-action-icon"><i data-feather="edit-3"></i></span>
+                        <span class="profile-action-text">Profil</span>
+                    </a>
+                    <a href="<?= base_url('profile/tutorial') ?>" class="profile-action-btn" aria-label="Tutorial" title="Tutorial">
+                        <span class="profile-action-icon"><i data-feather="play-circle"></i></span>
+                        <span class="profile-action-text">Tutorial</span>
+                    </a>
+                    <a href="<?= base_url('profile/guide-book-customer') ?>" class="profile-action-btn" aria-label="Guide Book Customer" title="Guide Book Customer">
+                        <span class="profile-action-icon"><i data-feather="book-open"></i></span>
+                        <span class="profile-action-text">Panduan</span>
+                    </a>
+                    <a href="<?= base_url('change_password') ?>" class="profile-action-btn" aria-label="Ganti Password" title="Ganti Password">
+                        <span class="profile-action-icon"><i data-feather="lock"></i></span>
+                        <span class="profile-action-text">Password</span>
+                    </a>
                 </div>
             </div>
 

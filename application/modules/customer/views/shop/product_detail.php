@@ -14,7 +14,80 @@ if (!function_exists('format_customer_price_text')) {
     return 'Rp ' . $formatted_price;
   }
 }
+
+$stock_question_message = 'Halo Admin ! Info stock untuk ' . $product->name;
+$stock_question_chat_url = site_url('message') . '?prefill_message=' . rawurlencode($stock_question_message);
+
+if (!is_login()) {
+  $stock_question_chat_url = site_url('login') . '?redir_to=' . rawurlencode(base64_encode($stock_question_chat_url));
+}
 ?>
+
+<style>
+  .product-page .product-section .product-purchase-panel {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .product-option-row,
+  .product-action-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .product-option-row .qty-pd,
+  .product-option-row .satuan {
+    flex: 1 1 0;
+    max-width: none;
+  }
+
+  .product-action-row .product-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 7px;
+    border-radius: 12px;
+    padding: 12px 10px !important;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    box-shadow: 0 8px 18px rgba(34, 34, 34, 0.12);
+  }
+
+  .product-action-row .product-action-btn svg {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+  }
+
+  .product-action-row .product-chat-btn {
+    color: #2f2500;
+    background: #ffd666;
+    border-color: #ffd666;
+  }
+
+  .product-action-row .product-chat-btn:hover,
+  .product-action-row .product-chat-btn:focus {
+    color: #211900;
+    background: #ffc933;
+    border-color: #ffc933;
+  }
+
+  @media (max-width: 360px) {
+    .product-action-row .product-action-btn {
+      gap: 5px;
+      padding-right: 8px !important;
+      padding-left: 8px !important;
+      font-size: 13px;
+    }
+  }
+</style>
 
 <!-- Main Start -->
 <main class="main-wrap product-page mb-xxl">
@@ -49,27 +122,41 @@ if (!function_exists('format_customer_price_text')) {
 
     </div>
     <?php if (!is_login()) : ?>
+      <div class="select-group product-purchase-panel">
+        <div class="product-action-row">
+          <a class="btn btn-warning btn-lg product-action-btn product-chat-btn" href="<?php echo html_escape($stock_question_chat_url); ?>">
+            <i data-feather="message-circle"></i>
+            <span>Chat Dengan Admin</span>
+          </a>
+        </div>
     <?php else : ?>
-      <div class="select-group row">
-        <input class="form-control qty-pd col-6" id="qty" type="number" value="1" />
-        <div class="input-box satuan col-6">
-          <div class="select-box">
-            <select class="form-control satuan-pd" id="satuan">
-              <option value="1"><?php echo $product->product_unit_1; ?></option>
-              <?php if ($product->product_unit_2 && $product->product_unit_value != 0) : ?>
-                <option value="2"><?php echo $product->product_unit_2; ?></option>
-              <?php endif; ?>
-            </select>
-            <span><i data-feather="chevron-right"></i></span>
+      <div class="select-group product-purchase-panel">
+        <div class="product-option-row">
+          <input class="form-control qty-pd" id="qty" type="number" value="1" />
+          <div class="input-box satuan">
+            <div class="select-box">
+              <select class="form-control satuan-pd" id="satuan">
+                <option value="1"><?php echo $product->product_unit_1; ?></option>
+                <?php if ($product->product_unit_2 && $product->product_unit_value != 0) : ?>
+                  <option value="2"><?php echo $product->product_unit_2; ?></option>
+                <?php endif; ?>
+              </select>
+              <span><i data-feather="chevron-right"></i></span>
+            </div>
           </div>
         </div>
-        <?php if (!is_login()) : ?>
-          <!--<a class="btn btn-success btn-lg add-to-chart add-cart atc-pd col-12" href="<?= base_url('login') ?>">Beli</a>-->
-        <?php else : ?>
-          <a class="btn btn-success btn-lg add-to-chart add-cart atc-pd col-12" id="atc" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->promo == 1) ?
-                                                                                                                                                                                                  get_v_price($product->promo_price, $product->promo_price_2, $product->promo_price_3) :
-                                                                                                                                                                                                  get_v_price($product->price, $product->price_2, $product->price_3); ?>" data-id="<?php echo $product->id; ?>" data-satuan-qty="<?php echo $product->product_unit_value; ?>" data-product-type="<?php echo $product->product_type; ?>" data-satuan="1" data-satuan-text="<?php echo $product->product_unit_1; ?>" data-qty="1" data-product-weight="<?php echo $product->product_unit_weight ?>">Beli</a>
-        <?php endif; ?>
+        <div class="product-action-row">
+          <a class="btn btn-success btn-lg add-to-chart add-cart product-action-btn" id="atc" href="#" data-sku="<?php echo $product->sku; ?>" data-name="<?php echo $product->name; ?>" data-price="<?php echo ($product->promo == 1) ?
+                                                                                                                                                                                                   get_v_price($product->promo_price, $product->promo_price_2, $product->promo_price_3) :
+                                                                                                                                                                                                   get_v_price($product->price, $product->price_2, $product->price_3); ?>" data-id="<?php echo $product->id; ?>" data-satuan-qty="<?php echo $product->product_unit_value; ?>" data-product-type="<?php echo $product->product_type; ?>" data-satuan="1" data-satuan-text="<?php echo $product->product_unit_1; ?>" data-qty="1" data-product-weight="<?php echo $product->product_unit_weight ?>">
+            <i data-feather="shopping-cart"></i>
+            <span>Beli</span>
+          </a>
+          <a class="btn btn-warning btn-lg product-action-btn product-chat-btn" href="<?php echo html_escape($stock_question_chat_url); ?>">
+            <i data-feather="message-circle"></i>
+            <span>Chat Dengan Admin</span>
+          </a>
+        </div>
       <?php endif; ?>
 
       </div>

@@ -81,8 +81,20 @@ window.customerChatLastMessageId = <?= (int) $last_message_id ?>;
 
 document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('auto_text')) {
-        document.getElementById('pesan').value = "Halo Admin! , Mohon informasi terkait ekspedisi dan biaya ongkir dong.";
+    const textarea = document.getElementById('pesan');
+
+    if (!textarea) {
+        return;
+    }
+
+    if (urlParams.has('prefill_message')) {
+        textarea.value = urlParams.get('prefill_message') || '';
+    } else if (urlParams.has('auto_text')) {
+        textarea.value = "Halo Admin! , Mohon informasi terkait ekspedisi dan biaya ongkir dong.";
+    }
+
+    if (textarea.value !== '') {
+        textarea.focus();
     }
 });
 
