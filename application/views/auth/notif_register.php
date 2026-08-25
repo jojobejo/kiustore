@@ -65,7 +65,7 @@
       <section class="error mb-large">
         <h2 class="font-lg">Pendaftaran berhasil !</h2>
         <p class="content-color font-md">Anda dapat memulai belanja di toko kami, Terima kasih...</p>
-        <a href="<?= site_url(); ?>" class="btn-solid">Kembali ke Halaman Login</a>
+        <a href="<?= site_url('login'); ?>" class="btn-solid">Kembali ke Halaman Login</a>
       </section>
       <!-- Error Section End -->
     </div>
@@ -94,7 +94,7 @@
     <section class="error mb-large">
       <h2 class="font-lg">Pendaftaran berhasil !</h2>
       <p class="content-color font-md">Anda dapat memulai belanja di toko kami, Terima kasih...</p>
-      <a href="<?= site_url() ?>" class="btn-solid">Kembali ke Halaman Login</a>
+      <a href="<?= site_url('login') ?>" class="btn-solid">Kembali ke Halaman Login</a>
     </section>
     <!-- Error Section End -->
   </main>

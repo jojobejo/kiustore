@@ -173,6 +173,15 @@ class Product_model extends CI_Model {
         return $this->db->where('id', $id)->delete('coupons');
     }
 
+    public function delete_coupons(Array $ids)
+    {
+        if (empty($ids)) {
+            return false;
+        }
+
+        return $this->db->where_in('id', $ids)->delete('coupons');
+    }
+
     public function get_all_promo()
     {
         $data = $this->db->query("
@@ -205,6 +214,11 @@ class Product_model extends CI_Model {
     public function delete_promo($id)
     {
         return $this->db->where('id', $id)->delete('promo');
+    }
+
+    public function delete_promos(Array $ids)
+    {
+        return $this->db->where_in('id', $ids)->delete('promo');
     }
 
     public function latest()

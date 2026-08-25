@@ -1,0 +1,132 @@
+.kiu-splash-active {
+  overflow: hidden;
+}
+
+.kiu-splash {
+  --kiu-splash-duration: 5s;
+  align-items: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 58%, #eef7f3 100%);
+  color: #1f2937;
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  min-height: 100vh;
+  opacity: 1;
+  overflow: hidden;
+  padding: 24px;
+  position: fixed;
+  transition: opacity 520ms ease, visibility 520ms ease;
+  visibility: visible;
+  z-index: 99999;
+}
+
+.kiu-splash.is-hiding {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.kiu-splash__panel {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 95, 219, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 22px 60px rgba(30, 64, 175, 0.12);
+  display: flex;
+  justify-content: center;
+  min-height: 340px;
+  padding: 36px 28px;
+  width: min(520px, 100%);
+}
+
+.kiu-splash__content {
+  text-align: center;
+  width: min(420px, 100%);
+}
+
+.kiu-splash__logo-wrap {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  margin-bottom: 26px;
+  max-width: 360px;
+  width: 82%;
+}
+
+.kiu-splash__logo {
+  display: block;
+  height: auto;
+  max-height: 132px;
+  object-fit: contain;
+  width: 100%;
+}
+
+.kiu-splash__status {
+  align-items: center;
+  color: #334155;
+  display: inline-flex;
+  font-size: 15px;
+  font-weight: 700;
+  gap: 10px;
+  letter-spacing: 0;
+  margin-bottom: 18px;
+}
+
+.kiu-splash__status::before {
+  background: #0baf9a;
+  border-radius: 50%;
+  content: "";
+  height: 9px;
+  width: 9px;
+}
+
+.kiu-splash__progress {
+  background: #e6edf7;
+  border-radius: 999px;
+  height: 6px;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  width: min(340px, 78vw);
+}
+
+.kiu-splash__progress::before {
+  animation: kiuSplashProgress var(--kiu-splash-duration) linear forwards;
+  background: linear-gradient(90deg, #0c5fdb 0%, #0baf9a 100%);
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  position: absolute;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+@keyframes kiuSplashProgress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .kiu-splash {
+    padding: 18px;
+  }
+
+  .kiu-splash__panel {
+    border-radius: 18px;
+    min-height: 300px;
+    padding: 30px 20px;
+  }
+
+  .kiu-splash__logo-wrap {
+    margin-bottom: 22px;
+    width: 88%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kiu-splash,
+  .kiu-splash__progress::before {
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+  }
+}

@@ -60,6 +60,7 @@ $route['api/v1/status']                     = 'api/mobile/index';
 $route['api/v1/auth/register']              = 'api/mobile/register';
 $route['api/v1/auth/login']                 = 'api/mobile/login';
 $route['api/v1/auth/logout']                = 'api/mobile/logout';
+$route['api/v1/onboarding/complete']        = 'api/mobile/onboarding_complete';
 $route['api/v1/account']                    = 'api/mobile/account';
 $route['api/v1/profile']                    = 'api/mobile/profile';
 $route['api/v1/banners']                    = 'api/mobile/banners';

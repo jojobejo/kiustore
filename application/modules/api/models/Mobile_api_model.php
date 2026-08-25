@@ -60,6 +60,15 @@ class Mobile_api_model extends CI_Model
 
         $this->db->insert('customers', $customer);
 
+        if ($this->db->table_exists('mobile_onboarding_flags')) {
+            $this->db->insert('mobile_onboarding_flags', array(
+                'user_id' => $user_id,
+                'is_new_user' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ));
+        }
+
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
             return FALSE;
@@ -95,6 +104,69 @@ class Mobile_api_model extends CI_Model
             'plain_token' => $plain,
             'expires_at' => $expires_at
         );
+    }
+
+    public function onboarding_state($user_id, $default_is_new_user = FALSE)
+    {
+        $state = array(
+            'is_new_user' => (bool) $default_is_new_user,
+            'show_tutorial' => (bool) $default_is_new_user,
+            'show_completion_splash' => (bool) $default_is_new_user,
+            'completion_splash_duration_seconds' => 5,
+            'redirect_after_tutorial_url' => site_url('home'),
+            'home_route' => 'home'
+        );
+
+        if (!$this->db->table_exists('mobile_onboarding_flags')) {
+            return $state;
+        }
+
+        $row = $this->db
+            ->where('user_id', (int) $user_id)
+            ->get('mobile_onboarding_flags')
+            ->row();
+
+        if (!$row) {
+            return $state;
+        }
+
+        $is_new_user = ((int) $row->is_new_user === 1 && empty($row->tutorial_completed_at));
+
+        $state['is_new_user'] = $is_new_user;
+        $state['show_tutorial'] = $is_new_user;
+        $state['show_completion_splash'] = $is_new_user;
+
+        return $state;
+    }
+
+    public function complete_onboarding($user_id)
+    {
+        if (!$this->db->table_exists('mobile_onboarding_flags')) {
+            return TRUE;
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $data = array(
+            'is_new_user' => 0,
+            'tutorial_completed_at' => $now,
+            'completion_splash_shown_at' => $now,
+            'updated_at' => $now
+        );
+
+        $exists = $this->db
+            ->where('user_id', (int) $user_id)
+            ->count_all_results('mobile_onboarding_flags') > 0;
+
+        if ($exists) {
+            return $this->db
+                ->where('user_id', (int) $user_id)
+                ->update('mobile_onboarding_flags', $data);
+        }
+
+        $data['user_id'] = (int) $user_id;
+        $data['created_at'] = $now;
+
+        return $this->db->insert('mobile_onboarding_flags', $data);
     }
 
     public function user_from_token($plain_token, $touch = TRUE)

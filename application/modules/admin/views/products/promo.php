@@ -32,7 +32,18 @@ defined('BASEPATH') or exit('No direct script access allowed');
       <div class="card">
         <!-- Card header -->
         <div class="card-header border-0">
-          <h3 class="mb-0">Kategori Promo</h3>
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Kategori Promo</h3>
+            </div>
+            <?php if (admin_role() == 'admin' || admin_role() == 'adminonline') : ?>
+              <div class="col text-right">
+                <button type="button" class="btn btn-danger btn-sm bulkDeleteBtn" disabled>
+                  <i class="fa fa-trash"></i> Hapus Terpilih
+                </button>
+              </div>
+            <?php endif; ?>
+          </div>
         </div>
 
         <div class="packageContainer">
@@ -41,6 +52,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <table class="table align-items-center table-flush" id="promoList" style="width: 100%">
               <thead class="thead-light">
                 <tr>
+                  <th scope="col" class="text-center">
+                    <?php if (admin_role() == 'admin' || admin_role() == 'adminonline') : ?>
+                      <input type="checkbox" id="checkAllPromo">
+                    <?php endif; ?>
+                  </th>
                   <th scope="col">#</th>
                   <th scope="col">Nama Produk</th>
                   <th schope="col">Potongan Harga</th>
@@ -71,12 +87,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
               <form role="form" action="#" method="POST" id="addPromoForm">
 
                 <div class="form-group">
-                  <label class="form-control-label" for="product_id">Nama Produk:</label>
-                  <select name="product_id" class="form-control" id="product_id">
-                    <option>Pilih Produk</option>
+                  <label class="form-control-label" for="add_product_id">Nama Produk:</label>
+                  <select name="product_id" class="form-control promo-product-select" id="add_product_id" required>
+                    <option value="">Pilih Produk</option>
                     <?php if (count($products) > 0) : ?>
                       <?php foreach ($products as $product) : ?>
-                        <option value="<?php echo $product->id; ?>"> <?php echo $product->name; ?></option>
+                        <option value="<?php echo $product->id; ?>"><?php echo $product->name; ?></option>
                       <?php endforeach; ?>
                     <?php endif; ?>
                   </select>
@@ -138,9 +154,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <form action="#" id="deletePromo" method="POST">
 
           <input type="hidden" name="id" value="" class="deleteID">
+          <input type="hidden" name="ids" value="" class="deleteIDs">
 
           <div class="modal-body">
-            <p>Yakin ingin menghapus? Tindakan ini tidak dapat dibatalkan.</p>
+            <p class="deleteMessage">Yakin ingin menghapus? Tindakan ini tidak dapat dibatalkan.</p>
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-danger btn-delete">Hapus</button>
@@ -166,12 +183,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 
                 <div class="form-group">
-                  <label class="form-control-label" for="product_id">Nama Produk:</label>
-                  <select name="product_id" class="form-control edit-product-id" id="product_id">
-                    <option>Pilih Produk</option>
+                  <label class="form-control-label" for="edit_product_id">Nama Produk:</label>
+                  <select name="product_id" class="form-control promo-product-select edit-product-id" id="edit_product_id" required>
+                    <option value="">Pilih Produk</option>
                     <?php if (count($products) > 0) : ?>
                       <?php foreach ($products as $product) : ?>
-                        <option value="<?php echo $product->id; ?>" <?php echo set_select('product_id', $product->id); ?>>› <?php echo $product->name; ?></option>
+                        <option value="<?php echo $product->id; ?>" <?php echo set_select('product_id', $product->id); ?>><?php echo $product->name; ?></option>
                       <?php endforeach; ?>
                     <?php endif; ?>
                   </select>
@@ -234,12 +251,85 @@ defined('BASEPATH') or exit('No direct script access allowed');
   <script src="<?php echo get_theme_uri('vendor/datatables.net/js/jquery.dataTables.min.js', 'argon'); ?>"></script>
   <script src="<?php echo get_theme_uri('vendor/datatables.net-bs4/js/dataTables.bootstrap4.min.js', 'argon'); ?>"></script>
   <script src="<?php echo base_url('assets/plugins/datatables.lang.js'); ?>"></script>
+  <style>
+    .select2-container {
+      width: 100% !important;
+    }
+
+    .select2-container .select2-selection--single {
+      height: calc(2.75rem + 2px);
+      border: 1px solid #cad1d7;
+      border-radius: .375rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: calc(2.75rem + 2px);
+      padding-left: .75rem;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: calc(2.75rem + 2px);
+    }
+  </style>
   <script>
     $(document).ready(function() {
+      $('#add_product_id').select2({
+        placeholder: 'Cari nama produk',
+        allowClear: true,
+        width: '100%',
+        dropdownParent: $('#addModal')
+      });
+
+      $('#edit_product_id').select2({
+        placeholder: 'Cari nama produk',
+        allowClear: true,
+        width: '100%',
+        dropdownParent: $('#editModal')
+      });
+
       $(document).on('click', '.btnDelete', function() {
         var id = $(this).data('id');
 
         $('.deleteID').val(id);
+        $('.deleteIDs').val('');
+        $('.deleteMessage').text('Yakin ingin menghapus promo ini? Tindakan ini tidak dapat dibatalkan.');
+        $('#deleteModal').modal('show');
+      });
+
+      function getSelectedPromoIds() {
+        return $('.promo-check:checked').map(function() {
+          return $(this).val();
+        }).get();
+      }
+
+      function updateBulkDeleteButton() {
+        var selectedCount = getSelectedPromoIds().length;
+        $('.bulkDeleteBtn').prop('disabled', selectedCount === 0);
+      }
+
+      $(document).on('change', '.promo-check', function() {
+        var total = $('.promo-check').length;
+        var selectedCount = getSelectedPromoIds().length;
+
+        $('#checkAllPromo').prop('checked', total > 0 && total === selectedCount);
+        updateBulkDeleteButton();
+      });
+
+      $(document).on('change', '#checkAllPromo', function() {
+        $('.promo-check').prop('checked', $(this).prop('checked'));
+        updateBulkDeleteButton();
+      });
+
+      $(document).on('click', '.bulkDeleteBtn', function() {
+        var ids = getSelectedPromoIds();
+
+        if (ids.length === 0) {
+          return;
+        }
+
+        $('.deleteID').val('');
+        $('.deleteIDs').val(ids.join(','));
+        $('.deleteMessage').text('Yakin ingin menghapus ' + ids.length + ' promo terpilih? Tindakan ini tidak dapat dibatalkan.');
         $('#deleteModal').modal('show');
       });
 
@@ -257,14 +347,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
               var d = res.data;
 
               $('.edit-id').val(d.id);
-              $('.edit-product-id').val(d.product_id);
+              $('.edit-product-id').val(d.product_id).trigger('change');
               $('.edit-credit').val(d.credit);
               $('.edit-start').val(d.start_date);
               $('.edit-expired').val(d.expired_date);
 
-              if (d.is_active == 1) {
-                $('#av').attr('checked', true);
-              }
+              $('#av').prop('checked', d.is_active == 1);
 
               $('#editModal').modal('show');
             }
@@ -298,19 +386,21 @@ defined('BASEPATH') or exit('No direct script access allowed');
         })
       });
 
-      $('#deletepromo').submit(function(e) {
+      $('#deletePromo').submit(function(e) {
         e.preventDefault();
 
         var id = $('.deleteID').val();
+        var ids = $('.deleteIDs').val();
         var btn = $('.btn-delete');
 
-        btn.html('<i class="fa fa-spin fa-spinner"></i> Menghapus...');
+        btn.html('<i class="fa fa-spin fa-spinner"></i> Menghapus...').attr('disabled', true);
 
         $.ajax({
           method: 'POST',
           url: '<?php echo site_url('admin/products/promo_api?action=delete_promo'); ?>',
           data: {
-            id: id
+            id: id,
+            ids: ids
           },
           success: function(res) {
             if (res.code == 204) {
@@ -319,9 +409,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
               setTimeout(() => {
                 $('#deleteModal').modal('hide');
                 table.ajax.reload();
-                btn.html('Hapus');
+                $('#checkAllPromo').prop('checked', false);
+                updateBulkDeleteButton();
+                btn.html('Hapus').removeAttr('disabled');
               }, 1500);
             }
+          },
+          error: function() {
+            btn.html('Hapus').removeAttr('disabled');
           }
         })
       });
@@ -329,6 +424,19 @@ defined('BASEPATH') or exit('No direct script access allowed');
       var table = $('#promoList').DataTable({
         "ajax": "<?php echo site_url('admin/products/promo_api?action=promo_list'); ?>",
         "columns": [{
+            "data": "id",
+            "orderable": false,
+            "searchable": false,
+            "className": "text-center",
+            render: function(data) {
+              if (role == 'admin' || role == 'adminonline') {
+                return '<input type="checkbox" class="promo-check" value="' + data + '">';
+              }
+
+              return '';
+            }
+          },
+          {
             "data": "id",
             "orderable": false,
             "className": "text-center",
@@ -374,6 +482,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
             "next": "&rsaquo;",
             "previous": "&lsaquo;"
           },
+        },
+        "drawCallback": function() {
+          $('#checkAllPromo').prop('checked', false);
+          updateBulkDeleteButton();
         }
       });
 
@@ -397,7 +509,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
               btn.html('<i class="fa fa-check"></i> Berhasil!');
 
               setTimeout(function() {
-                $('#addPromoForm .form-control').val(null);
+                $('#addPromoForm')[0].reset();
+                $('#add_product_id').val(null).trigger('change');
                 btn.html('Tambah');
               }, 2000);
               setTimeout(() => {

@@ -523,6 +523,129 @@ if (!function_exists('format_customer_price_text')) {
       font-size: 14px;
     }
 
+    .kiu-onboarding-splash[hidden] {
+      display: none;
+    }
+
+    .kiu-onboarding-splash {
+      align-items: center;
+      background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 60%, #eef8f4 100%);
+      display: flex;
+      inset: 0;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      padding: 28px;
+      position: fixed;
+      text-align: center;
+      z-index: 10010;
+    }
+
+    .kiu-onboarding-splash::before {
+      display: none;
+    }
+
+    .kiu-onboarding-splash::after {
+      display: none;
+    }
+
+    .kiu-splash-content {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      max-width: 420px;
+      position: relative;
+      width: 100%;
+      z-index: 1;
+    }
+
+    .kiu-splash-logo-card {
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid rgba(12, 95, 219, 0.08);
+      border-radius: 22px;
+      box-shadow: 0 22px 58px rgba(30, 64, 175, 0.12);
+      display: flex;
+      height: 150px;
+      justify-content: center;
+      margin-bottom: 34px;
+      padding: 28px;
+      width: min(100%, 360px);
+    }
+
+    .kiu-splash-logo-card img {
+      display: block;
+      max-height: 88px;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .kiu-splash-icon {
+      display: none;
+    }
+
+    .kiu-splash-icon.icon-bag {
+      left: 4%;
+      top: 104px;
+    }
+
+    .kiu-splash-icon.icon-leaf {
+      color: #0b8f70;
+      right: 3%;
+      top: 78px;
+    }
+
+    .kiu-splash-icon.icon-cart {
+      bottom: 164px;
+      left: 8%;
+    }
+
+    .kiu-splash-icon.icon-spark {
+      bottom: 186px;
+      color: #f59e0b;
+      right: 8%;
+    }
+
+    .kiu-splash-title {
+      color: #0f3f8f;
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1.18;
+      margin: 0 0 24px;
+    }
+
+    .kiu-splash-desc {
+      color: #64748b;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.42;
+      margin: 0 auto 34px;
+      max-width: 440px;
+    }
+
+    .kiu-splash-redirect {
+      align-items: center;
+      background: #0c5fdb;
+      border: 0;
+      border-radius: 999px;
+      box-shadow: 0 14px 30px rgba(12, 95, 219, 0.18);
+      color: #ffffff;
+      display: inline-flex;
+      font-size: 17px;
+      font-weight: 900;
+      gap: 12px;
+      justify-content: center;
+      padding: 13px 24px;
+      text-decoration: none;
+    }
+
+    .kiu-splash-redirect:hover,
+    .kiu-splash-redirect:focus {
+      color: #ffffff;
+      text-decoration: none;
+    }
+
     @keyframes kiuTourFadeIn {
       to {
         opacity: 1;
@@ -533,6 +656,24 @@ if (!function_exists('format_customer_price_text')) {
       to {
         opacity: 1;
         transform: translate(-50%, 0);
+      }
+    }
+
+    @keyframes kiuSplashFloat {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes kiuSplashPop {
+      to {
+        opacity: 1;
+        transform: scale(1);
       }
     }
 
@@ -561,6 +702,29 @@ if (!function_exists('format_customer_price_text')) {
       .kiu-tour-desc {
         font-size: 15px;
       }
+
+      .kiu-onboarding-splash {
+        padding: 22px;
+      }
+
+      .kiu-splash-logo-card {
+        height: 128px;
+        margin-bottom: 28px;
+        width: min(100%, 310px);
+      }
+
+      .kiu-splash-title {
+        font-size: 32px;
+      }
+
+      .kiu-splash-desc {
+        font-size: 16px;
+      }
+
+      .kiu-splash-redirect {
+        font-size: 15px;
+        padding: 12px 20px;
+      }
     }
   </style>
 
@@ -575,6 +739,23 @@ if (!function_exists('format_customer_price_text')) {
     <div class="kiu-tour-actions">
       <button class="kiu-tour-skip" type="button" id="kiuTourSkip">Skip</button>
       <button class="kiu-tour-next" type="button" id="kiuTourNext">Lanjut <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+  <div class="kiu-onboarding-splash" id="kiuOnboardingSplash" aria-live="polite" hidden>
+    <div class="kiu-splash-content">
+      <span class="kiu-splash-icon icon-bag"><i class="fas fa-shopping-bag"></i></span>
+      <span class="kiu-splash-icon icon-leaf"><i class="fas fa-leaf"></i></span>
+      <span class="kiu-splash-icon icon-cart"><i class="fas fa-shopping-cart"></i></span>
+      <span class="kiu-splash-icon icon-spark"><i class="fas fa-magic"></i></span>
+      <div class="kiu-splash-logo-card">
+        <img src="<?= get_theme_uri('images/logo/logo.png') ?>" alt="Karisma Online Shop">
+      </div>
+      <h2 class="kiu-splash-title">Selamat<br>Berbelanja</h2>
+      <p class="kiu-splash-desc">Tutorial selesai. Temukan produk terbaik Karisma dan mulai belanja dari dashboard.</p>
+      <a class="kiu-splash-redirect" id="kiuSplashRedirect" href="<?= site_url('home') ?>">
+        <i class="fas fa-home"></i>
+        <span>Mengarahkan ke dashboard</span>
+      </a>
     </div>
   </div>
 
@@ -666,6 +847,10 @@ if (!function_exists('format_customer_price_text')) {
       var count = document.getElementById('kiuTourCount');
       var next = document.getElementById('kiuTourNext');
       var skip = document.getElementById('kiuTourSkip');
+      var splash = document.getElementById('kiuOnboardingSplash');
+      var splashRedirect = document.getElementById('kiuSplashRedirect');
+      var dashboardUrl = '<?= site_url('home') ?>';
+      var splashTimer = null;
 
       function getVisibleElement(selector) {
         var nodes = document.querySelectorAll(selector);
@@ -748,6 +933,31 @@ if (!function_exists('format_customer_price_text')) {
         }
       }
 
+      function redirectToDashboard() {
+        window.location.replace(dashboardUrl);
+      }
+
+      function showCompletionSplash() {
+        document.body.classList.remove('kiu-tour-running');
+        document.removeEventListener('click', lockTutorialClicks, true);
+
+        [overlay, spotlight, card].forEach(function(element) {
+          if (element) {
+            element.remove();
+          }
+        });
+
+        if (splash) {
+          splash.hidden = false;
+        }
+
+        if (window.history.replaceState) {
+          window.history.replaceState(null, '', dashboardUrl);
+        }
+
+        splashTimer = window.setTimeout(redirectToDashboard, 5000);
+      }
+
       function lockTutorialClicks(event) {
         if (!card || card.contains(event.target)) {
           return;
@@ -762,8 +972,7 @@ if (!function_exists('format_customer_price_text')) {
 
       next.addEventListener('click', function() {
         if (current >= steps.length - 1) {
-          closeTour();
-          document.removeEventListener('click', lockTutorialClicks, true);
+          showCompletionSplash();
           return;
         }
 
@@ -778,6 +987,16 @@ if (!function_exists('format_customer_price_text')) {
       window.addEventListener('resize', function() {
         showStep(current);
       });
+
+      if (splashRedirect) {
+        splashRedirect.addEventListener('click', function(event) {
+          event.preventDefault();
+          if (splashTimer) {
+            window.clearTimeout(splashTimer);
+          }
+          redirectToDashboard();
+        });
+      }
 
       window.setTimeout(function() {
         showStep(0);

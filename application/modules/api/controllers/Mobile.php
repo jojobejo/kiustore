@@ -84,7 +84,8 @@ class Mobile extends CI_Controller
             'token' => $token['plain_token'],
             'token_type' => 'Bearer',
             'expires_at' => $token['expires_at'],
-            'user' => $this->mobile_api->profile($user_id)
+            'user' => $this->mobile_api->profile($user_id),
+            'onboarding' => $this->mobile_api->onboarding_state($user_id, TRUE)
         ), 201, 'Pendaftaran berhasil.');
     }
 
@@ -113,7 +114,8 @@ class Mobile extends CI_Controller
             'token' => $token['plain_token'],
             'token_type' => 'Bearer',
             'expires_at' => $token['expires_at'],
-            'user' => $this->mobile_api->profile($user->id)
+            'user' => $this->mobile_api->profile($user->id),
+            'onboarding' => $this->mobile_api->onboarding_state($user->id)
         ), 200, 'Login berhasil.');
     }
 
@@ -127,10 +129,34 @@ class Mobile extends CI_Controller
         return $this->respond(null, 200, 'Logout berhasil.');
     }
 
+    public function onboarding_complete()
+    {
+        if (!$this->require_method('POST') || !$this->authenticate()) {
+            return;
+        }
+
+        if (!$this->mobile_api->complete_onboarding($this->user->id)) {
+            return $this->error('Status tutorial gagal disimpan.', 500);
+        }
+
+        return $this->respond(array(
+            'onboarding' => $this->mobile_api->onboarding_state($this->user->id)
+        ), 200, 'Tutorial selesai.');
+    }
+
     public function account()
     {
-        if (!$this->require_method('DELETE') || !$this->authenticate()) {
+        if (!$this->authenticate()) {
             return;
+        }
+
+        $method = strtoupper($this->input->method(TRUE));
+        if ($method === 'GET') {
+            return $this->respond($this->mobile_api->profile($this->user->id));
+        }
+
+        if ($method !== 'DELETE') {
+            return $this->method_not_allowed(array('GET', 'DELETE'));
         }
 
         if (!$this->mobile_api->delete_account($this->user->id)) {

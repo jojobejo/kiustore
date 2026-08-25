@@ -1010,7 +1010,7 @@ class Order_model extends CI_Model
 
     public function order_data($id)
     {
-        $data = $this->db->query("SELECT o.*, c.name, c.code, p.id as payment_id, p.payment_price, p.payment_date, p.picture_name, p.payment_status, p.confirmed_date, p.payment_data , ongs.jsongkir AS ongkir_ekspedisi
+        $data = $this->db->query("SELECT o.*, c.name, c.code, c.credit AS coupon_credit, p.id as payment_id, p.payment_price, p.payment_date, p.picture_name, p.payment_status, p.confirmed_date, p.payment_data , ongs.jsongkir AS ongkir_ekspedisi
         FROM orders o
         LEFT JOIN coupons c
             ON c.id = o.coupon_id

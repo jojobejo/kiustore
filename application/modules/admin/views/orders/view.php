@@ -67,6 +67,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <td><b><?php echo get_formatted_date($data->order_date); ?></b></td>
               </tr>
               <tr>
+                <td>Kode Kupon</td>
+                <td><b><?php echo (!empty($data->coupon_id) && !empty($data->code)) ? $data->code : '-'; ?></b></td>
+              </tr>
+              <tr>
+                <td>Nominal Potongan Kupon</td>
+                <td><b><?php echo (!empty($data->coupon_id) && !empty($data->coupon_credit) && $data->coupon_credit > 0) ? 'Rp. ' . format_rupiah($data->coupon_credit) : 'Rp. 0'; ?></b></td>
+              </tr>
+              <tr>
                 <td>Nama Customer</td>
                 <td><b><?php echo $delivery_data->customer->name; ?></b></td>
               </tr>
