@@ -1,6 +1,34 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
+$render_order_badges = function ($order) {
+  $badges = [];
+
+  $badges[] = get_order_status($order->order_status, $order->payment_method);
+
+  if ($order->payment_method == 2 && $order->payment_status == 3) {
+    $badges[] = get_payment_status($order->payment_status);
+  }
+
+  $discount_amount = isset($order->discount_amount) ? (float) $order->discount_amount : 0;
+
+  if (!empty($order->has_coupon_discount)) {
+    $coupon_label = !empty($order->coupon) ? html_escape($order->coupon) : 'Promo';
+    $badges[] = '<span class="badge bg-success">Menggunakan Kupon/Promo: ' . $coupon_label . '</span>';
+    $badges[] = '<span class="badge bg-info">Diskon Rp ' . format_rupiah($discount_amount) . '</span>';
+  } else {
+    $badges[] = '<span class="badge bg-secondary">Tanpa Kupon/Promo</span>';
+  }
+
+  return '<div class="order-status-badges mt-1">' . implode(' ', $badges) . '</div>';
+};
 ?>
+<style>
+  .order-history .order-box {
+    cursor: pointer;
+  }
+
+</style>
 <!-- Main Start -->
 <main class="main-wrap order-history mb-xxl">
   <ul class="nav nav-tab nav-pills custom-scroll-hidden" id="pills-tab" role="tablist">
@@ -57,33 +85,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
                 <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
+                <?= $render_order_badges($order); ?>
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />
                     </div> -->
-            </div>
-            <div class="bottom-content">
-              <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
-              <span class="content-color font-xs">
-                <?php if ($order->payment_method == 2) : ?>
-                  <?php if ($order->payment_status == 3) : ?>
-                    <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                    <?php echo get_payment_status($order->payment_status); ?>
-                  <?php else : ?>
-                    <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                  <?php endif; ?>
-                <?php else : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php endif; ?>
-              </span>
-              <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
-              <div class="rating">
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-              </div>
             </div>
           </div>
         <?php endif; ?>
@@ -100,28 +106,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
                 <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
+                <?= $render_order_badges($order); ?>
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />
                     </div> -->
-            </div>
-            <div class="bottom-content">
-              <a href="<?= base_url('order_view/') . $order->id; ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
-              <span class="content-color font-xs">
-                <?php if ($order->payment_method == 2) : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php else : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php endif; ?>
-              </span>
-              <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
-              <div class="rating">
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-              </div>
             </div>
           </div>
         <?php endif; ?>
@@ -141,29 +130,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
                 <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
+                <?= $render_order_badges($order); ?>
 
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />
                     </div> -->
-            </div>
-            <div class="bottom-content">
-              <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
-              <span class="content-color font-xs">
-                <?php if ($order->payment_method == 2) : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php else : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php endif; ?>
-              </span>
-              <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
-              <div class="rating">
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-              </div>
             </div>
           </div>
         <?php endif; ?>
@@ -181,29 +153,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
                 <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
+                <?= $render_order_badges($order); ?>
 
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />
                     </div> -->
-            </div>
-            <div class="bottom-content">
-              <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
-              <span class="content-color font-xs">
-                <?php if ($order->payment_method == 2) : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php else : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php endif; ?>
-              </span>
-              <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
-              <div class="rating">
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-              </div>
             </div>
           </div>
         <?php endif; ?>
@@ -212,7 +167,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
     <div class="tab-pane fade" id="catagories5" role="tabpanel" aria-labelledby="catagories5-tab">
       <?php foreach ($orders as $order) : ?>
-        <?php if (($order->payment_method == 2 &&  $order->order_status == 7) || ($order->payment_method == 1 &&  $order->order_status == 7)) : ?>
+        <?php if (($order->payment_method == 2 &&  $order->order_status == 7) || ($order->payment_method == 1 &&  $order->order_status == 7) || ($order->payment_method == 3 &&  $order->order_status == 7)) : ?>
           <div class="order-box">
             <div class="media">
               <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number; ?>" class="content-box">
@@ -220,29 +175,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
                 <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
+                <?= $render_order_badges($order); ?>
 
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />
                     </div> -->
-            </div>
-            <div class="bottom-content">
-              <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
-              <span class="content-color font-xs">
-                <?php if ($order->payment_method == 2) : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php else : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php endif; ?>
-              </span>
-              <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
-              <div class="rating">
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-              </div>
             </div>
           </div>
         <?php endif; ?>
@@ -259,30 +197,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
                 <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
+                <?= $render_order_badges($order); ?>
                 <p class="font-xs content-color">Jatuh Tempo: <?php echo get_formatted_date($order->due_date); ?></p>
 
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />
                     </div> -->
-            </div>
-            <div class="bottom-content">
-              <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
-              <span class="content-color font-xs">
-                <?php if ($order->payment_method == 2) : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php else : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php endif; ?>
-              </span>
-              <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
-              <div class="rating">
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-              </div>
             </div>
           </div>
         <?php endif; ?>
@@ -299,30 +220,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <p class="font-xs content-color"><?php echo get_formatted_date($order->order_date); ?></p>
                 <span class="content-color font-xs">Total: <span class="font-theme"><?php echo format_rupiah($order->final_price); ?></span></span>
                 <span class="content-color font-xs">Jumlah Barang: <span class="font-theme"><?php echo $order->total_items; ?></span></span>
+                <?= $render_order_badges($order); ?>
                 <p class="font-xs content-color">Jatuh Tempo: <?php echo get_formatted_date($order->due_date); ?></p>
 
               </a>
               <!--    <div class="media-body">
                       <img src="<?php echo get_theme_uri('images/map/map.jpg'); ?>" alt="map" />
                     </div> -->
-            </div>
-            <div class="bottom-content">
-              <a href="<?= base_url() . 'customer/orders/view/' . $order->id, '#' . $order->order_number ?>" class="title-color font-sm fw-600"> Lihat Detail </a>
-              <span class="content-color font-xs">
-                <?php if ($order->payment_method == 2) : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php else : ?>
-                  <?php echo get_order_status($order->order_status, $order->payment_method); ?>
-                <?php endif; ?>
-              </span>
-              <!-- <a href="javascript:void(0)" class="give-rating content-color font-sm"> Rate & Review Product</a> -->
-              <div class="rating">
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-                <i data-feather="star"></i>
-              </div>
             </div>
           </div>
         <?php endif; ?>
@@ -443,4 +347,33 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </div>
   </form>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.order-history .order-box').forEach(function(card) {
+      var target = card.querySelector('.content-box');
+
+      if (!target || !target.href) {
+        return;
+      }
+
+      card.setAttribute('role', 'link');
+      card.setAttribute('tabindex', '0');
+
+      card.addEventListener('click', function(event) {
+        if (event.target.closest('button, input, label, select, textarea')) {
+          return;
+        }
+
+        window.location.href = target.href;
+      });
+
+      card.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          window.location.href = target.href;
+        }
+      });
+    });
+  });
+</script>
 <!-- Filter Offcanvas End -->

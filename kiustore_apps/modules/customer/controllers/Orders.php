@@ -45,7 +45,7 @@ class Orders extends CI_Controller
             if (($dt->payment_method == 2 &&  $dt->order_status == 6) || ($dt->payment_method == 2 &&  $dt->order_status == 5) || ($dt->payment_method == 1 &&  $dt->order_status == 6)) {
                 $orders['success']++;
             }
-            if (($dt->payment_method == 2 &&  $dt->order_status == 7) || ($dt->payment_method == 1 &&  $dt->order_status == 7)) {
+            if (($dt->payment_method == 2 &&  $dt->order_status == 7) || ($dt->payment_method == 1 &&  $dt->order_status == 7) || ($dt->payment_method == 3 &&  $dt->order_status == 7)) {
                 $orders['cancel']++;
             }
             if ($dt->payment_method > 0 &&  $dt->order_status > 0) {
@@ -386,7 +386,8 @@ class Orders extends CI_Controller
                 if (($data->payment_method == 1 && $data->order_status == 1) ||
                     ($data->payment_method == 2 && $data->order_status == 1) ||
                     ($data->payment_method == 2 && $data->order_status == 2) ||
-                    ($data->payment_method == 3 && $data->order_status == 1)
+                    ($data->payment_method == 3 && $data->order_status == 1) ||
+                    ($data->payment_method == 3 && $data->order_status == 11)
                 ) {
                     $this->order->cancel_order($del_va);
                     $response = array('code' => 200, 'success' => TRUE, 'message' => 'Order dibatalkan');

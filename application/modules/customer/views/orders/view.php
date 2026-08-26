@@ -1,6 +1,35 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 $banks = (array) json_decode(get_settings('payment_banks'));
+
+$order_subtotal = (float) ($data->total_belanja ?? 0);
+$order_total_after_discount = isset($data->total_price) ? (float) $data->total_price : $order_subtotal;
+$coupon_discount = 0;
+
+if (!empty($data->coupon_id)) {
+    $coupon_discount = max(0, $order_subtotal - $order_total_after_discount);
+
+    if ($coupon_discount <= 0 && isset($data->kupon)) {
+        $coupon_discount = min((float) $data->kupon, $order_subtotal);
+        $order_total_after_discount = max(0, $order_subtotal - $coupon_discount);
+    }
+}
+
+$selected_ongkir = null;
+foreach ((array) $is_ongkir as $ongkir_data) {
+    $ongkir_parts = explode(';', (string) $ongkir_data->ongkir_price);
+
+    if ((string) $ongkir_data->ongkir_price !== '0' && isset($ongkir_parts[4]) && is_numeric($ongkir_parts[4])) {
+        $selected_ongkir = (float) $ongkir_parts[4];
+        break;
+    }
+}
+
+$shipping_cost = ($selected_ongkir !== null) ? $selected_ongkir : (float) ($data->shipping_cost ?? 0);
+$insurance = (float) ($data->insurance ?? 0);
+$final_price = $order_total_after_discount + $shipping_cost + $insurance;
+$shipping_chat_url = base_url('message?auto_text=1');
+$shipping_pending = ((int) $data->payment_method === 3 && (int) $data->order_status === 11 && $shipping_cost <= 0 && empty($data->nama_ekspedisi));
 ?>
 
 <main class="main-wrap order-detail mb-xxl">
@@ -71,56 +100,50 @@ $banks = (array) json_decode(get_settings('payment_banks'));
             <?php if ($data->coupon_id) : ?>
                 <li>
                     <span>Total Belanja</span>
-                    <span>Rp <?php echo format_rupiah($data->total_belanja + $data->kupon); ?></span>
+                    <span>Rp <?php echo format_rupiah($order_subtotal); ?></span>
                 </li>
                 <li>
                     <span>Potongan Kupon</span>
-                    <span>Rp <?php echo format_rupiah($data->kupon); ?></span>
+                    <span>Rp <?php echo format_rupiah($coupon_discount); ?></span>
                 </li>
             <?php else : ?>
                 <li>
                     <span>Total Belanja</span>
-                    <span>Rp <?php echo format_rupiah($data->total_belanja); ?></span>
+                    <span>Rp <?php echo format_rupiah($order_subtotal); ?></span>
                 </li>
             <?php endif; ?>
 
-            <?php foreach ($is_ongkir as $o) :
-                $jsongkir = explode(';', $o->ongkir_price); ?>
-                <?php if ($o->ongkir_price == '0') : ?>
-                    <li>
-                        <span>Ekspedisi</span>
-                        <span>Rp <?php echo format_rupiah($data->shipping_cost); ?></span>
-                    </li>
-
-                <?php else : ?>
-                    <li>
-                        <span>Ekspedisi</span>
-                        <span>Rp <?php echo format_rupiah($jsongkir['4']); ?></span>
-                    </li>
-                <?php endif; ?>
-            <?php endforeach; ?>
+            <li>
+                <span>Ekspedisi</span>
+                <span>
+                    <?php if ($shipping_pending) : ?>
+                        <a href="<?= $shipping_chat_url; ?>" class="badge bg-warning text-dark">Tentukan ekspedisi kepada admin</a>
+                    <?php else : ?>
+                        Rp <?php echo format_rupiah($shipping_cost); ?>
+                    <?php endif; ?>
+                </span>
+            </li>
 
             <li>
                 <span>Nama Ekspedisi</span>
-                <span><?php echo !empty($data->nama_ekspedisi) ? $data->nama_ekspedisi : '-'; ?></span>
+                <span>
+                    <?php if ($shipping_pending) : ?>
+                        <a href="<?= $shipping_chat_url; ?>" class="badge bg-warning text-dark">Tentukan ekspedisi kepada admin</a>
+                    <?php else : ?>
+                        <?php echo !empty($data->nama_ekspedisi) ? html_escape($data->nama_ekspedisi) : '-'; ?>
+                    <?php endif; ?>
+                </span>
             </li>
 
             <li>
                 <span>Asuransi</span>
-                <span>Rp <?php echo format_rupiah($data->insurance); ?></span>
+                <span>Rp <?php echo format_rupiah($insurance); ?></span>
             </li>
-            <?php foreach ($is_ongkir as $o) :
-                $jsongkir = explode(';', $o->ongkir_price);
-                $final_price = 0;
-                $ongkir_value = isset($jsongkir[4]) ? $jsongkir[4] : 0;
-                $final_price = $data->insurance + $data->shipping_cost + $data->total_belanja + $ongkir_value;
-            ?>
 
-                <li>
-                    <span>Total Keseluruhan</span>
-                    <span class="font-theme">Rp <?php echo format_rupiah($final_price); ?></span>
-                </li>
-            <?php endforeach; ?>
+            <li>
+                <span>Total Keseluruhan</span>
+                <span class="font-theme">Rp <?php echo format_rupiah($final_price); ?></span>
+            </li>
 
             <li>
                 <span>Pembayaran</span>
@@ -220,7 +243,6 @@ $banks = (array) json_decode(get_settings('payment_banks'));
         <section class="address-section p-0">
             <h3 class="font-theme font-md">Pembayaran</h3>
             <div class="address">
-                <?php $final_price = $data->insurance + $data->shipping_cost + $data->total_belanja + $ongkir_value; ?>
                 <table class="table table-hover table-striped table-hover">
                     <tr>
                         <td style="font-weight: bold;">Virual Account</td>

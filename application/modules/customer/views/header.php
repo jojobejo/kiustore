@@ -32,7 +32,7 @@
 
   <!-- Style css -->
   <link rel="stylesheet" id="change-link" type="text/css" href="<?php echo get_theme_uri('css/style.css?v=0.01'); ?>" />
-  <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/css/kiu-splash.css?v=20260821_1'); ?>" />
+  <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/css/kiu-splash.css?v=20260825_1'); ?>" />
   <!-- jquery 3.6.0 -->
   <script src="<?php echo get_theme_uri('js/jquery-3.6.0.min.js'); ?>"></script>
   <!-- SELECT2 -->
@@ -53,14 +53,12 @@ $show_splash_screen = ($first_segment === NULL || $first_segment === '' || $firs
 ?>
 <body<?php echo $show_splash_screen ? ' class="kiu-splash-active"' : ''; ?>>
   <?php if ($show_splash_screen) : ?>
-    <div class="kiu-splash" id="kiuSplashScreen" data-splash-duration="5000" role="status" aria-live="polite" aria-label="Memuat Karisma Online Shop">
+    <div class="kiu-splash" id="kiuSplashScreen" data-splash-duration="2000" role="status" aria-live="polite" aria-label="Memuat Karisma Online Shop">
       <div class="kiu-splash__panel">
         <div class="kiu-splash__content">
           <div class="kiu-splash__logo-wrap">
             <img class="kiu-splash__logo" src="<?php echo base_url('assets/images/karisma-splash-logo.png?v=20260820_2'); ?>" alt="Karisma Online Shop" />
           </div>
-          <div class="kiu-splash__status">Menyiapkan Karisma Online</div>
-          <div class="kiu-splash__progress" aria-hidden="true"></div>
         </div>
       </div>
     </div>

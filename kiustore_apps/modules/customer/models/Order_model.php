@@ -33,6 +33,7 @@ class Order_model extends CI_Model
         if ($filter == 'semua') {
             $orders = $this->db->query("SELECT
                   o.id,
+                  o.total_price,
                   SUM(oi.order_qty * oi.order_price) AS total_belanja,
                   o.order_number,
                   o.order_date,
@@ -77,6 +78,7 @@ class Order_model extends CI_Model
             $orders = $this->db->query("
             SELECT
                   o.id,
+                  o.total_price,
                   SUM(oi.order_qty * oi.order_price) AS total_belanja,
                   o.order_number,
                   o.order_date,
@@ -117,6 +119,7 @@ class Order_model extends CI_Model
             $orders = $this->db->query("
             SELECT
                   o.id,
+                  o.total_price,
                   SUM(oi.order_qty * oi.order_price) AS total_belanja,
                   o.order_number,
                   o.order_date,
@@ -157,6 +160,7 @@ class Order_model extends CI_Model
             $orders = $this->db->query("
             SELECT
                   o.id,
+                  o.total_price,
                   SUM(oi.order_qty * oi.order_price) AS total_belanja,
                   o.order_number,
                   o.order_date,
@@ -197,6 +201,7 @@ class Order_model extends CI_Model
             $orders = $this->db->query("
             SELECT
                   o.id,
+                  o.total_price,
                   SUM(oi.order_qty * oi.order_price) AS total_belanja,
                   o.order_number,
                   o.order_date,
@@ -237,6 +242,7 @@ class Order_model extends CI_Model
             $orders = $this->db->query("
             SELECT
                   o.id,
+                  o.total_price,
                   SUM(oi.order_qty * oi.order_price) AS total_belanja,
                   o.order_number,
                   o.order_date,
@@ -275,7 +281,19 @@ class Order_model extends CI_Model
             ");
         }
 
-        return $orders->result();
+        $result = $orders->result();
+
+        foreach ($result as $order) {
+            $subtotal = (float) $order->total_belanja;
+            $total_after_discount = isset($order->total_price) ? (float) $order->total_price : $subtotal;
+            $discount_amount = max(0, $subtotal - $total_after_discount);
+
+            $order->discount_amount = $discount_amount;
+            $order->final_price = $total_after_discount + (float) $order->shipping_cost + (float) $order->insurance;
+            $order->has_coupon_discount = !empty($order->coupon) || $discount_amount > 0;
+        }
+
+        return $result;
     }
 
     // public function get_orders($val)

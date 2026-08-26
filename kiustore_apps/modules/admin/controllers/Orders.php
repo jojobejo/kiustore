@@ -230,115 +230,35 @@ class Orders extends CI_Controller
         switch ($action) {
             case 'order_all':
                 $orders = $this->order->get_all_orders();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'order_all_sales':
                 $orders = $this->order->get_all_orders_sales();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'order_all_distribusi':
                 $orders = $this->order->get_all_orders_distribusi();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'order_payment':
                 $orders = $this->order->get_order_payment();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'order_process':
                 $orders = $this->order->get_order_process();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'order_packing':
                 $orders = $this->order->get_order_packing();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'order_deliver':
                 $orders = $this->order->get_order_deliver();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'order_success':
                 $orders = $this->order->get_order_success();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'order_success_kadep':
                 $orders = $this->order->get_order_success_kadep();
@@ -457,17 +377,7 @@ class Orders extends CI_Controller
 
             case 'order_cancel':
                 $orders = $this->order->get_order_cancel();
-                $n = 0;
-                foreach ($orders as $order) {
-                    $orders[$n]->order_status = get_order_status($order->order_status, $order->payment_method);
-                    $orders[$n]->payment_method = get_payment_method($order->payment_method);
-                    $orders[$n]->order_date = get_formatted_date($order->order_date);;
-                    $orders[$n]->final_price = format_rupiah($order->final_price);
-
-                    $n++;
-                }
-                $orders['data'] = $orders;
-                $response = $orders;
+                $response = $this->format_order_api_rows($orders);
                 break;
             case 'verify':
                 $data['id'] = $this->input->post('id');
@@ -564,6 +474,60 @@ class Orders extends CI_Controller
         $response = json_encode($response);
         $this->output->set_content_type('application/json')
             ->set_output($response);
+    }
+
+    private function format_order_api_rows($orders)
+    {
+        $n = 0;
+        foreach ($orders as $order) {
+            $orders[$n]->order_status = $this->format_order_status_badges($order);
+            $orders[$n]->payment_method = get_payment_method($order->payment_method);
+            $orders[$n]->order_date = get_formatted_date($order->order_date);
+            $orders[$n]->final_price = $this->format_order_final_price($order);
+
+            $n++;
+        }
+
+        $orders['data'] = $orders;
+
+        return $orders;
+    }
+
+    private function format_order_final_price($order)
+    {
+        $raw_final_price = isset($order->final_price) ? (float) $order->final_price : 0;
+        $discount_amount = $this->get_order_discount_amount($order);
+        $corrected_total = max(0, $raw_final_price - $discount_amount);
+
+        return 'Rp ' . format_rupiah($corrected_total);
+    }
+
+    private function format_order_status_badges($order)
+    {
+        $discount_amount = $this->get_order_discount_amount($order);
+        $badges = array(
+            get_order_status($order->order_status, $order->payment_method)
+        );
+
+        if (!empty($order->coupon) || $discount_amount > 0) {
+            $coupon_label = !empty($order->coupon)
+                ? htmlspecialchars((string) $order->coupon, ENT_QUOTES, 'UTF-8')
+                : 'Promo';
+            $badges[] = '<span class="badge badge-success">Menggunakan Kupon/Promo: ' . $coupon_label . '</span>';
+            $badges[] = '<span class="badge badge-info">Diskon Rp ' . format_rupiah($discount_amount) . '</span>';
+        } else {
+            $badges[] = '<span class="badge badge-secondary">Tanpa Kupon/Promo</span>';
+        }
+
+        return '<div class="order-status-badges">' . implode(' ', $badges) . '</div>';
+    }
+
+    private function get_order_discount_amount($order)
+    {
+        $subtotal = isset($order->total_belanja) ? (float) $order->total_belanja : (isset($order->total_price) ? (float) $order->total_price : 0);
+        $total_after_discount = isset($order->total_price) ? (float) $order->total_price : $subtotal;
+
+        return max(0, $subtotal - $total_after_discount);
     }
 
     public function status()
