@@ -95,6 +95,11 @@ $route['error/app']                         = 'errors/app';
 $route['dashboard_admin']                   = 'admin/dashboard';
 $route['admin/briva-switch']                = 'admin/briva_switch';
 $route['admin/briva-switch/update']         = 'admin/briva_switch/update';
+$route['admin/zahir-stock']                 = 'admin/zahir_stock';
+$route['admin/zahir-stock/data']            = 'admin/zahir_stock/data';
+$route['admin/zahir-stock/approve']         = 'admin/zahir_stock/approve';
+$route['admin/zahir-stock/insert-product']  = 'admin/zahir_stock/insert_product';
+$route['admin/zahir-stock/export-stock-excel'] = 'admin/zahir_stock/export_stock_excel';
 $route['admin']                             = 'admin/admin';
 $route['admin/categories']                  = 'admin/products/category';
 
