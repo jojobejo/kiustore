@@ -410,6 +410,28 @@ class Mobile extends CI_Controller
         return $this->respond($this->mobile_api->payment_methods());
     }
 
+    public function coupon_check()
+    {
+        if (!$this->require_method('POST') || !$this->authenticate()) {
+            return;
+        }
+
+        if (!$this->require_fields(array('code', 'subtotal'))) {
+            return;
+        }
+
+        $result = $this->mobile_api->validate_coupon(
+            trim((string) $this->value('code')),
+            (float) $this->value('subtotal')
+        );
+
+        if (!$result['success']) {
+            return $this->error($result['message'], $result['status']);
+        }
+
+        return $this->respond($result['data'], 200, 'Kupon dapat digunakan.');
+    }
+
     public function payment_banks()
     {
         if (!$this->require_method('GET')) {
@@ -457,21 +479,45 @@ class Mobile extends CI_Controller
             return;
         }
 
-        if (!$this->require_fields(array('shipping_quote_id', 'shipping_service'))) {
+        $result = $this->mobile_api->checkout($this->user->id, $this->user->level, array(
+            'shipping_quote_id' => (int) $this->value('shipping_quote_id', 0),
+            'shipping_service' => trim((string) $this->value('shipping_service', '')),
+            'note' => trim((string) $this->value('note', '')),
+            'voucher_code' => trim((string) $this->value('voucher_code', ''))
+        ));
+
+        if (!$result['success']) {
+            return $this->error(
+                $result['message'],
+                $result['status'],
+                isset($result['errors']) ? $result['errors'] : array()
+            );
+        }
+
+        return $this->respond($result['data'], 201, 'Pesanan berhasil dibuat.');
+    }
+
+    public function apply_order_coupon($id)
+    {
+        if (!$this->require_method('POST') || !$this->authenticate()) {
             return;
         }
 
-        $result = $this->mobile_api->checkout($this->user->id, $this->user->level, array(
-            'shipping_quote_id' => (int) $this->value('shipping_quote_id'),
-            'shipping_service' => trim((string) $this->value('shipping_service')),
-            'note' => trim((string) $this->value('note', ''))
-        ));
+        if (!$this->require_fields(array('code'))) {
+            return;
+        }
+
+        $result = $this->mobile_api->apply_order_coupon(
+            (int) $id,
+            $this->user->id,
+            trim((string) $this->value('code'))
+        );
 
         if (!$result['success']) {
             return $this->error($result['message'], $result['status']);
         }
 
-        return $this->respond($result['data'], 201, 'Pesanan berhasil dibuat.');
+        return $this->respond($result['data'], 200, 'Kupon berhasil diterapkan.');
     }
 
     public function cancel_order($id)
@@ -751,7 +797,20 @@ class Mobile extends CI_Controller
             return $this->error($result['message'], 502, $result['data']);
         }
 
-        return $this->respond($result['data'], $status);
+        return $this->respond($this->normalize_shipping_data($result['data']), $status);
+    }
+
+    private function normalize_shipping_data($data)
+    {
+        if (is_array($data) && array_key_exists('data', $data) && is_array($data['data'])) {
+            return $data['data'];
+        }
+
+        if (is_array($data) && isset($data['rajaongkir']['results'])) {
+            return $data['rajaongkir']['results'];
+        }
+
+        return $data;
     }
 
     private function payment_picture_name()

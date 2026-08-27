@@ -36,16 +36,16 @@ class Mobile_api_model extends CI_Model
 
         $customer = array(
             'user_id' => $user_id,
-            'nik' => '',
-            'npwp' => '',
+            'nik' => isset($data['nik']) ? (string) $data['nik'] : '',
+            'npwp' => isset($data['npwp']) ? (string) $data['npwp'] : '',
             'name' => $data['name'],
             'phone_number' => $data['phone_number'],
-            'province_id' => 0,
-            'kota_id' => 0,
-            'subdistrict_id' => 0,
+            'province_id' => isset($data['province_id']) ? (int) $data['province_id'] : 0,
+            'kota_id' => isset($data['kota_id']) ? (int) $data['kota_id'] : 0,
+            'subdistrict_id' => isset($data['subdistrict_id']) ? (int) $data['subdistrict_id'] : 0,
             'address' => $data['address'],
             'shop_name' => $data['shop_name'],
-            'shop_address' => $data['shop_address'] !== '' ? $data['shop_address'] : $data['address'],
+            'shop_address' => (isset($data['shop_address']) && $data['shop_address'] !== '') ? $data['shop_address'] : $data['address'],
             'max_credit' => 0,
             'level' => 1,
             'profile_picture' => null,
@@ -55,10 +55,19 @@ class Mobile_api_model extends CI_Model
         );
 
         if ($this->db->field_exists('alamat_kirim', 'customers')) {
-            $customer['alamat_kirim'] = $data['address'];
+            $customer['alamat_kirim'] = (isset($data['alamat_kirim']) && $data['alamat_kirim'] !== '') ? $data['alamat_kirim'] : $data['address'];
         }
 
         $this->db->insert('customers', $customer);
+
+        if ($this->db->table_exists('mobile_onboarding_flags')) {
+            $this->db->insert('mobile_onboarding_flags', array(
+                'user_id' => $user_id,
+                'is_new_user' => 1,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ));
+        }
 
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
@@ -97,54 +106,129 @@ class Mobile_api_model extends CI_Model
         );
     }
 
-    public function user_from_token($plain_token, $touch = TRUE)
+    public function onboarding_state($user_id, $default_is_new_user = FALSE)
     {
-        $user = $this->db
-            ->select('t.id AS token_id, u.id, u.email, u.status, c.name, c.level, c.salesman_id')
-            ->from('mobile_api_tokens t')
-            ->join('users u', 'u.id = t.user_id')
-            ->join('customers c', 'c.user_id = u.id')
-            ->where('t.token_hash', hash('sha256', $plain_token))
-            ->where('t.revoked_at IS NULL', null, FALSE)
-            ->where('t.expires_at >', date('Y-m-d H:i:s'))
-            ->where(array('u.status' => 1, 'u.role' => 'customer'))
-            ->get()
+        $state = array(
+            'is_new_user' => (bool) $default_is_new_user,
+            'show_tutorial' => (bool) $default_is_new_user,
+            'show_completion_splash' => (bool) $default_is_new_user,
+            'completion_splash_duration_seconds' => 5,
+            'redirect_after_tutorial_url' => site_url('home'),
+            'home_route' => 'home'
+        );
+
+        if (!$this->db->table_exists('mobile_onboarding_flags')) {
+            return $state;
+        }
+
+        $row = $this->db
+            ->where('user_id', (int) $user_id)
+            ->get('mobile_onboarding_flags')
             ->row();
 
-        if ($user && $touch) {
-            $this->db->where('id', $user->token_id)->update('mobile_api_tokens', array(
+        if (!$row) {
+            return $state;
+        }
+
+        $is_new_user = ((int) $row->is_new_user === 1 && empty($row->tutorial_completed_at));
+
+        $state['is_new_user'] = $is_new_user;
+        $state['show_tutorial'] = $is_new_user;
+        $state['show_completion_splash'] = $is_new_user;
+
+        return $state;
+    }
+
+    public function complete_onboarding($user_id)
+    {
+        if (!$this->db->table_exists('mobile_onboarding_flags')) {
+            return TRUE;
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $data = array(
+            'is_new_user' => 0,
+            'tutorial_completed_at' => $now,
+            'completion_splash_shown_at' => $now,
+            'updated_at' => $now
+        );
+
+        $exists = $this->db
+            ->where('user_id', (int) $user_id)
+            ->count_all_results('mobile_onboarding_flags') > 0;
+
+        if ($exists) {
+            return $this->db
+                ->where('user_id', (int) $user_id)
+                ->update('mobile_onboarding_flags', $data);
+        }
+
+        $data['user_id'] = (int) $user_id;
+        $data['created_at'] = $now;
+
+        return $this->db->insert('mobile_onboarding_flags', $data);
+    }
+
+    public function user_from_token($plain_token, $touch = TRUE)
+    {
+        $token_hash = hash('sha256', $plain_token);
+        $token = $this->db
+            ->where('token_hash', $token_hash)
+            ->where('revoked_at IS NULL', null, false)
+            ->get('mobile_api_tokens')
+            ->row();
+
+        if (!$token) {
+            return null;
+        }
+
+        if (strtotime($token->expires_at) < time()) {
+            return null;
+        }
+
+        if ($touch) {
+            $this->db->where('id', $token->id)->update('mobile_api_tokens', array(
                 'last_used_at' => date('Y-m-d H:i:s')
             ));
         }
 
+        $user = $this->db
+            ->select('u.id, u.email, u.status, c.name, c.level, c.salesman_id, c.subdistrict_id')
+            ->from('users u')
+            ->join('customers c', 'c.user_id = u.id')
+            ->where('u.id', (int) $token->user_id)
+            ->get()
+            ->row();
+
+        if (!$user) {
+            return null;
+        }
+
+        $user->id = (int) $user->id;
+        $user->status = (int) $user->status;
+        $user->level = (int) $user->level;
+        $user->salesman_id = (int) $user->salesman_id;
+        $user->subdistrict_id = (int) $user->subdistrict_id;
         return $user;
     }
 
     public function revoke_token($plain_token)
     {
+        $token_hash = hash('sha256', $plain_token);
         return $this->db
-            ->where('token_hash', hash('sha256', $plain_token))
+            ->where('token_hash', $token_hash)
             ->update('mobile_api_tokens', array('revoked_at' => date('Y-m-d H:i:s')));
     }
 
     public function delete_account($user_id)
     {
-        $user_id = (int) $user_id;
-        if ($user_id <= 0) {
-            return FALSE;
-        }
-
-        $user = $this->db
-            ->where(array('id' => $user_id, 'role' => 'customer'))
-            ->get('users')
-            ->row_array();
-
+        $user = $this->find_user_by_id($user_id);
         if (!$user) {
             return FALSE;
         }
 
         $now = date('Y-m-d H:i:s');
-        $deleted_email = 'deleted-user-' . $user_id . '-' . time() . '@deleted.kiustore.local';
+        $deleted_email = $this->build_anonymized_email($user_id);
 
         $this->db->trans_begin();
 
@@ -172,6 +256,14 @@ class Mobile_api_model extends CI_Model
             'c.subdistrict_id', 'c.level', 'c.max_credit', 'c.profile_picture',
             'c.salesman_id', 'c.kode_customer'
         );
+
+        if ($this->db->field_exists('nik', 'customers')) {
+            $fields[] = 'c.nik';
+        }
+
+        if ($this->db->field_exists('npwp', 'customers')) {
+            $fields[] = 'c.npwp';
+        }
 
         if ($this->db->field_exists('alamat_kirim', 'customers')) {
             $fields[] = 'c.alamat_kirim';
@@ -209,7 +301,11 @@ class Mobile_api_model extends CI_Model
         $allowed = array();
         foreach ($data as $field => $value) {
             if ($this->db->field_exists($field, 'customers')) {
-                $allowed[$field] = $value;
+                if (in_array($field, array('province_id', 'kota_id', 'subdistrict_id', 'level', 'max_credit'), TRUE)) {
+                    $allowed[$field] = (int) $value;
+                } else {
+                    $allowed[$field] = $value;
+                }
             }
         }
 
@@ -217,7 +313,28 @@ class Mobile_api_model extends CI_Model
             return FALSE;
         }
 
-        return $this->db->where('user_id', (int) $user_id)->update('customers', $allowed);
+        if (isset($allowed['name']) && $this->db->field_exists('name', 'users')) {
+            $this->db->where('id', (int) $user_id)->update('users', array('name' => $allowed['name']));
+        }
+
+        $res = $this->db->where('user_id', (int) $user_id)->update('customers', $allowed);
+
+        if ($this->db->table_exists('customer_location') && (isset($allowed['province_id']) || isset($allowed['kota_id']) || isset($allowed['subdistrict_id']))) {
+            $loc_exists = $this->db->where('user_id', (string) $user_id)->count_all_results('customer_location') > 0;
+            $loc_data = array(
+                'provinsi' => isset($allowed['province_id']) ? (int) $allowed['province_id'] : 0,
+                'kota' => isset($allowed['kota_id']) ? (int) $allowed['kota_id'] : 0,
+                'sub_kota' => isset($allowed['subdistrict_id']) ? (int) $allowed['subdistrict_id'] : 0
+            );
+            if ($loc_exists) {
+                $this->db->where('user_id', (string) $user_id)->update('customer_location', $loc_data);
+            } else {
+                $loc_data['user_id'] = (string) $user_id;
+                $this->db->insert('customer_location', $loc_data);
+            }
+        }
+
+        return $res;
     }
 
     public function categories()
@@ -470,7 +587,7 @@ class Mobile_api_model extends CI_Model
     {
         $row = $this->db
             ->where('user_id', (int) $user_id)
-            ->where_not_in('order_status', array(5, 6, 7))
+            ->where_not_in('order_status', array(3, 4, 5, 6, 7))
             ->order_by('order_date', 'DESC')
             ->get('orders')
             ->row_array();
@@ -705,39 +822,19 @@ class Mobile_api_model extends CI_Model
 
     public function checkout($user_id, $level, $data)
     {
-        $quote = $this->db
-            ->where(array(
-                'id' => (int) $data['shipping_quote_id'],
-                'user_id' => (int) $user_id,
-                'used_at' => null
-            ))
-            ->where('expires_at >', date('Y-m-d H:i:s'))
-            ->get('mobile_shipping_quotes')
-            ->row();
-
-        if (!$quote) {
-            return array('success' => FALSE, 'status' => 422, 'message' => 'Quote ongkir tidak valid atau kedaluwarsa.');
-        }
-
         $cart = $this->cart($user_id, $level);
         if (empty($cart['items'])) {
             return array('success' => FALSE, 'status' => 422, 'message' => 'Keranjang masih kosong.');
         }
 
-        if ((int) $quote->weight !== (int) $cart['summary']['total_weight']) {
-            return array('success' => FALSE, 'status' => 422, 'message' => 'Berat keranjang berubah. Buat quote ongkir baru.');
-        }
-
-        $selected = null;
-        foreach ((array) json_decode($quote->options_json, TRUE) as $option) {
-            if (strcasecmp($option['service'], $data['shipping_service']) === 0) {
-                $selected = $option;
-                break;
-            }
-        }
-
-        if (!$selected) {
-            return array('success' => FALSE, 'status' => 422, 'message' => 'Layanan ongkir tidak ditemukan.');
+        $active_order = $this->active_transaction_order($user_id);
+        if ($active_order) {
+            return array(
+                'success' => FALSE,
+                'status' => 409,
+                'message' => 'Masih ada transaksi berjalan. Lanjutkan dari menu Riwayat sebelum membuat pesanan baru.',
+                'errors' => array('active_order' => $active_order)
+            );
         }
 
         foreach ($cart['items'] as $item) {
@@ -752,7 +849,6 @@ class Mobile_api_model extends CI_Model
         }
 
         $profile = $this->profile($user_id);
-        $shipping_cost = (float) $selected['cost'];
         $order_number = $this->generate_order_number($user_id);
 
         $order = array(
@@ -778,14 +874,14 @@ class Mobile_api_model extends CI_Model
                 'note' => $data['note']
             )),
             'due_date' => date('Y-m-d'),
-            'jenis_pengiriman' => $selected['courier'] . '-' . $selected['service'],
-            'estimasi_kirim' => $selected['etd'] ? $selected['etd'] : '0',
-            'shipping_cost' => $shipping_cost,
+            'jenis_pengiriman' => '',
+            'estimasi_kirim' => '',
+            'shipping_cost' => 0,
             'insurance' => 0
         );
 
         if ($this->db->field_exists('nama_ekspedisi', 'orders')) {
-            $order['nama_ekspedisi'] = $selected['courier'];
+            $order['nama_ekspedisi'] = '';
         }
 
         $this->db->trans_begin();
@@ -808,9 +904,6 @@ class Mobile_api_model extends CI_Model
 
         $this->db->insert_batch('order_items', $order_items);
         $this->db->where('user_id', (int) $user_id)->delete('mobile_cart_items');
-        $this->db->where('id', (int) $quote->id)->update('mobile_shipping_quotes', array(
-            'used_at' => date('Y-m-d H:i:s')
-        ));
 
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
@@ -1083,12 +1176,19 @@ class Mobile_api_model extends CI_Model
             return array('success' => FALSE, 'status' => 404, 'message' => 'Payment BRIVA belum tersedia.');
         }
 
-        if (in_array((int) $order['order_status'], array(3, 10), TRUE)) {
+        if ((int) $briva['status'] === 2 || in_array((int) $order['order_status'], array(3, 10), TRUE)) {
+            $this->complete_briva_payment($order['order_number']);
+            $briva = $this->briva_payment_by_order_number($order['order_number']);
+            $order = $this->db
+                ->where(array('id' => (int) $order_id, 'user_id' => (int) $user_id))
+                ->get('orders')
+                ->row_array();
+
             return array(
                 'success' => TRUE,
                 'status' => 200,
-                'message' => 'Order sudah dibayar.',
-                'data' => $this->format_briva_status_response($order, $user_id, $briva, 'Y', FALSE, 'Order sudah dibayar.')
+                'message' => 'Pembayaran BRIVA sudah dikonfirmasi dan order masuk pengemasan.',
+                'data' => $this->format_briva_status_response($order, $user_id, $briva, 'Y', FALSE, 'Pembayaran BRIVA sudah dikonfirmasi dan order masuk pengemasan.')
             );
         }
 
@@ -1134,9 +1234,8 @@ class Mobile_api_model extends CI_Model
 
         if ($paid_status === 'Y') {
             $brivaws->updateStatusVa($briva['userno'], $briva['order_number']);
-            $this->db->where('order_number', $order['order_number'])->update('briva_api', array('status' => 2));
-            $this->db->where('order_number', $order['order_number'])->update('orders', array('order_status' => 10));
-            $status_text = 'Pembayaran BRIVA berhasil diterima.';
+            $this->complete_briva_payment($order['order_number']);
+            $status_text = 'Pembayaran BRIVA berhasil diterima dan order masuk pengemasan.';
             $is_expired = FALSE;
         } elseif ($is_expired) {
             $brivaws->updateStatusVa($briva['userno'], $briva['order_number']);
@@ -1376,12 +1475,7 @@ class Mobile_api_model extends CI_Model
         $existing = $this->briva_payment_by_order_number($order['order_number']);
 
         if ($existing) {
-            $this->db
-                ->where('order_number', $order['order_number'])
-                ->update('briva_api', array('status' => 2));
-            $this->db
-                ->where('order_number', $order['order_number'])
-                ->update('orders', array('order_status' => 10));
+            $this->complete_briva_payment($order['order_number']);
 
             $saved = $this->briva_payment_by_order_number($order['order_number']);
             $data = $this->format_briva_payment($saved ? $saved : $existing);
@@ -1415,9 +1509,7 @@ class Mobile_api_model extends CI_Model
 
         $this->db->trans_start();
         $this->save_briva_payment($order['order_number'], $data);
-        $this->db
-            ->where('order_number', $order['order_number'])
-            ->update('orders', array('order_status' => 10));
+        $this->complete_briva_payment($order['order_number']);
         $this->db->trans_complete();
 
         if (!$this->db->trans_status()) {
@@ -1438,13 +1530,8 @@ class Mobile_api_model extends CI_Model
 
     private function local_briva_payment_status($order, $user_id, $briva)
     {
-        if ((int) $briva['status'] !== 2 || (int) $order['order_status'] !== 10) {
-            $this->db
-                ->where('order_number', $order['order_number'])
-                ->update('briva_api', array('status' => 2));
-            $this->db
-                ->where('order_number', $order['order_number'])
-                ->update('orders', array('order_status' => 10));
+        if ((int) $briva['status'] !== 2 || (int) $order['order_status'] !== 3) {
+            $this->complete_briva_payment($order['order_number']);
 
             $briva = $this->briva_payment_by_order_number($order['order_number']);
             $order = $this->db
@@ -1478,6 +1565,17 @@ class Mobile_api_model extends CI_Model
             'message' => 'Pembayaran BRIVA lokal berhasil diterima.',
             'data' => $data
         );
+    }
+
+    private function complete_briva_payment($order_number)
+    {
+        $this->db
+            ->where('order_number', (string) $order_number)
+            ->update('briva_api', array('status' => 2));
+
+        return $this->db
+            ->where('order_number', (string) $order_number)
+            ->update('orders', array('order_status' => 3));
     }
 
     private function briva_customer_no($order)

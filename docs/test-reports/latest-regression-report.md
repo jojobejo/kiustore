@@ -1,14 +1,14 @@
 # KIU Store Regression Test Report
 
-Tanggal eksekusi: 2026-08-21 17:58:40 WIB
+Tanggal eksekusi: 2026-08-26 20:31:23 WIB
 Environment: PHP CLI 7.3.33, source-contract mode, database tidak disentuh.
 
 ## Ringkasan Eksekutif
 
 | Metrik | Nilai |
 |---|---:|
-| Total test | 13 |
-| Pass | 13 |
+| Total test | 15 |
+| Pass | 15 |
 | Fail | 0 |
 
 ## Taksonomi Data
@@ -232,6 +232,54 @@ Environment: PHP CLI 7.3.33, source-contract mode, database tidak disentuh.
 | ROLE REQUIREMENT | customer |
 | TEST TYPE | Source Contract / API Regression |
 | RISK LEVEL | CRITICAL |
+| RESULT | PASS |
+| BUG ANALYSIS | Tidak ada defect pada kontrak source yang diuji. |
+
+### API-CART-001 - PASS
+
+| Field | Nilai |
+|---|---|
+| TEST MODULE | Mobile API Cart |
+| SCENARIO | Order dikemas/dikirim tidak memblokir tambah cart |
+| PRECONDITION | Customer memiliki order lama dengan status 3 atau 4. |
+| TEST STEPS | Trace `Mobile_api_model::active_transaction_order` dan query status order. |
+| EXPECTED RESULT | Status Dikemas, Dikirim, Selesai, dan Dibatalkan tidak dihitung sebagai transaksi aktif pemblokir cart. |
+| AUDIT TRAIL | application/modules/api/models/Mobile_api_model.php |
+| ROUTE | /api/v1/cart |
+| CONTROLLER | application/modules/api/controllers/Mobile.php |
+| MODEL | application/modules/api/models/Mobile_api_model.php |
+| HELPER | UNVERIFIED |
+| LIBRARY | UNVERIFIED |
+| DATABASE TABLE | orders, mobile_cart_items |
+| EXTERNAL DEPENDENCY | Tidak ada |
+| AUTHENTICATION REQUIREMENT | Bearer token |
+| ROLE REQUIREMENT | customer |
+| TEST TYPE | Source Contract / API Regression |
+| RISK LEVEL | HIGH |
+| RESULT | PASS |
+| BUG ANALYSIS | Tidak ada defect pada kontrak source yang diuji. |
+
+### API-CHECKOUT-001 - PASS
+
+| Field | Nilai |
+|---|---|
+| TEST MODULE | Mobile API Checkout |
+| SCENARIO | Checkout menunggu ekspedisi admin |
+| PRECONDITION | Customer membuat pesanan dari keranjang. |
+| TEST STEPS | Trace `Mobile::checkout` dan `Mobile_api_model::checkout`. |
+| EXPECTED RESULT | Checkout mobile tidak mewajibkan quote ongkir, tidak mengisi ekspedisi otomatis, dan ongkir awal bernilai 0. |
+| AUDIT TRAIL | application/modules/api/controllers/Mobile.php; application/modules/api/models/Mobile_api_model.php |
+| ROUTE | /api/v1/orders/checkout |
+| CONTROLLER | application/modules/api/controllers/Mobile.php |
+| MODEL | application/modules/api/models/Mobile_api_model.php |
+| HELPER | UNVERIFIED |
+| LIBRARY | UNVERIFIED |
+| DATABASE TABLE | orders, order_items, mobile_cart_items |
+| EXTERNAL DEPENDENCY | Tidak ada untuk checkout awal; admin mengisi ekspedisi/ongkir |
+| AUTHENTICATION REQUIREMENT | Bearer token |
+| ROLE REQUIREMENT | customer |
+| TEST TYPE | Source Contract / API Regression |
+| RISK LEVEL | HIGH |
 | RESULT | PASS |
 | BUG ANALYSIS | Tidak ada defect pada kontrak source yang diuji. |
 

@@ -118,9 +118,10 @@ class Orders extends CI_Controller
                     'vaData'       => null
                 ]);
                 return;
-            } elseif ($order->order_status == 3) { // 3 = paid
+            } elseif ((int) $order->order_status === 3 || (int) $order->order_status === 10 || (int) $brivas->status === 2) {
+                $this->complete_briva_order($order_number);
                 echo json_encode([
-                    'status'       => 'Order sudah dibayar',
+                    'status'       => 'Pembayaran BRIVA sudah dikonfirmasi dan order masuk pengemasan.',
                     'paidStatus'   => 'Y',
                     'expiredDate'  => null,
                     'vaData'       => null
@@ -130,14 +131,10 @@ class Orders extends CI_Controller
         }
 
         if (is_briva_payment_local()) {
-            if ($order && (int) $order->order_status !== 10) {
-                $this->db->where('order_number', $order_number)->update('orders', ['order_status' => 10]);
-            }
-
-            $this->db->where('order_number', $order_number)->update('briva_api', ['status' => 2]);
+            $this->complete_briva_order($order_number);
 
             echo json_encode([
-                'status'       => 'Pembayaran BRIVA lokal berhasil diterima.',
+                'status'       => 'Pembayaran BRIVA lokal berhasil diterima dan order masuk pengemasan.',
                 'paidStatus'   => 'Y',
                 'expiredDate'  => $brivas->exp_date,
                 'vaData'       => [
@@ -171,11 +168,10 @@ class Orders extends CI_Controller
 
         if ($paidStatus === "Y" && $expiredDate && strtotime($expiredDate) > time()) {
             $this->brivaws->updateStatusVa($brivas->userno, $brivas->order_number);
-            $this->db->where('order_number', $order_number)->update('briva_api', ['status' => 2]);
-            $this->db->where('order_number', $order_number)->update('orders', ['order_status' => 10]);
+            $this->complete_briva_order($order_number);
 
             echo json_encode([
-                'status'       => $json->responseMessage ?? 'BRIVA sukses',
+                'status'       => 'Pembayaran BRIVA berhasil diterima dan order masuk pengemasan.',
                 'paidStatus'   => 'Y',
                 'expiredDate'  => $expiredDate,
                 'vaData'       => $json1->virtualAccountData ?? null
@@ -252,7 +248,7 @@ class Orders extends CI_Controller
                     $datava['exp_date'] = date('c', strtotime('+1 day'));
 
                     $this->save_local_briva_payment($trxid, $datava);
-                    $this->db->where('id', $id)->update('orders', ['order_status' => 10]);
+                    $this->complete_briva_order($trxid);
 
                     $response = [
                         'code'    => 200,
@@ -425,7 +421,7 @@ class Orders extends CI_Controller
                         $datava['exp_date'] = date('c', strtotime('+1 day'));
 
                         $this->save_local_briva_payment($trxid, $datava);
-                        $this->db->where('id', $id)->update('orders', ['order_status' => 10]);
+                        $this->complete_briva_order($trxid);
 
                         $response = array('code' => 200, 'success' => TRUE, 'message' => 'Payment BRIVA lokal telah terbuat');
                     } else {
@@ -470,5 +466,11 @@ class Orders extends CI_Controller
         }
 
         return $this->db->insert('briva_api', $data);
+    }
+
+    private function complete_briva_order($order_number)
+    {
+        $this->db->where('order_number', (string) $order_number)->update('briva_api', ['status' => 2]);
+        $this->db->where('order_number', (string) $order_number)->update('orders', ['order_status' => 3]);
     }
 }

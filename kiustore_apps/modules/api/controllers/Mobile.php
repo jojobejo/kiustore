@@ -67,7 +67,11 @@ class Mobile extends CI_Controller
             'phone_number' => trim((string) $this->value('phone_number')),
             'address' => trim((string) $this->value('address')),
             'shop_name' => trim((string) $this->value('shop_name', '')),
-            'shop_address' => trim((string) $this->value('shop_address', ''))
+            'shop_address' => trim((string) $this->value('shop_address', '')),
+            'province_id' => (int) $this->value('province_id', 0),
+            'kota_id' => (int) $this->value('kota_id', 0),
+            'subdistrict_id' => (int) $this->value('subdistrict_id', 0),
+            'alamat_kirim' => trim((string) $this->value('alamat_kirim', ''))
         ));
 
         if (!$user_id) {
@@ -80,7 +84,8 @@ class Mobile extends CI_Controller
             'token' => $token['plain_token'],
             'token_type' => 'Bearer',
             'expires_at' => $token['expires_at'],
-            'user' => $this->mobile_api->profile($user_id)
+            'user' => $this->mobile_api->profile($user_id),
+            'onboarding' => $this->mobile_api->onboarding_state($user_id, TRUE)
         ), 201, 'Pendaftaran berhasil.');
     }
 
@@ -109,7 +114,8 @@ class Mobile extends CI_Controller
             'token' => $token['plain_token'],
             'token_type' => 'Bearer',
             'expires_at' => $token['expires_at'],
-            'user' => $this->mobile_api->profile($user->id)
+            'user' => $this->mobile_api->profile($user->id),
+            'onboarding' => $this->mobile_api->onboarding_state($user->id)
         ), 200, 'Login berhasil.');
     }
 
@@ -123,10 +129,34 @@ class Mobile extends CI_Controller
         return $this->respond(null, 200, 'Logout berhasil.');
     }
 
+    public function onboarding_complete()
+    {
+        if (!$this->require_method('POST') || !$this->authenticate()) {
+            return;
+        }
+
+        if (!$this->mobile_api->complete_onboarding($this->user->id)) {
+            return $this->error('Status tutorial gagal disimpan.', 500);
+        }
+
+        return $this->respond(array(
+            'onboarding' => $this->mobile_api->onboarding_state($this->user->id)
+        ), 200, 'Tutorial selesai.');
+    }
+
     public function account()
     {
-        if (!$this->require_method('DELETE') || !$this->authenticate()) {
+        if (!$this->authenticate()) {
             return;
+        }
+
+        $method = strtoupper($this->input->method(TRUE));
+        if ($method === 'GET') {
+            return $this->respond($this->mobile_api->profile($this->user->id));
+        }
+
+        if ($method !== 'DELETE') {
+            return $this->method_not_allowed(array('GET', 'DELETE'));
         }
 
         if (!$this->mobile_api->delete_account($this->user->id)) {
@@ -153,7 +183,8 @@ class Mobile extends CI_Controller
 
         $fields = array(
             'name', 'phone_number', 'address', 'shop_name', 'shop_address',
-            'province_id', 'kota_id', 'subdistrict_id', 'alamat_kirim'
+            'province_id', 'kota_id', 'subdistrict_id', 'alamat_kirim',
+            'nik', 'npwp'
         );
         $data = array();
 
@@ -426,18 +457,18 @@ class Mobile extends CI_Controller
             return;
         }
 
-        if (!$this->require_fields(array('shipping_quote_id', 'shipping_service'))) {
-            return;
-        }
-
         $result = $this->mobile_api->checkout($this->user->id, $this->user->level, array(
-            'shipping_quote_id' => (int) $this->value('shipping_quote_id'),
-            'shipping_service' => trim((string) $this->value('shipping_service')),
+            'shipping_quote_id' => (int) $this->value('shipping_quote_id', 0),
+            'shipping_service' => trim((string) $this->value('shipping_service', '')),
             'note' => trim((string) $this->value('note', ''))
         ));
 
         if (!$result['success']) {
-            return $this->error($result['message'], $result['status']);
+            return $this->error(
+                $result['message'],
+                $result['status'],
+                isset($result['errors']) ? $result['errors'] : array()
+            );
         }
 
         return $this->respond($result['data'], 201, 'Pesanan berhasil dibuat.');
@@ -720,7 +751,20 @@ class Mobile extends CI_Controller
             return $this->error($result['message'], 502, $result['data']);
         }
 
-        return $this->respond($result['data'], $status);
+        return $this->respond($this->normalize_shipping_data($result['data']), $status);
+    }
+
+    private function normalize_shipping_data($data)
+    {
+        if (is_array($data) && array_key_exists('data', $data) && is_array($data['data'])) {
+            return $data['data'];
+        }
+
+        if (is_array($data) && isset($data['rajaongkir']['results'])) {
+            return $data['rajaongkir']['results'];
+        }
+
+        return $data;
     }
 
     private function payment_picture_name()

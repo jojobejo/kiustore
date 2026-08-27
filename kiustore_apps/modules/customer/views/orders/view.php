@@ -601,11 +601,6 @@ $shipping_pending = ((int) $data->payment_method === 3 && (int) $data->order_sta
             clearInterval(statusInterval);
             clearInterval(countdownInterval);
             return;
-        } else if (orderStatus == 10) {
-            console.warn("Dalam Verifikasi Admin");
-            clearInterval(statusInterval);
-            clearInterval(countdownInterval);
-            return;
         }
 
         $.ajax({
@@ -614,6 +609,20 @@ $shipping_pending = ((int) $data->payment_method === 3 && (int) $data->order_sta
             dataType: "json",
             success: function(res) {
                 console.log("BRIVA Response:", res);
+
+                if (res.paidStatus === "Y") {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Transaksi Berhasil",
+                        text: "Pembayaran Anda telah dikonfirmasi.",
+                        confirmButtonColor: "#198754"
+                    }).then(() => {
+                        clearInterval(statusInterval);
+                        clearInterval(countdownInterval);
+                        location.reload();
+                    });
+                    return;
+                }
 
                 if (res.vaData) {
                     let briva = res.vaData;
@@ -660,21 +669,6 @@ $shipping_pending = ((int) $data->payment_method === 3 && (int) $data->order_sta
                             <a href="#" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Batalkan</a>
                         </div>
                     `);
-
-
-                    // TRANSAKSI SUKSES
-                    if (res.paidStatus === "Y") {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Transaksi Berhasil",
-                            text: "Pembayaran Anda telah dikonfirmasi.",
-                            confirmButtonColor: "#198754"
-                        }).then(() => {
-                            clearInterval(statusInterval);
-                            location.reload();
-                        });
-                        return;
-                    }
 
                     // TRANSAKSI EXPIRED
                     if (expiredDate && new Date().getTime() > expiredDate && !expiredHandled) {
@@ -831,7 +825,7 @@ $shipping_pending = ((int) $data->payment_method === 3 && (int) $data->order_sta
 
         statusInterval = setInterval(function() {
             cekStatus();
-        }, 60000);
+        }, 10000);
     });
 </script>
 

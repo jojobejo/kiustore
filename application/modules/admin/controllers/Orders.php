@@ -104,7 +104,7 @@ class Orders extends CI_Controller
             }
 
             $this->db->where('order_number', $invoice)->update('briva_api', ['status' => 2]);
-            $this->db->where('order_number', $invoice)->update('orders', ['order_status' => 10]);
+            $this->db->where('order_number', $invoice)->update('orders', ['order_status' => 3]);
 
             echo json_encode([
                 'debug_raw' => [

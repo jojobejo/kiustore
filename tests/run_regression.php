@@ -461,6 +461,65 @@ class KiuRegressionRunner
             ),
             array(
                 'meta' => $this->meta(
+                    'API-CART-001',
+                    'Mobile API Cart',
+                    'Order dikemas/dikirim tidak memblokir tambah cart',
+                    'Customer memiliki order lama dengan status 3 atau 4.',
+                    'Trace `Mobile_api_model::active_transaction_order` dan query status order.',
+                    'Status Dikemas, Dikirim, Selesai, dan Dibatalkan tidak dihitung sebagai transaksi aktif pemblokir cart.',
+                    'application/modules/api/models/Mobile_api_model.php',
+                    '/api/v1/cart',
+                    'application/modules/api/controllers/Mobile.php',
+                    'application/modules/api/models/Mobile_api_model.php',
+                    'UNVERIFIED',
+                    'UNVERIFIED',
+                    'orders, mobile_cart_items',
+                    'Tidak ada',
+                    'Bearer token',
+                    'customer',
+                    'Source Contract / API Regression',
+                    'HIGH'
+                ),
+                'callback' => function () use ($self) {
+                    $model = $self->read('application/modules/api/models/Mobile_api_model.php');
+                    $body = $self->functionBody($model, 'active_transaction_order');
+                    $self->assertContains("where_not_in('order_status', array(3, 4, 5, 6, 7))", $body, 'Order status 3 dan 4 harus boleh menambahkan item baru ke cart.');
+                }
+            ),
+            array(
+                'meta' => $this->meta(
+                    'API-CHECKOUT-001',
+                    'Mobile API Checkout',
+                    'Checkout menunggu ekspedisi admin',
+                    'Customer membuat pesanan dari keranjang.',
+                    'Trace `Mobile::checkout` dan `Mobile_api_model::checkout`.',
+                    'Checkout mobile tidak mewajibkan quote ongkir, tidak mengisi ekspedisi otomatis, dan ongkir awal bernilai 0.',
+                    'application/modules/api/controllers/Mobile.php; application/modules/api/models/Mobile_api_model.php',
+                    '/api/v1/orders/checkout',
+                    'application/modules/api/controllers/Mobile.php',
+                    'application/modules/api/models/Mobile_api_model.php',
+                    'UNVERIFIED',
+                    'UNVERIFIED',
+                    'orders, order_items, mobile_cart_items',
+                    'Tidak ada untuk checkout awal; admin mengisi ekspedisi/ongkir',
+                    'Bearer token',
+                    'customer',
+                    'Source Contract / API Regression',
+                    'HIGH'
+                ),
+                'callback' => function () use ($self) {
+                    $controller = $self->functionBody($self->read('application/modules/api/controllers/Mobile.php'), 'checkout');
+                    $model = $self->functionBody($self->read('application/modules/api/models/Mobile_api_model.php'), 'checkout');
+                    $self->assertContains("\$this->value('shipping_quote_id', 0)", $controller, 'Checkout harus menerima request tanpa shipping_quote_id.');
+                    $self->assertContains("\$this->value('shipping_service', '')", $controller, 'Checkout harus menerima request tanpa shipping_service.');
+                    $self->assertContains("'jenis_pengiriman' => ''", $model, 'Jenis pengiriman awal harus kosong sampai diisi admin.');
+                    $self->assertContains("'shipping_cost' => 0", $model, 'Ongkir awal harus 0 sampai diisi admin.');
+                    $self->assertContains("\$order['nama_ekspedisi'] = ''", $model, 'Nama ekspedisi awal harus kosong sampai diisi admin.');
+                    $self->assertContains("'active_order' => \$active_order", $model, 'Checkout harus mengembalikan active_order saat ada transaksi berjalan.');
+                }
+            ),
+            array(
+                'meta' => $this->meta(
                     'API-006',
                     'Mobile API Account',
                     'Account detail mobile',
