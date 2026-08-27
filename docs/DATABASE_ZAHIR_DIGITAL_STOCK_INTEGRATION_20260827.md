@@ -102,9 +102,9 @@ Insert divalidasi ulang terhadap data Zahir terbaru dan dibatalkan bila nama bar
 
 Export stock bersifat read-only dan membaca:
 
-- Data olahan Zahir dari API integration payload.
-- `products.name` sebagai `Nama Barang`.
-- `products.stock` sebagai `Qty`.
+- Data olahan Zahir dari API integration payload atau batch import aktif.
+- Hasil compare Zahir-only, yaitu barang Zahir yang tidak ada di `products`.
+- Kolom export hanya `Nama Barang` dan `Qty`.
 
 Tidak ada mutasi database saat export.
 

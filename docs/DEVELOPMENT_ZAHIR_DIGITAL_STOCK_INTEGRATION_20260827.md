@@ -130,10 +130,10 @@ Tombol `Export Data Stock` menjalankan:
 admin/zahir-stock/export-stock-excel
 ```
 
-File Excel berisi dua tabel:
+File Excel berisi data `Barang Zahir Tidak Ada di Produk Karisma Online` dengan header:
 
-1. `Data Olah Stock Zahir Digital`: hasil hit API Zahir setelah rules olah data, kolom `Nama Barang` dan `Qty`.
-2. `Data Stock Products Karisma Online`: data dari tabel `products`, kolom `Nama Barang` dan `Qty`.
+- `Nama Barang`
+- `Qty`
 
 ## Status Verifikasi
 

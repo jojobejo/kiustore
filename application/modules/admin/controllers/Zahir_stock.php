@@ -324,14 +324,15 @@ class Zahir_stock extends CI_Controller
 
     public function export_stock_excel()
     {
-        $payload = $this->build_stock_payload();
+        $source_mode = $this->input->get('source') === 'import' ? 'import' : 'api';
+        $batch_id = (int) $this->input->get('batch_id');
+        $payload = $this->build_stock_payload($source_mode, $batch_id);
         if (!$payload['success']) {
             show_error('Data Zahir Digital belum siap: ' . $payload['error_message'], 500, 'Export Gagal');
             return;
         }
 
-        $products = $this->zahir_stock->get_products_for_compare();
-        $filename = 'export_stock_zahir_products_' . date('Ymd_His') . '.xls';
+        $filename = 'barang_zahir_tidak_ada_produk_karisma_' . date('Ymd_His') . '.xls';
 
         header('Content-Type: application/vnd.ms-excel; charset=UTF-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -339,24 +340,12 @@ class Zahir_stock extends CI_Controller
 
         echo "\xEF\xBB\xBF";
         echo '<html><head><meta charset="UTF-8"></head><body>';
-        echo '<h3>Data Olah Stock Zahir Digital</h3>';
         echo '<table border="1">';
         echo '<thead><tr><th>Nama Barang</th><th>Qty</th></tr></thead><tbody>';
-        foreach ($payload['processed'] as $row) {
+        foreach ($payload['zahir_only'] as $row) {
             echo '<tr>';
             echo '<td>' . html_escape($row['nama_barang']) . '</td>';
             echo '<td>' . (int) $row['qty'] . '</td>';
-            echo '</tr>';
-        }
-        echo '</tbody></table>';
-
-        echo '<br><h3>Data Stock Products Karisma Online</h3>';
-        echo '<table border="1">';
-        echo '<thead><tr><th>Nama Barang</th><th>Qty</th></tr></thead><tbody>';
-        foreach ($products as $product) {
-            echo '<tr>';
-            echo '<td>' . html_escape($product->name) . '</td>';
-            echo '<td>' . (int) $product->stock . '</td>';
             echo '</tr>';
         }
         echo '</tbody></table>';

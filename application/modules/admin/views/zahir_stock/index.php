@@ -371,7 +371,7 @@ function zahir_stock_render_zahir_only_rows($rows)
       <div class="card">
         <div class="card-header border-0 d-flex align-items-center justify-content-between">
           <h3 class="mb-0">Barang Zahir Tidak Ada di Produk Karisma Online</h3>
-          <a href="<?php echo site_url('admin/zahir-stock/export-stock-excel'); ?>" class="btn btn-success btn-sm">
+          <a href="<?php echo site_url('admin/zahir-stock/export-stock-excel?source=' . $source_mode . '&batch_id=' . (int) $batch_id); ?>" class="btn btn-success btn-sm">
             <i class="fa fa-file-excel"></i> Export Data Stock
           </a>
         </div>
