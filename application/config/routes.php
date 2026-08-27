@@ -100,6 +100,7 @@ $route['admin/zahir-stock/data']            = 'admin/zahir_stock/data';
 $route['admin/zahir-stock/approve']         = 'admin/zahir_stock/approve';
 $route['admin/zahir-stock/insert-product']  = 'admin/zahir_stock/insert_product';
 $route['admin/zahir-stock/export-stock-excel'] = 'admin/zahir_stock/export_stock_excel';
+$route['admin/zahir-stock/import']          = 'admin/zahir_stock/import';
 $route['admin']                             = 'admin/admin';
 $route['admin/categories']                  = 'admin/products/category';
 

@@ -183,6 +183,55 @@ function zahir_stock_render_zahir_only_rows($rows)
     </div>
   <?php endif; ?>
 
+  <div class="card">
+    <div class="card-header border-0 d-flex align-items-center justify-content-between">
+      <div>
+        <h3 class="mb-0">Import Data Stock Zahir Digital</h3>
+        <small class="text-muted">
+          Sumber aktif:
+          <?php if ($source_mode === 'import' && !empty($import_batch)) : ?>
+            Batch import #<?php echo (int) $import_batch->id; ?> - <?php echo html_escape($import_batch->source_file_name); ?>
+          <?php else : ?>
+            API live Zahir Digital
+          <?php endif; ?>
+        </small>
+      </div>
+      <div>
+        <a href="<?php echo site_url('admin/zahir-stock'); ?>" class="btn btn-sm <?php echo $source_mode === 'api' ? 'btn-primary' : 'btn-outline-primary'; ?>">API Live</a>
+        <?php if (!empty($latest_import)) : ?>
+          <a href="<?php echo site_url('admin/zahir-stock?source=import&batch_id=' . (int) $latest_import->id); ?>" class="btn btn-sm <?php echo $source_mode === 'import' ? 'btn-primary' : 'btn-outline-primary'; ?>">Import Terakhir</a>
+        <?php endif; ?>
+      </div>
+    </div>
+    <div class="card-body">
+      <form action="<?php echo site_url('admin/zahir-stock/import'); ?>" method="post" enctype="multipart/form-data" class="row align-items-end">
+        <div class="col-md-8">
+          <label class="form-control-label">File export Zahir Digital</label>
+          <input type="file" name="stock_file" class="form-control" accept=".xls,.csv,.txt,.tsv" required>
+          <small class="text-muted">Gunakan file export dari Zahir Digital. Sistem akan olah karakter *, trim, unique nama barang, dan sum Qty.</small>
+        </div>
+        <div class="col-md-4 mt-3 mt-md-0">
+          <button type="submit" class="btn btn-success btn-block">
+            <i class="fa fa-upload"></i> Import dan Olah Data
+          </button>
+        </div>
+      </form>
+      <?php if (!empty($import_batch)) : ?>
+        <div class="alert alert-info mt-3 mb-0">
+          Batch aktif #<?php echo (int) $import_batch->id; ?>:
+          raw <?php echo (int) $import_batch->raw_rows; ?>,
+          olahan <?php echo (int) $import_batch->processed_rows; ?>,
+          match <?php echo (int) $import_batch->matched_rows; ?>,
+          Zahir-only <?php echo (int) $import_batch->zahir_only_rows; ?>,
+          product-only <?php echo (int) $import_batch->product_only_rows; ?>.
+          <span class="badge badge-secondary ml-2">Pending <?php echo (int) $import_update_summary['PENDING']; ?></span>
+          <span class="badge badge-success ml-1">Updated <?php echo (int) $import_update_summary['UPDATED']; ?></span>
+          <span class="badge badge-info ml-1">Inserted <?php echo (int) $import_update_summary['INSERTED']; ?></span>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+
   <div class="card d-none">
     <div class="card-header border-0">
       <h3 class="mb-0">Rules Olah Data Zahir Digital</h3>
@@ -222,6 +271,8 @@ function zahir_stock_render_zahir_only_rows($rows)
   </div>
 
   <form id="approveSelectedForm" action="<?php echo site_url('admin/zahir-stock/approve'); ?>" method="post" onsubmit="return prepareApproveSelected();">
+    <input type="hidden" name="source_mode" value="<?php echo html_escape($source_mode); ?>">
+    <input type="hidden" name="batch_id" value="<?php echo (int) $batch_id; ?>">
     <div id="selectedProductInputs"></div>
     <div class="card">
       <div class="card-header border-0 d-flex align-items-center justify-content-between">
@@ -311,6 +362,8 @@ function zahir_stock_render_zahir_only_rows($rows)
   </form>
   <form id="approveAllForm" action="<?php echo site_url('admin/zahir-stock/approve'); ?>" method="post" onsubmit="return confirm('Bulk all akan update seluruh produk match sesuai Qty Zahir Digital terbaru. Lanjutkan?');">
     <input type="hidden" name="approve_all" value="1">
+    <input type="hidden" name="source_mode" value="<?php echo html_escape($source_mode); ?>">
+    <input type="hidden" name="batch_id" value="<?php echo (int) $batch_id; ?>">
   </form>
 
   <div class="row">
@@ -406,7 +459,9 @@ function zahir_stock_render_zahir_only_rows($rows)
         type: 'POST',
         dataType: 'json',
         data: {
-          nama_barang: namaBarang
+          nama_barang: namaBarang,
+          source_mode: '<?php echo html_escape($source_mode); ?>',
+          batch_id: '<?php echo (int) $batch_id; ?>'
         },
         success: function(response) {
           if (!response || !response.success) {

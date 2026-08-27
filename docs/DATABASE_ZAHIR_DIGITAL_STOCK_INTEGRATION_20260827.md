@@ -4,7 +4,15 @@ Tanggal: 2026-08-27
 
 ## Kesimpulan Skema
 
-Tidak ada perubahan skema database pada module ini.
+Ada perubahan skema database untuk module import/tracking stock Zahir Digital.
+
+Migration:
+
+```text
+db/migrations/20260827_zahir_stock_import_tracking.sql
+```
+
+Migration sudah dijalankan pada database lokal `kiucoid_kiustore`.
 
 Module memakai tabel existing:
 
@@ -19,6 +27,42 @@ Verifikasi lokal pada database `kiucoid_kiustore`:
 - `products.name`: `varchar(191) NOT NULL`
 - `products.stock`: `int(10) NOT NULL`
 - Jumlah produk lokal saat pengecekan: 737
+
+## Tabel Baru
+
+### `zahir_stock_import_batches`
+
+Menyimpan header batch import:
+
+- nama file asli,
+- nama file tersimpan,
+- total raw rows,
+- total data olahan,
+- total match,
+- total Zahir-only,
+- total product-only,
+- status import,
+- waktu import.
+
+### `zahir_stock_import_items`
+
+Menyimpan detail tracking per barang:
+
+- `batch_id`,
+- `nama_barang`,
+- `qty`,
+- `product_id` bila match,
+- `product_stock`,
+- `selisih`,
+- `match_status`: `MATCHED`, `ZAHIR_ONLY`, atau `PRODUCT_ONLY`,
+- `update_status`: `PENDING`, `UPDATED`, atau `INSERTED`,
+- `updated_product_id`,
+- `updated_at`.
+
+Status tracking diperbarui oleh proses aplikasi:
+
+- Approve update stock dari batch import mengubah item match menjadi `UPDATED`.
+- Insert produk dari daftar Zahir-only pada batch import mengubah item menjadi `INSERTED`.
 
 ## Proses Update Saat Approve
 
@@ -63,6 +107,16 @@ Export stock bersifat read-only dan membaca:
 - `products.stock` sebagai `Qty`.
 
 Tidak ada mutasi database saat export.
+
+## Production Migration
+
+Jalankan SQL berikut pada production sebelum memakai import:
+
+```powershell
+Get-Content db\migrations\20260827_zahir_stock_import_tracking.sql | C:\xampp\mysql\bin\mysql.exe -u <user> -p <database>
+```
+
+Untuk hosting tanpa PowerShell, jalankan isi file SQL tersebut melalui phpMyAdmin atau client MySQL production.
 
 ## Matching Key
 

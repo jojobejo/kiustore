@@ -12,6 +12,7 @@ Menyediakan halaman admin baru untuk mengambil data stock ready dari Zahir Digit
 - Endpoint JSON audit data: `admin/zahir-stock/data`
 - Endpoint approve update stock: `admin/zahir-stock/approve`
 - Endpoint export Excel stock: `admin/zahir-stock/export-stock-excel`
+- Endpoint import file stock: `admin/zahir-stock/import`
 - Controller: `application/modules/admin/controllers/Zahir_stock.php`
 - Model: `application/modules/admin/models/Zahir_stock_model.php`
 - View: `application/modules/admin/views/zahir_stock/index.php`
@@ -65,6 +66,30 @@ Parser sumber mendukung JSON, HTML table, CSV, semicolon-delimited, dan TSV deng
 5. Admin memilih produk match dan menekan `Approve Terpilih`; tombol menyala saat ada pilihan dan menampilkan badge total terpilih.
 6. Admin dapat menekan `Bulk All Update Data Semua` untuk update seluruh produk match terbaru.
 7. Sistem mengambil ulang data Zahir terbaru, mencocokkan ulang produk terpilih atau seluruh produk match, lalu update `products.stock` sesuai Qty Zahir dalam transaksi database.
+
+## Import Lokal ke Production
+
+Module import berada di halaman `admin/zahir-stock`.
+
+Alur:
+
+1. User export file dari Zahir Digital memakai format `Nama Barang` dan `Qty`.
+2. User upload file `.xls`, `.csv`, `.txt`, atau `.tsv` ke form `Import Data Stock Zahir Digital`.
+3. Sistem membaca file, menjalankan rules olah data yang sama dengan API live, lalu menyimpan batch import ke tabel tracking.
+4. Setelah sukses, halaman diarahkan ke mode `source=import&batch_id=<id>` sehingga compare, approve, insert produk, dan tracking memakai batch import tersebut.
+5. Tombol `API Live` mengembalikan halaman ke sumber API live, sedangkan tombol `Import Terakhir` membuka batch import terbaru.
+6. Batch import menampilkan tracking status `Pending`, `Updated`, dan `Inserted` berdasarkan jalannya approve update stock dan insert produk.
+
+File upload disimpan di:
+
+```text
+assets/uploads/zahir_stock_import/
+```
+
+Tracking disimpan di:
+
+- `zahir_stock_import_batches`
+- `zahir_stock_import_items`
 
 ## Kontrol Risiko
 

@@ -20,8 +20,14 @@ class Zahir_stock extends CI_Controller
     public function index()
     {
         $params['title'] = 'Integrasi Stock Zahir Digital';
-        $data = $this->build_stock_payload();
+        $source_mode = $this->input->get('source') === 'import' ? 'import' : 'api';
+        $batch_id = (int) $this->input->get('batch_id');
+        $data = $this->build_stock_payload($source_mode, $batch_id);
         $data['flash'] = $this->session->flashdata('zahir_stock_flash');
+        $data['latest_import'] = $this->zahir_stock->get_latest_import_batch();
+        $data['import_update_summary'] = !empty($data['import_batch'])
+            ? $this->zahir_stock->get_import_update_summary($data['import_batch']->id)
+            : array('PENDING' => 0, 'UPDATED' => 0, 'INSERTED' => 0);
 
         $this->load->view('header', $params);
         $this->load->view('zahir_stock/index', $data);
@@ -30,12 +36,16 @@ class Zahir_stock extends CI_Controller
 
     public function data()
     {
-        $this->json_response($this->build_stock_payload());
+        $source_mode = $this->input->get('source') === 'import' ? 'import' : 'api';
+        $batch_id = (int) $this->input->get('batch_id');
+        $this->json_response($this->build_stock_payload($source_mode, $batch_id));
     }
 
     public function approve()
     {
         $approve_all = $this->input->post('approve_all') === '1';
+        $source_mode = $this->input->post('source_mode') === 'import' ? 'import' : 'api';
+        $batch_id = (int) $this->input->post('batch_id');
         $product_ids = $this->input->post('product_ids');
         $product_ids = is_array($product_ids) ? $product_ids : array();
         $product_ids = array_unique(array_filter(array_map('intval', $product_ids)));
@@ -49,7 +59,7 @@ class Zahir_stock extends CI_Controller
             return;
         }
 
-        $payload = $this->build_stock_payload();
+        $payload = $this->build_stock_payload($source_mode, $batch_id);
         if (!$payload['success']) {
             $this->session->set_flashdata('zahir_stock_flash', array(
                 'type' => 'danger',
@@ -80,6 +90,9 @@ class Zahir_stock extends CI_Controller
 
             $row = $latest_by_product[$product_id];
             $this->zahir_stock->update_product_stock($product_id, $row['zahir_qty']);
+            if ($source_mode === 'import' && $batch_id > 0) {
+                $this->zahir_stock->mark_import_item_updated($batch_id, $product_id, 'UPDATED', $product_id);
+            }
             $updated++;
         }
         $this->db->trans_complete();
@@ -96,7 +109,143 @@ class Zahir_stock extends CI_Controller
             ));
         }
 
-        redirect('admin/zahir-stock');
+        $redirect_url = 'admin/zahir-stock';
+        if ($source_mode === 'import' && $batch_id > 0) {
+            $redirect_url .= '?source=import&batch_id=' . $batch_id;
+        }
+
+        redirect($redirect_url);
+    }
+
+    public function import()
+    {
+        if (empty($_FILES['stock_file']['name'])) {
+            $this->session->set_flashdata('zahir_stock_flash', array(
+                'type' => 'warning',
+                'message' => 'Pilih file export Zahir Digital terlebih dahulu.'
+            ));
+            redirect('admin/zahir-stock');
+            return;
+        }
+
+        $original_name = $_FILES['stock_file']['name'];
+        $extension = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
+        $allowed = array('xls', 'csv', 'txt', 'tsv');
+        if (!in_array($extension, $allowed, TRUE)) {
+            $this->session->set_flashdata('zahir_stock_flash', array(
+                'type' => 'danger',
+                'message' => 'Format file tidak didukung. Gunakan export .xls dari Zahir Digital atau CSV/TSV.'
+            ));
+            redirect('admin/zahir-stock');
+            return;
+        }
+
+        $upload_dir = FCPATH . 'assets/uploads/zahir_stock_import/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, TRUE);
+        }
+
+        $stored_name = 'zahir_stock_' . date('Ymd_His') . '_' . mt_rand(1000, 9999) . '.' . $extension;
+        $stored_path = $upload_dir . $stored_name;
+
+        if (!move_uploaded_file($_FILES['stock_file']['tmp_name'], $stored_path)) {
+            $this->session->set_flashdata('zahir_stock_flash', array(
+                'type' => 'danger',
+                'message' => 'Upload file gagal.'
+            ));
+            redirect('admin/zahir-stock');
+            return;
+        }
+
+        $content = file_get_contents($stored_path);
+        $raw_rows = $this->parse_source_rows($content);
+        if (empty($raw_rows)) {
+            $this->session->set_flashdata('zahir_stock_flash', array(
+                'type' => 'danger',
+                'message' => 'File berhasil diupload, tetapi kolom Nama Barang dan Qty belum terbaca.'
+            ));
+            redirect('admin/zahir-stock');
+            return;
+        }
+
+        $processed = $this->process_zahir_rows($raw_rows);
+        $compare = $this->compare_processed_rows($processed, $this->zahir_stock->get_products_for_compare());
+        $now = date('Y-m-d H:i:s');
+
+        $this->db->trans_start();
+        $batch_id = $this->zahir_stock->create_import_batch(array(
+            'source_file_name' => $original_name,
+            'stored_file_name' => $stored_name,
+            'raw_rows' => count($raw_rows),
+            'processed_rows' => count($processed),
+            'matched_rows' => count($compare['matched']),
+            'zahir_only_rows' => count($compare['zahir_only']),
+            'product_only_rows' => count($compare['product_only']),
+            'status' => 'IMPORTED',
+            'imported_by' => NULL,
+            'imported_at' => $now
+        ));
+
+        $items = array();
+        foreach ($compare['matched'] as $row) {
+            $items[] = array(
+                'batch_id' => $batch_id,
+                'nama_barang' => $row['nama_barang'],
+                'qty' => (int) $row['zahir_qty'],
+                'product_id' => (int) $row['product_id'],
+                'product_name' => $row['product_name'],
+                'product_stock' => (int) $row['product_stock'],
+                'selisih' => (int) $row['selisih'],
+                'match_status' => 'MATCHED',
+                'update_status' => 'PENDING'
+            );
+        }
+
+        foreach ($compare['zahir_only'] as $row) {
+            $items[] = array(
+                'batch_id' => $batch_id,
+                'nama_barang' => $row['nama_barang'],
+                'qty' => (int) $row['qty'],
+                'product_id' => NULL,
+                'product_name' => NULL,
+                'product_stock' => NULL,
+                'selisih' => NULL,
+                'match_status' => 'ZAHIR_ONLY',
+                'update_status' => 'PENDING'
+            );
+        }
+
+        foreach ($compare['product_only'] as $row) {
+            $items[] = array(
+                'batch_id' => $batch_id,
+                'nama_barang' => $row['nama_barang'],
+                'qty' => (int) $row['stock'],
+                'product_id' => (int) $row['product_id'],
+                'product_name' => $row['nama_barang'],
+                'product_stock' => (int) $row['stock'],
+                'selisih' => NULL,
+                'match_status' => 'PRODUCT_ONLY',
+                'update_status' => 'PENDING'
+            );
+        }
+
+        $this->zahir_stock->insert_import_items($items);
+        $this->db->trans_complete();
+
+        if (!$this->db->trans_status()) {
+            $this->session->set_flashdata('zahir_stock_flash', array(
+                'type' => 'danger',
+                'message' => 'Import gagal saat menyimpan staging/tracking.'
+            ));
+            redirect('admin/zahir-stock');
+            return;
+        }
+
+        $this->session->set_flashdata('zahir_stock_flash', array(
+            'type' => 'success',
+            'message' => 'Import berhasil. ' . count($processed) . ' data olahan disimpan sebagai acuan integrasi batch #' . $batch_id . '.'
+        ));
+        redirect('admin/zahir-stock?source=import&batch_id=' . $batch_id);
     }
 
     public function insert_product()
@@ -114,7 +263,9 @@ class Zahir_stock extends CI_Controller
             return;
         }
 
-        $payload = $this->build_stock_payload();
+        $source_mode = $this->input->post('source_mode') === 'import' ? 'import' : 'api';
+        $batch_id = (int) $this->input->post('batch_id');
+        $payload = $this->build_stock_payload($source_mode, $batch_id);
         if (!$payload['success']) {
             $this->json_response(array(
                 'success' => false,
@@ -149,6 +300,9 @@ class Zahir_stock extends CI_Controller
 
         $this->db->trans_start();
         $product_id = $this->zahir_stock->add_product_from_zahir($row['nama_barang'], $row['qty']);
+        if ($source_mode === 'import' && $batch_id > 0) {
+            $this->zahir_stock->mark_import_item_inserted_by_name($batch_id, $row['nama_barang'], $product_id);
+        }
         $this->db->trans_complete();
 
         if (!$this->db->trans_status() || !$product_id) {
@@ -209,11 +363,82 @@ class Zahir_stock extends CI_Controller
         echo '</body></html>';
     }
 
-    private function build_stock_payload()
+    private function build_stock_payload($source_mode = 'api', $batch_id = 0)
     {
-        $source = $this->fetch_zahir_source();
         $products = $this->zahir_stock->get_products_for_compare();
+        $import_batch = NULL;
+        $source = $source_mode === 'import'
+            ? $this->fetch_import_source($batch_id, $import_batch)
+            : $this->fetch_zahir_source();
         $processed = array();
+        $compare = array('matched' => array(), 'zahir_only' => array(), 'product_only' => array());
+
+        if ($source['success']) {
+            $processed = $this->process_zahir_rows($source['rows']);
+            $compare = $this->compare_processed_rows($processed, $products);
+        }
+
+        return array(
+            'success' => $source['success'],
+            'source_url' => $source['url'],
+            'source_mode' => $source_mode,
+            'batch_id' => $import_batch ? (int) $import_batch->id : 0,
+            'import_batch' => $import_batch,
+            'http_code' => $source['http_code'],
+            'error_message' => $source['error_message'],
+            'raw_count' => $source['raw_count'],
+            'processed' => array_values($processed),
+            'matched' => array_values($compare['matched']),
+            'zahir_only' => array_values($compare['zahir_only']),
+            'product_only' => array_values($compare['product_only']),
+            'summary' => array(
+                'processed_rows' => count($processed),
+                'matched_rows' => count($compare['matched']),
+                'zahir_only_rows' => count($compare['zahir_only']),
+                'product_only_rows' => count($compare['product_only'])
+            )
+        );
+    }
+
+    private function fetch_import_source($batch_id, &$import_batch)
+    {
+        $import_batch = $batch_id > 0 ? $this->zahir_stock->get_import_batch($batch_id) : $this->zahir_stock->get_latest_import_batch();
+
+        if (!$import_batch) {
+            return array(
+                'success' => false,
+                'url' => 'import://zahir-stock',
+                'http_code' => 0,
+                'error_message' => 'Belum ada batch import stock Zahir Digital.',
+                'rows' => array(),
+                'raw_count' => 0
+            );
+        }
+
+        $rows = array();
+        foreach ($this->zahir_stock->get_import_items($import_batch->id) as $item) {
+            if ($item->match_status === 'PRODUCT_ONLY') {
+                continue;
+            }
+
+            $rows[] = array(
+                'nama_barang' => $item->nama_barang,
+                'qty' => (int) $item->qty
+            );
+        }
+
+        return array(
+            'success' => true,
+            'url' => 'import://zahir-stock/batch/' . $import_batch->id,
+            'http_code' => 200,
+            'error_message' => '',
+            'rows' => $rows,
+            'raw_count' => count($rows)
+        );
+    }
+
+    private function compare_processed_rows($processed, $products)
+    {
         $matched = array();
         $zahir_only = array();
         $product_only = array();
@@ -222,76 +447,73 @@ class Zahir_stock extends CI_Controller
 
         foreach ($products as $product) {
             $key = $this->normalize_compare_name($product->name);
-            if ($key === '') {
-                continue;
+            if ($key !== '') {
+                $product_map[$key] = $product;
             }
-
-            $product_map[$key] = $product;
         }
 
-        if ($source['success']) {
-            $processed = $this->process_zahir_rows($source['rows']);
+        foreach ($processed as $row) {
+            $key = $this->normalize_compare_name($row['nama_barang']);
+            $zahir_map[$key] = $row;
 
-            foreach ($processed as $row) {
-                $key = $this->normalize_compare_name($row['nama_barang']);
-                $zahir_map[$key] = $row;
-
-                if (isset($product_map[$key])) {
-                    $product = $product_map[$key];
-                    $matched[] = array(
-                        'product_id' => (int) $product->id,
-                        'nama_barang' => $row['nama_barang'],
-                        'zahir_qty' => (int) $row['qty'],
-                        'product_name' => $product->name,
-                        'product_stock' => (int) $product->stock,
-                        'selisih' => (int) $row['qty'] - (int) $product->stock
-                    );
-                } else {
-                    $zahir_only[] = array(
-                        'nama_barang' => $row['nama_barang'],
-                        'qty' => (int) $row['qty']
-                    );
-                }
+            if (isset($product_map[$key])) {
+                $product = $product_map[$key];
+                $matched[] = array(
+                    'product_id' => (int) $product->id,
+                    'nama_barang' => $row['nama_barang'],
+                    'zahir_qty' => (int) $row['qty'],
+                    'product_name' => $product->name,
+                    'product_stock' => (int) $product->stock,
+                    'selisih' => (int) $row['qty'] - (int) $product->stock
+                );
+            } else {
+                $zahir_only[] = array(
+                    'nama_barang' => $row['nama_barang'],
+                    'qty' => (int) $row['qty']
+                );
             }
+        }
 
-            foreach ($product_map as $key => $product) {
-                if (!isset($zahir_map[$key])) {
-                    $product_only[] = array(
-                        'product_id' => (int) $product->id,
-                        'nama_barang' => $product->name,
-                        'stock' => (int) $product->stock
-                    );
-                }
+        foreach ($product_map as $key => $product) {
+            if (!isset($zahir_map[$key])) {
+                $product_only[] = array(
+                    'product_id' => (int) $product->id,
+                    'nama_barang' => $product->name,
+                    'stock' => (int) $product->stock
+                );
             }
         }
 
         return array(
-            'success' => $source['success'],
-            'source_url' => $source['url'],
-            'http_code' => $source['http_code'],
-            'error_message' => $source['error_message'],
-            'raw_count' => $source['raw_count'],
-            'processed' => array_values($processed),
-            'matched' => array_values($matched),
-            'zahir_only' => array_values($zahir_only),
-            'product_only' => array_values($product_only),
-            'summary' => array(
-                'processed_rows' => count($processed),
-                'matched_rows' => count($matched),
-                'zahir_only_rows' => count($zahir_only),
-                'product_only_rows' => count($product_only)
-            )
+            'matched' => $matched,
+            'zahir_only' => $zahir_only,
+            'product_only' => $product_only
         );
     }
 
     private function fetch_zahir_source()
     {
+        $enabled = $this->config->item('zahir_stockready_enabled', 'zahirdigital');
         $url = $this->config->item('zahir_stockready_url', 'zahirdigital');
         $token = $this->config->item('zahir_stockready_token', 'zahirdigital');
         $username = $this->config->item('zahir_stockready_username', 'zahirdigital');
         $password = $this->config->item('zahir_stockready_password', 'zahirdigital');
         $timeout = (int) $this->config->item('zahir_stockready_timeout', 'zahirdigital');
         $timeout = $timeout > 0 ? $timeout : 30;
+
+        if (!$this->is_enabled_config($enabled)) {
+            $message = $this->config->item('zahir_stockready_unavailable_message', 'zahirdigital');
+            $message = $message !== '' ? $message : 'Integrasi Stock Zahir Digital sedang dinonaktifkan.';
+
+            return array(
+                'success' => FALSE,
+                'url' => $url,
+                'http_code' => 0,
+                'error_message' => $message,
+                'rows' => array(),
+                'raw_count' => 0
+            );
+        }
 
         $response = '';
         $http_code = 0;
@@ -322,7 +544,7 @@ class Zahir_stock extends CI_Controller
             curl_close($curl);
 
             if ($response === FALSE) {
-                $error_message = $curl_error;
+                $error_message = $this->format_zahir_connection_error($curl_error, $url);
                 $response = '';
             }
         } else {
@@ -351,7 +573,7 @@ class Zahir_stock extends CI_Controller
             }
 
             if ($response === FALSE) {
-                $error_message = 'Gagal mengambil data sumber Zahir Digital.';
+                $error_message = $this->format_zahir_connection_error('Gagal mengambil data sumber Zahir Digital.', $url);
                 $response = '';
             }
         }
@@ -376,6 +598,63 @@ class Zahir_stock extends CI_Controller
             'rows' => $rows,
             'raw_count' => count($rows)
         );
+    }
+
+    private function is_enabled_config($value)
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        $value = strtolower(trim((string) $value));
+
+        return in_array($value, array('1', 'true', 'yes', 'on'), TRUE);
+    }
+
+    private function format_zahir_connection_error($error, $url)
+    {
+        $message = trim((string) $error);
+        if ($message === '') {
+            $message = 'Tidak dapat terhubung ke sumber Zahir Digital.';
+        }
+
+        $host = parse_url($url, PHP_URL_HOST);
+        if ($this->is_private_network_host($host)) {
+            $message .= ' Host sumber memakai alamat jaringan lokal/internal (' . $host . '), sehingga server online tidak dapat mengaksesnya tanpa VPN, reverse proxy internal, atau proses sinkronisasi terjadwal.';
+        }
+
+        return $message;
+    }
+
+    private function is_private_network_host($host)
+    {
+        if ($host === NULL || $host === '') {
+            return FALSE;
+        }
+
+        if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === FALSE) {
+            return FALSE;
+        }
+
+        $long = ip2long($host);
+        if ($long === FALSE) {
+            return FALSE;
+        }
+
+        $ranges = array(
+            array('10.0.0.0', '10.255.255.255'),
+            array('172.16.0.0', '172.31.255.255'),
+            array('192.168.0.0', '192.168.255.255'),
+            array('127.0.0.0', '127.255.255.255')
+        );
+
+        foreach ($ranges as $range) {
+            if ($long >= ip2long($range[0]) && $long <= ip2long($range[1])) {
+                return TRUE;
+            }
+        }
+
+        return FALSE;
     }
 
     private function parse_source_rows($response)
