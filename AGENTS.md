@@ -66,3 +66,34 @@ Setelah konsep disetujui, hasilkan output siap pakai dalam format:
 - Ringkas, tajam, tegas, berwawasan strategis, dan solutif.
 - Selalu berikan tautan klik langsung (*clickable links*) ke file atau artefak yang dibuat.
 - Bersikap sebagai partner terpercaya yang mampu memimpin dengan data (*lead with data*).
+
+---
+
+## 7. DEVELOPMENT SYNC RULES: application -> kiustore_apps
+
+### Single Source of Truth
+- Folder `application/` adalah sumber utama pengembangan dan validasi.
+- Folder `kiustore_apps/` adalah mirror distribusi dari `application/`.
+- Jangan melakukan perubahan fungsional langsung di `kiustore_apps/`, kecuali perubahan tersebut terlebih dahulu dibuat dan divalidasi di `application/`.
+
+### Workflow Wajib Setelah Perubahan di application
+1. Cari file yang berubah pada folder `application/`.
+2. Review perubahan tersebut dan pastikan tidak ada file konfigurasi sensitif yang ikut berubah tanpa kebutuhan.
+3. Jalankan dry-run sinkronisasi:
+   ```bash
+   ./scripts/sync_application_to_kiustore_apps.sh --dry-run
+   ```
+4. Jika daftar perubahan sudah sesuai, jalankan sinkronisasi aktual:
+   ```bash
+   ./scripts/sync_application_to_kiustore_apps.sh
+   ```
+5. Verifikasi hasil akhir:
+   ```bash
+   ./scripts/sync_application_to_kiustore_apps.sh --verify
+   ```
+
+### Rule Risiko
+- Setiap file yang ada di `application/` tetapi belum ada di `kiustore_apps/` wajib ditambahkan melalui proses sinkronisasi.
+- Setiap file dengan path sama tetapi isi berbeda wajib diperbarui dari `application/` ke `kiustore_apps/`.
+- Setiap file yang hanya ada di `kiustore_apps/` akan dihapus saat full mirror karena tidak memiliki sumber pada `application/`.
+- Jika ada kebutuhan mempertahankan file khusus di `kiustore_apps/`, dokumentasikan pengecualian tersebut terlebih dahulu sebelum sinkronisasi.

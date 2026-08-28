@@ -133,7 +133,7 @@ if (!function_exists('verify_login')) {
         if (is_login()) {
             $user_data = user_data();
             $role = $user_data->role;
-            if ($role == 'admin' || $role == 'salesman' || $role == 'distribusi') {
+            if ($role == 'admin' || $role == 'adminonline' || $role == 'keuangan' || $role == 'salesman' || $role == 'distribusi' || $role == 'kadep') {
                 redirect('dashboard_admin');
             } else if ($role == 'customer') {
                 redirect('home');

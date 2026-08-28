@@ -105,6 +105,7 @@ $is_product_detail = ($this->uri->segment(1) === 'product' && is_numeric($this->
   };
 </script>
 <script src="<?php echo site_url('assets/js/webview-error-handler.js?v=20260225_2'); ?>"></script>
+<script src="<?php echo base_url('assets/js/kiu-splash.js?v=20260825_1'); ?>"></script>
 
 
 <script>

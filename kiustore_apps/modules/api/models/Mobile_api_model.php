@@ -820,6 +820,46 @@ class Mobile_api_model extends CI_Model
         return $result;
     }
 
+    public function validate_coupon($code, $subtotal)
+    {
+        $code = strtoupper(trim((string) $code));
+        $subtotal = max(0, (float) $subtotal);
+
+        if ($code === '' || $subtotal <= 0) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Kode kupon tidak valid.');
+        }
+
+        $today = date('Y-m-d');
+        $coupon = $this->db
+            ->where('UPPER(code) = ' . $this->db->escape($code), null, false)
+            ->where('is_active', 1)
+            ->where('start_date <=', $today)
+            ->where('expired_date >=', $today)
+            ->get('coupons')
+            ->row_array();
+
+        if (!$coupon) {
+            return array('success' => FALSE, 'status' => 404, 'message' => 'Kode kupon tidak tersedia atau sudah kedaluwarsa.');
+        }
+
+        $discount = min($subtotal, (float) $coupon['credit']);
+        if ($discount <= 0) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Kupon tidak dapat digunakan untuk transaksi ini.');
+        }
+
+        return array(
+            'success' => TRUE,
+            'status' => 200,
+            'data' => array(
+                'id' => (int) $coupon['id'],
+                'name' => $coupon['name'],
+                'code' => strtoupper($coupon['code']),
+                'credit' => $discount,
+                'discount_amount' => $discount
+            )
+        );
+    }
+
     public function checkout($user_id, $level, $data)
     {
         $cart = $this->cart($user_id, $level);
@@ -850,16 +890,27 @@ class Mobile_api_model extends CI_Model
 
         $profile = $this->profile($user_id);
         $order_number = $this->generate_order_number($user_id);
+        $coupon = null;
+        $discount = 0;
+        $voucher_code = isset($data['voucher_code']) ? trim((string) $data['voucher_code']) : '';
+        if ($voucher_code !== '') {
+            $coupon_result = $this->validate_coupon($voucher_code, $cart['summary']['subtotal']);
+            if (!$coupon_result['success']) {
+                return $coupon_result;
+            }
+            $coupon = $coupon_result['data'];
+            $discount = (float) $coupon['discount_amount'];
+        }
 
         $order = array(
             'user_id' => (int) $user_id,
-            'coupon_id' => null,
+            'coupon_id' => $coupon ? (int) $coupon['id'] : null,
             'order_number' => $order_number,
             'kd_faktur' => 'MOB-' . $order_number,
             'invoice_number' => '',
             'order_status' => 1,
             'order_date' => date('Y-m-d H:i:s'),
-            'total_price' => $cart['summary']['subtotal'],
+            'total_price' => max(0, (float) $cart['summary']['subtotal'] - $discount),
             'total_items' => count($cart['items']),
             'payment_method' => null,
             'shipping_method' => 5,
@@ -1331,6 +1382,16 @@ class Mobile_api_model extends CI_Model
             unset($item['order_qty'], $item['order_price'], $item['picture_name'], $item['name'], $item['satuan_text']);
         }
 
+        $items_subtotal = 0;
+        foreach ($items as $item) {
+            $items_subtotal += (float) $item['subtotal'];
+        }
+        $coupon = $this->order_coupon(isset($order['coupon_id']) ? $order['coupon_id'] : null);
+        $coupon_discount = $coupon ? max(0, $items_subtotal - (float) $order['total_price']) : 0;
+        if ($coupon && $coupon_discount <= 0) {
+            $coupon_discount = min($items_subtotal, (float) $coupon['discount_amount']);
+        }
+
         $delivery_data = is_array($order['delivery_data']) ? $order['delivery_data'] : array();
         $customer = isset($delivery_data['customer']) && is_array($delivery_data['customer'])
             ? $delivery_data['customer']
@@ -1343,9 +1404,56 @@ class Mobile_api_model extends CI_Model
             'shipping_service' => $this->order_shipping_service($order),
             'shipping_cost' => isset($order['shipping_cost']) ? (float) $order['shipping_cost'] : 0,
             'insurance' => isset($order['insurance']) ? (float) $order['insurance'] : 0,
+            'coupon' => $coupon,
+            'coupon_discount' => $coupon_discount,
             'briva_payment' => $this->format_briva_payment(
                 $this->briva_payment_by_order_number($order['order_number'])
             )
+        );
+    }
+
+    public function apply_order_coupon($id, $user_id, $code)
+    {
+        $order = $this->db
+            ->where(array('id' => (int) $id, 'user_id' => (int) $user_id))
+            ->get('orders')
+            ->row_array();
+
+        if (!$order) {
+            return array('success' => FALSE, 'status' => 404, 'message' => 'Pesanan tidak ditemukan.');
+        }
+
+        if (!empty($order['coupon_id'])) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Pesanan sudah menggunakan kupon.');
+        }
+
+        if (!in_array((int) $order['order_status'], array(1, 2, 8, 9), TRUE)) {
+            return array('success' => FALSE, 'status' => 422, 'message' => 'Kupon tidak dapat diterapkan pada status pesanan ini.');
+        }
+
+        $items_subtotal = $this->order_items_subtotal((int) $id);
+        $coupon_result = $this->validate_coupon($code, $items_subtotal);
+        if (!$coupon_result['success']) {
+            return $coupon_result;
+        }
+
+        $coupon = $coupon_result['data'];
+        $discount = (float) $coupon['discount_amount'];
+        $updated = $this->db
+            ->where(array('id' => (int) $id, 'user_id' => (int) $user_id))
+            ->update('orders', array(
+                'coupon_id' => (int) $coupon['id'],
+                'total_price' => max(0, $items_subtotal - $discount)
+            ));
+
+        if (!$updated) {
+            return array('success' => FALSE, 'status' => 500, 'message' => 'Kupon gagal diterapkan.');
+        }
+
+        return array(
+            'success' => TRUE,
+            'status' => 200,
+            'data' => $this->order((int) $id, (int) $user_id)
         );
     }
 
@@ -1704,6 +1812,7 @@ class Mobile_api_model extends CI_Model
         );
 
         $row['id'] = (int) $row['id'];
+        $row['coupon_id'] = empty($row['coupon_id']) ? null : (int) $row['coupon_id'];
         $row['order_status'] = $status;
         $row['status_id'] = $status;
         $row['status_label'] = isset($labels[$status]) ? $labels[$status] : 'Status ' . $status;
@@ -1716,6 +1825,41 @@ class Mobile_api_model extends CI_Model
         $row['delivery_data'] = json_decode($row['delivery_data'], TRUE);
 
         return $row;
+    }
+
+    private function order_coupon($coupon_id)
+    {
+        if (!$coupon_id) {
+            return null;
+        }
+
+        $coupon = $this->db
+            ->where('id', (int) $coupon_id)
+            ->get('coupons')
+            ->row_array();
+
+        if (!$coupon) {
+            return null;
+        }
+
+        return array(
+            'id' => (int) $coupon['id'],
+            'name' => $coupon['name'],
+            'code' => strtoupper($coupon['code']),
+            'credit' => (float) $coupon['credit'],
+            'discount_amount' => (float) $coupon['credit']
+        );
+    }
+
+    private function order_items_subtotal($order_id)
+    {
+        $row = $this->db
+            ->select('COALESCE(SUM(order_qty * order_price), 0) AS subtotal', FALSE)
+            ->where('order_id', (int) $order_id)
+            ->get('order_items')
+            ->row_array();
+
+        return $row ? (float) $row['subtotal'] : 0;
     }
 
     private function generate_order_number($user_id)

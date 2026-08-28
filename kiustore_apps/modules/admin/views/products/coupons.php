@@ -31,8 +31,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <div class="col">
       <div class="card">
         <!-- Card header -->
-        <div class="card-header border-0">
+        <div class="card-header border-0 d-flex justify-content-between align-items-center">
           <h3 class="mb-0">Kategori Kupon</h3>
+          <?php if (admin_role() == 'admin' || admin_role() == 'adminonline') : ?>
+            <button type="button" class="btn btn-sm btn-danger btnBulkDelete" disabled>
+              <i class="fa fa-trash"></i> Hapus Terpilih
+            </button>
+          <?php endif; ?>
         </div>
 
         <div class="packageContainer">
@@ -41,6 +46,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <table class="table align-items-center table-flush" id="packageList" style="width: 100%">
               <thead class="thead-light">
                 <tr>
+                  <th scope="col" style="width: 48px;">
+                    <?php if (admin_role() == 'admin' || admin_role() == 'adminonline') : ?>
+                      <input type="checkbox" id="checkAllCoupons" aria-label="Pilih semua kupon">
+                    <?php endif; ?>
+                  </th>
                   <th scope="col">#</th>
                   <th scope="col">Nama</th>
                   <th schope="col">Kode</th>
@@ -160,6 +170,28 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </div>
   </div>
 
+  <div class="modal fade" id="bulkDeleteModal" tabindex="-1" role="dialog" aria-labelledby="bulk-delete-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-modal-dialog-centered modal-" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title" id="bulk-delete-modal-title">Hapus Kupon Terpilih</h6>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <form action="#" id="bulkDeleteCoupon" method="POST">
+          <div class="modal-body">
+            <p>Yakin ingin menghapus <strong><span class="bulk-delete-count">0</span> kupon</strong>? Tindakan ini tidak dapat dibatalkan.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-danger btn-bulk-delete">Hapus Terpilih</button>
+            <button type="button" class="btn btn-link ml-auto" data-dismiss="modal">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="modal-form" aria-hidden="true">
     <div class="modal-dialog modal- modal-dialog modal-md" role="document">
       <div class="modal-content">
@@ -251,6 +283,47 @@ defined('BASEPATH') or exit('No direct script access allowed');
   <script src="<?php echo base_url('assets/plugins/datatables.lang.js'); ?>"></script>
   <script>
     $(document).ready(function() {
+      var selectedCouponIds = {};
+      var role = '<?= admin_role(); ?>';
+
+      function getSelectedCouponIds() {
+        return Object.keys(selectedCouponIds);
+      }
+
+      function updateBulkDeleteState() {
+        var selectedCount = getSelectedCouponIds().length;
+        $('.bulk-delete-count').text(selectedCount);
+        $('.btnBulkDelete').prop('disabled', selectedCount === 0);
+      }
+
+      function syncCurrentPageCheckboxes(api) {
+        var selectableRows = 0;
+        var selectedRows = 0;
+
+        api.rows({
+          page: 'current'
+        }).every(function() {
+          var row = this.data();
+          var isSelected = !!selectedCouponIds[row.id];
+          var checkbox = $(this.node()).find('.coupon-check');
+
+          checkbox.prop('checked', isSelected);
+
+          if (checkbox.length) {
+            selectableRows++;
+          }
+
+          if (isSelected) {
+            selectedRows++;
+          }
+        });
+
+        $('#checkAllCoupons')
+          .prop('checked', selectableRows > 0 && selectableRows === selectedRows)
+          .prop('indeterminate', selectedRows > 0 && selectedRows < selectableRows);
+        updateBulkDeleteState();
+      }
+
       $(document).on('click', '.btnDelete', function() {
         var id = $(this).data('id');
 
@@ -314,6 +387,87 @@ defined('BASEPATH') or exit('No direct script access allowed');
         })
       });
 
+      $(document).on('change', '.coupon-check', function() {
+        var id = $(this).val();
+
+        if ($(this).is(':checked')) {
+          selectedCouponIds[id] = true;
+        } else {
+          delete selectedCouponIds[id];
+        }
+
+        syncCurrentPageCheckboxes(table);
+      });
+
+      $('#checkAllCoupons').change(function() {
+        var isChecked = $(this).is(':checked');
+
+        table.rows({
+          page: 'current'
+        }).every(function() {
+          var row = this.data();
+
+          if (isChecked) {
+            selectedCouponIds[row.id] = true;
+          } else {
+            delete selectedCouponIds[row.id];
+          }
+        });
+
+        syncCurrentPageCheckboxes(table);
+      });
+
+      $('.btnBulkDelete').click(function() {
+        var selectedCount = getSelectedCouponIds().length;
+
+        if (selectedCount === 0) {
+          return;
+        }
+
+        $('.bulk-delete-count').text(selectedCount);
+        $('#bulkDeleteModal').modal('show');
+      });
+
+      $('#bulkDeleteCoupon').submit(function(e) {
+        e.preventDefault();
+
+        var ids = getSelectedCouponIds();
+        var btn = $('.btn-bulk-delete');
+
+        if (ids.length === 0) {
+          return;
+        }
+
+        btn.html('<i class="fa fa-spin fa-spinner"></i> Menghapus...').attr('disabled', true);
+
+        $.ajax({
+          method: 'POST',
+          url: '<?php echo site_url('admin/products/coupon_api?action=delete_coupons'); ?>',
+          data: {
+            ids: ids
+          },
+          success: function(res) {
+            if (res.code == 204) {
+              selectedCouponIds = {};
+              btn.html('<i class="fa fa-check"></i> Terhapus!');
+
+              setTimeout(() => {
+                $('#bulkDeleteModal').modal('hide');
+                table.ajax.reload();
+                $('#checkAllCoupons').prop('checked', false);
+                updateBulkDeleteState();
+                btn.html('Hapus Terpilih').removeAttr('disabled');
+              }, 1500);
+            } else {
+              btn.html('Hapus Terpilih').removeAttr('disabled');
+            }
+          },
+          error: function() {
+            btn.html('Hapus Terpilih').removeAttr('disabled');
+          }
+        });
+      });
+
       $('#deleteCoupon').submit(function(e) {
         e.preventDefault();
 
@@ -334,7 +488,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
               setTimeout(() => {
                 $('#deleteModal').modal('hide');
+                delete selectedCouponIds[id];
                 table.ajax.reload();
+                updateBulkDeleteState();
                 btn.html('Hapus');
               }, 1500);
             }
@@ -342,10 +498,21 @@ defined('BASEPATH') or exit('No direct script access allowed');
         })
       });
 
-      var role = '<?= admin_role(); ?>';
       var table = $('#packageList').DataTable({
         "ajax": "<?php echo site_url('admin/products/coupon_api?action=coupon_list'); ?>",
         "columns": [{
+            "data": null,
+            "orderable": false,
+            "searchable": false,
+            "mRender": function(data, type, row) {
+              if (role == 'admin' || role == 'adminonline') {
+                return '<input type="checkbox" class="coupon-check" value="' + row.id + '" aria-label="Pilih kupon">';
+              } else {
+                return '';
+              }
+            }
+          },
+          {
             "data": "id"
           },
           {
@@ -388,7 +555,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
             "last": "&raquo;",
             "next": "&rsaquo;",
             "previous": "&lsaquo;"
-          },
+          }
+        },
+        "drawCallback": function() {
+          syncCurrentPageCheckboxes(this.api());
         }
       });
 

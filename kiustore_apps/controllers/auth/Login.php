@@ -57,25 +57,32 @@ class Login extends CI_Controller
 
                 if (password_verify($password, $user_password)) {
                     $role = $this->login->get_role();
+                    $logged_user_id = $this->login->logged_user_id();
+                    $login_data_set = [
+                        'user_id' => $logged_user_id,
+                    ];
+
                     if ($role == 'customer') {
+                        $logged_salesman_id = $this->login->logged_salesman_id();
+                        $logged_user_level = $this->login->logged_user_level();
                         $login_data = [
                             'is_login' => TRUE,
                             'is_customer' => TRUE,
-                            'user_id' => $this->login->logged_user_id(),
-                            'salesman_id' => $this->login->logged_salesman_id(),
-                            'user_level' => $this->login->logged_user_level(),
+                            'user_id' => $logged_user_id,
+                            'salesman_id' => $logged_salesman_id,
+                            'user_level' => $logged_user_level,
                             'login_at' => time(),
                             'remember_me' => ($remember_me == 1) ? TRUE : FALSE
                         ];
                         $login_data_set = array(
-                            'user_id' => $this->login->logged_user_id(),
-                            'salesman_id' => $this->login->logged_salesman_id(),
-                            'user_level' => $this->login->logged_user_level(),
+                            'user_id' => $logged_user_id,
+                            'salesman_id' => $logged_salesman_id,
+                            'user_level' => $logged_user_level,
                         );
                         $this->session->set_userdata($login_data_set);
                     } else {
                         $login_data = [
-                            'user_id' => $this->login->logged_user_id(),
+                            'user_id' => $logged_user_id,
                             'is_login' => TRUE,
                             'is_admin' => TRUE,
                             'login_at' => time(),
@@ -100,9 +107,16 @@ class Login extends CI_Controller
                         // exit;
                     }
 
+                    if ($role == 'customer' && $this->is_new_customer_login($logged_user_id, $email)) {
+                        $this->session->set_userdata('kiu_start_customer_tutorial', TRUE);
+                        $this->session->unset_userdata('kiu_new_customer_user_id');
+                        $this->session->unset_userdata('kiu_new_customer_email');
+                        $redir_to = 'home?start_tutorial=1';
+                    }
+
                     if ($remember_me == 1) {
                         $this->input->set_cookie('__ACTIVE_SESSION_DATA', $login_session, 604800); //48 jam
-                        $this->input->set_userdata('__ACTIVE_SESSION_DATA', $login_data_set); //48 jam
+                        $this->session->set_userdata('__ACTIVE_SESSION_DATA', $login_session); //48 jam
                     } else {
                         $this->session->set_userdata('__ACTIVE_SESSION_DATA', $login_session, $login_data_set);
                     }
@@ -120,5 +134,14 @@ class Login extends CI_Controller
                 redirect('/auth/login');
             }
         }
+    }
+
+    private function is_new_customer_login($user_id, $email)
+    {
+        $new_customer_user_id = (int) $this->session->userdata('kiu_new_customer_user_id');
+        $new_customer_email = strtolower((string) $this->session->userdata('kiu_new_customer_email'));
+
+        return $new_customer_user_id === (int) $user_id
+            || ($new_customer_email !== '' && $new_customer_email === strtolower((string) $email));
     }
 }

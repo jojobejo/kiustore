@@ -262,25 +262,38 @@ class Shop extends CI_Controller
                 $iduser     = $this->session->userdata('user_id');
                 // $kdchart    = $this->product->kdnonkomersial($iduser);
                 $coupon = $this->input->post('coupon_code') ? $this->input->post('coupon_code') : $this->session->userdata('_temp_coupon');
+                $coupon = trim((string) $coupon);
                 $quantity = $this->input->post('quantity') ? $this->input->post('quantity') : $this->session->userdata('_temp_quantity');
+                $quantity = is_array($quantity) ? $quantity : array();
 
                 if ($this->session->userdata('_temp_quantity') || $this->session->userdata('_temp_coupon')) {
                     $this->session->unset_userdata('_temp_coupon');
                     $this->session->unset_userdata('_temp_quantity');
                 }
 
+                if (empty($quantity)) {
+                    $this->session->set_flashdata('error', 'Keranjang tidak valid. Silakan cek ulang item belanja Anda.');
+                    redirect('cart');
+                    return;
+                }
+
                 $items = [];
 
                 foreach ($quantity as $rowid => $qty) {
-                    $items['rowid'] = $rowid;
-                    $items['qty'] = $qty;
+                    $items[] = array(
+                        'rowid' => $rowid,
+                        'qty' => (int) $qty
+                    );
                 }
 
                 $this->cart->update($items);
+                $subtotal = $this->cart->total();
+                $this->session->unset_userdata('coupon_id');
+                $this->session->unset_userdata('coupon_discount');
 
                 if (empty($coupon)) {
                     $discount = 0;
-                    $disc = 'Tidak menggunkan kupon';
+                    $disc = 'Tidak menggunakan kupon';
                 } else {
                     if ($this->customer->is_coupon_exist($coupon)) {
                         if ($this->customer->is_coupon_active($coupon)) {
@@ -292,8 +305,9 @@ class Shop extends CI_Controller
                                 $this->session->set_userdata('coupon_id', $coupon_id);
 
                                 $credit = $this->customer->get_coupon_credit($coupon);
-                                $discount = $credit;
-                                $disc = '<span class="badge badge-success">' . $coupon . '</span> Rp ' . format_rupiah($credit);
+                                $discount = min((float) $credit, (float) $subtotal);
+                                $this->session->set_userdata('coupon_discount', $discount);
+                                $disc = '<span class="badge badge-success">' . html_escape($coupon) . '</span> Rp ' . format_rupiah($credit);
                             }
                         } else {
                             $discount = 0;
@@ -481,7 +495,9 @@ class Shop extends CI_Controller
                 if ($payment == 1) {
                     $quantity_multi = $this->session->userdata('order_quantity_multi');
                     $total_price_multi = $this->session->userdata('total_price_multi');
-                    $total_credit = $total_price_multi[2] + $total_price_multi[3];
+                    $coupon_discount = (float) $this->session->userdata('coupon_discount');
+                    $total_price_multi_for_limit = $this->_apply_discount_to_totals($total_price_multi, $coupon_discount);
+                    $total_credit = $total_price_multi_for_limit[2] + $total_price_multi_for_limit[3];
 
                     $limit_transaction = get_user_limit_transaction();
                     if ($total_credit > $limit_transaction) {
@@ -490,19 +506,24 @@ class Shop extends CI_Controller
                     }
                     if (is_members() == '0') {
                         $kdfakturs   = $this->input->post('kdfaktur');
+                        $coupon_discount_remaining = $coupon_discount;
                         foreach ($total_price_multi as $type => $total) {
                             if ($total) {
-                                $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $coupon_id);
+                                $order_discount = min($coupon_discount_remaining, (float) $total);
+                                $coupon_discount_remaining -= $order_discount;
+                                $order_coupon_id = ($order_discount > 0) ? $coupon_id : null;
+                                $order_total = max(0, (float) $total - $order_discount);
+                                $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $order_coupon_id);
                                 $due_date = ($type == 1 ? date('Y-m-d') : ($type == 2 ? date('Y-m-d', strtotime(' + 1 months')) : ($type == 3 ? date('Y-m-d', strtotime(' + 2 months')) : "")));
 
                                 $order = array(
                                     'user_id' => $user_id,
-                                    'coupon_id' => $coupon_id,
+                                    'coupon_id' => $order_coupon_id,
                                     'order_number' => $order_number,
                                     'kd_faktur'    => $kdfakturs,
                                     'order_status' => 9,
                                     'order_date' => $order_date,
-                                    'total_price' => $total,
+                                    'total_price' => $order_total,
                                     'total_items' => count($quantity_multi[$type]),
                                     'payment_method' => $payment,
                                     'shipping_method' => $shipping,
@@ -513,6 +534,7 @@ class Shop extends CI_Controller
                                     'shipping_cost' => 0
                                 );
                                 $order = $this->product->create_order($order);
+                                $items = array();
                                 $n = 0;
                                 foreach ($quantity_multi[$type] as $id => $data) {
                                     $items[$n]['order_id'] = $order;
@@ -529,20 +551,25 @@ class Shop extends CI_Controller
                             }
                         }
                     } else {
+                        $coupon_discount_remaining = $coupon_discount;
                         foreach ($total_price_multi as $type => $total) {
                             $jnkirim    = $this->input->post('jns_shipping');
                             if ($total) {
-                                $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $coupon_id);
+                                $order_discount = min($coupon_discount_remaining, (float) $total);
+                                $coupon_discount_remaining -= $order_discount;
+                                $order_coupon_id = ($order_discount > 0) ? $coupon_id : null;
+                                $order_total = max(0, (float) $total - $order_discount);
+                                $order_number = $this->_create_order_number($quantity_multi[$type], $user_id, $order_coupon_id);
                                 $due_date = ($type == 1 ? date('Y-m-d') : ($type == 2 ? date('Y-m-d', strtotime(' + 1 months')) : ($type == 3 ? date('Y-m-d', strtotime(' + 2 months')) : "")));
 
                                 $order = array(
                                     'user_id' => $user_id,
-                                    'coupon_id' => $coupon_id,
+                                    'coupon_id' => $order_coupon_id,
                                     'order_number' => $order_number,
                                     'kd_faktur'    => $kdfaktur,
                                     'order_status' => 9,
                                     'order_date' => $order_date,
-                                    'total_price' => $total,
+                                    'total_price' => $order_total,
                                     'total_items' => count($quantity_multi[$type]),
                                     'payment_method' => $payment,
                                     'shipping_method' => $shipping,
@@ -553,6 +580,7 @@ class Shop extends CI_Controller
                                     'shipping_cost' => $ongkirprice
                                 );
                                 $order = $this->product->create_order($order);
+                                $items = array();
                                 $n = 0;
                                 foreach ($quantity_multi[$type] as $id => $data) {
                                     $items[$n]['order_id'] = $order;
@@ -595,6 +623,7 @@ class Shop extends CI_Controller
                         );
 
                         $order = $this->product->create_order($order);
+                        $items = array();
                         $n = 0;
 
                         foreach ($quantity as $id => $data) {
@@ -639,6 +668,7 @@ class Shop extends CI_Controller
                         );
 
                         $order = $this->product->create_order($order);
+                        $items = array();
                         $n = 0;
 
                         foreach ($quantity as $id => $data) {
@@ -702,6 +732,7 @@ class Shop extends CI_Controller
                         );
 
                         $order = $this->product->create_order($order);
+                        $items = array();
                         $n = 0;
 
                         foreach ($quantity as $id => $data) {
@@ -763,6 +794,7 @@ class Shop extends CI_Controller
                     );
 
                     $order = $this->product->create_order($order);
+                    $items = array();
                     $n = 0;
 
                     foreach ($quantity as $id => $data) {
@@ -790,8 +822,9 @@ class Shop extends CI_Controller
                 $this->cart->destroy();
                 $this->session->unset_userdata('order_quantity');
                 $this->session->unset_userdata('total_price');
-                $this->session->unset_userdata('total_price_muulti');
+                $this->session->unset_userdata('total_price_multi');
                 $this->session->unset_userdata('coupon_id');
+                $this->session->unset_userdata('coupon_discount');
                 $this->session->unset_userdata('brivadata');
 
                 $this->session->set_flashdata('order_flash', 'Order berhasil ditambahkan');
@@ -802,6 +835,31 @@ class Shop extends CI_Controller
                 }
                 break;
         }
+    }
+
+
+    private function _apply_discount_to_totals($totals, $discount)
+    {
+        $discount_remaining = max(0, (float) $discount);
+        $discounted_totals = is_array($totals) ? $totals : array();
+
+        foreach ($discounted_totals as $type => $total) {
+            if ($discount_remaining <= 0) {
+                break;
+            }
+
+            $total = (float) $total;
+            if ($total <= 0) {
+                $discounted_totals[$type] = 0;
+                continue;
+            }
+
+            $order_discount = min($discount_remaining, $total);
+            $discounted_totals[$type] = max(0, $total - $order_discount);
+            $discount_remaining -= $order_discount;
+        }
+
+        return $discounted_totals;
     }
 
 

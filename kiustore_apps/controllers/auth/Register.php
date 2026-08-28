@@ -70,13 +70,8 @@ class Register extends CI_Controller
 
             $this->register->register_customer($customer_data);
 
-            $login_data = [
-                'is_login' => FALSE,
-                'user_id' => $user,
-                'login_at' => time(),
-                'remember_me' => FALSE
-            ];
-
+            $this->session->set_userdata('kiu_new_customer_user_id', (int) $user);
+            $this->session->set_userdata('kiu_new_customer_email', $email);
             $this->session->set_flashdata('store_flash', 'Pendaftaran akun berhasil!');
 
             redirect('auth/register/notif');

@@ -502,6 +502,22 @@ class Products extends CI_Controller
                 $this->product->delete_coupon($id);
                 $response = array('code' => 204, 'message' => 'Kupon berhasil dihapus!');
                 break;
+            case 'delete_coupons':
+                $ids = $this->input->post('ids');
+                $ids = is_array($ids) ? $ids : explode(',', (string) $ids);
+                $ids = array_unique(array_filter(array_map('intval', $ids)));
+
+                if (empty($ids)) {
+                    $response = array('code' => 400, 'message' => 'Pilih minimal satu kupon untuk dihapus.');
+                    break;
+                }
+
+                $this->product->delete_coupons($ids);
+                $response = array(
+                    'code' => 204,
+                    'message' => count($ids) . ' kupon berhasil dihapus!'
+                );
+                break;
             case 'edit_coupon':
                 $id = $this->input->post('id');
                 $name = $this->input->post('name');
@@ -644,9 +660,18 @@ class Products extends CI_Controller
                 break;
             case 'delete_promo':
                 $id = $this->input->post('id');
+                $ids = $this->input->post('ids');
 
-                $this->product->delete_promo($id);
-                $response = array('code' => 204, 'message' => 'Kupon berhasil dihapus!');
+                if (! empty($ids)) {
+                    $ids = array_filter(array_map('intval', explode(',', $ids)));
+                    if (! empty($ids)) {
+                        $this->product->delete_promos($ids);
+                    }
+                } else {
+                    $this->product->delete_promo($id);
+                }
+
+                $response = array('code' => 204, 'message' => 'Promo berhasil dihapus!');
                 break;
             case 'edit_promo':
                 $id = $this->input->post('id');

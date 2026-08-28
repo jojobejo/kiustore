@@ -4,6 +4,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <?php if (count($cartaddons) > 0) : ?>
   <?php if (count($carts) > 0) : ?>
     <main class="main-wrap cart-page mb-xxl">
+      <form action="<?= base_url('checkout'); ?>" method="POST">
       <?php if ($this->session->flashdata('error')) : ?>
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
           <?= $this->session->flashdata('error'); ?>
@@ -50,7 +51,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <h6 class="mb-0">Apakah anda punya Kupon?</h6>
             <p class="mb-2">Masukkan kode kupon untuk mendapatkan potongan harga!</p>
             <div class="coupon-form">
-              <input id="code" name="coupon_code" type="text" class="form-control" placeholder="">
+              <input id="code" name="coupon_code" type="text" class="form-control" placeholder="Kode kupon">
             </div>
           </div>
         </div>
@@ -69,27 +70,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
       </div>
 
       <div hidden>
-        <form action="<?= base_url('checkout'); ?>" method="POST">
           <input type="text" name="customer" value="<?= $this->session->userdata('user_id') ?>">
-          <?php foreach ($carts as $item) : ?>
-            <div class="swipe-to-show cart-<?php echo $item['rowid']; ?>">
-              <div class="product-list media">
-                <a href="#"><img src="<?php echo get_product_image($item['id']); ?>" alt="offer" /></a>
-                <div class="media-body">
-                  <a href="#" class="font-sm"> <?php echo $item['name']; ?> </a>
-                  <span class="content-color font-xs">Rp <?php echo format_rupiah($item['price']); ?> x <span class="qty-item-<?php echo $item['rowid']; ?>"><?php echo $item['qty']; ?> <?php echo $item['satuan_text']; ?></span></span>
-                  <span class="title-color subtotal-item-<?php echo $item['rowid']; ?> font-sm">Rp <?php echo format_rupiah($item['subtotal']); ?></span>
-                  <div class="plus-minus">
-                    <i class="subs" data-feather="minus"></i>
-                    <input class="cart-update" name="quantity[<?php echo $item['rowid']; ?>]" type="number" data-qty="<?php echo $item['qty']; ?>" data-rowid="<?php echo $item['rowid']; ?>" value="<?php echo $item['qty']; ?>" min="0" max="1000" />
-                    <i class="adds" data-feather="plus"></i>
-                  </div>
-                </div>
-              </div>
-              <div class="delete-button" data-bs-toggle="offcanvas" data-bs-target="#confirmation" aria-controls="confirmation" data-rowid="<?php echo $item['rowid']; ?>">
-              </div>
-            </div>
-          <?php endforeach; ?>
           <?php foreach ($itm_cart as $itm) : ?>
             <input type="text" value="<?= $itm->kdchart ?>" name="kdchart" id="kdchart">
           <?php endforeach; ?>
@@ -98,8 +79,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
       </form>
     </main>
 
-
-    </main>
 
     <!-- Main End -->
   <?php else : ?>

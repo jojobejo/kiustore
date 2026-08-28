@@ -179,6 +179,23 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                 </div>
 
+                <div class="card cart-amount-area mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <strong>Rp <?php echo format_rupiah($subtotal); ?></strong>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span>Kupon</span>
+                            <strong><?php echo $discount; ?></strong>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span>Total Setelah Potongan</span>
+                            <strong>Rp <?php echo format_rupiah($total); ?></strong>
+                        </div>
+                    </div>
+                </div>
+
 
                 <!-- Cart Amount Area-->
                 <div class="card cart-amount-area mb-10">
@@ -228,6 +245,23 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <label for="exampleFormControlInput1" class="form-label">Catatan</label>
                                 <textarea name="note" class="form-control" id="note"></textarea>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card cart-amount-area mb-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <strong>Rp <?php echo format_rupiah($subtotal); ?></strong>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span>Kupon</span>
+                            <strong><?php echo $discount; ?></strong>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span>Total Setelah Potongan</span>
+                            <strong>Rp <?php echo format_rupiah($total); ?></strong>
                         </div>
                     </div>
                 </div>
