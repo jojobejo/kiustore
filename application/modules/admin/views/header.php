@@ -121,6 +121,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <span class="nav-link-text">Stock Zahir Digital</span>
                 </a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link <?= ($this->uri->segment(2) == 'pricelist-import' ? 'active' : '') ?>" href="<?php echo site_url('admin/pricelist-import'); ?>">
+                  <i class="fa fa-file-invoice-dollar text-warning"></i>
+                  <span class="nav-link-text">Import Pricelist</span>
+                </a>
+              </li>
               <li class="nav-item" hidden>
                 <a class="nav-link <?= ($this->uri->segment(2) == 'payments' ? 'active' : '') ?>" href="<?php echo site_url('admin/brivaws'); ?>">
                   <i class="ni ni-bullet-list-67 text-info"></i>

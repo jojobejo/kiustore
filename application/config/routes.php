@@ -101,6 +101,11 @@ $route['admin/zahir-stock/approve']         = 'admin/zahir_stock/approve';
 $route['admin/zahir-stock/insert-product']  = 'admin/zahir_stock/insert_product';
 $route['admin/zahir-stock/export-stock-excel'] = 'admin/zahir_stock/export_stock_excel';
 $route['admin/zahir-stock/import']          = 'admin/zahir_stock/import';
+$route['admin/pricelist-import']            = 'admin/pricelist_import';
+$route['admin/pricelist-import/import']     = 'admin/pricelist_import/import';
+$route['admin/pricelist-import/approve']    = 'admin/pricelist_import/approve';
+$route['admin/pricelist-import/export-pricelist-only-excel'] = 'admin/pricelist_import/export_pricelist_only_excel';
+$route['admin/pricelist-import/export-product-only-excel'] = 'admin/pricelist_import/export_product_only_excel';
 $route['admin']                             = 'admin/admin';
 $route['admin/categories']                  = 'admin/products/category';
 
