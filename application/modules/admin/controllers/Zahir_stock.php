@@ -69,10 +69,7 @@ class Zahir_stock extends CI_Controller
             return;
         }
 
-        $latest_by_product = array();
-        foreach ($payload['matched'] as $row) {
-            $latest_by_product[(int) $row['product_id']] = $row;
-        }
+        $latest_by_product = $this->group_matched_rows_by_product($payload['matched']);
 
         if ($approve_all) {
             $product_ids = array_keys($latest_by_product);
@@ -169,7 +166,9 @@ class Zahir_stock extends CI_Controller
         }
 
         $processed = $this->process_zahir_rows($raw_rows);
-        $compare = $this->compare_processed_rows($processed, $this->zahir_stock->get_products_for_compare());
+        $products = $this->zahir_stock->get_products_for_compare();
+        $aliases = $this->zahir_stock->get_active_product_aliases();
+        $compare = $this->compare_processed_rows($processed, $products, $aliases);
         $now = date('Y-m-d H:i:s');
 
         $this->db->trans_start();
@@ -196,7 +195,7 @@ class Zahir_stock extends CI_Controller
                 'product_name' => $row['product_name'],
                 'product_stock' => (int) $row['product_stock'],
                 'selisih' => (int) $row['selisih'],
-                'match_status' => 'MATCHED',
+                'match_status' => $row['match_type'] === 'ALIAS' ? 'ALIAS_MATCHED' : 'MATCHED',
                 'update_status' => 'PENDING'
             );
         }
@@ -355,6 +354,7 @@ class Zahir_stock extends CI_Controller
     private function build_stock_payload($source_mode = 'api', $batch_id = 0)
     {
         $products = $this->zahir_stock->get_products_for_compare();
+        $aliases = $this->zahir_stock->get_active_product_aliases();
         $import_batch = NULL;
         $source = $source_mode === 'import'
             ? $this->fetch_import_source($batch_id, $import_batch)
@@ -364,7 +364,7 @@ class Zahir_stock extends CI_Controller
 
         if ($source['success']) {
             $processed = $this->process_zahir_rows($source['rows']);
-            $compare = $this->compare_processed_rows($processed, $products);
+            $compare = $this->compare_processed_rows($processed, $products, $aliases);
         }
 
         return array(
@@ -383,6 +383,7 @@ class Zahir_stock extends CI_Controller
             'summary' => array(
                 'processed_rows' => count($processed),
                 'matched_rows' => count($compare['matched']),
+                'alias_matched_rows' => $this->count_alias_matched_rows($compare['matched']),
                 'zahir_only_rows' => count($compare['zahir_only']),
                 'product_only_rows' => count($compare['product_only'])
             )
@@ -426,34 +427,81 @@ class Zahir_stock extends CI_Controller
         );
     }
 
-    private function compare_processed_rows($processed, $products)
+    private function compare_processed_rows($processed, $products, $aliases = array())
     {
         $matched = array();
         $zahir_only = array();
         $product_only = array();
         $product_map = array();
-        $zahir_map = array();
+        $product_id_map = array();
+        $alias_map = array();
+        $matched_product_map = array();
 
         foreach ($products as $product) {
             $key = $this->normalize_compare_name($product->name);
             if ($key !== '') {
                 $product_map[$key] = $product;
             }
+            $product_id_map[(int) $product->id] = $product;
+        }
+
+        foreach ($aliases as $alias) {
+            $zahir_key = isset($alias->normalized_zahir_name) && $alias->normalized_zahir_name !== ''
+                ? strtolower(trim($alias->normalized_zahir_name))
+                : $this->normalize_compare_name($alias->zahir_name);
+
+            if ($zahir_key === '') {
+                continue;
+            }
+
+            $product = NULL;
+            $alias_product_id = isset($alias->product_id) ? (int) $alias->product_id : 0;
+            if ($alias_product_id > 0 && isset($product_id_map[$alias_product_id])) {
+                $product = $product_id_map[$alias_product_id];
+            } else {
+                $product_key = $this->normalize_compare_name($alias->product_name);
+                if ($product_key !== '' && isset($product_map[$product_key])) {
+                    $product = $product_map[$product_key];
+                }
+            }
+
+            if ($product) {
+                $alias_map[$zahir_key] = array(
+                    'alias' => $alias,
+                    'product' => $product
+                );
+            }
         }
 
         foreach ($processed as $row) {
             $key = $this->normalize_compare_name($row['nama_barang']);
-            $zahir_map[$key] = $row;
+            $product = NULL;
+            $match_type = 'EXACT';
+            $alias_id = NULL;
 
-            if (isset($product_map[$key])) {
+            if (isset($alias_map[$key])) {
+                $product = $alias_map[$key]['product'];
+                $match_type = 'ALIAS';
+                $alias_id = (int) $alias_map[$key]['alias']->id;
+            } elseif (isset($product_map[$key])) {
                 $product = $product_map[$key];
+            }
+
+            if ($product) {
+                $product_key = $this->normalize_compare_name($product->name);
+                if ($product_key !== '') {
+                    $matched_product_map[$product_key] = TRUE;
+                }
+
                 $matched[] = array(
                     'product_id' => (int) $product->id,
                     'nama_barang' => $row['nama_barang'],
                     'zahir_qty' => (int) $row['qty'],
                     'product_name' => $product->name,
                     'product_stock' => (int) $product->stock,
-                    'selisih' => (int) $row['qty'] - (int) $product->stock
+                    'selisih' => (int) $row['qty'] - (int) $product->stock,
+                    'match_type' => $match_type,
+                    'alias_id' => $alias_id
                 );
             } else {
                 $zahir_only[] = array(
@@ -464,7 +512,7 @@ class Zahir_stock extends CI_Controller
         }
 
         foreach ($product_map as $key => $product) {
-            if (!isset($zahir_map[$key])) {
+            if (!isset($matched_product_map[$key])) {
                 $product_only[] = array(
                     'product_id' => (int) $product->id,
                     'nama_barang' => $product->name,
@@ -478,6 +526,42 @@ class Zahir_stock extends CI_Controller
             'zahir_only' => $zahir_only,
             'product_only' => $product_only
         );
+    }
+
+    private function group_matched_rows_by_product($matched)
+    {
+        $grouped = array();
+
+        foreach ($matched as $row) {
+            $product_id = (int) $row['product_id'];
+            if (!isset($grouped[$product_id])) {
+                $grouped[$product_id] = $row;
+                continue;
+            }
+
+            $grouped[$product_id]['zahir_qty'] += (int) $row['zahir_qty'];
+            $grouped[$product_id]['selisih'] = (int) $grouped[$product_id]['zahir_qty'] - (int) $grouped[$product_id]['product_stock'];
+            if (strpos($grouped[$product_id]['nama_barang'], $row['nama_barang']) === FALSE) {
+                $grouped[$product_id]['nama_barang'] .= ' | ' . $row['nama_barang'];
+            }
+            if ($row['match_type'] === 'ALIAS') {
+                $grouped[$product_id]['match_type'] = 'ALIAS';
+            }
+        }
+
+        return $grouped;
+    }
+
+    private function count_alias_matched_rows($matched)
+    {
+        $total = 0;
+        foreach ($matched as $row) {
+            if (isset($row['match_type']) && $row['match_type'] === 'ALIAS') {
+                $total++;
+            }
+        }
+
+        return $total;
     }
 
     private function fetch_zahir_source()

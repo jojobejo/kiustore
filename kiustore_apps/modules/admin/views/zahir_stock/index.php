@@ -20,6 +20,13 @@ function zahir_stock_render_match_rows($rows)
       </td>
       <td><?php echo html_escape($row['product_name']); ?></td>
       <td><?php echo html_escape($row['nama_barang']); ?></td>
+      <td>
+        <?php if (isset($row['match_type']) && $row['match_type'] === 'ALIAS') : ?>
+          <span class="badge badge-warning">Alias</span>
+        <?php else : ?>
+          <span class="badge badge-success">Normal</span>
+        <?php endif; ?>
+      </td>
       <td><?php echo (int) $row['product_stock']; ?></td>
       <td><?php echo (int) $row['zahir_qty']; ?></td>
       <td>
@@ -66,7 +73,7 @@ function zahir_stock_render_zahir_only_rows($rows)
         </div>
       </div>
       <div class="row">
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl col-md-6">
           <div class="card card-stats">
             <div class="card-body">
               <div class="row">
@@ -79,7 +86,7 @@ function zahir_stock_render_zahir_only_rows($rows)
             </div>
           </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl col-md-6">
           <div class="card card-stats">
             <div class="card-body">
               <div class="row">
@@ -92,7 +99,7 @@ function zahir_stock_render_zahir_only_rows($rows)
             </div>
           </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl col-md-6">
           <div class="card card-stats">
             <div class="card-body">
               <div class="row">
@@ -105,7 +112,7 @@ function zahir_stock_render_zahir_only_rows($rows)
             </div>
           </div>
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl col-md-6">
           <div class="card card-stats">
             <div class="card-body">
               <div class="row">
@@ -117,6 +124,19 @@ function zahir_stock_render_zahir_only_rows($rows)
               </div>
             </div>
           </div>
+        </div>
+        <div class="col-xl col-md-6">
+          <a href="<?php echo site_url('admin/zahir-stock-alias'); ?>" class="card card-stats zahir-action-card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Setting Alias</h5>
+                  <span class="h4 font-weight-bold mb-0">Nama Barang Zahir</span>
+                </div>
+                <div class="col-auto"><div class="icon icon-shape bg-secondary text-white rounded-circle shadow"><i class="fa fa-cog"></i></div></div>
+              </div>
+            </div>
+          </a>
         </div>
       </div>
     </div>
@@ -145,26 +165,47 @@ function zahir_stock_render_zahir_only_rows($rows)
 
     .zahir-match-table th:nth-child(2),
     .zahir-match-table td:nth-child(2) {
-      width: 28% !important;
+      width: 25% !important;
     }
 
     .zahir-match-table th:nth-child(3),
     .zahir-match-table td:nth-child(3) {
-      width: 28% !important;
+      width: 25% !important;
     }
 
     .zahir-match-table th:nth-child(4),
-    .zahir-match-table td:nth-child(4),
+    .zahir-match-table td:nth-child(4) {
+      width: 9% !important;
+      text-align: center;
+    }
+
     .zahir-match-table th:nth-child(5),
     .zahir-match-table td:nth-child(5),
     .zahir-match-table th:nth-child(6),
-    .zahir-match-table td:nth-child(6) {
-      width: 12.33% !important;
+    .zahir-match-table td:nth-child(6),
+    .zahir-match-table th:nth-child(7),
+    .zahir-match-table td:nth-child(7) {
+      width: 11.33% !important;
       text-align: right;
     }
 
     .zahir-match-panel .dataTables_wrapper {
       width: 100%;
+    }
+
+    .zahir-action-card {
+      color: inherit;
+      display: block;
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .zahir-action-card:hover,
+    .zahir-action-card:focus {
+      color: inherit;
+      text-decoration: none;
+      transform: translateY(-2px);
+      box-shadow: 0 1rem 3rem rgba(31, 45, 61, .18) !important;
     }
   </style>
 
@@ -222,6 +263,7 @@ function zahir_stock_render_zahir_only_rows($rows)
           raw <?php echo (int) $import_batch->raw_rows; ?>,
           olahan <?php echo (int) $import_batch->processed_rows; ?>,
           match <?php echo (int) $import_batch->matched_rows; ?>,
+          alias <?php echo (int) $summary['alias_matched_rows']; ?>,
           Zahir-only <?php echo (int) $import_batch->zahir_only_rows; ?>,
           product-only <?php echo (int) $import_batch->product_only_rows; ?>.
           <span class="badge badge-secondary ml-2">Pending <?php echo (int) $import_update_summary['PENDING']; ?></span>
@@ -313,6 +355,7 @@ function zahir_stock_render_zahir_only_rows($rows)
                     <th>Pilih</th>
                     <th>Produk Karisma Online</th>
                     <th>Nama Barang Zahir</th>
+                    <th>Jenis Match</th>
                     <th>Stock Karisma</th>
                     <th>Qty Zahir</th>
                     <th>Selisih</th>
@@ -330,6 +373,7 @@ function zahir_stock_render_zahir_only_rows($rows)
                     <th>Pilih</th>
                     <th>Produk Karisma Online</th>
                     <th>Nama Barang Zahir</th>
+                    <th>Jenis Match</th>
                     <th>Stock Karisma</th>
                     <th>Qty Zahir</th>
                     <th>Selisih</th>
@@ -347,6 +391,7 @@ function zahir_stock_render_zahir_only_rows($rows)
                     <th>Pilih</th>
                     <th>Produk Karisma Online</th>
                     <th>Nama Barang Zahir</th>
+                    <th>Jenis Match</th>
                     <th>Stock Karisma</th>
                     <th>Qty Zahir</th>
                     <th>Selisih</th>
@@ -428,11 +473,12 @@ function zahir_stock_render_zahir_only_rows($rows)
       columnDefs: [
         { orderable: false, targets: 0 },
         { width: '7%', targets: 0 },
-        { width: '28%', targets: 1 },
-        { width: '28%', targets: 2 },
-        { width: '12.33%', targets: 3 },
-        { width: '12.33%', targets: 4 },
-        { width: '12.33%', targets: 5 }
+        { width: '25%', targets: 1 },
+        { width: '25%', targets: 2 },
+        { width: '9%', targets: 3 },
+        { width: '11.33%', targets: 4 },
+        { width: '11.33%', targets: 5 },
+        { width: '11.33%', targets: 6 }
       ]
     });
     var zahirOnlyTable = $('#tableZahirOnly').DataTable({

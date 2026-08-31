@@ -116,7 +116,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </li>
               <?php endif; ?>
               <li class="nav-item">
-                <a class="nav-link <?= ($this->uri->segment(2) == 'zahir-stock' ? 'active' : '') ?>" href="<?php echo site_url('admin/zahir-stock'); ?>">
+                <a class="nav-link <?= ($this->uri->segment(2) == 'zahir-stock' || $this->uri->segment(2) == 'zahir-stock-alias' ? 'active' : '') ?>" href="<?php echo site_url('admin/zahir-stock'); ?>">
                   <i class="fa fa-warehouse text-info"></i>
                   <span class="nav-link-text">Stock Zahir Digital</span>
                 </a>
