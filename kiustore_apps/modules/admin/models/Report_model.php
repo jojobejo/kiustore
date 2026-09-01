@@ -66,6 +66,58 @@ class Report_model extends CI_Model {
         return $this->db->query($sql);
     }
 
+    public function revenue_report($filters)
+    {
+        $this->apply_revenue_report_query($filters);
+
+        return $this->db
+            ->order_by('o.order_date', 'DESC')
+            ->get();
+    }
+
+    public function revenue_report_total($filters)
+    {
+        $this->apply_revenue_report_query($filters, true);
+
+        $row = $this->db->get()->row();
+
+        return $row ? (float) $row->total_revenue : 0;
+    }
+
+    private function apply_revenue_report_query($filters, $total_only = false)
+    {
+        if ($total_only) {
+            $this->db->select('COALESCE(SUM(o.total_price), 0) AS total_revenue', false);
+        } else {
+            $this->db->select("
+                o.id,
+                o.kd_faktur,
+                o.order_number,
+                o.order_date,
+                o.order_status,
+                o.payment_method,
+                o.total_price,
+                cu.shop_name,
+                cu.name AS customer
+            ", false);
+        }
+
+        $this->db
+            ->from('orders o')
+            ->join('customers cu', 'cu.user_id = o.user_id')
+            ->join('users u', 'u.id = o.user_id')
+            ->where_in('o.order_status', array(3, 4))
+            ->where($this->external_user_where('u'), null, false);
+
+        if (!empty($filters['start_date'])) {
+            $this->db->where('DATE(o.order_date) >=', $filters['start_date']);
+        }
+
+        if (!empty($filters['end_date'])) {
+            $this->db->where('DATE(o.order_date) <=', $filters['end_date']);
+        }
+    }
+
     public function latest_orders()
     {
         $orders = $this->db->query("

@@ -337,7 +337,7 @@ class Payment_model extends CI_Model
     public function payment_by($id)
     {
         $payments = $this->db->query("
-            SELECT p.id, p.payment_date, p.order_id, p.payment_price, p.payment_status as status, o.order_number, c.name AS customer, p.payment_status
+            SELECT p.id, p.payment_date, p.order_id, p.payment_price, p.payment_status as status, o.order_number, o.payment_method, c.name AS customer, p.payment_status
             FROM payments p
             JOIN orders o
                 ON o.id = p.order_id
