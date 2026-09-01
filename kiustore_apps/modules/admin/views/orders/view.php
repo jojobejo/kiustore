@@ -155,7 +155,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   <?php foreach ($items as $item) : ?>
                     <tr>
                       <td>
-                        <img class="img img-fluid rounded" style="width: 60px; height: 60px;" alt="<?php echo $item->name; ?>" src="<?php echo base_url('assets/uploads/products/' . $item->picture_name); ?>">
+                        <img class="img img-fluid rounded" style="width: 60px; height: 60px;" alt="<?php echo $item->name; ?>" src="<?php echo get_product_image_url($item->picture_name); ?>">
                       </td>
                       <td>
                         <h5 class="mb-0"><?php echo $item->name; ?></h5>

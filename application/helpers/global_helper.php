@@ -460,6 +460,107 @@ if (!function_exists('count_percent_discount')) {
     }
 }
 
+if (!function_exists('normalize_product_image_name')) {
+    function normalize_product_image_name($file_name)
+    {
+        $name = pathinfo((string) $file_name, PATHINFO_FILENAME);
+        $name = strtoupper($name);
+        $name = preg_replace('/\([0-9]+\)$/', '', $name);
+        $name = str_replace(array('LITER', 'LTR', 'GRAM'), array('L', 'L', 'GR'), $name);
+        return preg_replace('/[^A-Z0-9]/', '', $name);
+    }
+}
+
+if (!function_exists('product_image_asset_url')) {
+    function product_image_asset_url($file_name)
+    {
+        $path = 'assets/uploads/products/' . rawurlencode($file_name);
+        $version = @filemtime(FCPATH . 'assets/uploads/products/' . $file_name);
+        $url = base_url($path);
+
+        return $version ? $url . '?v=' . $version : $url;
+    }
+}
+
+if (!function_exists('resolve_product_image_name')) {
+    function resolve_product_image_name($picture_name)
+    {
+        static $lookup = null;
+
+        $file_name = trim((string) $picture_name);
+
+        if ($file_name !== '' && strtolower($file_name) !== 'null') {
+            $exact_path = FCPATH . 'assets/uploads/products/' . $file_name;
+
+            if (is_file($exact_path)) {
+                return $file_name;
+            }
+
+            if ($lookup === null) {
+                $lookup = array(
+                    'exact' => array(),
+                    'normalized' => array()
+                );
+
+                $upload_dir = FCPATH . 'assets/uploads/products/';
+                $files = glob($upload_dir . '*');
+
+                if (is_array($files)) {
+                    foreach ($files as $file) {
+                        if (!is_file($file)) {
+                            continue;
+                        }
+
+                        $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+                        if (!in_array($extension, array('jpg', 'jpeg', 'png'), true)) {
+                            continue;
+                        }
+
+                        $basename = basename($file);
+                        $lookup['exact'][strtolower($basename)] = $basename;
+
+                        $normalized = normalize_product_image_name($basename);
+
+                        if ($normalized !== '' && !isset($lookup['normalized'][$normalized])) {
+                            $lookup['normalized'][$normalized] = $basename;
+                        }
+                    }
+                }
+            }
+
+            $exact_key = strtolower($file_name);
+            if (isset($lookup['exact'][$exact_key])) {
+                return $lookup['exact'][$exact_key];
+            }
+
+            $normalized_key = normalize_product_image_name($file_name);
+            if ($normalized_key !== '' && isset($lookup['normalized'][$normalized_key])) {
+                return $lookup['normalized'][$normalized_key];
+            }
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('get_product_image_url')) {
+    function get_product_image_url($picture_name)
+    {
+        $file_name = resolve_product_image_name($picture_name);
+
+        if ($file_name !== null) {
+            return product_image_asset_url($file_name);
+        }
+
+        if (is_file(FCPATH . 'assets/uploads/products/default.jpg')) {
+            return product_image_asset_url('default.jpg');
+        }
+
+        return base_url('assets/themes/fastkart/images/product/1.png');
+    }
+}
+
 if (!function_exists('get_product_image')) {
     function get_product_image($id)
     {
@@ -467,14 +568,9 @@ if (!function_exists('get_product_image')) {
         $CI->load->model('product_model');
 
         $data = $CI->product_model->product_data($id);
-        $picture_name = $data->picture_name;
+        $picture_name = $data ? $data->picture_name : null;
 
-        if (!$picture_name)
-            $picture_name = 'default.jpg';
-
-        $file = './assets/uploads/products/' . $picture_name;
-
-        return base_url('assets/uploads/products/' . $picture_name);
+        return get_product_image_url($picture_name);
     }
 }
 

@@ -254,7 +254,7 @@ if (!function_exists('format_customer_price_text')) {
               <div>
                 <div class="item">
                   <a href="<?php echo site_url('product/' . $data->id . '/' . $data->sku . '/'); ?>">
-                    <img src="<?php echo base_url('assets/uploads/products/' . $data->picture_name); ?>" alt="<?php echo $data->name; ?>" />
+                    <img src="<?php echo get_product_image_url($data->picture_name); ?>" alt="<?php echo $data->name; ?>" />
                   </a>
                 </div>
               </div>
@@ -318,7 +318,7 @@ if (!function_exists('format_customer_price_text')) {
 
           <?php foreach (array_slice($promo_products, 0, 3) as $product) : ?>
             <div class="product-list media">
-              <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" class="img-fluid" alt="<?php echo $product->name; ?>" /></a>
+              <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo get_product_image_url($product->picture_name); ?>" class="img-fluid" alt="<?php echo $product->name; ?>" /></a>
               <div class="media-body">
                 <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>" class="font-sm"> <?php echo $product->name; ?></a>
                 <span class="title-color font-sm"><?php echo format_customer_price_text($product->promo_price, $product->promo_price_2, $product->promo_price_3); ?> <del><small> <?php echo format_customer_price_text($product->price, $product->price_2, $product->price_3); ?></small></del>
@@ -352,7 +352,7 @@ if (!function_exists('format_customer_price_text')) {
           <div>
             <div class="product-card">
               <div class="img-wrap">
-                <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" class="img-fluid" alt="<?php echo $product->name; ?>" /> </a>
+                <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo get_product_image_url($product->picture_name); ?>" class="img-fluid" alt="<?php echo $product->name; ?>" /> </a>
               </div>
               <div class="content-wrap">
                 <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>" class="font-sm title-color"><?php echo $product->name; ?> </a>
@@ -392,7 +392,7 @@ if (!function_exists('format_customer_price_text')) {
 
               <div class="img-wrap">
                 <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>">
-                  <img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" class="w-100 h-100 object-fit-cover" alt="<?php echo $product->name; ?>" />
+                  <img src="<?php echo get_product_image_url($product->picture_name); ?>" class="w-100 h-100 object-fit-cover" alt="<?php echo $product->name; ?>" />
                 </a>
               </div>
 

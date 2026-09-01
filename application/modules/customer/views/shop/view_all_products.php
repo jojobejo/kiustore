@@ -18,7 +18,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
                                 <!-- <a class="wishlist-btn" href="#"><i class="lni lni-heart"></i></a> -->
                                 <a class="product-thumbnail d-block" href="<?php echo site_url('shop/product/'. $product->id .'/'. $product->sku .'/'); ?>">
-                                <img class="mb-2" src="<?php echo base_url('assets/uploads/products/'. $product->picture_name); ?>" alt="<?php echo $product->name; ?>">
+                                <img class="mb-2" src="<?php echo get_product_image_url($product->picture_name); ?>" alt="<?php echo $product->name; ?>">
                                 </a>
                                 <a class="product-title d-block" href="single-product.html">Beach Cap</a>
                                 <?php if ($product->current_discount > 0) : ?>

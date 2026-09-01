@@ -168,6 +168,7 @@ class Products extends CI_Controller
             $config['upload_path'] = './assets/uploads/products/';
             $config['allowed_types'] = 'jpg|png|jpeg';
             $config['max_size'] = 2048;
+            $file_name = NULL;
 
             $this->load->library('upload', $config);
 

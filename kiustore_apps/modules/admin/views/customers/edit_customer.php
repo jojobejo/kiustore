@@ -181,7 +181,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <div class="tab-content" id="pills-tabContent">
                         <div class="tab-pane fade show active" id="pills-current" role="tabpanel" aria-labelledby="pills-home-tab">
                             <div class="text-center">
-                                <img alt="<?php echo $product->name; ?>" src="<?php echo base_url('assets/uploads/products/'. $product->picture_name); ?>" class="img img-fluid rounded">
+                                <img alt="<?php echo $product->name; ?>" src="<?php echo get_product_image_url($product->picture_name); ?>" class="img img-fluid rounded">
                             </div>
                         </div>
                         <div class="tab-pane fade" id="pills-edit" role="tabpanel" aria-labelledby="pills-profile-tab">

@@ -104,9 +104,13 @@ class Product_model extends CI_Model {
     public function is_product_have_image($id)
     {
         $data = $this->product_data($id);
-        $file = $data->picture_name;
+        $file = $data ? $data->picture_name : null;
 
-        return file_exists('./assets/uploads/products/'. $file) ? TRUE : FALSE;
+        if (function_exists('resolve_product_image_name')) {
+            return resolve_product_image_name($file) !== null ? TRUE : FALSE;
+        }
+
+        return $file && file_exists('./assets/uploads/products/'. $file) ? TRUE : FALSE;
     }
 
     public function edit_product($id, $product)

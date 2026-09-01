@@ -39,7 +39,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             </div>
                             <div class="card-body">
                                 <div class="text-center">
-                                    <img alt="<?php echo $product->name; ?>" class="img img-fluid rounded" src="<?php echo base_url('assets/uploads/products/'. $product->picture_name); ?>" style="width: 1000px; max-height: 800px">
+                                    <img alt="<?php echo $product->name; ?>" class="img img-fluid rounded" src="<?php echo get_product_image_url($product->picture_name); ?>" style="width: 1000px; max-height: 800px">
                                     <br>
                                     <br>
                                     <?php echo ($product->stock > 0) ? $product->stock .' '. $product->product_unit: '<span class="text-danger"><em>Stok habis</em></span>'; ?> / Rp <?php echo format_rupiah($product->price); ?>

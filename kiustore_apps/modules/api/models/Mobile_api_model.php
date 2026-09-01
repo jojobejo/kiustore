@@ -494,9 +494,13 @@ class Mobile_api_model extends CI_Model
 
     private function product_image_url($picture_name)
     {
+        if (function_exists('get_product_image_url')) {
+            return get_product_image_url($picture_name);
+        }
+
         $file_name = $picture_name ? $picture_name : 'default.jpg';
-        $path = 'assets/uploads/products/' . $file_name;
-        $version = @filemtime(FCPATH . $path);
+        $path = 'assets/uploads/products/' . rawurlencode($file_name);
+        $version = @filemtime(FCPATH . 'assets/uploads/products/' . $file_name);
         $url = base_url($path);
 
         return $version ? $url . '?v=' . $version : $url;

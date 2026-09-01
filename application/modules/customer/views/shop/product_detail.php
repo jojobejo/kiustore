@@ -94,16 +94,16 @@ if (!is_login()) {
   <!-- Banner Section Start -->
   <div class="banner-box product-banner">
     <div class="banner">
-      <img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" alt="veg" />
+      <img src="<?php echo get_product_image_url($product->picture_name); ?>" alt="<?php echo $product->name; ?>" />
     </div>
     <!-- <div class="banner">
-          <img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" alt="veg" />
+          <img src="<?php echo get_product_image_url($product->picture_name); ?>" alt="<?php echo $product->name; ?>" />
         </div>
         <div class="banner">
-          <img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" alt="veg" />
+          <img src="<?php echo get_product_image_url($product->picture_name); ?>" alt="<?php echo $product->name; ?>" />
         </div>
         <div class="banner">
-          <img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" alt="veg" />
+          <img src="<?php echo get_product_image_url($product->picture_name); ?>" alt="<?php echo $product->name; ?>" />
         </div> -->
   </div>
   <!-- Banner Section End -->
@@ -190,7 +190,7 @@ if (!is_login()) {
           <div>
             <div class="product-card">
               <div class="img-wrap">
-                <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo base_url('assets/uploads/products/' . $product->picture_name); ?>" class="w-100 h-100 object-fit-cover" alt="<?php echo $product->name; ?>" /> </a>
+                <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>"><img src="<?php echo get_product_image_url($product->picture_name); ?>" class="w-100 h-100 object-fit-cover" alt="<?php echo $product->name; ?>" /> </a>
               </div>
               <div class="content-wrap">
                 <a href="<?php echo site_url('product/' . $product->id . '/' . $product->sku . '/'); ?>" class="font-sm title-color"><?php echo $product->name; ?> </a>

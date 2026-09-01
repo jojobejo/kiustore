@@ -39,7 +39,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               </div>
               <div class="card-body p-0">
               <div>
-                  <center><img alt="<?php echo $product->name; ?>" class="img img-fluid rounded" src="<?php echo base_url('assets/uploads/products/'. $product->picture_name); ?>"> </center>
+                  <center><img alt="<?php echo $product->name; ?>" class="img img-fluid rounded" src="<?php echo get_product_image_url($product->picture_name); ?>"> </center>
               </div>
 
                 <table class="table table-hover table-striped">
