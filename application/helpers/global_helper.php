@@ -823,11 +823,14 @@ if (!function_exists('get_price')) {
     {
         $login_data = session_data();
 
-        if (!$login_data->is_login) {
+        if (!isset($login_data->is_login) || !$login_data->is_login) {
             return $price1;
         }
 
-        $level = $login_data->user_level;
+        $level = 1;
+        if (isset($login_data->user_level) && $login_data->user_level !== null && $login_data->user_level !== '') {
+            $level = (int) $login_data->user_level;
+        }
 
 
         if ($level == 1) {
@@ -847,11 +850,14 @@ if (!function_exists('get_v_price')) {
     {
         $login_data = session_data();
 
-        if (!$login_data->is_login) {
+        if (!isset($login_data->is_login) || !$login_data->is_login) {
             return $price1;
         }
 
-        $level = $login_data->user_level;
+        $level = 1;
+        if (isset($login_data->user_level) && $login_data->user_level !== null && $login_data->user_level !== '') {
+            $level = (int) $login_data->user_level;
+        }
 
 
         if ($level == 1) {
@@ -861,6 +867,8 @@ if (!function_exists('get_v_price')) {
         } elseif ($level == 3) {
             return $price3;
         }
+
+        return $price1;
     }
 }
 
@@ -868,11 +876,12 @@ if (!function_exists('level_user')) {
     function level_user()
     {
         $login_data = session_data();
-        if ($login_data->is_login) {
-            $level = $login_data->user_level;
-        } else {
-            $level = 1;
+        $level = 1;
+
+        if (isset($login_data->is_login) && $login_data->is_login && isset($login_data->user_level) && $login_data->user_level !== null && $login_data->user_level !== '') {
+            $level = (int) $login_data->user_level;
         }
+
         return $level;
     }
 }
