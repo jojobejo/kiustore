@@ -45,39 +45,74 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
           <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane fade show active" id="success" role="tabpanel" aria-labelledby="success-tab">
-              <div class="table-responsive">
-                <?php //echo form_open('admin/report/tabel', array('id' => 'FormLaporan'));
-                ?>
-                <form action="<?= base_url('admin/report/tabel') ?>" method="POST" id="FormLaporan1">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <div class="form-horizontal">
-                        <div class="form-group">
-                          <label class="col-sm-4 control-label">Bulan</label>
-                          <div class="col-sm-8">
-                            <input type='month' name='from' class='form-control' id='bulan' value="<?php echo date('m-Y'); ?>" data-toggle="datetimepicker" data-target="#tanggal_dari" autocomplete="false">
-                          </div>
-                        </div>
-                      </div>
+              <form action="<?php echo site_url('admin/report'); ?>" method="GET" id="revenueReportForm" class="px-4 pt-4">
+                <div class="row">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label class="form-control-label">Jenis Periode</label>
+                      <select name="period_type" id="periodType" class="form-control">
+                        <option value="date_range" <?php echo ($filters['period_type'] == 'date_range') ? 'selected' : ''; ?>>Rentang Tanggal</option>
+                        <option value="month_range" <?php echo ($filters['period_type'] == 'month_range') ? 'selected' : ''; ?>>Bulan ke Bulan</option>
+                        <option value="yearly" <?php echo ($filters['period_type'] == 'yearly') ? 'selected' : ''; ?>>Tahunan</option>
+                      </select>
                     </div>
                   </div>
-
-                  <div class='row'>
-                    <div class="col-sm-5">
-                      <div class="form-horizontal">
-                        <div class="form-group">
-                          <div class="col-sm-4"></div>
-                          <div class="col-sm-8">
-                            <button type="submit" class="btn btn-primary" style='margin-left: 0px;'>Tampilkan</button>
-                          </div>
-                        </div>
-                      </div>
+                  <div class="col-md-3 period-field" data-period="date_range">
+                    <div class="form-group">
+                      <label class="form-control-label">Tanggal Mulai</label>
+                      <input type="date" name="start_date" class="form-control" value="<?php echo html_escape($filters['start_date']); ?>">
                     </div>
                   </div>
-                  <?php echo form_close(); ?>
+                  <div class="col-md-3 period-field" data-period="date_range">
+                    <div class="form-group">
+                      <label class="form-control-label">Tanggal Akhir</label>
+                      <input type="date" name="end_date" class="form-control" value="<?php echo html_escape($filters['end_date']); ?>">
+                    </div>
+                  </div>
+                  <div class="col-md-3 period-field" data-period="month_range">
+                    <div class="form-group">
+                      <label class="form-control-label">Bulan Mulai</label>
+                      <input type="month" name="start_month" class="form-control" value="<?php echo html_escape($filters['start_month']); ?>">
+                    </div>
+                  </div>
+                  <div class="col-md-3 period-field" data-period="month_range">
+                    <div class="form-group">
+                      <label class="form-control-label">Bulan Akhir</label>
+                      <input type="month" name="end_month" class="form-control" value="<?php echo html_escape($filters['end_month']); ?>">
+                    </div>
+                  </div>
+                  <div class="col-md-3 period-field" data-period="yearly">
+                    <div class="form-group">
+                      <label class="form-control-label">Tahun</label>
+                      <input type="number" name="year" min="2000" max="2100" class="form-control" value="<?php echo html_escape($filters['year']); ?>">
+                    </div>
+                  </div>
+                  <div class="col-md-3 d-flex align-items-end">
+                    <div class="form-group w-100">
+                      <button type="submit" class="btn btn-primary btn-block">Tampilkan</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
 
-                  <br />
-                  <div id='result'></div>
+              <div class="px-4 pb-4">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="bg-gradient-info rounded p-4 mb-3">
+                      <h5 class="text-uppercase text-white mb-1">Total Pendapatan</h5>
+                      <span class="h2 font-weight-bold text-white mb-0">Rp <?php echo format_rupiah($total_revenue); ?></span>
+                      <p class="mt-2 mb-0 text-sm text-white">Periode <?php echo html_escape($filter_summary); ?></p>
+                    </div>
+                  </div>
+                </div>
+                <div id="result">
+                  <?php $this->load->view('reports/report_table', array(
+                    'data' => $data,
+                    'total_revenue' => $total_revenue,
+                    'filters' => $filters,
+                    'filter_summary' => $filter_summary
+                  )); ?>
+                </div>
               </div>
             </div>
 
@@ -111,10 +146,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 <script>
   $(document).ready(function() {
-    $('#bulan').datetimepicker({
-      timepicker: false,
-      format: 'm-Y'
-    });
+    function togglePeriodFields() {
+      var periodType = $('#periodType').val();
+      $('.period-field').hide();
+      $('.period-field[data-period="' + periodType + '"]').show();
+    }
+
+    $('#periodType').on('change', togglePeriodFields);
+    togglePeriodFields();
   });
 
 </script>
