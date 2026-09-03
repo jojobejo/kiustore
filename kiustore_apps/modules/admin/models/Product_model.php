@@ -237,14 +237,88 @@ class Product_model extends CI_Model {
 
     public function get_all_banner()
     {
-        $data = $this->db->query("
-            SELECT b.*, a.id as banner_id, a.banner_image
-            FROM banner_product a
-            JOIN products b
-                ON b.id = a.product_id
-        ")->result();
+        $select = "
+            b.*,
+            a.id AS banner_id,
+            a.product_id,
+            a.banner_image,
+            a.created_at";
+
+        $select .= $this->db->field_exists('banner_title', 'banner_product') ? ", a.banner_title" : ", NULL AS banner_title";
+        $select .= $this->db->field_exists('redirect_type', 'banner_product') ? ", a.redirect_type" : ", 'product' AS redirect_type";
+        $select .= $this->db->field_exists('redirect_product_id', 'banner_product') ? ", a.redirect_product_id" : ", a.product_id AS redirect_product_id";
+        $select .= $this->db->field_exists('redirect_category_id', 'banner_product') ? ", a.redirect_category_id" : ", NULL AS redirect_category_id";
+        $select .= $this->db->field_exists('redirect_url', 'banner_product') ? ", a.redirect_url" : ", NULL AS redirect_url";
+        $select .= $this->db->field_exists('display_order', 'banner_product') ? ", a.display_order" : ", a.id AS display_order";
+        $select .= $this->db->field_exists('is_active', 'banner_product') ? ", a.is_active" : ", 1 AS is_active";
+        $select .= $this->db->field_exists('redirect_category_id', 'banner_product') ? ", c.name AS redirect_category_name" : ", NULL AS redirect_category_name";
+
+        $this->db->select($select, FALSE)
+            ->from('banner_product a')
+            ->join('products b', 'b.id = a.product_id', 'left');
+
+        if ($this->db->field_exists('redirect_category_id', 'banner_product'))
+        {
+            $this->db->join('product_category c', 'c.id = a.redirect_category_id', 'left');
+        }
+
+        if ($this->db->field_exists('display_order', 'banner_product'))
+        {
+            $this->db->order_by('a.display_order', 'ASC');
+        }
+
+        $data = $this->db->order_by('a.id', 'DESC')->get()->result();
 
         return $data;
+    }
+
+    public function is_banner_product_flexible_ready()
+    {
+        $columns = array(
+            'banner_title',
+            'redirect_type',
+            'redirect_product_id',
+            'redirect_category_id',
+            'redirect_url',
+            'display_order',
+            'is_active'
+        );
+
+        foreach ($columns as $column)
+        {
+            if ( ! $this->db->field_exists($column, 'banner_product'))
+            {
+                return FALSE;
+            }
+        }
+
+        return TRUE;
+    }
+
+    public function banner_data($id)
+    {
+        $select = "
+            a.id AS banner_id,
+            a.product_id,
+            a.banner_image,
+            a.created_at,
+            b.name AS product_name,
+            b.sku";
+
+        $select .= $this->db->field_exists('banner_title', 'banner_product') ? ", a.banner_title" : ", NULL AS banner_title";
+        $select .= $this->db->field_exists('redirect_type', 'banner_product') ? ", a.redirect_type" : ", 'product' AS redirect_type";
+        $select .= $this->db->field_exists('redirect_product_id', 'banner_product') ? ", a.redirect_product_id" : ", a.product_id AS redirect_product_id";
+        $select .= $this->db->field_exists('redirect_category_id', 'banner_product') ? ", a.redirect_category_id" : ", NULL AS redirect_category_id";
+        $select .= $this->db->field_exists('redirect_url', 'banner_product') ? ", a.redirect_url" : ", NULL AS redirect_url";
+        $select .= $this->db->field_exists('display_order', 'banner_product') ? ", a.display_order" : ", a.id AS display_order";
+        $select .= $this->db->field_exists('is_active', 'banner_product') ? ", a.is_active" : ", 1 AS is_active";
+
+        return $this->db->select($select, FALSE)
+            ->from('banner_product a')
+            ->join('products b', 'b.id = a.product_id', 'left')
+            ->where('a.id', $id)
+            ->get()
+            ->row();
     }
 
     public function add_new_banner_product(Array $product)
@@ -254,9 +328,67 @@ class Product_model extends CI_Model {
         return $this->db->insert_id();
     }
 
+    public function edit_banner_product($id, Array $banner)
+    {
+        return $this->db->where('id', $id)->update('banner_product', $banner);
+    }
+
+    public function update_banner_display_settings(Array $settings)
+    {
+        if (empty($settings))
+        {
+            return FALSE;
+        }
+
+        $this->db->trans_start();
+
+        foreach ($settings as $id => $setting)
+        {
+            $this->db->where('id', $id)->update('banner_product', $setting);
+        }
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status();
+    }
+
+    public function count_active_banner_products($exclude_id = NULL)
+    {
+        if ( ! $this->db->field_exists('is_active', 'banner_product'))
+        {
+            return 0;
+        }
+
+        $this->db->where('is_active', 1);
+
+        if ($exclude_id !== NULL)
+        {
+            $this->db->where('id !=', $exclude_id);
+        }
+
+        return $this->db->count_all_results('banner_product');
+    }
+
+    public function get_next_banner_display_order()
+    {
+        if ( ! $this->db->field_exists('display_order', 'banner_product'))
+        {
+            return 1;
+        }
+
+        $row = $this->db->select_max('display_order')->get('banner_product')->row();
+
+        return ($row && (int) $row->display_order > 0) ? ((int) $row->display_order + 1) : 1;
+    }
+
     public function delete_banner_product($id)
     {
         return $this->db->where('id', $id)->delete('banner_product');
+    }
+
+    public function is_category_exist($id)
+    {
+        return ($this->db->where('id', $id)->get('product_category')->num_rows() > 0) ? TRUE : FALSE;
     }
 
 }

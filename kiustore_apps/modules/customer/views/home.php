@@ -184,11 +184,11 @@ if (!function_exists('format_customer_price_text')) {
     <div class="h-banner-slider">
 
       <?php if (count($banner_product) > 0) : ?>
-        <?php foreach (array_slice($banner_product, 0, 3) as $banner) : ?>
+        <?php foreach ($banner_product as $banner) : ?>
           <div>
             <div class="banner-box">
-              <a href="<?php echo site_url('product/' . $banner->id . '/' . $banner->sku . '/'); ?>">
-                <img src="<?php echo base_url('assets/uploads/banner_product/' . $banner->banner_image); ?>" alt="banner" class="bg-img" />
+              <a href="<?php echo html_escape(! empty($banner->target_url) ? $banner->target_url : site_url('category')); ?>">
+                <img src="<?php echo base_url('assets/uploads/banner_product/' . $banner->banner_image); ?>" alt="<?php echo html_escape(! empty($banner->banner_title) ? $banner->banner_title : 'banner'); ?>" class="bg-img" />
               </a>
             </div>
           </div>

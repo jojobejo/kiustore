@@ -1,455 +1,471 @@
-# Guidebook Admin dan Customer KIU Store
+# Guidebook Pengguna KIU Store
 
-Tanggal dokumen: 2026-08-21
+Tanggal dokumen: 2026-08-21  
+Versi bahasa umum: 2026-09-03
 
 ## Tujuan
 
-Guidebook ini menjadi panduan operasional untuk admin dan customer dari awal akses sampai penyelesaian order. Isi dokumen disusun dari fitur yang terverifikasi di route, controller, view, helper, dan model repositori lokal.
+Guidebook ini dibuat sebagai panduan penggunaan KIU Store untuk pelanggan, tim admin, tim penjualan, keuangan, distribusi, dan manajemen. Bahasa dalam dokumen ini sengaja dibuat umum agar mudah dibaca, mudah dibagikan, dan tetap sesuai dengan alur kerja yang berlaku di aplikasi.
 
-## Audit Trail
+Dokumen ini menjelaskan cara menggunakan KIU Store dari awal pendaftaran, pemilihan produk, pembayaran, pengiriman, sampai pengelolaan pesanan oleh tim internal.
 
-| Area | Sumber Sistem |
+## Prinsip Penggunaan
+
+| Prinsip | Penjelasan |
 |---|---|
-| Route aplikasi | `application/config/routes.php` |
-| Login/Register/Logout | `application/controllers/auth/Login.php`, `Register.php`, `Logout.php` |
-| Role dan session | `application/helpers/session_helper.php` |
-| Status order/payment | `application/helpers/global_helper.php` |
-| Customer web | `application/modules/customer/controllers` |
-| Admin web | `application/modules/admin/controllers` |
-| API mobile | `application/modules/api/controllers/Mobile.php` |
+| Data harus benar | Pastikan nama, alamat, nomor handphone, produk, jumlah barang, harga, dan pembayaran sudah sesuai sebelum disimpan. |
+| Perubahan harus berdasarkan bukti | Perubahan status pesanan, pembayaran, atau pengiriman harus mengikuti kondisi nyata dan bukti yang tersedia. |
+| Setiap bagian punya tanggung jawab | Pelanggan, admin, sales, keuangan, distribusi, dan manajemen memiliki tugas masing-masing dalam alur pesanan. |
+| Komunikasi harus jelas | Gunakan chat atau kontak resmi jika ada pertanyaan, kendala, atau kebutuhan klarifikasi. |
+| Keamanan akun dijaga | Jangan membagikan password, bukti pembayaran, atau data pribadi kepada pihak yang tidak berwenang. |
 
-## Akun dan Hak Akses
+## Jenis Pengguna dan Hak Akses
 
-| Role | Akses Utama |
+| Jenis Pengguna | Akses Utama |
 |---|---|
-| `customer` | Home, katalog produk, cart, checkout, pembayaran, order history, invoice, chat, profil, privacy policy |
-| `admin` | Seluruh menu admin yang dikawal helper admin |
-| `adminonline` | Produk, kategori, banner, order, promo, kupon, customer, chat, settings tertentu |
-| `keuangan` | Pembayaran, piutang, customer, laporan, produk sesuai menu |
-| `salesman` | Produk, order, promo, kupon, customer, chat |
-| `distribusi` | Pesanan distribusi dan pengiriman |
-| `kadep` | Rating sales dan nilai rata-rata |
+| Pelanggan | Melihat produk, memasukkan barang ke keranjang, membuat pesanan, melakukan pembayaran, melihat riwayat pesanan, chat, dan mengelola profil. |
+| Admin | Mengelola data utama, memantau pesanan, membantu pelanggan, dan menjaga kelancaran operasional aplikasi. |
+| Admin Online | Mengelola produk, kategori, promosi, kupon, pesanan, pelanggan, chat, dan pengaturan tertentu. |
+| Keuangan | Memeriksa pembayaran, piutang, bukti bayar, dan status tagihan pelanggan. |
+| Sales | Membantu proses pesanan, pelanggan, promo, chat, dan layanan penjualan. |
+| Distribusi | Mengelola proses pengemasan, pengiriman, nomor resi, dan informasi distribusi barang. |
+| Manajemen | Memantau laporan, penilaian layanan, dan kinerja operasional. |
 
-## Panduan Customer
+## Panduan Untuk Pelanggan
 
-### 1. Registrasi Akun
+### 1. Membuat Akun
 
-1. Buka `/register`.
-2. Isi password, nama lengkap, alamat, nomor HP, dan email.
-3. Submit formulir.
-4. Sistem membuat akun `users` role `customer` dan data profil di `customers`.
-5. Setelah berhasil, customer diarahkan ke halaman notifikasi registrasi.
+1. Buka halaman pendaftaran.
+2. Isi nama lengkap, alamat, nomor handphone, email, dan password.
+3. Pastikan semua data sudah benar.
+4. Kirim formulir pendaftaran.
+5. Setelah berhasil, pelanggan akan diarahkan ke halaman pemberitahuan pendaftaran.
 
-Catatan validasi:
+Hal yang perlu diperhatikan:
 
-- Password wajib minimal 4 karakter.
-- Nomor HP wajib unik di tabel `customers`.
-- Email wajib unik di tabel `users`.
+- Gunakan nomor handphone dan email yang aktif.
+- Nomor handphone dan email tidak boleh sama dengan akun lain.
+- Password harus mudah diingat oleh pemilik akun, tetapi tidak mudah ditebak orang lain.
 
-### 2. Login dan Logout
+### 2. Masuk dan Keluar Akun
 
-1. Buka `/login`.
+1. Buka halaman masuk.
 2. Isi email dan password.
-3. Klik `Masuk`.
-4. Customer aktif diarahkan ke `/home`.
-5. Untuk keluar, buka menu sidebar lalu pilih `Logout` atau akses `/logout`.
+3. Pilih tombol masuk.
+4. Jika akun aktif dan data benar, pelanggan akan masuk ke halaman utama.
+5. Untuk keluar, pilih menu keluar akun.
 
-Jika customer mencoba membuka `/cart`, `/profile`, atau halaman customer private tanpa login, sistem akan mengarahkan ke login dengan parameter redirect.
+Jika pelanggan membuka halaman pribadi sebelum masuk akun, aplikasi akan meminta pelanggan untuk masuk terlebih dahulu.
 
-### 3. Navigasi Home dan Katalog
+### 3. Melihat Produk
 
-Menu customer utama:
+Pelanggan dapat menggunakan menu utama berikut:
 
 | Menu | Fungsi |
 |---|---|
-| Home | Melihat banner, kategori, promo, produk, invoice, dan tagihan |
-| Kategori | Melihat daftar kategori produk |
-| Cart | Melihat dan mengelola keranjang |
-| Histori Order | Melihat daftar dan detail pesanan |
-| Chat | Mengirim dan membaca pesan dengan admin |
-| Settings/Profile | Mengelola profil, alamat, akun, dan guide book |
-| Privacy & Policy | Membaca kebijakan privasi |
+| Home | Melihat banner, kategori, promo, produk, invoice, dan tagihan. |
+| Kategori | Melihat produk berdasarkan kategori. |
+| Keranjang | Melihat dan mengatur barang yang akan dibeli. |
+| Riwayat Pesanan | Melihat daftar pesanan dan detailnya. |
+| Chat | Bertanya atau berkomunikasi dengan admin. |
+| Profil | Mengelola data diri, alamat, akun, dan panduan penggunaan. |
+| Kebijakan Privasi | Membaca ketentuan penggunaan data dan privasi. |
 
-Alur katalog:
+Alur melihat produk:
 
-1. Buka `/home`, `/category`, `/all_products`, atau `/promo`.
-2. Cari produk melalui fitur search.
-3. Buka detail produk lewat `/product/{id}/{sku}`.
-4. Pastikan harga, stok, satuan, berat, dan deskripsi sesuai kebutuhan.
+1. Buka halaman utama, kategori, semua produk, atau promo.
+2. Cari produk yang dibutuhkan.
+3. Buka detail produk.
+4. Periksa harga, stok, satuan, berat, gambar, dan deskripsi produk.
+5. Jika produk sesuai, masukkan ke keranjang.
 
-### 4. Keranjang dan Ongkir
+### 4. Mengelola Keranjang dan Ongkir
 
-1. Tambahkan produk ke cart.
-2. Buka `/cart`.
-3. Periksa item, qty, satuan, subtotal, dan total.
-4. Untuk customer yang wajib ongkir, pilih asal, tujuan, dan kurir.
-5. Sistem menghitung ongkir memakai modul RajaOngkir/Komerce.
-6. Pilih layanan ongkir, lalu simpan.
+1. Masukkan produk yang ingin dibeli ke keranjang.
+2. Buka halaman keranjang.
+3. Periksa nama produk, jumlah, satuan, harga, dan total sementara.
+4. Jika ongkir diperlukan, pilih alamat asal, alamat tujuan, dan kurir.
+5. Pilih layanan pengiriman yang tersedia.
+6. Simpan pilihan pengiriman.
 
-Kondisi yang perlu diperhatikan:
+Hal yang perlu diperhatikan:
 
-- Cart tidak dapat diproses bila data produk tidak lengkap.
-- Checkout akan ditolak bila ada transaksi BRIVA berjalan yang belum selesai atau belum dibatalkan.
-- Untuk customer level tertentu, ongkir dapat bernilai 0 sesuai logic sistem.
+- Pesanan tidak dapat dilanjutkan jika data produk belum lengkap.
+- Pesanan dapat tertahan jika masih ada pembayaran Virtual Account yang belum selesai atau belum dibatalkan.
+- Untuk pelanggan tertentu, ongkir dapat mengikuti ketentuan khusus perusahaan.
 
-### 5. Checkout
+### 5. Membuat Pesanan
 
-1. Dari cart, masukkan kode kupon jika ada.
-2. Perbarui quantity.
-3. Lanjut ke checkout.
-4. Sistem menghitung subtotal, discount, ongkir, dan total.
-5. Periksa data pengiriman: nama, nomor HP, alamat, toko, alamat toko, dan catatan.
-6. Pilih metode pembayaran.
-7. Submit order.
+1. Periksa kembali isi keranjang.
+2. Masukkan kupon jika tersedia.
+3. Sesuaikan jumlah barang jika perlu.
+4. Lanjutkan ke proses pemesanan.
+5. Periksa subtotal, potongan harga, ongkir, dan total pembayaran.
+6. Pastikan nama penerima, nomor handphone, alamat, nama toko, alamat toko, dan catatan sudah benar.
+7. Pilih metode pembayaran.
+8. Kirim pesanan.
 
-Metode pembayaran yang terverifikasi di helper:
+Metode pembayaran yang tersedia:
 
-| Kode | Metode |
+| Metode | Penjelasan |
 |---|---|
-| 1 | Kredit |
-| 2 | Virtual Account |
-| 3 | Transfer Bank |
+| Kredit | Pembayaran mengikuti ketentuan kredit pelanggan. |
+| Virtual Account | Pembayaran menggunakan nomor pembayaran khusus. |
+| Transfer Bank | Pembayaran melalui transfer dan konfirmasi bukti bayar. |
 
-Catatan kredit:
+Catatan untuk pembayaran kredit:
 
-- Order kredit dapat masuk status `Dalam Pengajuan Kredit`.
-- Jika total kredit melebihi limit transaksi customer, sistem menolak checkout dan mengarahkan kembali ke cart.
+- Pesanan kredit dapat menunggu persetujuan terlebih dahulu.
+- Jika nilai pesanan melebihi batas kredit pelanggan, pesanan tidak dapat dilanjutkan sampai ada penyesuaian.
 
 ### 6. Pembayaran
 
 #### Virtual Account
 
-1. Setelah order VA dibuat, ikuti instruksi pembayaran VA.
-2. Cek status pembayaran melalui detail order bila tersedia.
-3. Status pembayaran akan berubah sesuai respons BRIVA atau mode local development.
+1. Setelah pesanan dibuat, pelanggan akan mendapatkan instruksi pembayaran.
+2. Ikuti instruksi pembayaran sesuai informasi yang muncul.
+3. Setelah membayar, pantau status pembayaran di detail pesanan.
+4. Jika status belum berubah, pelanggan dapat menghubungi admin atau keuangan.
 
 #### Transfer Bank
 
-1. Buka halaman konfirmasi pembayaran dari order atau `/customer/payments/confirm?order={id}`.
+1. Buka halaman konfirmasi pembayaran dari detail pesanan.
 2. Isi bank asal, nama pengirim, nomor rekening, nominal transfer, dan bank tujuan.
-3. Upload bukti pembayaran jika tersedia.
-4. Submit.
-5. Sistem membuat data `payments` dengan status menunggu konfirmasi.
-6. Admin/keuangan akan memverifikasi pembayaran.
+3. Unggah bukti pembayaran jika diminta.
+4. Kirim konfirmasi pembayaran.
+5. Tim keuangan akan memeriksa dan mengonfirmasi pembayaran.
 
-### 7. Histori Order dan Status
+### 7. Melihat Riwayat dan Status Pesanan
 
-1. Buka `/order_history`.
-2. Pilih order untuk melihat detail.
-3. Pantau status order.
+1. Buka menu riwayat pesanan.
+2. Pilih pesanan yang ingin dilihat.
+3. Periksa detail barang, alamat pengiriman, pembayaran, dan status pesanan.
+4. Pantau perubahan status sampai pesanan selesai.
 
-Status order utama:
+Status pesanan yang umum digunakan:
 
-| Status | Arti Operasional |
+| Status | Arti |
 |---|---|
-| Proses oleh Sales | Order sedang diproses sales |
-| Menunggu Pembayaran | Customer perlu melakukan pembayaran |
-| Menunggu Konfirmasi Pembayaran | Bukti/payment menunggu verifikasi |
-| Payment Verify | Pembayaran sudah tervalidasi awal |
-| Pengemasan | Order sedang dikemas |
-| Pengiriman | Order sedang dikirim |
-| Barang Diterima | Customer sudah menerima barang |
-| Selesai | Order selesai |
-| Dibatalkan | Order dibatalkan |
-| Dalam Pengajuan Kredit | Order kredit menunggu approval |
+| Diproses Sales | Pesanan sedang diperiksa dan diproses oleh tim sales. |
+| Menunggu Pembayaran | Pelanggan perlu melakukan pembayaran. |
+| Menunggu Konfirmasi Pembayaran | Bukti pembayaran sedang diperiksa. |
+| Pembayaran Terverifikasi | Pembayaran sudah dinyatakan sesuai. |
+| Pengemasan | Barang sedang disiapkan untuk dikirim. |
+| Pengiriman | Barang sedang dalam proses pengiriman. |
+| Barang Diterima | Pelanggan sudah menerima barang. |
+| Selesai | Pesanan sudah selesai. |
+| Dibatalkan | Pesanan tidak dilanjutkan. |
+| Menunggu Persetujuan Kredit | Pesanan kredit sedang menunggu persetujuan. |
 
-### 8. Profil dan Alamat
+### 8. Mengelola Profil dan Alamat
 
-1. Buka `/profile`.
-2. Untuk ubah profil, buka edit profile.
-3. Update nama, nomor HP, alamat, nama toko, alamat toko, dan foto profil bila perlu.
-4. Untuk alamat kirim, gunakan menu edit alamat.
-5. Pilih provinsi, kabupaten/kota, dan kecamatan/subdistrict.
+1. Buka menu profil.
+2. Pilih ubah profil untuk memperbarui data diri.
+3. Perbarui nama, nomor handphone, alamat, nama toko, alamat toko, atau foto profil jika diperlukan.
+4. Gunakan menu alamat kirim untuk mengatur alamat tujuan.
+5. Pilih provinsi, kabupaten atau kota, dan kecamatan.
 6. Simpan perubahan.
 
-Catatan:
+Hal yang perlu diperhatikan:
 
-- Foto profil hanya menerima `jpg` dan `png` dengan batas upload sesuai controller.
-- Password baru minimal 4 karakter.
-- Email harus format valid dan panjang sesuai validasi controller.
+- Gunakan foto dengan format umum seperti JPG atau PNG.
+- Email harus menggunakan format yang benar.
+- Jika mengganti password, gunakan password yang aman dan mudah diingat oleh pemilik akun.
 
-### 9. Chat dan Contact
+### 9. Chat dan Kontak
 
 Chat:
 
-1. Buka `/message`.
-2. Ketik pesan.
-3. Kirim ke admin.
-4. Pantau balasan di halaman yang sama.
+1. Buka menu chat.
+2. Tulis pesan dengan jelas.
+3. Kirim pesan ke admin.
+4. Pantau balasan pada halaman yang sama.
 
-Contact:
+Kontak:
 
-1. Buka `/contact`.
-2. Isi nama, email, subject, dan pesan.
-3. Submit.
-4. Sistem mencatat pesan ke `contacts`.
+1. Buka halaman kontak.
+2. Isi nama, email, judul pesan, dan isi pesan.
+3. Kirim formulir.
+4. Tim terkait akan menindaklanjuti sesuai kebutuhan.
 
-### 10. Review dan Rating
+### 10. Review dan Penilaian
 
-1. Setelah order selesai atau diterima, buka halaman review bila tersedia.
-2. Isi rating dan deskripsi.
-3. Submit.
-4. Data rating digunakan pada modul review/rating admin.
+1. Setelah pesanan selesai atau barang diterima, pelanggan dapat memberikan penilaian jika menu tersedia.
+2. Isi rating dan ulasan dengan jujur.
+3. Kirim penilaian.
+4. Penilaian digunakan sebagai bahan evaluasi layanan.
 
-## Panduan Admin
+## Panduan Untuk Tim Internal
 
-### 1. Login Admin
+### 1. Masuk Sebagai Tim Internal
 
-1. Buka `/login`.
-2. Masukkan akun role admin yang aktif.
-3. Sistem mengarahkan role admin, adminonline, keuangan, salesman, distribusi, dan kadep ke `/dashboard_admin`.
-4. Menu sidebar tampil sesuai role.
+1. Buka halaman masuk.
+2. Gunakan akun internal yang aktif.
+3. Setelah berhasil masuk, pengguna akan diarahkan ke dashboard admin.
+4. Menu yang muncul akan menyesuaikan hak akses masing-masing pengguna.
 
 ### 2. Dashboard
 
-1. Buka `/dashboard_admin`.
-2. Gunakan dashboard sebagai pintu masuk monitoring.
-3. Perhatikan badge jumlah order, pembayaran belum terkonfirmasi, dan pesan belum dibaca jika tampil.
+Dashboard digunakan sebagai pusat pemantauan aktivitas operasional.
 
-### 3. Produk, Kategori, Kupon, Promo, dan Banner
+Hal yang perlu dipantau:
+
+- Pesanan baru.
+- Pembayaran yang belum dikonfirmasi.
+- Pesan pelanggan yang belum dibaca.
+- Pesanan yang sedang dikemas atau dikirim.
+- Data pelanggan, produk, dan laporan yang perlu diperiksa.
+
+### 3. Mengelola Produk, Kategori, Kupon, Promo, dan Banner
 
 #### Produk
 
-1. Buka `/admin/products`.
-2. Lihat daftar semua produk, produk dengan harga, dan produk belum ada harga.
-3. Tambah produk melalui menu tambah produk.
-4. Isi nama, kategori, harga level, stok, satuan, berat, tipe produk, deskripsi, dan gambar.
-5. Simpan.
-6. Untuk edit, buka detail/edit produk, ubah data, lalu simpan.
-7. Untuk hapus gambar atau produk, gunakan aksi yang tersedia di halaman produk.
-
-Validasi penting:
-
-- Nama produk wajib 4 sampai 255 karakter.
-- Harga utama wajib.
-- Stok wajib numerik.
-- Berat produk wajib.
-- Upload gambar produk menerima `jpg`, `png`, `jpeg` dan batas ukuran sesuai controller.
-
-#### Kategori
-
-1. Buka `/admin/categories`.
-2. Tambah kategori baru.
-3. Edit nama kategori bila perlu.
-4. Hapus kategori yang tidak digunakan setelah memastikan tidak mengganggu produk aktif.
-
-#### Kupon
-
-1. Buka `/admin/products/coupons`.
-2. Tambahkan nama, kode, nilai credit, tanggal mulai, tanggal expired.
-3. Aktifkan/nonaktifkan sesuai periode promosi.
-
-#### Promo
-
-1. Buka `/admin/products/promo`.
-2. Pilih produk, nilai promo, tanggal mulai, tanggal expired.
-3. Simpan dan pantau status aktif/expired.
-
-#### Banner Produk
-
-1. Buka menu Banner Produk.
-2. Tambahkan banner sesuai kebutuhan promosi.
-3. Edit atau hapus banner yang tidak lagi aktif.
-
-### 4. Customer
-
-1. Buka `/admin/customers`.
-2. Lihat daftar customer.
-3. Tambah customer baru bila pendaftaran dilakukan oleh internal.
-4. Isi nama, NIK, NPWP, email, password, kota, alamat, toko, level, limit kredit, dan salesman.
-5. Buka detail customer untuk melihat profil, order, payment, VA, dan riwayat terkait.
-6. Gunakan aksi activate/deactivate untuk mengatur status akun.
-7. Gunakan reset password bila customer membutuhkan reset awal.
-8. Gunakan generate/update VA customer bila diperlukan.
-
-Catatan:
-
-- Reset password admin untuk customer memakai default `1234` pada controller.
-- Setelah reset password, customer harus diminta mengganti password dari profil.
-
-### 5. Order Management
-
-1. Buka `/admin/orders` untuk order umum.
-2. Role distribusi/admin membuka `/admin/orders/distribusi` untuk proses pengemasan/pengiriman.
-3. Role kadep/admin membuka `/admin/orders/kadep` untuk rating sales.
-4. Buka detail order untuk melihat item, delivery data, bank, resi, pembayaran, dan flash status.
-
-Aksi order umum:
-
-| Aksi | Kapan Digunakan | Dampak Sistem |
-|---|---|---|
-| Update status | Perubahan tahap order | `orders.order_status` berubah |
-| Verify order | Validasi invoice, ekspedisi, TTB, shipping cost, insurance | Order diverifikasi sesuai model |
-| Update harga | Hanya status 1, 9, atau 11 | Harga item dan total order berubah |
-| Update resi | Setelah resi tersedia | Resi tersimpan ke order/faktur |
-| Reset resi | Resi salah atau batal | Resi direset |
-| Update pengemasan | Distribusi memproses batch | Order menjadi status pengiriman |
+1. Buka menu produk.
+2. Lihat daftar produk yang aktif, produk yang memiliki harga, dan produk yang belum lengkap.
+3. Tambahkan produk baru jika diperlukan.
+4. Isi nama produk, kategori, harga, stok, satuan, berat, tipe produk, deskripsi, dan gambar.
+5. Simpan data produk.
+6. Untuk perubahan, buka detail produk, perbarui data, lalu simpan.
+7. Hapus gambar atau produk hanya jika sudah dipastikan tidak mengganggu operasional.
 
 Kontrol penting:
 
-- Update harga ditolak bila order bukan status 1, 9, atau 11.
-- Setiap perubahan status harus sesuai kondisi fisik order dan bukti operasional.
-- Untuk BRIVA, jangan ubah manual sebelum memastikan status pembayaran.
+- Nama produk harus jelas.
+- Harga utama harus diisi.
+- Stok harus menggunakan angka yang benar.
+- Berat produk harus diisi agar pengiriman dapat dihitung.
+- Gambar produk harus jelas dan sesuai barang.
 
-### 6. Pembayaran dan Piutang
+#### Kategori
+
+1. Buka menu kategori.
+2. Tambahkan kategori baru jika diperlukan.
+3. Ubah nama kategori bila ada pembaruan.
+4. Hapus kategori hanya setelah dipastikan tidak mengganggu produk aktif.
+
+#### Kupon
+
+1. Buka menu kupon.
+2. Isi nama kupon, kode kupon, nilai potongan atau manfaat, tanggal mulai, dan tanggal berakhir.
+3. Aktifkan atau nonaktifkan kupon sesuai periode promosi.
+
+#### Promo
+
+1. Buka menu promo.
+2. Pilih produk yang akan dipromosikan.
+3. Isi nilai promo serta tanggal mulai dan berakhir.
+4. Simpan dan pantau status promo secara berkala.
+
+#### Banner Produk
+
+1. Buka menu banner produk.
+2. Tambahkan banner sesuai kebutuhan promosi.
+3. Perbarui atau hapus banner yang sudah tidak berlaku.
+
+### 4. Mengelola Pelanggan
+
+1. Buka menu pelanggan.
+2. Lihat daftar pelanggan.
+3. Tambahkan pelanggan baru jika pendaftaran dibantu oleh tim internal.
+4. Isi data pelanggan dengan lengkap dan benar.
+5. Buka detail pelanggan untuk melihat profil, pesanan, pembayaran, dan riwayat terkait.
+6. Aktifkan atau nonaktifkan akun sesuai kebutuhan dan kebijakan perusahaan.
+7. Lakukan reset password hanya jika pelanggan membutuhkan bantuan resmi.
+8. Jika pelanggan menggunakan Virtual Account, pastikan data pembayaran khusus pelanggan sudah sesuai.
+
+Catatan keamanan:
+
+- Reset password harus mengikuti kebijakan internal.
+- Setelah reset password, pelanggan perlu diarahkan untuk mengganti password sendiri.
+- Jangan membagikan data pelanggan kepada pihak yang tidak berwenang.
+
+### 5. Mengelola Pesanan
+
+1. Buka menu pesanan.
+2. Pilih pesanan yang ingin diperiksa.
+3. Periksa detail barang, data pengiriman, pembayaran, catatan, dan status pesanan.
+4. Lakukan perubahan hanya jika data dan bukti operasional sudah sesuai.
+
+Aksi yang umum dilakukan:
+
+| Aksi | Kapan Digunakan | Dampak |
+|---|---|---|
+| Ubah status pesanan | Saat pesanan berpindah tahap | Status pesanan berubah sesuai proses terbaru. |
+| Verifikasi pesanan | Saat data pesanan sudah diperiksa | Pesanan dinyatakan siap masuk tahap berikutnya. |
+| Perbarui harga | Saat ada penyesuaian yang sah | Harga barang dan total pesanan diperbarui. |
+| Perbarui resi | Saat nomor pengiriman sudah tersedia | Informasi resi tersimpan pada pesanan. |
+| Reset resi | Saat resi salah atau batal | Informasi resi dikosongkan untuk diperbaiki. |
+| Proses pengemasan | Saat barang siap dikemas | Pesanan bergerak menuju tahap pengiriman. |
+
+Kontrol penting:
+
+- Perubahan harga hanya dilakukan pada tahap pesanan yang memang masih dapat disesuaikan.
+- Status pesanan harus mengikuti kondisi barang yang sebenarnya.
+- Jangan mengubah status pembayaran secara manual tanpa memastikan bukti pembayaran.
+- Untuk pembayaran Virtual Account, lakukan pengecekan status sebelum memproses lebih lanjut.
+
+### 6. Mengelola Pembayaran dan Piutang
 
 #### Pembayaran
 
-1. Buka `/admin/payments`.
-2. Filter semua, confirmed, dan not confirmed.
-3. Buka detail payment.
-4. Cocokkan nominal, order, bank asal, bank tujuan, dan bukti bayar.
-5. Pilih konfirmasi berhasil bila valid.
-6. Pilih gagal/kurang bayar bila pembayaran tidak ditemukan atau nominal tidak sesuai.
+1. Buka menu pembayaran.
+2. Periksa pembayaran yang sudah terkonfirmasi dan yang belum terkonfirmasi.
+3. Buka detail pembayaran.
+4. Cocokkan nominal, pesanan, bank asal, bank tujuan, dan bukti pembayaran.
+5. Konfirmasi pembayaran jika semua data sesuai.
+6. Tandai gagal atau kurang bayar jika pembayaran tidak ditemukan atau nominal tidak sesuai.
 
-Dampak:
+Dampak proses pembayaran:
 
-- Konfirmasi berhasil mengubah payment status menjadi berhasil dikonfirmasi.
-- Gagal/kurang bayar mengubah payment status menjadi gagal dan order mengikuti model payment.
+- Pembayaran yang valid akan dinyatakan berhasil dikonfirmasi.
+- Pembayaran yang tidak sesuai akan ditolak atau perlu diperbaiki.
+- Status pesanan harus tetap konsisten dengan hasil pemeriksaan pembayaran.
 
 #### Piutang
 
-1. Buka `/admin/piutang`.
-2. Lihat daftar piutang.
-3. Verifikasi sesuai bukti pembayaran/settlement.
-4. Pastikan status order dan payment konsisten setelah verifikasi.
+1. Buka menu piutang.
+2. Periksa daftar piutang pelanggan.
+3. Cocokkan dengan bukti pembayaran atau penyelesaian tagihan.
+4. Pastikan status pesanan dan pembayaran sudah selaras.
 
-### 7. BRIVA
+### 7. Pembayaran Virtual Account
 
-1. Admin dapat membuka `/admin/briva-switch` untuk mengatur mode BRIVA bila role mengizinkan.
-2. Pada detail order, gunakan inquiry atau cek VA status untuk validasi pembayaran VA.
-3. Dalam mode local development, respons dapat disimulasikan oleh controller.
-4. Dalam mode live, controller menggunakan library BRIVA sesuai konfigurasi.
-
-Kontrol risiko:
-
-- Jangan memproses order dibatalkan sebagai paid.
-- Pastikan `order_number`, `customerNo/cusno`, dan nominal sesuai sebelum membuat payment.
+1. Gunakan menu pengaturan atau pemeriksaan Virtual Account sesuai hak akses.
+2. Pada detail pesanan, lakukan pengecekan status pembayaran bila diperlukan.
+3. Pastikan nomor pesanan, nomor pelanggan, dan nominal pembayaran sudah benar.
+4. Jangan memproses pesanan yang sudah dibatalkan sebagai pembayaran berhasil.
+5. Jika ada perbedaan data, koordinasikan dengan keuangan atau admin yang berwenang.
 
 ### 8. Pengiriman
 
-1. Buka `/admin/pengiriman`.
-2. Lihat data pengiriman.
-3. Buka detail berdasarkan TTB bila tersedia.
-4. Update informasi pengiriman sesuai resi/truk/tanggal.
+1. Buka menu pengiriman.
+2. Lihat data pesanan yang perlu dikirim.
+3. Buka detail pengiriman.
+4. Perbarui nomor resi, kendaraan, tanggal, atau informasi pengiriman lain jika tersedia.
+5. Pastikan data pengiriman sesuai kondisi lapangan.
 
-### 9. Salesman, Rating, dan Review
+### 9. Sales, Rating, dan Review
 
-Salesman:
+Sales:
 
-1. Buka menu salesman.
-2. Tambah, edit, atau hapus salesman sesuai data internal.
-3. Pastikan customer memiliki salesman yang valid bila dipakai dalam proses order.
+1. Buka menu sales.
+2. Tambah, ubah, atau hapus data sales sesuai kebutuhan internal.
+3. Pastikan pelanggan yang membutuhkan pendampingan memiliki sales yang tepat.
 
 Rating:
 
-1. Buka menu Rating Sales atau Nilai Rata-rata.
-2. Pantau rating order selesai.
-3. Gunakan data ini sebagai bahan evaluasi layanan, bukan klaim KPI sebelum baseline produksi ditetapkan.
+1. Buka menu rating atau penilaian.
+2. Pantau hasil penilaian dari pesanan yang sudah selesai.
+3. Gunakan data rating sebagai bahan evaluasi layanan.
 
 Review:
 
 1. Buka menu review pelanggan.
-2. Lihat review.
-3. Hapus review hanya bila melanggar kebijakan internal.
+2. Lihat ulasan yang masuk.
+3. Hapus ulasan hanya jika melanggar kebijakan internal.
 
-### 10. Chat dan Contact
+### 10. Chat dan Kontak Pelanggan
 
 Chat pelanggan:
 
-1. Buka `/admin/messages`.
-2. Pilih customer.
+1. Buka menu pesan pelanggan.
+2. Pilih pelanggan.
 3. Baca pesan masuk.
-4. Balas pesan.
-5. Pantau unread counter.
+4. Balas dengan bahasa yang jelas, sopan, dan membantu.
+5. Pantau pesan yang belum dibaca.
 
-Contact:
+Kontak:
 
-1. Buka `/admin/contacts`.
-2. Lihat pesan contact form.
-3. Reply jika modul reply dipakai.
-4. Pastikan status contact berubah dibaca/dibalas.
+1. Buka menu kontak.
+2. Lihat pesan dari formulir kontak.
+3. Tindak lanjuti jika diperlukan.
+4. Pastikan pesan penting tidak terlewat.
 
-### 11. Settings Toko dan Profil Admin
+### 11. Pengaturan Toko dan Profil Internal
 
-Settings toko:
+Pengaturan toko:
 
-1. Buka `/admin/settings`.
-2. Update nama toko, nomor telepon, email, tagline, deskripsi, alamat, minimum free shipping, dan shipping cost.
-3. Update bank pembayaran dalam format form bank yang tersedia.
-4. Simpan.
+1. Buka menu pengaturan toko.
+2. Perbarui nama toko, nomor telepon, email, tagline, deskripsi, alamat, ketentuan ongkir, dan rekening pembayaran.
+3. Simpan perubahan.
+4. Pastikan informasi toko yang tampil ke pelanggan sudah benar.
 
-Profil admin:
+Profil internal:
 
-1. Buka `/admin/settings/profile`.
-2. Update nama, email, password, dan foto profil.
-3. Simpan.
+1. Buka menu profil.
+2. Perbarui nama, email, password, atau foto profil jika diperlukan.
+3. Simpan perubahan.
 
-Catatan upload:
+## Alur Pesanan Dari Awal Sampai Selesai
 
-- Foto admin menerima `jpg`, `png`, `jpeg` dan batas ukuran sesuai controller.
+1. Pelanggan membuat akun atau dibuatkan akun oleh tim internal.
+2. Pelanggan masuk ke aplikasi.
+3. Pelanggan memilih produk.
+4. Pelanggan memasukkan produk ke keranjang.
+5. Pelanggan memilih pengiriman jika diperlukan.
+6. Pelanggan membuat pesanan dan menggunakan kupon jika tersedia.
+7. Pelanggan memilih metode pembayaran.
+8. Pesanan tercatat di aplikasi.
+9. Pelanggan membayar atau menunggu persetujuan kredit.
+10. Sales, admin, atau keuangan memeriksa pesanan dan pembayaran.
+11. Distribusi menyiapkan barang.
+12. Barang dikirim ke pelanggan.
+13. Pelanggan menerima barang.
+14. Pesanan diselesaikan.
+15. Pelanggan dapat memberi ulasan atau rating.
+16. Data pesanan, pembayaran, dan rating digunakan untuk pemantauan internal.
 
-## SOP Hulu ke Hilir Order
-
-### Alur Customer ke Admin
-
-1. Customer register atau dibuatkan admin.
-2. Customer login.
-3. Customer memilih produk.
-4. Customer memasukkan produk ke cart.
-5. Customer memilih ongkir bila diperlukan.
-6. Customer checkout dengan kupon jika ada.
-7. Customer memilih pembayaran kredit, VA, atau transfer bank.
-8. Sistem membuat order dan item order.
-9. Customer membayar atau menunggu proses kredit.
-10. Admin/sales/keuangan memverifikasi order dan payment.
-11. Distribusi memproses pengemasan dan pengiriman.
-12. Customer menerima barang.
-13. Order diselesaikan.
-14. Customer memberi review/rating bila tersedia.
-15. Laporan dan rating digunakan untuk monitoring internal.
-
-### Kontrol Mutu Operasional
+## Kontrol Mutu Operasional
 
 | Tahap | Kontrol |
 |---|---|
-| Registrasi | Email dan phone unik, status akun aktif |
-| Produk | Harga, stok, berat, satuan, gambar valid |
-| Cart | Item sesuai produk aktif dan stok |
-| Ongkir | Origin, destination, courier, weight valid |
-| Checkout | Total, discount, ongkir, delivery data valid |
-| Payment | Nominal, order id, bank, bukti bayar valid |
-| BRIVA | Status VA, order number, customer number, nominal valid |
-| Order Status | Perubahan status sesuai bukti fisik/order |
-| Pengiriman | Resi/TTB/tanggal/no truk terisi bila diperlukan |
-| Closing | Order selesai setelah barang diterima |
+| Pendaftaran | Email, nomor handphone, dan status akun harus benar. |
+| Produk | Harga, stok, berat, satuan, dan gambar harus sesuai. |
+| Keranjang | Produk, jumlah, dan total harus sesuai kebutuhan pelanggan. |
+| Ongkir | Alamat, kurir, berat, dan layanan pengiriman harus tepat. |
+| Pesanan | Total, potongan harga, ongkir, dan data pengiriman harus benar. |
+| Pembayaran | Nominal, pesanan, bank, dan bukti bayar harus cocok. |
+| Virtual Account | Nomor pembayaran, nomor pesanan, dan nominal harus sesuai. |
+| Status Pesanan | Setiap perubahan harus mengikuti bukti operasional. |
+| Pengiriman | Resi, tanggal, kendaraan, dan informasi kirim harus diisi bila diperlukan. |
+| Penyelesaian | Pesanan diselesaikan setelah barang diterima atau sesuai kebijakan perusahaan. |
 
-## Checklist Harian Admin
+## Checklist Harian Tim Internal
 
-| Aktivitas | Frekuensi | Owner |
+| Aktivitas | Frekuensi | Penanggung Jawab |
 |---|---|---|
-| Cek order baru | Harian dan saat jam operasional | Sales/Admin Online |
-| Cek payment belum konfirmasi | Harian | Keuangan |
-| Cek order BRIVA berjalan | Harian | Keuangan/Admin |
-| Cek order pengemasan/pengiriman | Harian | Distribusi |
-| Cek chat pelanggan | Harian | Admin Online/Sales |
-| Cek produk stok/harga kosong | Harian/Mingguan | Admin Produk |
-| Cek laporan dan rating | Mingguan/Bulanan | Manajemen/Kadep |
+| Cek pesanan baru | Harian dan selama jam operasional | Sales atau Admin Online |
+| Cek pembayaran yang belum dikonfirmasi | Harian | Keuangan |
+| Cek pembayaran Virtual Account berjalan | Harian | Keuangan atau Admin |
+| Cek pesanan yang dikemas atau dikirim | Harian | Distribusi |
+| Cek chat pelanggan | Harian | Admin Online atau Sales |
+| Cek produk dengan stok atau harga kosong | Harian atau mingguan | Admin Produk |
+| Cek laporan dan rating | Mingguan atau bulanan | Manajemen |
 
-## Troubleshooting Singkat
+## Panduan Menghadapi Kendala
 
-| Masalah | Pemeriksaan Awal | Tindakan |
+| Kendala | Pemeriksaan Awal | Tindakan |
 |---|---|---|
-| Customer tidak bisa login | Status user, email, password | Aktifkan user atau reset password |
-| Customer tidak bisa checkout | Cart, transaksi BRIVA aktif, data produk, limit kredit | Selesaikan/batalkan transaksi aktif, koreksi produk, cek limit |
-| Ongkir tidak tampil | Origin/destination/courier/weight, API key | Validasi alamat dan credential |
-| Payment transfer belum masuk admin | Row `payments`, order_id, payment_status | Minta customer submit ulang bila data tidak ada |
-| VA tidak berubah paid | `briva_api`, mode local/live, response BRI | Jalankan inquiry/cek status dan validasi credential |
-| Order tidak bisa update harga | Status order | Pastikan status 1, 9, atau 11 |
-| Menu admin tidak tampil | Role user | Sesuaikan role dengan kebutuhan akses |
+| Pelanggan tidak bisa masuk akun | Cek status akun, email, dan password. | Aktifkan akun jika memang sah atau bantu reset password sesuai kebijakan. |
+| Pelanggan tidak bisa membuat pesanan | Cek keranjang, pembayaran yang masih berjalan, data produk, dan batas kredit. | Selesaikan atau batalkan transaksi lama, koreksi data produk, atau cek batas kredit. |
+| Ongkir tidak muncul | Cek alamat asal, alamat tujuan, kurir, dan berat barang. | Lengkapi alamat dan pastikan data pengiriman benar. |
+| Pembayaran transfer belum terlihat | Cek apakah konfirmasi pembayaran sudah dikirim. | Minta pelanggan mengirim ulang konfirmasi jika data belum masuk. |
+| Virtual Account belum berubah menjadi lunas | Cek nomor pembayaran, nominal, dan status pembayaran. | Lakukan pengecekan ulang dan koordinasikan dengan keuangan. |
+| Harga pesanan tidak bisa diubah | Cek tahap pesanan. | Pastikan pesanan masih berada pada tahap yang boleh disesuaikan. |
+| Menu internal tidak muncul | Cek hak akses pengguna. | Sesuaikan hak akses sesuai tugas dan persetujuan perusahaan. |
+
+## Etika Komunikasi Dengan Pelanggan
+
+- Gunakan bahasa yang sopan, jelas, dan membantu.
+- Hindari istilah internal yang tidak perlu diketahui pelanggan.
+- Jangan menjanjikan sesuatu sebelum data pesanan, stok, pembayaran, atau pengiriman terverifikasi.
+- Jika perlu waktu pemeriksaan, sampaikan bahwa tim sedang melakukan pengecekan.
+- Pastikan setiap jawaban mengarah pada solusi yang bisa ditindaklanjuti.
 
 ## Batasan Dokumen
 
-- Dokumen ini tidak menyatakan persentase kesiapan modul.
-- Dokumen ini tidak mengklaim KPI bisnis lapangan.
-- Hasil akhir operasional tetap harus dibuktikan melalui test evidence, database snapshot, screenshot, atau response JSON.
+- Dokumen ini adalah panduan penggunaan umum, bukan dokumen teknis pengembangan aplikasi.
+- Dokumen ini tidak mencantumkan rincian teknis internal aplikasi.
+- Dokumen ini tidak menyatakan angka keberhasilan bisnis, omzet, kepuasan pelanggan, atau target lain tanpa data resmi.
+- Kebijakan operasional dapat diperbarui sesuai keputusan perusahaan.
+- Jika ada perbedaan antara dokumen ini dan kebijakan resmi terbaru, gunakan kebijakan resmi terbaru sebagai acuan.

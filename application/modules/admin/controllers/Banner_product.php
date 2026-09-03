@@ -20,6 +20,8 @@ class Banner_product extends CI_Controller {
         $params['title'] = 'Kelola Banner Produk '. get_store_name();
 
         $products['banners'] = $this->product->get_all_banner();
+        $products['flash'] = $this->session->flashdata('banner_product_flash');
+        $products['error'] = $this->session->flashdata('banner_product_error');
 
         $this->load->view('header', $params);
         $this->load->view('products/banner_product', $products);
@@ -80,6 +82,10 @@ class Banner_product extends CI_Controller {
         $product['flash'] = $this->session->flashdata('add_new_product_flash');
         $product['error'] = $this->session->flashdata('add_new_product_error');
         $product['products'] = $this->product->get_list_products();
+        $product['categories'] = $this->product->get_all_categories();
+        $product['active_banner_count'] = $this->product->count_active_banner_products();
+        $product['is_edit'] = FALSE;
+        $product['banner'] = NULL;
 
         $this->load->view('header', $params);
         $this->load->view('products/add_new_banner_product', $product);
@@ -88,29 +94,22 @@ class Banner_product extends CI_Controller {
 
     public function add_banner_product()
     {
-        $product_id = $this->input->post('product_id');
-
-        if (empty($product_id) || ! is_numeric($product_id) || ! $this->product->is_product_exist($product_id))
+        if ( ! $this->product->is_banner_product_flexible_ready())
         {
-            $this->session->set_flashdata('add_new_product_error', 'Pilih produk yang valid untuk banner.');
+            $this->session->set_flashdata('add_new_product_error', 'Struktur database banner belum diperbarui. Jalankan SQL alter table terlebih dahulu.');
             redirect('admin/banner_product/add_new_banner_product');
         }
 
-        $config['upload_path'] = './assets/uploads/banner_product/';
-        $config['allowed_types'] = 'jpg|png|jpeg';
-        $config['max_size'] = 2048;
-        $config['encrypt_name'] = TRUE;
+        $error = '';
+        $banner = $this->_banner_payload_from_post($error);
 
-        if ( ! is_dir($config['upload_path']))
+        if ($banner === FALSE)
         {
-            mkdir($config['upload_path'], 0755, TRUE);
-        }
-
-        if ( ! is_dir($config['upload_path']) || ! is_writable($config['upload_path']))
-        {
-            $this->session->set_flashdata('add_new_product_error', 'Folder upload banner tidak dapat ditulis.');
+            $this->session->set_flashdata('add_new_product_error', $error);
             redirect('admin/banner_product/add_new_banner_product');
         }
+
+        $config = $this->_banner_upload_config();
 
         $this->load->library('upload', $config);
 
@@ -129,10 +128,9 @@ class Banner_product extends CI_Controller {
         $upload_data = $this->upload->data();
         $file_name = $upload_data['file_name'];
 
-        $product['product_id'] = $product_id;
-        $product['banner_image'] = $file_name;
+        $banner['banner_image'] = $file_name;
 
-        if ( ! $this->product->add_new_banner_product($product))
+        if ( ! $this->product->add_new_banner_product($banner))
         {
             $file = $config['upload_path'] . $file_name;
 
@@ -148,6 +146,276 @@ class Banner_product extends CI_Controller {
         $this->session->set_flashdata('add_new_product_flash', 'Banner produk baru berhasil ditambahkan!');
 
         redirect('admin/banner_product/add_new_banner_product');
+    }
+
+    public function edit_banner_product($id = 0)
+    {
+        $banner = $this->product->banner_data($id);
+
+        if ( ! $banner)
+        {
+            show_404();
+        }
+
+        $params['title'] = 'Ubah Banner Produk';
+
+        $product['flash'] = $this->session->flashdata('edit_banner_product_flash');
+        $product['error'] = $this->session->flashdata('edit_banner_product_error');
+        $product['products'] = $this->product->get_list_products();
+        $product['categories'] = $this->product->get_all_categories();
+        $product['active_banner_count'] = $this->product->count_active_banner_products($id);
+        $product['is_edit'] = TRUE;
+        $product['banner'] = $banner;
+
+        $this->load->view('header', $params);
+        $this->load->view('products/add_new_banner_product', $product);
+        $this->load->view('footer');
+    }
+
+    public function update_banner_product()
+    {
+        $id = $this->input->post('id');
+        $current = $this->product->banner_data($id);
+
+        if ( ! $current)
+        {
+            show_404();
+        }
+
+        if ( ! $this->product->is_banner_product_flexible_ready())
+        {
+            $this->session->set_flashdata('edit_banner_product_error', 'Struktur database banner belum diperbarui. Jalankan SQL alter table terlebih dahulu.');
+            redirect('admin/banner_product/edit_banner_product/'. $id);
+        }
+
+        $error = '';
+        $banner = $this->_banner_payload_from_post($error);
+
+        if ($banner === FALSE)
+        {
+            $this->session->set_flashdata('edit_banner_product_error', $error);
+            redirect('admin/banner_product/edit_banner_product/'. $id);
+        }
+
+        $new_file = NULL;
+
+        if (isset($_FILES['picture']) && $_FILES['picture']['error'] != UPLOAD_ERR_NO_FILE)
+        {
+            $config = $this->_banner_upload_config();
+            $this->load->library('upload', $config);
+
+            if ($_FILES['picture']['error'] != UPLOAD_ERR_OK)
+            {
+                $this->session->set_flashdata('edit_banner_product_error', $this->_upload_error_message($_FILES['picture']['error']));
+                redirect('admin/banner_product/edit_banner_product/'. $id);
+            }
+
+            if ( ! $this->upload->do_upload('picture'))
+            {
+                $this->session->set_flashdata('edit_banner_product_error', strip_tags($this->upload->display_errors()));
+                redirect('admin/banner_product/edit_banner_product/'. $id);
+            }
+
+            $upload_data = $this->upload->data();
+            $new_file = $upload_data['file_name'];
+            $banner['banner_image'] = $new_file;
+        }
+
+        if ( ! $this->product->edit_banner_product($id, $banner))
+        {
+            if ($new_file)
+            {
+                $this->_delete_banner_file($new_file);
+            }
+
+            $this->session->set_flashdata('edit_banner_product_error', 'Banner gagal diperbarui.');
+            redirect('admin/banner_product/edit_banner_product/'. $id);
+        }
+
+        if ($new_file && ! empty($current->banner_image) && $current->banner_image !== $new_file)
+        {
+            $this->_delete_banner_file($current->banner_image);
+        }
+
+        $this->session->set_flashdata('banner_product_flash', 'Banner produk berhasil diperbarui!');
+        redirect('admin/banner_product');
+    }
+
+    public function update_display_settings()
+    {
+        if ( ! $this->product->is_banner_product_flexible_ready())
+        {
+            $this->session->set_flashdata('banner_product_error', 'Struktur database banner belum diperbarui. Jalankan SQL alter table terlebih dahulu.');
+            redirect('admin/banner_product');
+        }
+
+        $orders = $this->input->post('display_order');
+        $active_ids = $this->input->post('is_active');
+
+        if ( ! is_array($orders))
+        {
+            $this->session->set_flashdata('banner_product_error', 'Tidak ada setting urutan banner yang dikirim.');
+            redirect('admin/banner_product');
+        }
+
+        $active_ids = is_array($active_ids) ? array_map('intval', $active_ids) : array();
+        $active_ids = array_values(array_unique($active_ids));
+
+        if (count($active_ids) > 3)
+        {
+            $this->session->set_flashdata('banner_product_error', 'Maksimal hanya 3 banner yang boleh aktif tampil.');
+            redirect('admin/banner_product');
+        }
+
+        $settings = array();
+
+        foreach ($orders as $id => $order)
+        {
+            $id = (int) $id;
+
+            if ($id < 1 || ! $this->product->banner_data($id))
+            {
+                continue;
+            }
+
+            $settings[$id] = array(
+                'display_order' => max(1, (int) $order),
+                'is_active' => in_array($id, $active_ids, TRUE) ? 1 : 0
+            );
+        }
+
+        if (empty($settings) || ! $this->product->update_banner_display_settings($settings))
+        {
+            $this->session->set_flashdata('banner_product_error', 'Setting tampilan banner gagal disimpan.');
+            redirect('admin/banner_product');
+        }
+
+        $this->session->set_flashdata('banner_product_flash', 'Setting urutan dan banner aktif berhasil disimpan.');
+        redirect('admin/banner_product');
+    }
+
+    private function _banner_upload_config()
+    {
+        $config['upload_path'] = './assets/uploads/banner_product/';
+        $config['allowed_types'] = 'jpg|png|jpeg';
+        $config['max_size'] = 2048;
+        $config['encrypt_name'] = TRUE;
+
+        if ( ! is_dir($config['upload_path']))
+        {
+            mkdir($config['upload_path'], 0755, TRUE);
+        }
+
+        if ( ! is_dir($config['upload_path']) || ! is_writable($config['upload_path']))
+        {
+            $this->session->set_flashdata('add_new_product_error', 'Folder upload banner tidak dapat ditulis.');
+            redirect('admin/banner_product/add_new_banner_product');
+        }
+
+        return $config;
+    }
+
+    private function _banner_payload_from_post(&$error)
+    {
+        $title = trim((string) $this->input->post('banner_title', TRUE));
+        $redirect_type = trim((string) $this->input->post('redirect_type', TRUE));
+        $product_id = trim((string) $this->input->post('product_id', TRUE));
+        $category_id = trim((string) $this->input->post('redirect_category_id', TRUE));
+        $redirect_url = trim((string) $this->input->post('redirect_url', TRUE));
+        $display_order = trim((string) $this->input->post('display_order', TRUE));
+        $is_active = $this->input->post('is_active') ? 1 : 0;
+        $id = $this->input->post('id');
+        $id = $id !== NULL && is_numeric($id) ? (int) $id : NULL;
+
+        if ($title === '')
+        {
+            $error = 'Title banner wajib diisi manual.';
+            return FALSE;
+        }
+
+        if ( ! in_array($redirect_type, array('product', 'category', 'custom'), TRUE))
+        {
+            $error = 'Tipe redirect banner tidak valid.';
+            return FALSE;
+        }
+
+        $banner = array(
+            'banner_title' => $title,
+            'redirect_type' => $redirect_type,
+            'product_id' => 0,
+            'redirect_product_id' => NULL,
+            'redirect_category_id' => NULL,
+            'redirect_url' => NULL,
+            'display_order' => $display_order !== '' && is_numeric($display_order) ? max(1, (int) $display_order) : $this->product->get_next_banner_display_order(),
+            'is_active' => $is_active
+        );
+
+        if ($is_active && $this->product->count_active_banner_products($id) >= 3)
+        {
+            $error = 'Maksimal hanya 3 banner yang boleh aktif tampil. Nonaktifkan salah satu banner lain terlebih dahulu.';
+            return FALSE;
+        }
+
+        if ($redirect_type === 'product')
+        {
+            if ($product_id === '' || ! is_numeric($product_id) || ! $this->product->is_product_exist($product_id))
+            {
+                $error = 'Pilih produk yang valid untuk redirect banner.';
+                return FALSE;
+            }
+
+            $banner['product_id'] = (int) $product_id;
+            $banner['redirect_product_id'] = (int) $product_id;
+            return $banner;
+        }
+
+        if ($redirect_type === 'category')
+        {
+            if ($category_id === '' || ! is_numeric($category_id) || ! $this->product->is_category_exist($category_id))
+            {
+                $error = 'Pilih kategori yang valid untuk redirect banner.';
+                return FALSE;
+            }
+
+            $banner['redirect_category_id'] = (int) $category_id;
+            return $banner;
+        }
+
+        if ($redirect_url === '' || strlen($redirect_url) > 255 || preg_match('/[\x00-\x1F\x7F]/', $redirect_url))
+        {
+            $error = 'URL redirect wajib diisi dan maksimal 255 karakter.';
+            return FALSE;
+        }
+
+        if (preg_match('/^(javascript|data|vbscript):/i', $redirect_url) || preg_match('/^\/\//', $redirect_url))
+        {
+            $error = 'URL redirect tidak aman.';
+            return FALSE;
+        }
+
+        if (preg_match('/^[a-z][a-z0-9+\-.]*:\/\//i', $redirect_url))
+        {
+            $scheme = strtolower(parse_url($redirect_url, PHP_URL_SCHEME));
+
+            if ( ! in_array($scheme, array('http', 'https'), TRUE) || ! filter_var($redirect_url, FILTER_VALIDATE_URL))
+            {
+                $error = 'URL eksternal harus memakai format http atau https yang valid.';
+                return FALSE;
+            }
+        }
+
+        $banner['redirect_url'] = $redirect_url;
+        return $banner;
+    }
+
+    private function _delete_banner_file($file_name)
+    {
+        $file = './assets/uploads/banner_product/' . basename($file_name);
+
+        if (is_file($file) && is_readable($file))
+        {
+            unlink($file);
+        }
     }
 
     private function _upload_error_message($error_code)
@@ -176,6 +444,7 @@ class Banner_product extends CI_Controller {
     public function delete($id) 
     {    
         $this->product->delete_banner_product($id);
+        $this->session->set_flashdata('banner_product_flash', 'Banner produk berhasil dihapus.');
         
         redirect('admin/banner_product');
     }

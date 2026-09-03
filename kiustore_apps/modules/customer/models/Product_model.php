@@ -295,23 +295,98 @@ class Product_model extends CI_Model
 
     public function get_all_banner()
     {
-        $data = $this->db->query("
-            SELECT
-                a.id AS banner_id,
-                a.product_id,
-                a.banner_image,
-                a.created_at,
-                b.id,
-                b.sku,
-                b.name
-            FROM banner_product a
-            LEFT JOIN products b
-                ON b.id = a.product_id
-            WHERE a.banner_image IS NOT NULL
-                AND a.banner_image != ''
-            ORDER BY a.id DESC
-        ")->result();
+        $select = "
+            a.id AS banner_id,
+            a.product_id,
+            a.banner_image,
+            a.created_at,
+            b.id,
+            b.sku,
+            b.name";
+
+        $select .= $this->db->field_exists('banner_title', 'banner_product') ? ", a.banner_title" : ", NULL AS banner_title";
+        $select .= $this->db->field_exists('redirect_type', 'banner_product') ? ", a.redirect_type" : ", 'product' AS redirect_type";
+        $select .= $this->db->field_exists('redirect_product_id', 'banner_product') ? ", a.redirect_product_id" : ", a.product_id AS redirect_product_id";
+        $select .= $this->db->field_exists('redirect_category_id', 'banner_product') ? ", a.redirect_category_id" : ", NULL AS redirect_category_id";
+        $select .= $this->db->field_exists('redirect_url', 'banner_product') ? ", a.redirect_url" : ", NULL AS redirect_url";
+        $select .= $this->db->field_exists('display_order', 'banner_product') ? ", a.display_order" : ", a.id AS display_order";
+        $select .= $this->db->field_exists('is_active', 'banner_product') ? ", a.is_active" : ", 1 AS is_active";
+        $select .= $this->db->field_exists('redirect_category_id', 'banner_product') ? ", c.name AS redirect_category_name" : ", NULL AS redirect_category_name";
+
+        $this->db->select($select, FALSE)
+            ->from('banner_product a')
+            ->join('products b', 'b.id = a.product_id', 'left');
+
+        if ($this->db->field_exists('redirect_category_id', 'banner_product'))
+        {
+            $this->db->join('product_category c', 'c.id = a.redirect_category_id', 'left');
+        }
+
+        $this->db
+            ->where('a.banner_image IS NOT NULL', NULL, FALSE)
+            ->where('a.banner_image !=', '')
+            ->limit(3);
+
+        if ($this->db->field_exists('is_active', 'banner_product'))
+        {
+            $this->db->where('a.is_active', 1);
+        }
+
+        if ($this->db->field_exists('display_order', 'banner_product'))
+        {
+            $this->db->order_by('a.display_order', 'ASC');
+        }
+
+        $data = $this->db
+            ->order_by('a.id', 'DESC')
+            ->get()
+            ->result();
+
+        foreach ($data as $banner)
+        {
+            $this->_hydrate_banner_redirect($banner);
+        }
+
         return $data;
+    }
+
+    private function _hydrate_banner_redirect($banner)
+    {
+        $banner->banner_title = ! empty($banner->banner_title) ? $banner->banner_title : (! empty($banner->name) ? $banner->name : 'Promo Produk');
+        $redirect_type = ! empty($banner->redirect_type) ? $banner->redirect_type : 'product';
+
+        if ($redirect_type === 'category' && ! empty($banner->redirect_category_id))
+        {
+            $category_name = ! empty($banner->redirect_category_name) ? $banner->redirect_category_name : 'kategori';
+            $banner->target_url = site_url('category/' . $banner->redirect_category_id . '/' . rawurlencode($category_name) . '/');
+            return;
+        }
+
+        if ($redirect_type === 'custom' && ! empty($banner->redirect_url))
+        {
+            $banner->target_url = $this->_normalize_banner_custom_url($banner->redirect_url);
+            return;
+        }
+
+        if ( ! empty($banner->id) && ! empty($banner->sku))
+        {
+            $banner->target_url = site_url('product/' . $banner->id . '/' . $banner->sku . '/');
+            return;
+        }
+
+        $banner->target_url = site_url('category');
+    }
+
+    private function _normalize_banner_custom_url($url)
+    {
+        $url = trim($url);
+
+        if (preg_match('/^https?:\/\//i', $url))
+        {
+            return $url;
+        }
+
+        return site_url(ltrim($url, '/'));
     }
 
     public function getweight($id)

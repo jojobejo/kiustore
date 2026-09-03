@@ -353,20 +353,48 @@ class Mobile_api_model extends CI_Model
             return $this->fallback_banners();
         }
 
-        $rows = $this->db->query("
-            SELECT
-                a.id AS banner_id,
-                a.product_id,
-                a.banner_image,
-                b.id,
-                b.sku,
-                b.name
-            FROM banner_product a
-            LEFT JOIN products b ON b.id = a.product_id
-            WHERE a.banner_image IS NOT NULL
-                AND a.banner_image != ''
-            ORDER BY a.id DESC
-        ")->result_array();
+        $select = "
+            a.id AS banner_id,
+            a.product_id,
+            a.banner_image,
+            b.id,
+            b.sku,
+            b.name";
+
+        $select .= $this->db->field_exists('banner_title', 'banner_product') ? ", a.banner_title" : ", NULL AS banner_title";
+        $select .= $this->db->field_exists('redirect_type', 'banner_product') ? ", a.redirect_type" : ", 'product' AS redirect_type";
+        $select .= $this->db->field_exists('redirect_product_id', 'banner_product') ? ", a.redirect_product_id" : ", a.product_id AS redirect_product_id";
+        $select .= $this->db->field_exists('redirect_category_id', 'banner_product') ? ", a.redirect_category_id" : ", NULL AS redirect_category_id";
+        $select .= $this->db->field_exists('redirect_url', 'banner_product') ? ", a.redirect_url" : ", NULL AS redirect_url";
+        $select .= $this->db->field_exists('display_order', 'banner_product') ? ", a.display_order" : ", a.id AS display_order";
+        $select .= $this->db->field_exists('is_active', 'banner_product') ? ", a.is_active" : ", 1 AS is_active";
+        $select .= $this->db->field_exists('redirect_category_id', 'banner_product') ? ", c.name AS redirect_category_name" : ", NULL AS redirect_category_name";
+
+        $this->db->select($select, false)
+            ->from('banner_product a')
+            ->join('products b', 'b.id = a.product_id', 'left');
+
+        if ($this->db->field_exists('redirect_category_id', 'banner_product')) {
+            $this->db->join('product_category c', 'c.id = a.redirect_category_id', 'left');
+        }
+
+        $this->db
+            ->where('a.banner_image IS NOT NULL', null, false)
+            ->where('a.banner_image !=', '')
+            ->limit(3);
+
+        if ($this->db->field_exists('is_active', 'banner_product')) {
+            $this->db->where('a.is_active', 1);
+        }
+
+        if ($this->db->field_exists('display_order', 'banner_product')) {
+            $this->db->order_by('a.display_order', 'ASC');
+        }
+
+        $rows = $this->db
+            ->order_by('a.id', 'DESC')
+            ->get()
+            ->result_array();
 
         if (empty($rows)) {
             return $this->fallback_banners();
@@ -374,19 +402,57 @@ class Mobile_api_model extends CI_Model
 
         $banners = array();
         foreach ($rows as $row) {
-            $title = isset($row['name']) && $row['name'] !== '' ? $row['name'] : 'Promo Produk';
+            $title = isset($row['banner_title']) && $row['banner_title'] !== '' ? $row['banner_title'] : (isset($row['name']) && $row['name'] !== '' ? $row['name'] : 'Promo Produk');
+            $target_url = $this->banner_target_url($row);
             $banners[] = array(
                 'id' => (int) $row['banner_id'],
                 'product_id' => isset($row['product_id']) ? (int) $row['product_id'] : null,
+                'category_id' => isset($row['redirect_category_id']) && $row['redirect_category_id'] !== null ? (int) $row['redirect_category_id'] : null,
                 'title' => $title,
                 'subtitle' => 'Lihat promo terbaru',
                 'image_name' => null,
                 'image_url' => base_url('assets/uploads/banner_product/' . $row['banner_image']),
+                'redirect_type' => isset($row['redirect_type']) && $row['redirect_type'] !== '' ? $row['redirect_type'] : 'product',
+                'redirect_url' => isset($row['redirect_url']) ? $row['redirect_url'] : null,
+                'target_url' => $target_url,
+                'display_order' => isset($row['display_order']) ? (int) $row['display_order'] : (int) $row['banner_id'],
+                'is_active' => isset($row['is_active']) ? (bool) $row['is_active'] : true,
                 'color_hex' => '#2F65D4'
             );
         }
 
         return $banners;
+    }
+
+    private function banner_target_url(array $row)
+    {
+        $redirect_type = isset($row['redirect_type']) && $row['redirect_type'] !== '' ? $row['redirect_type'] : 'product';
+
+        if ($redirect_type === 'category' && ! empty($row['redirect_category_id'])) {
+            $category_name = ! empty($row['redirect_category_name']) ? $row['redirect_category_name'] : 'kategori';
+            return site_url('category/' . $row['redirect_category_id'] . '/' . rawurlencode($category_name) . '/');
+        }
+
+        if ($redirect_type === 'custom' && ! empty($row['redirect_url'])) {
+            return $this->normalize_banner_custom_url($row['redirect_url']);
+        }
+
+        if (! empty($row['id']) && ! empty($row['sku'])) {
+            return site_url('product/' . $row['id'] . '/' . $row['sku'] . '/');
+        }
+
+        return site_url('category');
+    }
+
+    private function normalize_banner_custom_url($url)
+    {
+        $url = trim($url);
+
+        if (preg_match('/^https?:\/\//i', $url)) {
+            return $url;
+        }
+
+        return site_url(ltrim($url, '/'));
     }
 
     public function products($level, $filters, $page, $per_page)
