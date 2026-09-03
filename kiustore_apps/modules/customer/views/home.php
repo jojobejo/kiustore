@@ -14,6 +14,23 @@ if (!function_exists('format_customer_price_text')) {
     return 'Rp ' . $formatted_price;
   }
 }
+
+if (!function_exists('get_product_image_url')) {
+  function get_product_image_url($picture_name)
+  {
+    $picture_name = trim((string) $picture_name);
+
+    if ($picture_name !== '' && is_file(FCPATH . 'assets/uploads/products/' . $picture_name)) {
+      return base_url('assets/uploads/products/' . rawurlencode($picture_name));
+    }
+
+    if (is_file(FCPATH . 'assets/uploads/products/default.jpg')) {
+      return base_url('assets/uploads/products/default.jpg');
+    }
+
+    return base_url('assets/themes/fastkart/images/product/1.png');
+  }
+}
 ?>
 <!-- Main Start -->
 <main class="main-wrap index-page mb-xxl pt-2">
